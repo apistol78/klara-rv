@@ -1,0 +1,2121 @@
+--[[
+ TRAKTOR
+ Copyright (c) 2023 Anders Pistol.
+
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+]]
+
+local insttype = {
+	ARITHMETIC = "ARITHMETIC",
+	SHIFT = "SHIFT",
+	COMPARE = "COMPARE",
+	JUMP = "JUMP",
+	JUMP_CONDITIONAL = "JUMP_CONDITIONAL",
+	MEMORY = "MEMORY",
+	COMPLEX = "COMPLEX",
+	FPU = "FPU",
+	FPU_MEMORY = "FPU_MEMORY",
+}
+
+local operations = {
+	SIGNED_ADD = "`OP_SIGNED_ADD",
+	UNSIGNED_ADD = "`OP_UNSIGNED_ADD",
+	SIGNED_SUB = "`OP_SIGNED_SUB",
+	AND = "`OP_AND",
+	OR = "`OP_OR",
+	XOR = "`OP_XOR",
+	SHIFT_LEFT = "`OP_SHIFT_LEFT",
+	SHIFT_RIGHT = "`OP_SHIFT_RIGHT",
+	ARITHMETIC_SHIFT_RIGHT = "`OP_ARITHMETIC_SHIFT_RIGHT",
+	SIGNED_LESS_THAN = "`OP_SIGNED_LESS_THAN",
+	UNSIGNED_LESS_THAN = "`OP_UNSIGNED_LESS_THAN",
+	EQUAL = "`OP_EQUAL",
+	NOT_EQUAL = "`OP_NOT_EQUAL",
+	SIGNED_GREATER_EQUAL = "`OP_SIGNED_GREATER_EQUAL",
+	UNSIGNED_GREATER_EQUAL = "`OP_UNSIGNED_GREATER_EQUAL",
+}
+
+local fpu_operations = {
+	ADD = "`FPU_OP_ADD",
+	SUB = "`FPU_OP_SUB",
+	MUL = "`FPU_OP_MUL",
+	DIV = "`FPU_OP_DIV",
+	MADD = "`FPU_OP_MADD",
+	MSUB = "`FPU_OP_MSUB",
+	NMADD = "`FPU_OP_NMADD",
+	NMSUB = "`FPU_OP_NMSUB",
+	F2I = "`FPU_OP_F2I",
+	F2UI = "`FPU_OP_F2UI",
+	I2F = "`FPU_OP_I2F",
+	UI2F = "`FPU_OP_UI2F",
+	MOV = "`FPU_OP_MOV",
+	CMP_EQUAL = "`FPU_OP_CMP_EQUAL",
+	CMP_LESS = "`FPU_OP_CMP_LESS",
+	CMP_LEQUAL = "`FPU_OP_CMP_LEQUAL",
+	SGNJ = "`FPU_OP_SGNJ",
+	SGNJN = "`FPU_OP_SGNJN",
+	SGNJX = "`FPU_OP_SGNJX",
+	MIN = "`FPU_OP_MIN",
+	MAX = "`FPU_OP_MAX",
+}
+
+local operands = {
+	RS1 = "`RS1",
+	RS2 = "`RS2",
+	IMM = "`IMM",
+	PC = "`PC",
+	ZERO = "`ZERO"
+}
+
+local instructions = {
+	{
+		mask = 0xfe00707f,
+		data = 0x00000033,
+		name = "ADD",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = R_s(f.rs1) + R_s(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00000013,
+		name = "ADDI",
+		format = "I",
+		type = insttype.ARITHMETIC,
+        cpp = [[
+			const auto f = FormatI::parse(word);
+			R_s(f.rd) = R_s(f.rs1) + f.imm;
+        ]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x0000001b,
+		name = "ADDIW",
+		format = "I"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0000003b,
+		name = "ADDW",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x0000302f,
+		name = "AMOADD.D",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x0000202f,
+		name = "AMOADD.W",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x6000302f,
+		name = "AMOAND.D",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x6000202f,
+		name = "AMOAND.W",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0xe000302f,
+		name = "AMOMAXU.D",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0xe000202f,
+		name = "AMOMAXU.W",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x4000302f,
+		name = "AMOOR.D",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x4000202f,
+		name = "AMOOR.W",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x0800302f,
+		name = "AMOSWAP.D",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x0800202f,
+		name = "AMOSWAP.W",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x00007033,
+		name = "AND",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) & R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.AND,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00007013,
+		name = "ANDI",
+		format = "I",
+ 		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_u(f.rd) = R_u(f.rs1) & f.imm;
+        ]],
+		verilog_alu = {
+			operation = operations.AND,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0x0000007f,
+		data = 0x00000017,
+		name = "AUIPC",
+		format = "U",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatU::parse(word);
+			R_u(f.rd) = PC + f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.PC,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00000063,
+		name = "BEQ",
+		format = "B",
+		type = insttype.JUMP_CONDITIONAL,
+		cpp = [[
+			const auto f = FormatB::parse(word);
+			if (R_s(f.rs1) == R_s(f.rs2))
+				PC_NEXT = PC + f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.EQUAL,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00005063,
+		name = "BGE",
+		format = "B",
+		type = insttype.JUMP_CONDITIONAL,
+		cpp = [[
+			const auto f = FormatB::parse(word);
+			if (R_s(f.rs1) >= R_s(f.rs2))
+				PC_NEXT = PC + f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_GREATER_EQUAL,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00007063,
+		name = "BGEU",
+		format = "B",
+		type = insttype.JUMP_CONDITIONAL,
+		cpp = [[
+			const auto f = FormatB::parse(word);
+			if (R_u(f.rs1) >= R_u(f.rs2))
+				PC_NEXT = PC + f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_GREATER_EQUAL,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00004063,
+		name = "BLT",
+		format = "B",
+		type = insttype.JUMP_CONDITIONAL,
+		cpp = [[
+			const auto f = FormatB::parse(word);
+			if (R_s(f.rs1) < R_s(f.rs2))
+				PC_NEXT = PC + f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_LESS_THAN,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00006063,
+		name = "BLTU",
+		format = "B",
+		type = insttype.JUMP_CONDITIONAL,
+		cpp = [[
+			const auto f = FormatB::parse(word);
+			if (R_u(f.rs1) < R_u(f.rs2))
+				PC_NEXT = PC + f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_LESS_THAN,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00001063,
+		name = "BNE",
+		format = "B",
+		type = insttype.JUMP_CONDITIONAL,
+		cpp = [[
+			const auto f = FormatB::parse(word);
+			if (R_s(f.rs1) != R_s(f.rs2))
+				PC_NEXT = PC + f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.NOT_EQUAL,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00003073,
+		name = "CSRRC",
+		format = "CSR",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatCSR::parse(word);
+			const uint32_t data = readCSR(f.csr);
+			const uint32_t tmp = R_u(f.rs1);
+			R_u(f.rd) = data;
+			writeCSR(f.csr, R_u(f.rd) & ~tmp);
+		]],
+		verilog_text = [[
+			`RD <= i_csr_rdata;
+			o_csr_wdata <= i_csr_rdata & ~`RS1;
+			o_csr_wdata_wr <= 1;
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00007073,
+		name = "CSRRCI",
+		format = "CSR",
+		type = insttype.COMPLEX,
+		cpp = [[
+			log::info << L"CSRRCI" << Endl;
+		]]
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00002073,
+		name = "CSRRS",
+		format = "CSR",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatCSR::parse(word);
+			const uint32_t data = readCSR(f.csr);
+			const uint32_t tmp = R_u(f.rs1);
+			R_u(f.rd) = data;
+			writeCSR(f.csr, R_u(f.rd) | tmp);
+		]],
+		verilog_text = [[
+			`RD <= i_csr_rdata;
+			o_csr_wdata <= i_csr_rdata | `RS1;
+			o_csr_wdata_wr <= 1;
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00006073,
+		name = "CSRRSI",
+		format = "CSR",
+		type = insttype.COMPLEX,
+		cpp = [[
+			log::info << L"CSRRSI" << Endl;
+		]]
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00001073,
+		name = "CSRRW",
+		format = "CSR",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatCSR::parse(word);
+			R_s(f.rd) = readCSR(f.csr);
+			writeCSR(f.csr, R_s(f.rs1));
+		]],
+		verilog_text = [[
+			`RD <= i_csr_rdata;
+			o_csr_wdata <= `RS1;
+			o_csr_wdata_wr <= 1;
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00005073,
+		name = "CSRRWI",
+		format = "CSR",
+		cpp = [[
+			log::info << L"CSRRWI" << Endl;
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x02004033,
+		name = "DIV",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const int32_t dividend = R_s(f.rs1);
+			const int32_t divisor = R_s(f.rs2);
+			if (divisor == 0)
+				R_s(f.rd) = -1;
+			else if (dividend == std::numeric_limits< int32_t >::lowest() && divisor == -1)
+				R_s(f.rd) = std::numeric_limits< int32_t >::lowest();
+			else
+				R_s(f.rd) = dividend / divisor;
+		]],
+		verilog_text = [[
+			if (`CYCLE == `DIV_CYCLE_LATENCY) begin
+				`RD <= div_result[31:0];
+				`EXECUTE_DONE;
+			end
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x02005033,
+		name = "DIVU",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t dividend = R_u(f.rs1);
+			const uint32_t divisor = R_u(f.rs2);
+			if (divisor ==  0)
+				R_u(f.rd) = 0xffffffff;
+			else		
+				R_u(f.rd) = dividend / divisor;
+		]],
+		verilog_text = [[
+			if (`CYCLE == `DIV_CYCLE_LATENCY) begin
+				`RD <= div_result[31:0];
+				`EXECUTE_DONE;
+			end
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0200503b,
+		name = "DIVUW",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0200403b,
+		name = "DIVW",
+		format = "R"
+	},
+	{
+		mask = 0xffffffff,
+		data = 0x00100073,
+		name = "EBREAK",
+		type = insttype.COMPLEX,
+		cpp = [[
+			return false;
+		]],
+		verilog_text = [[
+			`FAULT <= 1'b1;
+		]]
+	},
+	{
+		mask = 0xffffffff,
+		data = 0x00000073,
+		name = "ECALL",
+		type = insttype.COMPLEX,
+		cpp = [[
+			ecall();
+		]],
+		verilog_text = [[
+			`ECALL <= 1'b1;
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0xfe00007f,	-- 1111 111x xxxx xxxx xxxx xxxx x1111111
+		data = 0x00000053,	-- xxxx x00x xxxx xxxx xxxx xxxx x101 0011
+		name = "FADD",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR(f.rd) = FR(f.rs1) + FR(f.rs2);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.ADD
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0xfff0007f,	-- 1111 1111 1111 0000 0000 0000 0111 1111
+		data = 0xc0000053,	-- 1100 0000 0000 xxxx xxxx xxxx x101 0011
+		name = "FCVT_W_S",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R(f.rd) = (int32_t)FR(f.rs1);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.F2I
+		},
+		verilog_rd_bank = 0,
+		verilog_rs1_bank = 1
+	},
+	{
+		mask = 0xfff0007f,	-- 1111 1111 1111 0000 0000 0000 0111 1111
+		data = 0xc0100053,	-- 1100 0000 0001 xxxx xxxx xxxx x101 0011
+		name = "FCVT_WU_S",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = (uint32_t)FR(f.rs1);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.F2UI
+		},
+		verilog_rd_bank = 0,
+		verilog_rs1_bank = 1
+	},	
+	{
+		mask = 0xfff0007f,	-- 1111 1111 1111 0000 0000 0000 0111 1111
+		data = 0xd0000053,	-- 1101 0000 0000 xxxx xxxx xxxx x101 0011
+		name = "FCVT_S_W",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR(f.rd) = (float)R(f.rs1);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.I2F
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 0
+	},
+
+	{
+		mask = 0xfff0007f,	-- 1111 1111 1111 0000 0000 0000 0111 1111
+		data = 0xd0100053,	-- 1101 0000 0001 xxxx xxxx xxxx x101 0011
+		name = "FCVT_S_WU",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR(f.rd) = (float)R(f.rs1);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.UI2F
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 0
+	},
+
+	{
+		mask = 0xfe00007f,	-- 1111 111x xxxx xxxx xxxx xxxx x111 1111
+		data = 0x18000053,	-- xxxx x00x xxxx xxxx xxxx xxxx x101 0011
+		name = "FDIV",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR(f.rd) = FR(f.rs1) / FR(f.rs2);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.DIV
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x0000000f,
+		name = "FENCE",
+		format = "I",
+		type = insttype.COMPLEX,
+		cpp = [[
+			flushCaches();
+		]],
+		verilog_text = [[
+			`MEM_FLUSH <= 1;
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x0000100f,
+		name = "FENCE.I",
+		format = ""
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 111x xxxx xxxx xxxx xxxx x111 1111
+		data = 0xa0002053,	-- xxxx x00x xxxx xxxx xxxx xxxx x101 0011
+		name = "FEQ",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R(f.rd) = (FR(f.rs1) == FR(f.rs2) ? 1 : 0);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.CMP_EQUAL
+		},
+		verilog_rd_bank = 0,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},	
+	{
+		mask = 0x0000707f,
+		data = 0x00003007,
+		name = "FLD",
+		format = "I"
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 111x xxxx xxxx xxxx xxxx x111 1111
+		data = 0xa0000053,	-- xxxx x00x xxxx xxxx xxxx xxxx x101 0011
+		name = "FLE",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R(f.rd) = (FR(f.rs1) <= FR(f.rs2) ? 1 : 0);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.CMP_LEQUAL
+		},
+		verilog_rd_bank = 0,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 111x xxxx xxxx x111 xxxx x111 1111
+		data = 0xa0001053,	-- 1010 000x xxxx xxxx x001 xxxx x101 0011
+		name = "FLT",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R(f.rd) = (FR(f.rs1) < FR(f.rs2) ? 1 : 0);
+		]],		
+		verilog_fpu = {
+			operation = fpu_operations.CMP_LESS
+		},
+		verilog_rd_bank = 0,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},	
+	{
+		mask = 0x0000707f,
+		data = 0x00002007,
+		name = "FLW",
+		format = "I",
+		type = insttype.FPU_MEMORY,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			FR_u(f.rd) = (uint32_t)MEM_RD(R_u(f.rs1) + f.imm);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "R",
+			width = 4,
+			signed = false
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 0,
+		verilog_rs2_bank = 0
+	},
+	{
+		mask = 0x0600007f,	-- xxxx x11x xxxx xxxx xxxx xxxx x111 1111
+		data = 0x00000043,	-- xxxx x00x xxxx xxxx xxxx xxxx x101 0011
+		name = "FMADD",
+		format = "R4",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR4::parse(word);
+			FR(f.rd) = FR(f.rs1) * FR(f.rs2) + FR(f.rs3);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.MADD
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1,
+		verilog_rs3_bank = 1
+	},
+	{
+		mask = 0x0600007f,	-- xxxx x11x xxxx xxxx xxxx xxxx x111 1111
+		data = 0x00000047,	-- xxxx x00x xxxx xxxx xxxx xxxx x100 0111
+		name = "FMSUB",
+		format = "R4",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR4::parse(word);
+			FR(f.rd) = FR(f.rs1) * FR(f.rs2) - FR(f.rs3);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.MSUB
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1,
+		verilog_rs3_bank = 1
+	},
+	{
+		mask = 0x0600007f,	-- xxxx x11x xxxx xxxx xxxx xxxx x111 1111
+		data = 0x0000004f,	-- xxxx x00x xxxx xxxx xxxx xxxx x101 1111
+		name = "FNMADD",
+		format = "R4",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR4::parse(word);
+			FR(f.rd) = -(FR(f.rs1) * FR(f.rs2)) - FR(f.rs3);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.NMADD
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1,
+		verilog_rs3_bank = 1
+	},
+	{
+		mask = 0x0600007f,	-- xxxx x11x xxxx xxxx xxxx xxxx x111 1111
+		data = 0x0000004b,	-- xxxx x00x xxxx xxxx xxxx xxxx x100 1011
+		name = "FNMSUB",
+		format = "R4",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR4::parse(word);
+			FR(f.rd) = -(FR(f.rs1) * FR(f.rs2)) + FR(f.rs3);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.NMSUB
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1,
+		verilog_rs3_bank = 1
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 111x xxxx xxxx x111 xxxx x111 1111
+		data = 0x28000053,	-- 0010 1000 0000 0000 0000 0000 0101 0011
+		name = "FMIN",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR(f.rd) = std::min(FR(f.rs1), FR(f.rs2));
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.MIN
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 111x xxxx xxxx x111 xxxx x111 1111
+		data = 0x28001053,	-- 0010 1000 0000 0000 0001 0000 0101 0011
+		name = "FMAX",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR(f.rd) = std::max(FR(f.rs1), FR(f.rs2));
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.MAX
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0xfe00007f,	-- 1111 111x xxxx xxxx xxxx xxxx x111 1111
+		data = 0x10000053,	-- xxxx x00x xxxx xxxx xxxx xxxx x101 0011
+		name = "FMUL",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR(f.rd) = FR(f.rs1) * FR(f.rs2);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.MUL
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0xfff0707f,
+		data = 0xe0000053,
+		name = "FMV_X_W",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R(f.rd) = FR_u(f.rs1);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.MOV
+		},
+		verilog_rd_bank = 0,
+		verilog_rs1_bank = 1,
+		description = "Move FP register into INT register."
+	},
+	{
+		mask = 0xfff0707f,
+		data = 0xf0000053,
+		name = "FMV_W_X",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR_u(f.rd) = R(f.rs1);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.MOV
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 0,
+		description = "Move INT register into FP register."
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00003027,
+		name = "FSD",
+		format = "S"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x20000053,	--0010 000x xxxx xxxx x000 xxxx x101 0011
+		name = "FSGNJ",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t tmp1 = FR_u(f.rs1);
+			const uint32_t tmp2 = FR_u(f.rs2);
+			FR_u(f.rd) = (tmp1 & 0x7fffffff) | (tmp2 & 0x80000000);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.SGNJ
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x20001053,	--0010 000x xxxx xxxx x001 xxxx x101 0011
+		name = "FSGNJN",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t tmp1 = FR_u(f.rs1);
+			const uint32_t tmp2 = FR_u(f.rs2);
+			FR_u(f.rd) = (tmp1 & 0x7fffffff) | ((tmp2 & 0x80000000) ^ 0x80000000);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.SGNJN
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x20002053,	--0010 000x xxxx xxxx x010 xxxx x101 0011
+		name = "FSGNJX",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t tmp1 = FR_u(f.rs1);
+			const uint32_t tmp2 = FR_u(f.rs2);
+			FR_u(f.rd) = (tmp1 & 0x7fffffff) | ((tmp2 & 0x80000000) ^ (tmp1 & 0x80000000));
+		]],		
+		verilog_fpu = {
+			operation = fpu_operations.SGNJX
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0xfe00007f,	-- 1111 111x xxxx xxxx xxxx xxxx x111 1111
+		data = 0x08000053,	-- xxxx x00x xxxx xxxx xxxx xxxx x101 0011
+		name = "FSUB",
+		format = "R",
+		type = insttype.FPU,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			FR(f.rd) = FR(f.rs1) - FR(f.rs2);
+		]],
+		verilog_fpu = {
+			operation = fpu_operations.SUB
+		},
+		verilog_rd_bank = 1,
+		verilog_rs1_bank = 1,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00002027,
+		name = "FSW",
+		format = "S",
+		type = insttype.FPU_MEMORY,
+		cpp = [[
+			const auto f = FormatS::parse(word);
+			MEM_WR(R_u(f.rs1) + f.imm, FR_u(f.rs2));
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "W",
+			width = 4,
+			signed = false
+		},
+		verilog_rd_bank = 0,
+		verilog_rs1_bank = 0,
+		verilog_rs2_bank = 1
+	},
+	{
+		mask = 0x0000007f,
+		data = 0x0000006f,
+		name = "JAL",
+		format = "J",
+		type = insttype.JUMP,
+		cpp = [[
+			const auto f = FormatJ::parse(word);
+			R_u(f.rd) = PC_NEXT;
+			PC_NEXT = PC + f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.PC,
+			operand2 = operands.IMM
+		},
+		verilog_text = [[
+			`RD <= `PC + 4;
+			`GOTO(alu_result);
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00000067,
+		name = "JALR",
+		format = "I",
+		type = insttype.JUMP,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			const uint32_t tmp = PC_NEXT;
+			PC_NEXT = (R(f.rs1) + f.imm) & ~1;
+			R_u(f.rd) = tmp;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_text = [[
+			`RD <= `PC + 4;
+			`GOTO(alu_result & ~1);
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00000003,
+		name = "LB",
+		format = "I",
+		type = insttype.MEMORY,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_s(f.rd) = (int8_t)MEM_RD_U8(R_u(f.rs1) + f.imm);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "R",
+			width = 1,
+			signed = true
+		},
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00004003,
+		name = "LBU",
+		format = "I",
+		type = insttype.MEMORY,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_u(f.rd) = MEM_RD_U8(R_u(f.rs1) + f.imm);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "R",
+			width = 1,
+			signed = false
+		},
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00003003,
+		name = "LD",
+		format = "I"
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00001003,
+		name = "LH",
+		format = "I",
+		type = insttype.MEMORY,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_s(f.rd) = (int16_t)MEM_RD_U16(R_u(f.rs1) + f.imm);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "R",
+			width = 2,
+			signed = true
+		},
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00005003,
+		name = "LHU",
+		format = "I",
+		type = insttype.MEMORY,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R(f.rd) = MEM_RD_U16(R(f.rs1) + f.imm);			
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "R",
+			width = 2,
+			signed = false
+		},
+	},
+	{
+		mask = 0xf9f0707f,
+		data = 0x1000302f,
+		name = "LR.D",
+		format = "R"
+	},
+	{
+		mask = 0xf9f0707f,
+		data = 0x1000202f,
+		name = "LR.W",
+		format = "R"
+	},
+	{
+		mask = 0x0000007f,
+		data = 0x00000037,
+		name = "LUI",
+		format = "U",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatU::parse(word);
+			R_s(f.rd) = f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_ADD,
+			operand1 = operands.IMM,
+			operand2 = operands.ZERO
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00002003,
+		name = "LW",
+		format = "I",
+		type = insttype.MEMORY,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_s(f.rd) = (int32_t)MEM_RD(R_u(f.rs1) + f.imm);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "R",
+			width = 4,
+			signed = false
+		},
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00006003,
+		name = "LWU",
+		format = "I"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x02000033,
+		name = "MUL",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = R_s(f.rs1) * R_s(f.rs2);
+		]],
+		verilog_text = [[
+			if (`CYCLE == `MUL_CYCLE_LATENCY) begin
+				`RD <= mul_result[31:0];
+				`EXECUTE_DONE;
+			end
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x02001033,
+		name = "MULH",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const int64_t lh = (int64_t)R_s(f.rs1);
+			const int64_t rh = (int64_t)R_s(f.rs2);
+			R_s(f.rd) = (lh * rh) >> 32;
+		]],
+		verilog_text = [[
+			if (`CYCLE == `MUL_CYCLE_LATENCY) begin
+				`RD <= mul_result[63:32];
+				`EXECUTE_DONE;
+			end
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x02003033,
+		name = "MULHU",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint64_t lh = (uint64_t)R(f.rs1);
+			const uint64_t rh = (uint64_t)R(f.rs2);
+			R(f.rd) = (lh * rh) >> 32;
+		]],
+		verilog_text = [[
+			if (`CYCLE == `MUL_CYCLE_LATENCY) begin
+				`RD <= mul_result[63:32];
+				`EXECUTE_DONE;
+			end
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x02002033,
+		name = "MULHSU",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0200003b,
+		name = "MULW",
+		format = "R"
+	},
+	{
+		mask = 0xffffffff,
+		data = 0x30200073,
+		name = "MRET",
+		-- format = "M",
+		format = "CSR",
+		type = insttype.COMPLEX,
+		cpp = [[
+			returnFromInterrupt();
+		]],
+		verilog_text = [[
+			`GOTO(`MEPC);
+			`MRET <= 1'b1;
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x00006033,
+		name = "OR",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) | R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.OR,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00006013,
+		name = "ORI",
+		format = "I",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_u(f.rd) = R_u(f.rs1) | f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.OR,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x02006033,
+		name = "REM",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const int32_t dividend = R_s(f.rs1);
+			const int32_t divisor = R_s(f.rs2);
+			if (divisor == 0)
+				R_s(f.rd) = dividend;
+			else if (dividend == std::numeric_limits< int32_t >::lowest() && divisor == -1)
+				R_s(f.rd) = 0;
+			else
+				R_s(f.rd) = dividend % divisor;
+		]],
+		verilog_text = [[
+			if (`CYCLE == `DIV_CYCLE_LATENCY) begin
+				`RD <= div_remainder[31:0];
+				`EXECUTE_DONE;
+			end
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x02007033,
+		name = "REMU",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t dividend = R_u(f.rs1);
+			const uint32_t divisor = R_u(f.rs2);
+			if (divisor == 0)
+				R_u(f.rd) = dividend;
+			else
+				R_u(f.rd) = dividend % divisor;
+		]],
+		verilog_text = [[
+			if (`CYCLE == `DIV_CYCLE_LATENCY) begin
+				`RD <= div_remainder[31:0];
+				`EXECUTE_DONE;
+			end
+		]]
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0200703b,
+		name = "REMUW",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0200603b,
+		name = "REMW",
+		format = "R"
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00000023,
+		name = "SB",
+		format = "S",
+		type = insttype.MEMORY,
+		cpp = [[
+			const auto f = FormatS::parse(word);
+			MEM_WR_U8(R_u(f.rs1) + f.imm, (uint8_t)R_u(f.rs2));
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "W",
+			width = 1,
+			signed = false
+		},
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x1800302f,
+		name = "SC.D",
+		format = "R"
+	},
+	{
+		mask = 0xf800707f,
+		data = 0x1800202f,
+		name = "SC.W",
+		format = "R"
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00003023,
+		name = "SD",
+		format = "S"
+	},
+	{
+		mask = 0xfe007fff,
+		data = 0x12000073,
+		name = "SFENCE.VMA",
+		format = ""
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00001023,
+		name = "SH",
+		format = "S",
+		type = insttype.MEMORY,
+		cpp = [[
+			const auto f = FormatS::parse(word);
+			MEM_WR_U16(R_u(f.rs1) + f.imm, R_u(f.rs2));
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "W",
+			width = 2,
+			signed = false
+		},
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x00001033,
+		name = "SLL",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = R_s(f.rs1) << R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.SHIFT_LEFT,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfc00707f,
+		data = 0x00001013,
+		name = "SLLI",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = R_s(f.rs1) << ((word >> 20) & 0x1f);
+		]],
+		verilog_alu = {
+			operation = operations.SHIFT_LEFT,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0000101b,
+		name = "SLLIW",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0000103b,
+		name = "SLLW",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x00002033,
+		name = "SLT",
+		format = "R",
+		type = insttype.COMPARE,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = (R_s(f.rs1) < R_s(f.rs2)) ? 1 : 0;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_LESS_THAN,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00002013,
+		name = "SLTI",
+		format = "I",
+		type = insttype.COMPARE,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_u(f.rd) = (R_s(f.rs1) < f.imm) ? 1 : 0;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_LESS_THAN,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00003013,
+		name = "SLTIU",
+		format = "I",
+		type = insttype.COMPARE,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_u(f.rd) = (R_u(f.rs1) < f.imm) ? 1 : 0;
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_LESS_THAN,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x00003033,
+		name = "SLTU",
+		format = "R",
+		type = insttype.COMPARE,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = (R_u(f.rs1) < R_u(f.rs2)) ? 1 : 0;
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_LESS_THAN,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x40005033,
+		name = "SRA",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const int32_t sh = R_s(f.rs2);
+			if (sh >= 0)
+				R_s(f.rd) = R_s(f.rs1) >> sh;
+			else
+				log::error << L"SRA, shift by negative not supported!" << Endl;
+		]],
+		verilog_alu = {
+			operation = operations.ARITHMETIC_SHIFT_RIGHT,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfc00707f,
+		data = 0x40005013,
+		name = "SRAI",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const int32_t sh = (int32_t)((word >> 20) & 0x1f);
+			R_s(f.rd) = R_s(f.rs1) >> sh;
+		]],
+		verilog_alu = {
+			operation = operations.ARITHMETIC_SHIFT_RIGHT,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0xfc00707f,
+		data = 0x4000501b,
+		name = "SRAIW",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x4000503b,
+		name = "SRAW",
+		format = "R"
+	},
+	{
+		mask = 0xffffffff,
+		data = 0x10200073,
+		name = "SRET",
+		format = ""
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x00005033,
+		name = "SRL",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) >> R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.SHIFT_RIGHT,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfc00707f,
+		data = 0x00005013,
+		name = "SRLI",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) >> ((word >> 20) & 0x1f);
+		]],
+		verilog_alu = {
+			operation = operations.SHIFT_RIGHT,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0xfc00707f,
+		data = 0x0000501b,
+		name = "SRLIW",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x0000503b,
+		name = "SRLW",
+		format = "R"
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x40000033,
+		name = "SUB",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = R_s(f.rs1) - R_s(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_SUB,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x4000003b,
+		name = "SUBW",
+		format = "R"
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00002023,
+		name = "SW",
+		format = "S",
+		type = insttype.MEMORY,
+		cpp = [[
+			const auto f = FormatS::parse(word);
+			MEM_WR(R_u(f.rs1) + f.imm, R_u(f.rs2));
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		},
+		verilog_memory = {
+			direction = "W",
+			width = 4,
+			signed = false
+		},
+	},
+	{
+		mask = 0xffffffff,
+		data = 0x00200073,
+		name = "URET",
+		format = ""
+	},
+	{
+		mask = 0xffffffff,
+		data = 0x10500073,
+		name = "WFI",
+		format = "",
+		type = insttype.COMPLEX,
+		cpp = [[
+			m_waitForInterrupt = true;
+		]],
+		verilog = true
+	},
+	{
+		mask = 0xfe00707f,
+		data = 0x00004033,
+		name = "XOR",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) ^ R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.XOR,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0x0000707f,
+		data = 0x00004013,
+		name = "XORI",
+		format = "I",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatI::parse(word);
+			R_u(f.rd) = R_u(f.rs1) ^ f.imm;
+		]],
+		verilog_alu = {
+			operation = operations.XOR,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+}
+
+local function trim(s)
+   return s:match'^%s*(.*%S)' or ''
+end
+
+local function lines(s)
+	if s:sub(-1)~="\n" then s=s.."\n" end
+	return string.gmatch(s,'[^\r\n]+')
+end
+
+local function iter2tbl(it)
+	local t = {}
+	for i in it do table.insert(t, i) end
+	return t
+end
+
+local function indent(s)
+	local count = 0
+	for i = 1, #s do
+		if s:sub(i, i) ~= "\t" then break end
+		count = count + 1
+	end
+	return count
+end
+
+function main(argv)
+
+	local language = argv:get(0)
+	local debug = false
+	local cnt = 0
+
+	if language == "cpp" then
+
+		for i, inst in ipairs(instructions) do
+			assert((inst.mask & inst.data) == inst.data)
+			if inst.cpp ~= nil then 
+				if cnt >= 1 then stdout:print("else if") else stdout:print("if") end
+
+				stdout:printLn(" ((word & 0x" .. string.format("%08x", inst.mask) .. ") == 0x" .. string.format("%08x", inst.data) .. ")\t// " .. inst.name)
+				stdout:printLn("{")
+
+				local lns = iter2tbl(lines(inst.cpp))
+				while #lns > 0 and trim(lns[1]) == "" do
+					table.remove(lns, 1)
+				end
+				while #lns > 0 and trim(lns[#lns]) == "" do
+					table.remove(lns, #lns)
+				end
+				local ind = 80
+				for _, ln in pairs(lns) do
+					ind = math.min(ind, indent(ln))
+				end
+				for _, ln in pairs(lns) do
+					stdout:printLn("\t" .. ln:sub(ind + 1))
+				end
+
+				stdout:printLn("}")
+
+				cnt = cnt + 1
+			end
+		end
+
+		stdout:printLn("else")
+		stdout:printLn("{")
+		stdout:printLn("\tlog::error << L\"Unknown instruction, \" << str(L\"%08x\", word) << Endl;")
+		stdout:printLn("\treturn false;")
+		stdout:printLn("}")
+		stdout:printLn("return true;")
+
+	elseif language == "verilog_decode" then
+		local P < const > = { "B", "I", "J", "R", "R4", "S", "U", "CSR" }
+
+		stdout:printLn("// This file is automatically generated, DO NOT EDIT!")
+		stdout:printLn("// ==================================================")
+		stdout:printLn("")
+
+		-- Get all verilog instructions.
+		local vi = {}
+		for _, inst in ipairs(instructions) do
+			if inst.verilog ~= nil or inst.verilog_alu ~= nil or inst.verilog_text ~= nil or inst.verilog_fpu ~= nil then
+			-- if inst.verilog ~= nil or inst.verilog_alu ~= nil or inst.verilog_text ~= nil then
+				table.insert(vi, inst)
+			end
+		end
+
+		-- Instruction signals.
+		for _, inst in ipairs(vi) do
+			if inst.mask > 0x0000ffff or inst.data > 0x0000ffff then
+				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[31:0] & 32'h" .. string.format("%08x", inst.mask) .. ") == 32'h" .. string.format("%08x", inst.data) .. ");")
+			elseif inst.mask > 0x00000ff or inst.data > 0x000000ff then
+				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[15:0] & 16'h" .. string.format("%04x", inst.mask) .. "    ) == 16'h" .. string.format("%04x", inst.data) .. "    );")
+			else
+				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[ 7:0] &  8'h" .. string.format("%02x", inst.mask) .. "      ) ==  8'h" .. string.format("%02x", inst.data) .. "      );")
+			end
+		end
+		stdout:printLn("")
+
+		-- Format signals.
+		for _, prefix in ipairs(P) do
+			local t = {}
+			for i, inst in ipairs(vi) do
+				if inst.format == prefix then
+					table.insert(t, inst)
+				end
+			end
+			if #t > 0 then
+				stdout:print("wire is_" .. prefix .. " =")
+				for i, inst in ipairs(t) do
+					if i > 1 then stdout:print(" |") end
+					stdout:print(" is_" .. inst.name)
+				end
+				stdout:printLn(";")
+			else
+				stdout:printLn("wire is_" .. prefix .. " = 1'b0;")
+			end
+		end
+		stdout:printLn("")
+		-- stdout:printLn(
+		-- 	"wire is_B   = (`INSTRUCTION[6:0] == 7'h63);\n" ..
+		-- 	"wire is_I   = (`INSTRUCTION[6:0] == 7'h03) || (`INSTRUCTION[6:0] == 7'h13) || (`INSTRUCTION[6:0] == 7'h0f) || (`INSTRUCTION[6:0] == 7'h67);\n" ..
+		-- 	"wire is_J   = (`INSTRUCTION[6:0] == 7'h6f);\n" ..
+		-- 	"wire is_R   = (`INSTRUCTION[6:0] == 7'h33);\n" ..
+		-- 	"wire is_R4  = (`INSTRUCTION[6:0] == 7'h43) || (`INSTRUCTION[6:0] == 7'h4f) || (`INSTRUCTION[6:0] == 7'h47) || (`INSTRUCTION[6:0] == 7'h4b);\n" ..
+		-- 	"wire is_S   = (`INSTRUCTION[6:0] == 7'h23);\n" ..
+		-- 	"wire is_U   = (`INSTRUCTION[6:0] == 7'h17) || (`INSTRUCTION[6:0] == 7'h37);\n" ..
+		-- 	"wire is_CSR = (`INSTRUCTION[6:0] == 7'h73);"
+		-- )
+		-- stdout:printLn("")
+
+		-- Instruction type signals.
+		for _, it in pairs({
+			insttype.ARITHMETIC,
+			insttype.SHIFT,
+			insttype.COMPARE,
+			insttype.COMPLEX,
+			insttype.JUMP,
+			insttype.JUMP_CONDITIONAL,
+			insttype.MEMORY,
+			insttype.FPU,
+			insttype.FPU_CVT,
+			insttype.FPU_MEMORY,
+		}) do
+			stdout:print("wire is_" .. it .. " =")
+			local count = 0
+			for _, inst in ipairs(vi) do
+				assert(inst.type ~= nil);
+				if inst.type == it then
+					if count > 0 then stdout:print(" |") end
+					stdout:print(" is_" .. inst.name)
+					count = count + 1
+				end
+			end
+			stdout:printLn(";")
+		end
+		stdout:printLn("")
+
+		-- Instruction register banks.
+		stdout:printLn("wire RD_bank =");
+		for _, inst in ipairs(vi) do
+			if inst.verilog_rd_bank ~= nil and inst.verilog_rd_bank ~= 0 then
+				stdout:printLn("\tis_" .. string.format("%-9s", inst.name) .. " ? 1'd" .. inst.verilog_rd_bank .. " :");
+			end
+		end
+		stdout:printLn("\t1'b0;")
+		stdout:printLn("")
+
+		stdout:printLn("wire RS1_bank =");
+		for _, inst in ipairs(vi) do
+			if inst.verilog_rs1_bank ~= nil and inst.verilog_rs1_bank ~= 0 then
+				stdout:printLn("\tis_" .. string.format("%-9s", inst.name) .. " ? 1'd" .. inst.verilog_rs1_bank .. " :");
+			end
+		end
+		stdout:printLn("\t1'b0;")
+		stdout:printLn("")
+
+		stdout:printLn("wire RS2_bank =");
+		for _, inst in ipairs(vi) do
+			if inst.verilog_rs2_bank ~= nil and inst.verilog_rs2_bank ~= 0 then
+				stdout:printLn("\tis_" .. string.format("%-9s", inst.name) .. " ? 1'd" .. inst.verilog_rs2_bank .. " :");
+			end
+		end
+		stdout:printLn("\t1'b0;")
+		stdout:printLn("")
+
+		stdout:printLn("wire RS3_bank =");
+		for _, inst in ipairs(vi) do
+			if inst.verilog_rs3_bank ~= nil and inst.verilog_rs3_bank ~= 0 then
+				stdout:printLn("\tis_" .. string.format("%-9s", inst.name) .. " ? 1'd" .. inst.verilog_rs2_bank .. " :");
+			end
+		end
+		stdout:printLn("\t1'b0;")
+		stdout:printLn("")
+
+	elseif language == "verilog_alu" then
+		stdout:printLn("// This file is automatically generated, DO NOT EDIT!")
+		stdout:printLn("// ==================================================")
+		stdout:printLn("")
+
+		-- Get list of all instructions with an ALU specification.
+		local alu = {}
+		for i, inst in ipairs(instructions) do
+			if inst.verilog_alu ~= nil then
+				table.insert(alu, inst)
+			end
+		end
+
+		stdout:printLn("wire [3:0] alu_operation = ")
+		for i, inst in ipairs(alu) do
+			stdout:printLn("\tis_" .. string.format("%-5s", inst.name) .. " ? " .. string.format("%-26s", inst.verilog_alu.operation) .. " :")
+		end
+		stdout:printLn("\t4'd0;")
+		stdout:printLn("")
+
+		stdout:printLn("wire [4:0] alu_operand1 = ")
+		for i, inst in ipairs(alu) do
+			if inst.verilog_alu.operand1 ~= "`RS1" then
+				stdout:printLn("\tis_" .. string.format("%-5s", inst.name) .. " ? " .. string.format("%-5s", inst.verilog_alu.operand1) .. " :")
+			end
+		end
+		--stdout:printLn("\t3'd0;")
+		stdout:printLn("\t`RS1;")
+		stdout:printLn("")
+
+		stdout:printLn("wire [4:0] alu_operand2 = ")
+		for i, inst in ipairs(alu) do
+			if inst.verilog_alu.operand2 ~= "`RS2" then
+				stdout:printLn("\tis_" .. string.format("%-5s", inst.name) .. " ? " .. string.format("%-5s", inst.verilog_alu.operand2) .. " :")
+			end
+		end
+		--stdout:printLn("\t3'd0;")
+		stdout:printLn("\t`RS2;")
+		stdout:printLn("")
+
+	elseif language == "verilog_memory" then
+		stdout:printLn("// This file is automatically generated, DO NOT EDIT!")
+		stdout:printLn("// ==================================================")
+		stdout:printLn("")
+
+		-- Get list of all instructions with a MEMORY specification.
+		local alu = {}
+		for i, inst in ipairs(instructions) do
+			if inst.verilog_memory ~= nil and (inst.type == insttype.MEMORY or inst.type == insttype.FPU_MEMORY) then
+				table.insert(alu, inst)
+			end
+		end
+
+		stdout:printLn("wire memory_read = ")
+		for i, inst in ipairs(alu) do
+			if inst.verilog_memory.direction == "R" then
+				stdout:printLn("\tis_" .. string.format("%-4s", inst.name) .. "|")
+			end
+		end
+		stdout:printLn("\t1'b0;")
+		stdout:printLn("")
+
+		stdout:printLn("wire memory_write = ")
+		for i, inst in ipairs(alu) do
+			if inst.verilog_memory.direction == "W" then
+				stdout:printLn("\tis_" .. string.format("%-3s", inst.name) .. " |")
+			end
+		end
+		stdout:printLn("\t1'b0;")
+		stdout:printLn("")
+
+		stdout:printLn("wire [1:0] memory_width = ")
+		for i, inst in ipairs(alu) do
+			if inst.verilog_memory.width == 1 then
+				stdout:printLn("\tis_" .. string.format("%-3s", inst.name) .. " ? 2'b00 :")
+			elseif inst.verilog_memory.width == 2 then
+				stdout:printLn("\tis_" .. string.format("%-3s", inst.name) .. " ? 2'b01 :")
+			elseif inst.verilog_memory.width == 4 then
+				stdout:printLn("\tis_" .. string.format("%-3s", inst.name) .. " ? 2'b10 :")
+			else
+				stderr:printLn("Incorrect memory width in instruction " .. inst.name)
+				return 1
+			end
+		end
+		stdout:printLn("\t3'd0;")
+		stdout:printLn("")
+
+		stdout:printLn("wire memory_signed = ")
+		for i, inst in ipairs(alu) do
+			if inst.verilog_memory.signed == true then
+				stdout:printLn("\tis_" .. string.format("%-2s", inst.name) .. " |")
+			end
+		end
+		stdout:printLn("\t1'b0;")
+		stdout:printLn("")
+
+	elseif language == "verilog_ops" then
+		stdout:printLn("// This file is automatically generated, DO NOT EDIT!")
+		stdout:printLn("// ==================================================")
+		stdout:printLn("")
+		
+		-- Get all verilog instructions.
+		local vi = {}
+		for _, inst in ipairs(instructions) do
+			if inst.verilog_alu ~= nil or inst.verilog_text ~= nil then
+				table.insert(vi, inst)
+			end
+		end
+
+		-- Collect COMPEX instructions.
+		local t = {}
+		for _, inst in ipairs(vi) do
+			if inst.type == insttype.COMPLEX then
+				table.insert(t, inst)
+			end
+		end	
+		
+		local nbits = math.ceil(math.log(#t) / math.log(2))
+
+		for i, inst in ipairs(t) do
+			stdout:printLn("localparam OP_" .. string.format("%-6s", inst.name) .. " = " .. nbits .. "'d" .. i .. ";")
+		end
+
+	elseif language == "verilog_decode_ops" then
+
+		stdout:printLn("// This file is automatically generated, DO NOT EDIT!")
+		stdout:printLn("// ==================================================")
+		stdout:printLn("")
+		
+		-- Get all verilog instructions.
+		local vi = {}
+		for _, inst in ipairs(instructions) do
+			if inst.verilog_alu ~= nil or inst.verilog_text ~= nil then
+				table.insert(vi, inst)
+			end
+		end
+
+		-- Collect COMPEX instructions.
+		local t = {}
+		for _, inst in ipairs(vi) do
+			if inst.type == insttype.COMPLEX then
+				table.insert(t, inst)
+			end
+		end	
+		
+		stdout:printLn("`OP <= ")
+		for i, inst in ipairs(t) do
+			stdout:printLn("\tis_" .. string.format("%-6s", inst.name) .. " ? OP_" .. string.format("%-6s", inst.name) .. " : ")
+		end
+		stdout:printLn("\t0;")
+
+	elseif language == "verilog_execute_ops" then
+
+		local formats = nil
+		if argv.size > 1 then
+			formats = {}
+			for i = 1, argv.size - 1 do
+				formats[argv:get(i)] = true
+			end
+		end
+
+		stdout:printLn("// This file is automatically generated, DO NOT EDIT!")
+		stdout:printLn("// ==================================================")
+		stdout:printLn("")
+		
+		-- Get all verilog instructions.
+		local vi = {}
+		for _, inst in ipairs(instructions) do
+			if inst.verilog_alu ~= nil or inst.verilog_text ~= nil then
+				table.insert(vi, inst)
+			end
+		end
+
+		-- Collect COMPEX instructions.
+		local t = {}
+		for _, inst in ipairs(vi) do
+			if inst.type == insttype.COMPLEX then
+				if inst.format == nil or formats == nil or formats[inst.format] == true then
+					table.insert(t, inst)
+				end
+			end
+		end
+		
+		stdout:printLn("case (`EXECUTE_OP)")
+
+		local count = 0;
+		for i, inst in ipairs(t) do
+			stdout:printLn("\tOP_" .. inst.name .. ": begin")
+
+			if debug then
+				stdout:printLn("\t\t$display(\"" .. inst.name .. "\");")
+			end
+
+			local lns = iter2tbl(lines(inst.verilog_text))
+			while #lns > 0 and trim(lns[1]) == "" do
+				table.remove(lns, 1)
+			end
+			while #lns > 0 and trim(lns[#lns]) == "" do
+				table.remove(lns, #lns)
+			end
+			local ind = 80
+			for _, ln in pairs(lns) do
+				ind = math.min(ind, indent(ln))
+			end
+			for _, ln in pairs(lns) do
+				stdout:printLn("\t\t" .. ln:sub(ind + 1))
+			end
+
+			stdout:printLn("\tend")
+			count = count + 1
+		end
+
+		stdout:printLn("\tdefault: begin")
+		stdout:printLn("\t\t`EXECUTE_DONE;")
+		stdout:printLn("\tend")
+		stdout:printLn("endcase")
+
+	elseif language == "verilog_fpu" then
+		stdout:printLn("// This file is automatically generated, DO NOT EDIT!")
+		stdout:printLn("// ==================================================")
+		stdout:printLn("")
+
+		-- Get list of all instructions with an FPU specification.
+		local fpu = {}
+		for i, inst in ipairs(instructions) do
+			if inst.verilog_fpu ~= nil then
+				table.insert(fpu, inst)
+			end
+		end
+
+		stdout:printLn("wire [4:0] fpu_operation = ")
+		for i, inst in ipairs(fpu) do
+			stdout:printLn("\tis_" .. string.format("%-9s", inst.name) .. " ? " .. string.format("%-18s", inst.verilog_fpu.operation) .. " :")
+		end
+		stdout:printLn("\t5'd0;")
+		stdout:printLn("")
+
+	else
+		stderr:printLn("Unknown language \"" .. language .. "\".")
+	end
+end
