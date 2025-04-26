@@ -1,12 +1,12 @@
 /*
- TRAKTOR
- Copyright (c) 2023 Anders Pistol.
+ Klara-RV
+ Copyright (c) 2025 Anders Pistol.
 
  This Source Code Form is subject to the terms of the Mozilla Public
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-`include "CPU_Defines.sv"
+`include "CPU_Types.sv"
 
 `timescale 1ns/1ns
 

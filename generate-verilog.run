@@ -1,0 +1,34 @@
+-- Recursive convert CPU from SystemVerilog to plain old Verilog.
+-- Using "sv2v" tool found at https://github.com/zachjs/sv2v
+
+import(traktor)
+
+local function traverse(path, visitor)
+	local fa = FileSystem.getInstance():find(path.pathName .. "/*.*")
+	for i = 0, fa.size - 1 do
+		local f = fa:get(i)
+		local p = f.path
+		local fn = p.fileName
+		local pn = p.pathName
+		if f.directory then
+			if fn ~= "." and fn ~= ".." then
+				traverse(p, visitor)
+			end
+		else
+			visitor(p)
+		end
+	end
+end
+
+function main()
+	local base < const > = Path("./rtl")
+	traverse(base, function(path)
+		if path.extension ~= "sv" or path.pathOnly == "./rtl/private/generated" then return end
+		local p < const > = FileSystem.getInstance():getRelativePath(
+			FileSystem.getInstance():getAbsolutePath(path),
+			FileSystem.getInstance():getAbsolutePath(base)
+		)
+		FileSystem.getInstance():makeAllDirectories(Path("./rtl-v/" .. p.pathOnly))
+		run:execute("sv2v --incdir=./rtl " .. path.pathName .. " --write=" .. "./rtl-v/" .. p.pathNameNoExtension .. ".v")
+	end)
+end
