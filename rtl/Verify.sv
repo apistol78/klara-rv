@@ -8,7 +8,7 @@
 */
 
 `timescale 1ns/1ns
-`define FREQUENCY 100000000
+`define FREQUENCY 25000000
 
 module Verify(
       input CLOCK_p,
@@ -18,6 +18,7 @@ module Verify(
 	wire reset = 1'b0;
 
 
+/*
 	wire clkout0;
 	wire clkout1;
 	wire clklocked;
@@ -25,7 +26,7 @@ module Verify(
 	// https://projectf.io/posts/ecp5-fpga-clock
 	// out = CLKFB_DIV * in / CLKI_DIV
 	(* FREQUENCY_PIN_CLKI = "25.0", ICP_CURRENT = "6", LPF_RESISTOR = "16", MFG_ENABLE_FILTEROPAMP = "1", MFG_GMCREF_SEL = "2" *) EHXPLLL #(
-		.CLKFB_DIV(4'd16),
+		.CLKFB_DIV(4'd4),
 		.CLKI_DIV(1'd1),
 		.CLKOP_CPHASE(3'd7),
 		.CLKOP_DIV(4'd8),
@@ -47,6 +48,7 @@ module Verify(
 		.CLKOS(clkout1),
 		.LOCK(clklocked)
 	);
+*/
 
 
 	// CPU
@@ -70,7 +72,7 @@ module Verify(
 		.ICACHE_REGISTERED(1)		
 	) cpu(
 		.i_reset(reset),
-		.i_clock(clkout0),
+		.i_clock(clock),
 
 		// Control
 		.i_timer_interrupt(1'b0),

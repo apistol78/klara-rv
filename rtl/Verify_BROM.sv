@@ -17,12 +17,10 @@ module Verify_BROM(
 	output bit o_ready
 );
 
-	logic [31:0] data [
-	`include "Firmware.vmem-range"		
-	];
+	logic [31:0] data [0:3];
 
 	initial o_ready = 0;
-	initial $readmemh("Firmware.vmem", data);
+	initial $readmemh("Verify.vmem", data);
 
 	always_ff @(posedge i_clock)
 		if (i_request) begin
