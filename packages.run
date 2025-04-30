@@ -23,4 +23,14 @@ PACKAGES =
 		end,
 		license = "BSD-3-Clause"
 	},
+	{
+		type = "GET",
+		name = "oss-cad-suite-build",
+		url = "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2025-04-30/oss-cad-suite-windows-x64-20250430.exe",
+		os = "windows",
+		patch = function()
+			run:execute("oss-cad-suite-windows-x64-20250430.exe")
+		end,
+		license = "ISC"
+	},	
 }

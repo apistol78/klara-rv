@@ -1,0 +1,57 @@
+import (traktor)
+
+SOURCE =
+{
+	"Verify.v",
+	"CPU.v",
+	"private/CPU_ALU.v",
+	"private/CPU_BRAM.v",
+	"private/CPU_BRAM_1r1w.v",
+	"private/CPU_CSR.v",
+	"private/CPU_DCache_Comb.v",
+	"private/CPU_DCache_None.v",
+	"private/CPU_DCache_Reg.v",
+	"private/CPU_Decode.v",
+	"private/CPU_Defines.v",
+	"private/CPU_Divide.v",
+	"private/CPU_Execute.v",
+	"private/CPU_Fetch.v",
+	"private/CPU_Forward.v",
+	"private/CPU_ICache_Comb.v",
+	"private/CPU_ICache_None.v",
+	"private/CPU_ICache_Reg.v",
+	"private/CPU_Memory.v",
+	"private/CPU_Multiply.v",
+	"private/CPU_PreDecode.v",
+	"private/CPU_Registers.v",
+	"private/CPU_SkidBuffer.v",
+	"private/CPU_Types.v",
+	"private/CPU_Writeback.v",
+	"private/fpu/CPU_FPU.v",
+	"private/fpu/CPU_FPU_Add.v",
+	"private/fpu/CPU_FPU_Compare.v",
+	"private/fpu/CPU_FPU_Div.v",
+	"private/fpu/CPU_FPU_Float.v",
+	"private/fpu/CPU_FPU_Int.v",
+	"private/fpu/CPU_FPU_Mul.v",
+	"private/fpu/CPU_FPU_MulAdd.v"	
+}
+
+function main()
+
+	-- Generate SystemVerilog instructions.
+	run:run("generate-instructions.run")
+
+	-- Convert all SystemVerilog into Verilog files.
+	run:run("generate-verilog.run")
+
+	-- Concatenate all source files.
+	local f = ""
+	for _, s in ipairs(SOURCE) do
+		f = f .. " rtl-v/" .. s
+	end
+
+	run:execute("yosys -p \"synth_ecp5 -json build/Verify.json\" " .. f)
+	run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --top Verify --json build/Verify.json --textcfg build/Verify.config --lpf Verify.lpf --freq 65")
+	run:execute("ecppack --svf build/Verify.svf build/Verify.config build/Verify.bit")
+end
