@@ -1,0 +1,13 @@
+import(traktor)
+
+function main()
+	stdout:printLn("Generating verilog instructions...")
+	run:run("rtl/Instructions.run verilog_alu", "rtl/private/generated/Instructions_alu.sv")
+	run:run("rtl/Instructions.run verilog_memory", "rtl/private/generated/Instructions_memory.sv")
+	run:run("rtl/Instructions.run verilog_ops", "rtl/private/generated/Instructions_ops.sv")
+	run:run("rtl/Instructions.run verilog_decode", "rtl/private/generated/Instructions_decode.sv")
+	run:run("rtl/Instructions.run verilog_decode_ops", "rtl/private/generated/Instructions_decode_ops.sv")
+	run:run("rtl/Instructions.run verilog_execute_ops I J R U B S CSR", "rtl/private/generated/Instructions_execute_ops.sv")
+	run:run("rtl/Instructions.run verilog_fpu", "rtl/private/generated/Instructions_fpu.sv")
+	stdout:printLn("Done")
+end
