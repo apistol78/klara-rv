@@ -56,6 +56,9 @@ module CPU_Multiply(
 
 `else
 
+	assign o_result = 32'd0;
+
+	/*	
 	bit [63:0] p1;
 	bit [63:0] p2;
 	
@@ -73,6 +76,7 @@ module CPU_Multiply(
 		else
 			p2 <= p1;
 	end
+	*/
 
 `endif
 

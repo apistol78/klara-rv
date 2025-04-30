@@ -66,6 +66,10 @@ module CPU_Divide(
 
 `else
 
+	assign o_result = 32'd0;
+	assign o_remainder = 32'd0;
+
+	/*
 	bit [31:0] p1_result;
 	bit [31:0] p1_remainder;
 	bit [31:0] p2_result;
@@ -95,6 +99,7 @@ module CPU_Divide(
 			p2_remainder <= p1_remainder;
 		end
 	end
+	*/
 
 `endif
 

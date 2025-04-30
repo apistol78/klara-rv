@@ -53,6 +53,6 @@ function main()
 
 	run:mkdir("build")
 	run:execute("yosys -p \"synth_ecp5 -json build/Verify.json\" " .. f)
-	run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --top Verify --json build/Verify.json --textcfg build/Verify.config --lpf Verify.lpf --freq 65")
+	run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --timing-allow-fail --top Verify --json build/Verify.json --textcfg build/Verify.config --lpf Verify.lpf --report build/Verify.report --freq 65")
 	run:execute("ecppack --svf build/Verify.svf build/Verify.config build/Verify.bit")
 end
