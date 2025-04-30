@@ -3,6 +3,13 @@
 
 import(traktor)
 
+local function platform_select(default, windows)
+	if os.identifier == "windows" then return windows end
+	return default
+end
+
+local SV2V < const > = platform_select("3rdp/sv2v/sv2v-Linux/sv2v", "3rdp/sv2v/sv2v-Windows/sv2v.exe")
+
 local function traverse(path, visitor)
 	local fa = FileSystem.getInstance():find(path.pathName .. "/*.*")
 	for i = 0, fa.size - 1 do
@@ -12,23 +19,32 @@ local function traverse(path, visitor)
 		local pn = p.pathName
 		if f.directory then
 			if fn ~= "." and fn ~= ".." then
-				traverse(p, visitor)
+				if not traverse(p, visitor) then return false end
 			end
 		else
-			visitor(p)
+			if not visitor(p) then return false end
 		end
 	end
+	return true
 end
 
 function main()
 	local base < const > = Path("./rtl")
 	traverse(base, function(path)
-		if path.extension ~= "sv" or path.pathOnly == "./rtl/private/generated" then return end
+		if path.extension ~= "sv" or path.pathOnly == "./rtl/private/generated" then return true end
 		local p < const > = FileSystem.getInstance():getRelativePath(
 			FileSystem.getInstance():getAbsolutePath(path),
 			FileSystem.getInstance():getAbsolutePath(base)
 		)
 		FileSystem.getInstance():makeAllDirectories(Path("./rtl-v/" .. p.pathOnly))
-		run:execute("sv2v --incdir=./rtl " .. path.pathName .. " --write=" .. "./rtl-v/" .. p.pathNameNoExtension .. ".v")
+		local xc = run:execute(SV2V .. " --incdir=./rtl " .. path.pathName .. " --write=" .. "./rtl-v/" .. p.pathNameNoExtension .. ".v")
+		if xc == 0 then
+			stdout:printLn("\"" .. path.pathName .. "\" converted successfully.")
+			return true
+		else
+			stderr:printLn("Unable to execute \"sv2v\"; ensure \"sv2v\" is accessible from PATH.")
+			return false
+		end
 	end)
+	return 0
 end
