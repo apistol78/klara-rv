@@ -3,6 +3,7 @@ import (traktor)
 SOURCE =
 {
 	"Verify.v",
+	"Verify_BROM.v",
 	"CPU.v",
 	"private/CPU_ALU.v",
 	"private/CPU_BRAM.v",
@@ -34,7 +35,7 @@ SOURCE =
 	"private/fpu/CPU_FPU_Float.v",
 	"private/fpu/CPU_FPU_Int.v",
 	"private/fpu/CPU_FPU_Mul.v",
-	"private/fpu/CPU_FPU_MulAdd.v"	
+	"private/fpu/CPU_FPU_MulAdd.v"
 }
 
 function main()
@@ -52,7 +53,31 @@ function main()
 	end
 
 	run:mkdir("build")
-	run:execute("yosys -p \"synth_ecp5 -json build/Verify.json\" " .. f)
-	run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --timing-allow-fail --top Verify --json build/Verify.json --textcfg build/Verify.config --lpf Verify.lpf --report build/Verify.report --freq 65")
-	run:execute("ecppack --svf build/Verify.svf build/Verify.config build/Verify.bit")
+	run:rm("build/Verify.bit")
+	
+	local xc = run:execute("yosys -p \"synth_ecp5 -json build/Verify.json\" " .. f)
+	if xc ~= 0 then
+		stderr:printLn("yosys failed; build aborted.")
+		return 1
+	end
+
+	local xc = run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --timing-allow-fail --top Verify --json build/Verify.json --textcfg build/Verify.config --lpf Verify.lpf --report build/Verify.report --freq 65")
+	if xc ~= 0 then
+		stderr:printLn("nextpnr-ecp5 failed; build aborted.")
+		return 1
+	end
+
+	local xc = run:execute("ecppack --svf build/Verify.svf build/Verify.config build/Verify.bit")
+	if xc ~= 0 then
+		stderr:printLn("ecppack failed; build aborted.")
+		return 1
+	end
+
+	local xc = run:execute("openFPGALoader -c cmsisdap --vid=0x1d50 --pid=0x602b ./build/Verify.bit")
+	if xc ~= 0 then
+		stderr:printLn("openFPGALoader failed; build aborted.")
+		return 1
+	end
+
+	stdout:printLn("Build successful.")
 end

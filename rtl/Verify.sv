@@ -12,7 +12,7 @@
 
 module Verify(
       input CLOCK_p,
-      output bit LED_p
+      output LED_p
 );
 	wire clock = CLOCK_p;
 	wire reset = 1'b0;
@@ -49,6 +49,28 @@ module Verify(
 		.LOCK(clklocked)
 	);
 */
+
+	assign LED_p = cpu_ibus_address[20];
+
+	// bit [31:0] counter;
+	// always @(posedge clock) counter <= counter + 1;
+
+
+/*
+	Verify_BROM rom(
+		.i_clock(clock),
+		.i_request(cpu_ibus_request),
+		.i_address(cpu_ibus_address),
+		.o_rdata(cpu_ibus_rdata),
+		.o_ready(cpu_ibus_ready)
+	);
+*/
+
+	assign cpu_ibus_rdata = 32'h00000013;	// NOP
+	assign cpu_ibus_ready = ready;
+
+	bit ready = 1'b0;
+	always @(posedge clock) ready <= cpu_ibus_request;
 
 
 	// CPU

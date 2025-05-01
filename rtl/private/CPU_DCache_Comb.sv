@@ -85,7 +85,7 @@ module CPU_DCache_Comb #(
 
 	// One cycle latency, important since
 	// we rely on address only.
-	BRAM #(
+	CPU_BRAM #(
 		.WIDTH(64),
 		.SIZE(RANGE),
 		.ADDR_LSH(0)
