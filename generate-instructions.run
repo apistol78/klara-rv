@@ -1,13 +1,22 @@
+--[[
+ Klara-RV
+ Copyright (c) 2025 Anders Pistol.
+
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+]]
+
 import(traktor)
 
 function main()
 	stdout:printLn("Generating verilog instructions...")
-	run:run("rtl/Instructions.run verilog_alu", "rtl/private/generated/Instructions_alu.sv")
-	run:run("rtl/Instructions.run verilog_memory", "rtl/private/generated/Instructions_memory.sv")
-	run:run("rtl/Instructions.run verilog_ops", "rtl/private/generated/Instructions_ops.sv")
-	run:run("rtl/Instructions.run verilog_decode", "rtl/private/generated/Instructions_decode.sv")
-	run:run("rtl/Instructions.run verilog_decode_ops", "rtl/private/generated/Instructions_decode_ops.sv")
-	run:run("rtl/Instructions.run verilog_execute_ops I J R U B S CSR", "rtl/private/generated/Instructions_execute_ops.sv")
-	run:run("rtl/Instructions.run verilog_fpu", "rtl/private/generated/Instructions_fpu.sv")
+	run:run("instructions.run verilog_alu", "rtl/private/generated/Instructions_alu.sv")
+	run:run("instructions.run verilog_memory", "rtl/private/generated/Instructions_memory.sv")
+	run:run("instructions.run verilog_ops", "rtl/private/generated/Instructions_ops.sv")
+	run:run("instructions.run verilog_decode", "rtl/private/generated/Instructions_decode.sv")
+	run:run("instructions.run verilog_decode_ops", "rtl/private/generated/Instructions_decode_ops.sv")
+	run:run("instructions.run verilog_execute_ops I J R U B S CSR", "rtl/private/generated/Instructions_execute_ops.sv")
+	run:run("instructions.run verilog_fpu", "rtl/private/generated/Instructions_fpu.sv")
 	stdout:printLn("Done")
 end
