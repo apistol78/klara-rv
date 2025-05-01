@@ -9,7 +9,7 @@
 
 `timescale 1ns/1ns
 
-module PLIC(
+module CPU_PLIC(
 	input i_reset,
 	input i_clock,
 

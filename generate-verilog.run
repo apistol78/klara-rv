@@ -40,13 +40,13 @@ end
 function main()
 	local base < const > = Path("./rtl")
 	traverse(base, function(path)
-		if path.extension ~= "sv" or path.pathOnly == "./rtl/private/generated" then return true end
+		if path.extension ~= "sv" or path.pathOnly == "./rtl/cpu/private/generated" then return true end
 		local p < const > = FileSystem.getInstance():getRelativePath(
 			FileSystem.getInstance():getAbsolutePath(path),
 			FileSystem.getInstance():getAbsolutePath(base)
 		)
 		FileSystem.getInstance():makeAllDirectories(Path("./rtl-v/" .. p.pathOnly))
-		local xc = run:execute(SV2V .. " --incdir=./rtl " .. path.pathName .. " --write=" .. "./rtl-v/" .. p.pathNameNoExtension .. ".v")
+		local xc = run:execute(SV2V .. " --incdir=./rtl/cpu " .. path.pathName .. " --write=" .. "./rtl-v/" .. p.pathNameNoExtension .. ".v")
 		if xc == 0 then
 			stdout:printLn("\"" .. path.pathName .. "\" converted successfully.")
 			return true
