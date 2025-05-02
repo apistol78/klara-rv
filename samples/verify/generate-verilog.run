@@ -1,0 +1,48 @@
+import(traktor)
+
+local function platform_select(default, windows)
+	if os.identifier == "windows" then return windows end
+	return default
+end
+
+local SV2V < const > = run:resolve(platform_select("$(RUN_SCRIPT_PATH)/../../3rdp/sv2v/sv2v-Linux/sv2v", "$(RUN_SCRIPT_PATH)/../../3rdp/sv2v/sv2v-Windows/sv2v.exe"))
+
+local function traverse(path, visitor)
+	local path = FileSystem.getInstance():getAbsolutePath(path)
+	local fa = FileSystem.getInstance():find(path.pathName .. "/*.*")
+
+	for i = 0, fa.size - 1 do
+		local f = fa:get(i)
+		local p = f.path
+		local fn = p.fileName
+		local pn = p.pathName
+		if f.directory then
+			if fn ~= "." and fn ~= ".." then
+				if not traverse(p, visitor) then return false end
+			end
+		else
+			if not visitor(p) then return false end
+		end
+	end
+
+	return true
+end
+
+function main()
+
+	local inputPath = FileSystem.getInstance():getAbsolutePath(Path("rtl"))
+	local outputPath = FileSystem.getInstance():getAbsolutePath(Path("rtl-v"))
+
+	traverse(inputPath, function(path)
+		if path.pathName:find("/generated/") ~= nil then return true end
+		local p = FileSystem.getInstance():getRelativePath(
+			path,
+			inputPath
+		)
+		local outputFile = Path(outputPath.pathName .. "/" .. p.pathNameNoExtension .. ".v")
+		run:mkdir(outputFile.pathOnly)
+		run:execute(SV2V .. " --write=" .. outputFile.pathName .. " --incdir=rtl --incdir=../../rtl/cpu " .. path.pathName)
+		return true
+	end)
+	
+end

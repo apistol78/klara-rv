@@ -1,0 +1,25 @@
+import(traktor)
+
+local function platform_select(default, windows)
+	if os.identifier == "windows" then return windows end
+	return default
+end
+
+local SV2V < const > = run:resolve(platform_select("$(RUN_SCRIPT_PATH)/3rdp/sv2v/sv2v-Linux/sv2v", "$(RUN_SCRIPT_PATH)/3rdp/sv2v/sv2v-Windows/sv2v.exe"))
+
+function sv2v(sourceFile, includeDirs, outputPath)
+	local options = ""
+
+	-- Add include directories to options.
+	for _, includeDir in pairs(includeDirs) do
+		options = options .. " --incdir=" .. includeDir
+	end
+
+	-- Convert file.
+	run:mkdir(outputPath)
+	local outputFile = outputPath .. "/" .. Path(sourceFile).fileNameNoExtension .. ".v"
+	local result = run:execute(SV2V .. " --write=" .. outputFile .. " " .. options .. " " .. sourceFile)
+	if result ~= 0 then return nil end
+
+	return outputFile
+end
