@@ -14,6 +14,8 @@ SOURCE =
 	"verify/Verify.v",
 	"verify/Verify_BROM.v",
 	"cpu/CPU.v",
+	"cpu/CPU_BusMux.v",
+	"cpu/CPU_PLIC.v",
 	"cpu/private/CPU_ALU.v",
 	"cpu/private/CPU_BRAM.v",
 	"cpu/private/CPU_BRAM_1r1w.v",
@@ -48,6 +50,12 @@ SOURCE =
 }
 
 function main()
+
+	-- Ensure we can launch yosys before all else.
+	if os:whereIs("yosys") == nil then
+		stderr:printLn("Unable to locate yosys; ensure it's accessible through PATH.")
+		return 1
+	end
 
 	-- Generate SystemVerilog instructions.
 	run:run("generate-instructions.run")
