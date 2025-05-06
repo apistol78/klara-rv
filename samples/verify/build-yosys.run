@@ -1,0 +1,111 @@
+--[[
+ Klara-RV
+ Copyright (c) 2025 Anders Pistol.
+
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+]]
+
+import (traktor)
+
+run:loadScript("../../sv2v.run")
+
+local PATH_CPU < const > = "../../rtl/cpu"
+local PATH_VERIFY < const > = "rtl/verify"
+
+local SOURCE < const > =
+{
+	PATH_VERIFY .. "/Verify.sv",
+	PATH_VERIFY .. "/Verify_BROM.sv",
+	PATH_CPU .. "/CPU.sv",
+	PATH_CPU .. "/CPU_BusMux.sv",
+	PATH_CPU .. "/CPU_PLIC.sv",
+	PATH_CPU .. "/private/CPU_ALU.sv",
+	PATH_CPU .. "/private/CPU_BRAM.sv",
+	PATH_CPU .. "/private/CPU_BRAM_1r1w.sv",
+	PATH_CPU .. "/private/CPU_CSR.sv",
+	PATH_CPU .. "/private/CPU_DCache_Comb.sv",
+	PATH_CPU .. "/private/CPU_DCache_None.sv",
+	PATH_CPU .. "/private/CPU_DCache_Reg.sv",
+	PATH_CPU .. "/private/CPU_Decode.sv",
+	PATH_CPU .. "/private/CPU_Defines.sv",
+	PATH_CPU .. "/private/CPU_Divide.sv",
+	PATH_CPU .. "/private/CPU_Execute.sv",
+	PATH_CPU .. "/private/CPU_Fetch.sv",
+	PATH_CPU .. "/private/CPU_Forward.sv",
+	PATH_CPU .. "/private/CPU_ICache_Comb.sv",
+	PATH_CPU .. "/private/CPU_ICache_None.sv",
+	PATH_CPU .. "/private/CPU_ICache_Reg.sv",
+	PATH_CPU .. "/private/CPU_Memory.sv",
+	PATH_CPU .. "/private/CPU_Multiply.sv",
+	PATH_CPU .. "/private/CPU_PreDecode.sv",
+	PATH_CPU .. "/private/CPU_Registers.sv",
+	PATH_CPU .. "/private/CPU_SkidBuffer.sv",
+	PATH_CPU .. "/private/CPU_Types.sv",
+	PATH_CPU .. "/private/CPU_Writeback.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Add.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Compare.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Div.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Float.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Int.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Mul.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_MulAdd.sv"
+}
+
+function main()
+
+	-- Ensure we can launch yosys before all else.
+	if os:whereIs("yosys") == nil then
+		stderr:printLn("Unable to locate yosys; ensure it's accessible through PATH.")
+		return 1
+	end
+
+	-- Concatenate all source files.
+	local f = ""
+	for _, sv in ipairs(SOURCE) do
+		local v = sv2v(
+			sv,
+			{ ".", "../../rtl/cpu" },
+			"build/rtl-v"
+		)
+		f = f .. " " .. v
+	end
+	stdout:printLn(f)
+
+	-- Ensure old bit file is removed.
+	run:rm("build/Verify.bit")
+	run:rm("build/Verify.json")
+	run:rm("build/Verify.log")
+
+	-- Synthesize
+	local xc = run:execute("yosys -l build/Verify.log -p \"opt; share -aggressive; synth_ecp5 -abc9 -json build/Verify.json\" " .. f)
+	if xc ~= 0 then
+		stderr:printLn("yosys failed; build aborted.")
+		return 1
+	end
+
+	-- Place and route.
+	local xc = run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --timing-allow-fail --top Verify --json build/Verify.json --textcfg build/Verify.config --lpf Verify.lpf --report build/Verify.report.json --freq 100")
+	if xc ~= 0 then
+		stderr:printLn("nextpnr-ecp5 failed; build aborted.")
+		return 1
+	end
+
+	-- Create bit file.
+	local xc = run:execute("ecppack --compress --svf build/Verify.svf build/Verify.config build/Verify.bit")
+	if xc ~= 0 then
+		stderr:printLn("ecppack failed; build aborted.")
+		return 1
+	end
+
+	-- Program target.
+	local xc = run:execute("openFPGALoader -c cmsisdap --vid=0x1d50 --pid=0x602b ./build/Verify.bit")
+	if xc ~= 0 then
+		stderr:printLn("openFPGALoader failed; build aborted.")
+		return 1
+	end
+
+	stdout:printLn("Build successful.")
+end
