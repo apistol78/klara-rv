@@ -19,9 +19,9 @@ build/firmware/firmware : build/firmware/startup.o code/verify.ld
 	$(C) $(LINK_FLAGS) -nostdlib build/firmware/startup.o -o $@ -Tcode/verify.ld
 	$(OD) -D build/firmware/firmware > build/firmware/firmware.dump
 
-build/firmware/startup.o : code/startup.s
+build/firmware/startup.o : code/startup.c
 	@mkdir -p build/firmware
-	$(C) -c $(C_FLAGS) -nostdlib code/startup.s -o $@
+	$(C) -c $(C_FLAGS) -nostdlib code/startup.c -o $@
 
 clean :
 	@rm -Rf build/firmware

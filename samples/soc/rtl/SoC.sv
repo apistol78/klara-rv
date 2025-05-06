@@ -20,18 +20,84 @@ module SoC(
 	wire reset = 1'b0;
 
 	//assign LED_p = cpu_dbus_request;
-	//assign IO_p = value;
+	assign IO_p = pin_value;
+
+
+	bit pin_value = 1'b0;
+	wire pin_select;
+	bit pin_ready = 1'b0;
+
+	always @(posedge clock) begin
+		if (bus_request && pin_select) begin
+			pin_value <= bus_wdata[0];
+			pin_ready <= 1'b1;
+		end
+		else begin
+			pin_ready <= 1'b0;
+		end
+	end
 
 
 	//====================================================
 	// ROM
+	wire rom_select;
+	wire [31:0] rom_address;
+	wire [31:0] rom_rdata;
+	wire rom_ready;
+
 	SoC_BROM rom(
 		.i_clock(clock),
-		.i_request(bus_request),
-		.i_address(bus_address),
-		.o_rdata(bus_rdata),
-		.o_ready(bus_ready)
+		.i_request(bus_request && rom_select),
+		.i_address(rom_address),
+		.o_rdata(rom_rdata),
+		.o_ready(rom_ready)
 	);
+
+
+	//====================================================
+	// RAM
+	wire ram_select;
+	wire [31:0] ram_address;
+	wire [31:0] ram_wdata;
+	wire [31:0] ram_rdata;
+	wire ram_ready;
+
+	BRAM #(
+		.SIZE(32'h400)
+	) ram(
+		.i_clock(clock),
+		.i_request(bus_request && ram_select),
+		.i_rw(bus_rw),
+		.i_address(ram_address),
+		.i_wdata(ram_wdata),
+		.o_rdata(ram_rdata),
+		.o_ready(ram_ready),
+		.o_valid()
+	);
+
+
+	//====================================================
+	// Chip select
+
+	assign rom_select = bus_address[31:28] == 4'h0;
+	assign rom_address = { 4'h0, bus_address[27:0] };
+
+	assign ram_select = bus_address[31:28] == 4'h1;
+	assign ram_address = { 4'h0, bus_address[27:0] };
+	assign ram_wdata = bus_wdata;
+
+	assign pin_select = bus_address[31:28] == 4'h2;
+
+	assign bus_rdata =
+		rom_select		? rom_rdata		:
+		ram_select		? ram_rdata		:
+		32'h00000000;
+
+	assign bus_ready =
+		rom_select		? rom_ready		:
+		ram_select		? ram_ready		:
+		pin_select		? pin_ready		:
+		1'b0;
 
 
 	//====================================================
@@ -87,7 +153,7 @@ module SoC(
 		.FREQUENCY(`FREQUENCY),
 		.DCACHE_SIZE(0),
 		.DCACHE_REGISTERED(1),
-		.ICACHE_SIZE(4),
+		.ICACHE_SIZE(1),
 		.ICACHE_REGISTERED(1)		
 	) cpu(
 		.i_reset(reset),
