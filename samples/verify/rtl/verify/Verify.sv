@@ -10,12 +10,12 @@
 `timescale 1ns/1ns
 `define FREQUENCY 25000000
 
+(* top *)
 module Verify(
       input CLOCK_p,
-      output LED_p
+      output LED_p,
+	  output IO_p
 );
-	wire clock = CLOCK_p;
-	wire reset = 1'b0;
 
 /*
 	wire clkout0;
@@ -41,7 +41,7 @@ module Verify(
 		.CLKOS_FPHASE(1'd0),
 		.FEEDBK_PATH("INT_OS3")
 	) EHXPLLL (
-		.CLKI(clock),
+		.CLKI(CLOCK_p),
 		.RST(reset),
 		.CLKOP(clkout0),
 		.CLKOS(clkout1),
@@ -49,7 +49,28 @@ module Verify(
 	);
 */
 
-	assign LED_p = cpu_ibus_address[20];
+	wire clock = CLOCK_p;
+	wire reset = 1'b0;
+
+
+	assign LED_p = cpu_dbus_request;
+
+	bit value = 1'b0;
+	bit ready = 1'b0;
+
+	assign IO_p = value;
+	assign cpu_dbus_ready = ready;
+
+	always @(posedge clock) begin
+		if (cpu_dbus_request && !ready) begin
+			value <= ~value;
+			ready <= 1'b1;
+		end
+		else if (!cpu_dbus_request) begin
+			ready <= 1'b0;
+		end
+	end
+
 
 	Verify_BROM rom(
 		.i_clock(clock),
@@ -76,7 +97,7 @@ module Verify(
 		.FREQUENCY(`FREQUENCY),
 		.DCACHE_SIZE(0),
 		.DCACHE_REGISTERED(1),
-		.ICACHE_SIZE(1),
+		.ICACHE_SIZE(4),
 		.ICACHE_REGISTERED(1)		
 	) cpu(
 		.i_reset(reset),

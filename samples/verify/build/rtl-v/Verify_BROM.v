@@ -10,9 +10,9 @@ module Verify_BROM (
 	input [31:0] i_address;
 	output reg [31:0] o_rdata;
 	output reg o_ready;
-	reg [31:0] data [0:3];
+	reg [31:0] data [0:32];
 	initial o_ready = 0;
-	initial $readmemh("Verify.vmem", data);
+	initial $readmemh("firmware.vmem", data);
 	always @(posedge i_clock)
 		if (i_request)
 			o_rdata <= data[i_address >> 2];
