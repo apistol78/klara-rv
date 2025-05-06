@@ -16,70 +16,60 @@ module Verify(
       output LED_p,
 	  output IO_p
 );
-
-/*
-	wire clkout0;
-	wire clkout1;
-	wire clklocked;
-
-	// https://projectf.io/posts/ecp5-fpga-clock
-	// out = CLKFB_DIV * in / CLKI_DIV
-	(* FREQUENCY_PIN_CLKI = "25.0", ICP_CURRENT = "6", LPF_RESISTOR = "16", MFG_ENABLE_FILTEROPAMP = "1", MFG_GMCREF_SEL = "2" *) EHXPLLL #(
-		.CLKFB_DIV(4'd4),
-		.CLKI_DIV(1'd1),
-		.CLKOP_CPHASE(3'd7),
-		.CLKOP_DIV(4'd8),
-		.CLKOP_ENABLE("ENABLED"),
-		.CLKOP_FPHASE(1'd0),
-		.CLKOS3_CPHASE(5'd23),
-		.CLKOS3_DIV(1'd1),
-		.CLKOS3_ENABLE("ENABLED"),
-		.CLKOS3_FPHASE(1'd0),
-		.CLKOS_CPHASE(4'd9),
-		.CLKOS_DIV(4'd8),
-		.CLKOS_ENABLE("ENABLED"),
-		.CLKOS_FPHASE(1'd0),
-		.FEEDBK_PATH("INT_OS3")
-	) EHXPLLL (
-		.CLKI(CLOCK_p),
-		.RST(reset),
-		.CLKOP(clkout0),
-		.CLKOS(clkout1),
-		.LOCK(clklocked)
-	);
-*/
-
 	wire clock = CLOCK_p;
 	wire reset = 1'b0;
 
-
-	assign LED_p = cpu_dbus_request;
-
-	bit value = 1'b0;
-	bit ready = 1'b0;
-
-	assign IO_p = value;
-	assign cpu_dbus_ready = ready;
-
-	always @(posedge clock) begin
-		if (cpu_dbus_request && !ready) begin
-			value <= ~value;
-			ready <= 1'b1;
-		end
-		else if (!cpu_dbus_request) begin
-			ready <= 1'b0;
-		end
-	end
+	//assign LED_p = cpu_dbus_request;
+	//assign IO_p = value;
 
 
+	//====================================================
+	// ROM
 	Verify_BROM rom(
 		.i_clock(clock),
-		.i_request(cpu_ibus_request),
-		.i_address(cpu_ibus_address),
-		.o_rdata(cpu_ibus_rdata),
-		.o_ready(cpu_ibus_ready)
+		.i_request(bus_request),
+		.i_address(bus_address),
+		.o_rdata(bus_rdata),
+		.o_ready(bus_ready)
 	);
 
+
+	//====================================================
+	// CPU BusMux
+	wire bus_rw;
+	wire bus_request;
+	wire bus_ready;
+	wire [31:0] bus_address;
+	wire [31:0] bus_rdata;
+	wire [31:0] bus_wdata;
+
+	CPU_BusMux #(
+		.REGISTERED(1)
+	) bus(
+		.i_reset(reset),
+		.i_clock(clock),
+
+		.o_bus_rw(bus_rw),
+		.o_bus_request(bus_request),
+		.i_bus_ready(bus_ready),
+		.o_bus_address(bus_address),
+		.i_bus_rdata(bus_rdata),
+		.o_bus_wdata(bus_wdata),
+
+		.i_pa_request(cpu_ibus_request),
+		.o_pa_ready(cpu_ibus_ready),
+		.i_pa_address(cpu_ibus_address),
+		.o_pa_rdata(cpu_ibus_rdata),
+
+		.i_pb_rw(cpu_dbus_rw),
+		.i_pb_request(cpu_dbus_request),
+		.o_pb_ready(cpu_dbus_ready),
+		.i_pb_address(cpu_dbus_address),
+		.o_pb_rdata(cpu_dbus_rdata),
+		.i_pb_wdata(cpu_dbus_wdata)
+	);
+
+	//====================================================
 	// CPU
 	wire cpu_ibus_request;
 	wire cpu_ibus_ready;
