@@ -1,3 +1,4 @@
 /3rdp
 /build
-/samples/verify/build
+/samples/soc/build
+/samples/soc/firmware*

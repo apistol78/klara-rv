@@ -12,12 +12,12 @@ import (traktor)
 run:loadScript("../../sv2v.run")
 
 local PATH_CPU < const > = "../../rtl/cpu"
-local PATH_VERIFY < const > = "rtl/verify"
+local PATH_VERIFY < const > = "rtl"
 
 local SOURCE < const > =
 {
-	PATH_VERIFY .. "/Verify.sv",
-	PATH_VERIFY .. "/Verify_BROM.sv",
+	PATH_VERIFY .. "/SoC.sv",
+	PATH_VERIFY .. "/SoC_BROM.sv",
 	PATH_CPU .. "/CPU.sv",
 	PATH_CPU .. "/CPU_BusMux.sv",
 	PATH_CPU .. "/CPU_PLIC.sv",
@@ -75,33 +75,33 @@ function main()
 	stdout:printLn(f)
 
 	-- Ensure old bit file is removed.
-	run:rm("build/Verify.bit")
-	run:rm("build/Verify.json")
-	run:rm("build/Verify.log")
+	run:rm("build/SoC.bit")
+	run:rm("build/SoC.json")
+	run:rm("build/SoC.log")
 
 	-- Synthesize
-	local xc = run:execute("yosys -l build/Verify.log -p \"opt; share -aggressive; synth_ecp5 -abc9 -json build/Verify.json\" " .. f)
+	local xc = run:execute("yosys -l build/SoC.log -p \"opt; share -aggressive; synth_ecp5 -abc9 -json build/SoC.json\" " .. f)
 	if xc ~= 0 then
 		stderr:printLn("yosys failed; build aborted.")
 		return 1
 	end
 
 	-- Place and route.
-	local xc = run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --timing-allow-fail --top Verify --json build/Verify.json --textcfg build/Verify.config --lpf Verify.lpf --report build/Verify.report.json --freq 100")
+	local xc = run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --timing-allow-fail --top SoC --json build/SoC.json --textcfg build/SoC.config --lpf SoC.lpf --report build/SoC.report.json --freq 100")
 	if xc ~= 0 then
 		stderr:printLn("nextpnr-ecp5 failed; build aborted.")
 		return 1
 	end
 
 	-- Create bit file.
-	local xc = run:execute("ecppack --compress --svf build/Verify.svf build/Verify.config build/Verify.bit")
+	local xc = run:execute("ecppack --compress --svf build/SoC.svf build/SoC.config build/SoC.bit")
 	if xc ~= 0 then
 		stderr:printLn("ecppack failed; build aborted.")
 		return 1
 	end
 
 	-- Program target.
-	local xc = run:execute("openFPGALoader -c cmsisdap --vid=0x1d50 --pid=0x602b ./build/Verify.bit")
+	local xc = run:execute("openFPGALoader -c cmsisdap --vid=0x1d50 --pid=0x602b ./build/SoC.bit")
 	if xc ~= 0 then
 		stderr:printLn("openFPGALoader failed; build aborted.")
 		return 1

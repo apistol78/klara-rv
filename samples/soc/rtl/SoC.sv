@@ -11,7 +11,7 @@
 `define FREQUENCY 25000000
 
 (* top *)
-module Verify(
+module SoC(
       input CLOCK_p,
       output LED_p,
 	  output IO_p
@@ -25,7 +25,7 @@ module Verify(
 
 	//====================================================
 	// ROM
-	Verify_BROM rom(
+	SoC_BROM rom(
 		.i_clock(clock),
 		.i_request(bus_request),
 		.i_address(bus_address),

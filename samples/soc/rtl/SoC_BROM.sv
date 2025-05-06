@@ -9,7 +9,7 @@
 
 `timescale 1ns/1ns
 
-module Verify_BROM(
+module SoC_BROM(
 	input i_clock,
 	input i_request,
 	input [31:0] i_address,
