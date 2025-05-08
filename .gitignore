@@ -2,3 +2,5 @@
 /build
 /samples/soc/build
 /samples/soc/firmware*
+/samples/verify/build
+/samples/verify/code/verilator
