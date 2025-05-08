@@ -7,12 +7,17 @@ end
 
 local SV2V < const > = run:resolve(platform_select("$(RUN_SCRIPT_PATH)/3rdp/sv2v/sv2v-Linux/sv2v", "$(RUN_SCRIPT_PATH)/3rdp/sv2v/sv2v-Windows/sv2v.exe"))
 
-function sv2v(sourceFile, includeDirs, outputPath)
+function sv2v(sourceFile, includeDirs, defines, outputPath)
 	local options = ""
 
 	-- Add include directories to options.
 	for _, includeDir in pairs(includeDirs) do
 		options = options .. " --incdir=" .. includeDir
+	end
+
+	-- Add defines to options
+	for _, define in pairs(defines) do
+		options = options .. " --define=" .. define
 	end
 
 	-- Convert file.

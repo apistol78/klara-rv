@@ -64,12 +64,12 @@ function main()
 	end
 
 	-- Concatenate all source files.
-	-- #fixme define -D__VERILATOR__ -D__TESTBENCH__ 
 	local f = ""
 	for _, sv in ipairs(SOURCE) do
 		local v = sv2v(
 			sv,
 			{ ".", PATH_PERIF, PATH_CPU },
+			{ "__VERILATOR__" },
 			"build/rtl-v"
 		)
 		f = f .. " " .. v

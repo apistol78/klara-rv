@@ -69,6 +69,7 @@ function main()
 		local v = sv2v(
 			sv,
 			{ ".", "../../rtl/cpu" },
+			{},
 			"build/rtl-v"
 		)
 		f = f .. " " .. v
