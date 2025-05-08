@@ -5,11 +5,13 @@ typedef unsigned int uint32_t;
 
 void _start()
 {
-    volatile uint32_t* mem = (uint32_t*)0x10000000;
-    volatile uint32_t* io = (uint32_t*)0x20000000;
+    volatile uint32_t* uart = (uint32_t*)0x30000000;
     for (;;)
     {
-        (*mem)++;
-        *io = *mem;
+        *uart = 'H';
+        *uart = 'E';
+        *uart = 'L';
+        *uart = 'L';
+        *uart = 'O';
     }
 }

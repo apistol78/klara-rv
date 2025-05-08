@@ -14,7 +14,9 @@
 module SoC(
       input CLOCK_p,
       output LED_p,
-	  output IO_p
+	  output IO_p,
+	  input UART_RX,
+	  output UART_TX
 );
 	wire clock = CLOCK_p;
 	wire reset = 1'b0;
@@ -77,8 +79,34 @@ module SoC(
 
 
 	//====================================================
-	// Chip select
+	// UART
+	wire uart_select;
+	wire [1:0] uart_address;
+	wire [31:0] uart_wdata;
+	wire [31:0] uart_rdata;
+	wire uart_ready;
 
+	UART #(
+		.PRESCALE(`FREQUENCY / (9600 * 8)),
+		.RX_FIFO_DEPTH(512)
+	) uart(
+		.i_reset(reset),
+		.i_clock(clock),
+		.i_request(bus_request && uart_select),
+		.i_rw(bus_rw),
+		.i_address(uart_address),
+		.i_wdata(uart_wdata),
+		.o_rdata(uart_rdata),
+		.o_ready(uart_ready),
+		.o_interrupt(),
+		// ---
+		.UART_RX(UART_RX),
+		.UART_TX(UART_TX)
+	);
+
+
+	//====================================================
+	// Chip select
 	assign rom_select = bus_address[31:28] == 4'h0;
 	assign rom_address = { 4'h0, bus_address[27:0] };
 
@@ -86,16 +114,22 @@ module SoC(
 	assign ram_address = { 4'h0, bus_address[27:0] };
 	assign ram_wdata = bus_wdata;
 
-	assign pin_select = bus_address[31:28] == 4'h2;
+	assign uart_select = bus_address[31:28] == 4'h3;
+	assign uart_address = { 4'h0, bus_address[27:0] };
+	assign uart_wdata = bus_wdata;
+
+	assign pin_select = bus_address[31:28] == 4'h4;
 
 	assign bus_rdata =
 		rom_select		? rom_rdata		:
 		ram_select		? ram_rdata		:
+		uart_select		? uart_rdata	:
 		32'h00000000;
 
 	assign bus_ready =
 		rom_select		? rom_ready		:
 		ram_select		? ram_ready		:
+		uart_select		? uart_ready	:
 		pin_select		? pin_ready		:
 		1'b0;
 
@@ -134,6 +168,7 @@ module SoC(
 		.o_pb_rdata(cpu_dbus_rdata),
 		.i_pb_wdata(cpu_dbus_wdata)
 	);
+
 
 	//====================================================
 	// CPU
