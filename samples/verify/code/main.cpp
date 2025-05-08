@@ -44,10 +44,12 @@ void evaluate(VVerify* verify, const char* trace, int32_t steps)
 	assert(tb != nullptr); 
 
 	int32_t time = 0;
-	for (int32_t i = 0; i < steps; ++i)
+	bool stuck = false;
+
+	for (int32_t i = 0; !stuck && i < steps; ++i)
 	{
 		const uint32_t from = tb->Verify__DOT__cpu__DOT__writeback__DOT__retired;
-		while (tb->Verify__DOT__cpu__DOT__writeback__DOT__retired == from)
+		while (!stuck && tb->Verify__DOT__cpu__DOT__writeback__DOT__retired == from)
 		{
 			++time;
 			
@@ -67,11 +69,12 @@ void evaluate(VVerify* verify, const char* trace, int32_t steps)
 			if (time > 10000)
 			{
 				printf("Unable to execute, seems stuck!\n");
-				exit(0);
-				break;
+				stuck = true;
 			}
 		}
 	}
+
+	verify->final();
 
 	if (tfp)
 	{
@@ -80,19 +83,19 @@ void evaluate(VVerify* verify, const char* trace, int32_t steps)
 	}
 }
 
-std::random_device s_randomDevice;
+std::random_device* s_randomDevice = new std::random_device();
 
 // Randomize 32-bit signed integer.
 int32_t rnd32()
 {
-	const uint32_t v = s_randomDevice();
+	const uint32_t v = (*s_randomDevice)();
 	return *(const int32_t*)&v;
 }
 
 // Randomize 32-bit unsigned integer.
 uint32_t urnd32()
 {
-	return s_randomDevice();
+	return (*s_randomDevice)();
 }
 
 // Randomize float.
@@ -110,8 +113,8 @@ float rndf()
 // Randomize normalized float (0-1).
 float rndnf()
 {
-	const double f = (double)s_randomDevice();
-	const double nf = f / s_randomDevice.max();
+	const double f = (double)(*s_randomDevice)();
+	const double nf = f / (*s_randomDevice).max();
 	return (float)nf;
 }
 
@@ -2085,10 +2088,10 @@ bool verify(bool (*fn)(const char* trace), const char* name, bool ftrce)
 		// Re-run failed test with tracing enabled.
 		if (!result)
 		{
-			//g_rnd = traktor::Random(sd);
+			s_randomDevice = new std::random_device();
 			printf("Verify failed (at %d / %d), re-run with trace...\n", i, ITERATIONS);
-			// if (fn(fnf))
-			// 	printf("Inconsistent verification.\n");
+			if (fn(fnf))
+				printf("Inconsistent verification.\n");
 		}
 	}
 	else
@@ -2124,7 +2127,7 @@ int main(int argc, char **argv)
 	// CHECK(verify_DIV);
 	// CHECK(verify_UDIV);
 	CHECK(verify_JAL);
-	// CHECK(verify_JALR);	stuck?
+	// CHECK(verify_JALR);	// fault the CPU
 	CHECK(verify_LB);
 	CHECK(verify_LBU);
 	CHECK(verify_LH);
