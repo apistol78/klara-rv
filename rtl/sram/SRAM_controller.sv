@@ -9,7 +9,10 @@
 
 `timescale 1ns/1ns
 
-module SRAM_controller(
+module SRAM_controller #(
+	parameter FREQUENCY = 100_000_000,
+	params SRAM_ADDRESS_WIDTH = 18
+)(
 	input i_reset,
 	input i_clock,
 	input i_request,
@@ -19,7 +22,7 @@ module SRAM_controller(
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 
-	output bit [17:0] SRAM_A,
+	output bit [SRAM_ADDRESS_WIDTH-1:0] SRAM_A,
 	inout [15:0] SRAM_D,
 	output SRAM_CE_n,
 	output bit SRAM_OE_n,
@@ -29,7 +32,7 @@ module SRAM_controller(
 );
 
 	// Number of cycles for entire transaction.
-	localparam CYCLES = 4;
+	localparam CYCLES = (4 * FREQUENCY) / 100_000_000;
 	localparam READ_OFFSET = 1;
 	localparam WRITE_OFFSET = 1;
 
@@ -59,10 +62,10 @@ module SRAM_controller(
 		end
 
 		if (count < CYCLES / 2) begin
-			SRAM_A = { i_address[18:2], 1'b0 };
+			SRAM_A = { i_address[SRAM_ADDRESS_WIDTH:2], 1'b0 };
 		end
 		else begin
-			SRAM_A = { i_address[18:2], 1'b1 };
+			SRAM_A = { i_address[SRAM_ADDRESS_WIDTH:2], 1'b1 };
 		end
 
 		if (count < CYCLES / 2) begin
