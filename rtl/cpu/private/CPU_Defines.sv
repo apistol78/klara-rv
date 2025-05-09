@@ -20,11 +20,14 @@
 `endif
 
 // Multiply and divide
-`ifndef __VERILATOR__
+`ifdef USE_MULTIPLY_IP
 	`define MUL_CYCLE_LATENCY       2
+`else
+	`define MUL_CYCLE_LATENCY       4
+`endif
+`ifdef USE_DIVIDE_IP
 	`define DIV_CYCLE_LATENCY       14
 `else
-	`define MUL_CYCLE_LATENCY       2
 	`define DIV_CYCLE_LATENCY       2
 `endif
 

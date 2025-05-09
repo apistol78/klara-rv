@@ -24,7 +24,7 @@ VVerify* create_soc()
 	// Fill rom with NOP since prefetch might read more instructions
 	// than we evaluate.
 	for (int32_t i = 0; i < 256; ++i)
-		tb->rootp->Verify__DOT__ram__DOT__data[i] = 0x00000013;
+		tb->rootp->Verify__DOT__rom__DOT__data[i] = 0x00000013;
 
 	return tb;
 }
@@ -2127,16 +2127,16 @@ int main(int argc, char **argv)
 	// CHECK(verify_DIV);
 	// CHECK(verify_UDIV);
 	CHECK(verify_JAL);
-	// CHECK(verify_JALR);	// fault the CPU
+	CHECK(verify_JALR);
 	CHECK(verify_LB);
 	CHECK(verify_LBU);
 	CHECK(verify_LH);
 	CHECK(verify_LHU);
 	CHECK(verify_LUI);
 	CHECK(verify_LW);
-	// CHECK(verify_MUL);
-	// CHECK(verify_MULH);
-	// CHECK(verify_MULHU);
+	CHECK(verify_MUL);
+	CHECK(verify_MULH);
+	CHECK(verify_MULHU);
 	CHECK(verify_OR);
 	CHECK(verify_ORI);
 	// CHECK(verify_REM);

@@ -56,27 +56,18 @@ module CPU_Multiply(
 
 `else
 
-	assign o_result = 32'd0;
-
-	/*	
 	bit [63:0] p1;
 	bit [63:0] p2;
+	bit [63:0] p3;
 	
-	assign o_result = p2;
+	assign o_result = p3;
 
 	always_ff @(posedge i_clock)
 	begin
 		p1 <= { 32'b0, uop1 } * { 32'b0, uop2 };
-		if (i_signed) begin
-			if (s[0] != s[1])
-				p2 <= -$signed(p1);
-			else
-				p2 <= p1;
-		end
-		else
-			p2 <= p1;
+		p2 <= p1;
+		p3 <= (i_signed && s[0] != s[1]) ? -$signed(p2) : p2;
 	end
-	*/
 
 `endif
 
