@@ -1,0 +1,29 @@
+import(traktor)
+
+function main()
+
+	local IN = 25
+	local OUT = 100
+
+	for clki_div = 1, 128 do
+		for clkfb_div = 1, 128 do
+			for clkop_div = 1, 128 do
+
+				local f_pfd = IN / clki_div
+				local f_vco = f_pfd * clkfb_div * clkop_div
+				local f_clk_out = f_vco / clkop_div
+
+				if f_clk_out == OUT and f_vco >= 400 and f_vco <= 800 then
+					print("f_pfd " .. f_pfd)
+					print("f_vco " .. f_vco)
+					print("f_clk_out " .. f_clk_out)
+					print("CLKI_DIV " .. clki_div)
+					print("CLKFB_DIV " .. clkfb_div)
+					print("CLKOP_DIV " .. clkop_div)
+				end
+			end
+		end
+	end
+
+
+end
