@@ -10,7 +10,8 @@
 `timescale 1ns/1ns
 
 module UART_TX #(
-    parameter PRESCALE = 50000000 / (9600 * 8)
+	parameter FREQUENCY,
+	parameter BAUDRATE = 9600	
 )(
 	input i_reset,
 	input i_clock,
@@ -20,12 +21,13 @@ module UART_TX #(
 
 	output bit UART_TX
 );
-	localparam MAX_PRESCALE_VALUE = (PRESCALE << 3);
+	localparam MAX_RATE = FREQUENCY / (BAUDRATE);
+	localparam CNT_WIDTH = $clog2(MAX_RATE);
 
-	bit [1:0] state = 0;
-	bit [$clog2(MAX_PRESCALE_VALUE)-1:0] prescale = 0;
-	bit [8:0] data = 0;
-	bit [3:0] bidx = 0;
+	bit [2:0] state = 0;
+	bit [CNT_WIDTH:0] counter = 0;
+	bit [7:0] data = 0;
+	bit [8:0] bidx = 0;
 
 	// FIFO
 	wire tx_fifo_empty;
@@ -34,7 +36,7 @@ module UART_TX #(
 	bit tx_fifo_read = 0;
 	wire [7:0] tx_fifo_rdata;
 	FIFO #(
-		.DEPTH(64),
+		.DEPTH(16),
 		.WIDTH(8)
 	) tx_fifo(
 		.i_clock(i_clock),
@@ -67,45 +69,58 @@ module UART_TX #(
 
 	// Read from FIFO and transmit each byte.
 	always_ff @(posedge i_clock) begin
-		case (state)
-			0: begin
+
+		if (counter >= MAX_RATE) begin
+			counter <= 0;
+
+			// Serial tick.
+			case (state)
+
+				// Start bit.
+				1: begin
+					UART_TX <= 1'b0;
+					state <= 2;
+				end
+
+				// Clock data out.
+				2: begin
+					if (bidx < 8'd8) begin
+						UART_TX <= data[0];
+						data <= data >> 1;
+						bidx <= bidx + 1;
+					end
+					else begin
+						// Send stop bit.
+						UART_TX <= 1'b1;
+						bidx <= 8'd0;
+						state <= 3;
+					end
+				end
+
+				// TX done.
+				3: begin
+					state <= 0;
+				end
+			endcase
+
+		end else begin
+
+			counter <= counter + 1;
+
+			// Read from fifo.
+			if (state == 0) begin
 				if (!tx_fifo_empty) begin
 					if (!tx_fifo_read)
 						tx_fifo_read <= 1;
 					else begin
 						tx_fifo_read <= 0;
+						data <= tx_fifo_rdata;
 						bidx <= 0;
 						state <= 1;
 					end
 				end
 			end
-
-			1: begin
-				prescale <= (PRESCALE << 3) - 1;
-				bidx <= 8+1;
-				data <= { 1'b1, tx_fifo_rdata };
-				UART_TX <= 0;
-				state <= 2;
-			end
-
-			2: begin
-				if (prescale > 0) begin
-					prescale <= prescale - 1;
-				end
-				else begin				
-					if (bidx > 0) begin
-						bidx <= bidx - 1;
-						prescale <= (PRESCALE << 3) - 1;
-						{ data, UART_TX } <= { 1'b0, data };
-					end
-					else begin
-						prescale <= (PRESCALE << 3);
-						UART_TX <= 1;
-						state <= 0;
-					end
-				end
-			end
-		endcase
+		end
 	end
 
 endmodule

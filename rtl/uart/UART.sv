@@ -10,7 +10,8 @@
 `timescale 1ns/1ns
 
 module UART #(
-    parameter PRESCALE = 50000000 / (9600 * 8),
+	parameter FREQUENCY,
+	parameter BAUDRATE = 9600,
 	parameter RX_FIFO_DEPTH = 256
 )(
 	input i_reset,
@@ -27,6 +28,8 @@ module UART #(
     input UART_RX,
     output UART_TX
 );
+
+	localparam PRESCALE = FREQUENCY / (BAUDRATE * 8);
 
 	bit rx_request;
 	wire rx_ready;
@@ -47,7 +50,9 @@ module UART #(
 	bit tx_request;
 	wire tx_ready;
 	UART_TX #(
-		.PRESCALE(PRESCALE)
+		//.PRESCALE(PRESCALE)
+		.FREQUENCY(FREQUENCY),
+		.BAUDRATE(BAUDRATE)
 	) tx(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
