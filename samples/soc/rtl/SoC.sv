@@ -18,8 +18,25 @@ module SoC(
 	  input UART_RX,
 	  output UART_TX
 );
-	wire clock = CLOCK_p;
+	wire clock;
 	wire reset = 1'b0;
+
+
+	// current 1.04 MhZ signal at 125 MHz
+
+	// 125 MHz
+	PLL_ECP5 #(
+		.CLKI_DIV(1),
+		.CLKFB_DIV(5),
+		.CLKOP_DIV(5),
+		.CLKOP_CPHASE(0)
+	) pll(
+		.i_clk(CLOCK_p),
+		.o_clk1(clock),
+		.o_clk2(),
+		.o_clk_locked()
+	);
+
 
 	//assign LED_p = cpu_dbus_request;
 	assign IO_p = pin_value;
