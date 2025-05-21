@@ -1,0 +1,93 @@
+--[[
+ Klara-RV
+ Copyright (c) 2025 Anders Pistol.
+
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+]]
+
+import (traktor)
+import(traktor.run)
+
+local function writeFile(fn, lines)
+	local f = fileSystem:open(Path(run.cwd .. "/" .. fn), File.FmWrite)
+	if f == nil then return false end
+	local so = StreamOutput(f, Utf8Encoding())
+	for _, ln in ipairs(lines) do
+		so:printLn(ln)
+	end
+	f:close()
+end
+
+local function buildHostLinux()
+	local TRAKTOR_HOME < const > = os:getEnvironment("TRAKTOR_HOME")
+
+	os:setEnvironment("MAKE_OS", "linux")
+	os:setEnvironment("MAKE_DIALECT", "make")
+	os:setEnvironment("MAKE_FORMAT", TRAKTOR_HOME .. "/resources/build/configurations/make-format.sbm")
+	os:setEnvironment("MAKE_INCLUDE", TRAKTOR_HOME .. "/resources/build/configurations/make-config-linux.inc")
+	os:setEnvironment("MAKE_TOOLCHAIN", "gcc")
+	os:setEnvironment("MAKE_OBJECT_FILE", "%s.o")
+	os:setEnvironment("MAKE_STATIC_LIBRARY_FILE", "lib%s.a")
+	os:setEnvironment("MAKE_SHARED_LIBRARY_FILE", "lib%s.so")
+	os:setEnvironment("MAKE_EXECUTABLE_FILE", "%s")
+	os:setEnvironment("MAKE_VERBOSE", "false")
+
+	run:execute(
+		TRAKTOR_HOME .. "/bin/linux/releasestatic/Traktor.SolutionBuilder.App " ..
+		"-f=make2 " ..
+		"-make-solution-template=" .. TRAKTOR_HOME .. "/resources/build/configurations/make-solution.sbm " ..
+		"-make-project-template=" .. TRAKTOR_HOME .. "/resources/build/configurations/make-project.sbm " ..
+		"klara-rv-linux.xms"
+	)
+
+	run:pushd("build/linux")
+	if run:execute("make -f KlaraRV.mak ReleaseStatic") ~= 0 then return false end
+	run:popd()
+
+	return true
+end
+
+local function buildHostWin64()
+	local TRAKTOR_HOME < const > = os:getEnvironment("TRAKTOR_HOME")
+
+	run:execute(
+		TRAKTOR_HOME .. "/bin/win64/releasestatic/Traktor.SolutionBuilder.App " ..
+		"-f=msvc " ..
+		"-p=" .. TRAKTOR_HOME .. "/resources/build/configurations/msvc-2022-win64.xml " ..
+		"klara-rv-win64.xms"
+	)
+
+	run:pushd("build/win64")
+
+	writeFile(
+		"build.bat",
+		{
+			"@echo off",
+			"call \"" .. TRAKTOR_HOME .. "/scripts/config.bat\"",
+			"call \"" .. TRAKTOR_HOME .. "/scripts/config-vs-x64.bat\"",
+			"msbuild -m KlaraRV.sln /p:Configuration=ReleaseStatic"
+		}
+	)
+
+	if run:execute("build/win64/build.bat") ~= 0 then
+		stderr:printLn("Failed to execute build file.")
+		return false
+	end
+
+	run:popd()
+
+	return true
+end
+
+function main()
+	-- if not buildHostLinux() then return 1 end
+	if os.identifier == "windows" then
+		if not buildHostWin64() then return 1 end
+	else
+		if not buildHostLinux() then return 1 end
+	end
+	stdout:printLn("Build successful.")
+	return 0
+end
