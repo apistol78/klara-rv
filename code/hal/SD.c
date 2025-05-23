@@ -13,8 +13,8 @@
 #include "hal/SD.h"
 #include "hal/Timer.h"
 
-//#define SD_TRACE_INFO(...) printf(__VA_ARGS__)
-#define SD_TRACE_INFO(...)
+#define SD_TRACE_INFO(...) printf(__VA_ARGS__)
+//#define SD_TRACE_INFO(...)
 #define SD_TRACE_ERROR(...) printf(__VA_ARGS__)
 
 // #define SD_ASSERT(cond) \
@@ -930,8 +930,9 @@ int32_t sd_init(int32_t mode)
 
 	// Finally set desired acceleration mode;
 	// not applicable for emulator.
-	// if (deviceId != SR_DEVICE_ID_RV32)
-		s_mode = mode;
+
+	// #fixme uncomment this for HW
+	//	s_mode = mode;
 
 	return 0;
 }

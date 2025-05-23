@@ -215,7 +215,7 @@ CPU::CPU(Bus* bus, OutputStream* trace, bool twoWayICache)
 	for (uint32_t i = 0; i < sizeof_array(m_registers); ++i)
 		m_registers[i] = 0x00000000;
 
-	m_registers[2] = 0x20110000;
+	m_registers[2] = 0x00000000;
 
 	for (uint32_t i = 0; i < sizeof_array(m_csr); ++i)
 		m_csr[i] = 0x00000000;
