@@ -8,32 +8,18 @@
 */
 #include "hal/Audio.h"
 #include "hal/Interrupt.h"
-#include "hal/SystemRegisters.h"
 
 static uint32_t s_channels = 0;
 
 void audio_init()
 {
-	switch(sysreg_read(SR_REG_DEVICE_ID))
-	{
-	case SR_DEVICE_ID_RV32:
-	case SR_DEVICE_ID_RV32T:
-	case SR_DEVICE_ID_Q_CV_2:
-	case SR_DEVICE_ID_Q_CV_5:
-		s_channels = 1;
-		break;
-
-	default:
-		s_channels = 2;
-		break;
-	}
+	s_channels = 2;
 }
 
 void audio_set_playback_rate(uint32_t rate)
 {
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
-	const uint32_t freq = sysreg_read(SR_REG_FREQUENCY);
-	audio[1] = freq / rate;
+	audio[1] = CPU_FREQUENCY / rate;
 }
 
 uint32_t audio_get_queued()

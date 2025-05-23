@@ -9,10 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Runtime/Kernel.h"
-#include "hal/DMA.h"
 #include "hal/Interrupt.h"
-#include "hal/SystemRegisters.h"
 #include "hal/Timer.h"
 #include "hal/Video.h"
 
@@ -26,7 +23,7 @@
 static void* s_primary_target = 0;
 static uint32_t s_visible_offset = 0;
 static uint32_t s_hidden_offset = MAX_WIDTH * MAX_HEIGHT;
-static volatile kernel_sig_t s_vblank_signal;
+// static volatile kernel_sig_t s_vblank_signal;
 static volatile int s_vblank = 0;
 static int32_t s_mode = 0;
 
@@ -47,7 +44,7 @@ c_modes[] =
 
 static void video_interrupt_handler()
 {
-	kernel_sig_raise(&s_vblank_signal);
+	// kernel_sig_raise(&s_vblank_signal);
 	s_vblank++;
 }
 
@@ -144,12 +141,12 @@ void video_blit(const void* source)
 void video_present(int32_t waitVblank)
 {
 	// Wait until vblank occurs.
-	while (waitVblank > 0)
-	{
-		if (kernel_sig_try_wait(&s_vblank_signal, 400) == 0)
-			printf("WARN: vblank wait failed (%d)\n", s_vblank);
-		--waitVblank;
-	}
+	// while (waitVblank > 0)
+	// {
+	// 	if (kernel_sig_try_wait(&s_vblank_signal, 400) == 0)
+	// 		printf("WARN: vblank wait failed (%d)\n", s_vblank);
+	// 	--waitVblank;
+	// }
 
 	// Swap offsets.
 	const uint32_t tmp = s_hidden_offset;
@@ -163,5 +160,5 @@ void video_present(int32_t waitVblank)
 
 void video_wait_vblank()
 {
-	kernel_sig_try_wait(&s_vblank_signal, 400);
+	// kernel_sig_try_wait(&s_vblank_signal, 400);
 }

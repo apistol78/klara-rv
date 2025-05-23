@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <object type="traktor.sb.Solution" version="5">
 	<name>KlaraRV</name>
-	<rootPath>build/linux</rootPath>
+	<rootPath>build/rv</rootPath>
 	<aggregateOutputPath/>
 	<projects>
 		<item type="traktor.sb.Project" version="1">

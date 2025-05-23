@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#define CPU_FREQUENCY 100000000
+
 #define UART_BASE	0x51000000
 #define I2C_BASE	0x53000000
 #define SD_BASE		0x54000000

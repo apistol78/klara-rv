@@ -8,11 +8,9 @@
 */
 #include <stdio.h>
 #include <string.h>
-#include "Runtime/Kernel.h"
 #include "hal/Common.h"
 #include "hal/CRC.h"
 #include "hal/SD.h"
-#include "hal/SystemRegisters.h"
 #include "hal/Timer.h"
 
 //#define SD_TRACE_INFO(...) printf(__VA_ARGS__)
@@ -549,8 +547,8 @@ int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 	const uint32_t addr = block;	// SDHC take block number.
 	// \todo support non SDHC
 
-	sysreg_modify(SR_REG_LEDS, 1, 1);
-	kernel_enter_critical();
+	// sysreg_modify(SR_REG_LEDS, 1, 1);
+	// kernel_enter_critical();
 
 	int32_t result = 0;
 	for (int32_t i = 0; i < 10; ++i)
@@ -560,14 +558,15 @@ int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 			result = 1;
 			break;
 		}
-		kernel_leave_critical();
-		kernel_sleep(100);
-		kernel_enter_critical();
+		// kernel_leave_critical();
+		// kernel_sleep(100);
+		// kernel_enter_critical();
+		timer_wait_ms(100);
 	}
 	if (!result)
 	{
-		kernel_leave_critical();
-		sysreg_modify(SR_REG_LEDS, 1, 0);
+		// kernel_leave_critical();
+		// sysreg_modify(SR_REG_LEDS, 1, 0);
 		SD_TRACE_ERROR("[SD] Unable to issue CMD17\n");
 		return 0;
 	}
@@ -596,14 +595,14 @@ int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 		// Not ready; yield this thread.
 		if (try > 2000)
 		{
-			kernel_leave_critical();
-			kernel_yield();
-			kernel_enter_critical();
+			// kernel_leave_critical();
+			// kernel_yield();
+			// kernel_enter_critical();
 		}
 		else if (try > 10000)
 		{
-			kernel_leave_critical();
-			sysreg_modify(SR_REG_LEDS, 1, 0);
+			// kernel_leave_critical();
+			// sysreg_modify(SR_REG_LEDS, 1, 0);
 			printf("[SD] No start bit detected\n");
 			return 0;
 		}
@@ -678,8 +677,8 @@ int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 		}
 	}
 
-	kernel_leave_critical();
-	sysreg_modify(SR_REG_LEDS, 1, 0);
+	// kernel_leave_critical();
+	// sysreg_modify(SR_REG_LEDS, 1, 0);
 	return bufferLen;
 }
 
@@ -690,8 +689,8 @@ int32_t sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t buffer
 	const uint32_t addr = block;	// SDHC take block number.
 	// \todo support non SDHC
 
-	sysreg_modify(SR_REG_LEDS, 1, 1);
-	kernel_enter_critical();
+	// sysreg_modify(SR_REG_LEDS, 1, 1);
+	// kernel_enter_critical();
 
 	int32_t result = 0;
 	for (int32_t i = 0; i < 10; ++i)
@@ -701,14 +700,15 @@ int32_t sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t buffer
 			result = 1;
 			break;
 		}
-		kernel_leave_critical();
-		kernel_sleep(100);
-		kernel_enter_critical();
+		// kernel_leave_critical();
+		// kernel_sleep(100);
+		// kernel_enter_critical();
+		timer_wait_ms(100);
 	}
 	if (!result)
 	{
-		kernel_leave_critical();
-		sysreg_modify(SR_REG_LEDS, 1, 0);
+		// kernel_leave_critical();
+		// sysreg_modify(SR_REG_LEDS, 1, 0);
 		SD_TRACE_ERROR("[SD] Unable to issue CMD24\n");
 		return 0;
 	}
@@ -839,22 +839,22 @@ int32_t sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t buffer
 	}
 	if (!writeSuccess)
 	{
-		kernel_leave_critical();
-		sysreg_modify(SR_REG_LEDS, 1, 0);
-		printf("[SD] No end bit detected\n");
+		// kernel_leave_critical();
+		// sysreg_modify(SR_REG_LEDS, 1, 0);
+		// printf("[SD] No end bit detected\n");
 		return 0;
 	}
 
 	sd_dummy_clock(100000);
 
-	kernel_leave_critical();
-	sysreg_modify(SR_REG_LEDS, 1, 0);
+	// kernel_leave_critical();
+	// sysreg_modify(SR_REG_LEDS, 1, 0);
 	return bufferLen;
 }
 
 int32_t sd_init(int32_t mode)
 {
-	const uint32_t deviceId = sysreg_read(SR_REG_DEVICE_ID);
+	// const uint32_t deviceId = sysreg_read(SR_REG_DEVICE_ID);
 
 	// Use SW mode for initialization.
 	s_mode = SD_MODE_SW;
@@ -930,7 +930,7 @@ int32_t sd_init(int32_t mode)
 
 	// Finally set desired acceleration mode;
 	// not applicable for emulator.
-	if (deviceId != SR_DEVICE_ID_RV32)
+	// if (deviceId != SR_DEVICE_ID_RV32)
 		s_mode = mode;
 
 	return 0;
