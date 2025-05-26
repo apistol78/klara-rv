@@ -8,10 +8,10 @@
 */
 #include "HAL/Timer.h"
 
-void timer_wait_ms(uint32_t ms)
+void hal_timer_wait_ms(uint32_t ms)
 {
-	const uint32_t until = timer_get_ms() + ms;
-	while (timer_get_ms() < until)
+	const uint32_t until = hal_timer_get_ms() + ms;
+	while (hal_timer_get_ms() < until)
 	{
 		__asm__ volatile (
 			"nop	\n"

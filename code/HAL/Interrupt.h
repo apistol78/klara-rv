@@ -19,12 +19,12 @@
 
 typedef void (*irq_handler_t)(uint32_t source);
 
-EXTERN_C void interrupt_init();
+EXTERN_C void hal_interrupt_init();
 
-EXTERN_C void interrupt_set_handler(uint32_t source, irq_handler_t handler);
+EXTERN_C void hal_interrupt_set_handler(uint32_t source, irq_handler_t handler);
 
-EXTERN_C irq_handler_t* interrupt_get_handler(uint32_t source);
+EXTERN_C irq_handler_t* hal_interrupt_get_handler(uint32_t source);
 
-EXTERN_C void interrupt_enable();
+EXTERN_C void hal_interrupt_enable();
 
-EXTERN_C void interrupt_disable();
+EXTERN_C void hal_interrupt_disable();

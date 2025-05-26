@@ -10,14 +10,14 @@
 
 #include "HAL/Common.h"
 
-EXTERN_C void uart_tx_u8(uint8_t data);
+EXTERN_C void hal_uart_tx_u8(uint8_t data);
 
-EXTERN_C uint32_t uart_rx_full();
+EXTERN_C uint32_t hal_uart_rx_full();
 
-EXTERN_C uint32_t uart_rx_empty();
+EXTERN_C uint32_t hal_uart_rx_empty();
 
-EXTERN_C uint8_t uart_rx_u8();
+EXTERN_C uint8_t hal_uart_rx_u8();
 
-EXTERN_C uint16_t uart_rx_u16();
+EXTERN_C uint16_t hal_uart_rx_u16();
 
-EXTERN_C uint32_t uart_rx_u32();
+EXTERN_C uint32_t hal_uart_rx_u32();

@@ -24,35 +24,35 @@
 #define I2C_WR_SCL_HIGH() \
 	{ *I2C_CTRL = 0x0022; }
 
-static void i2c_dly()
+static void hal_i2c_dly()
 {
 	for (uint32_t i = 0; i < 80; ++i)
 		__asm__ volatile ("nop");
 }
 
-static void i2c_start()
+static void hal_i2c_start()
 {
 	I2C_WR_SDA_HIGH();	// i2c start bit sequence
-	i2c_dly();
+	hal_i2c_dly();
 	I2C_WR_SCL_HIGH();
-	i2c_dly();
+	hal_i2c_dly();
 	I2C_WR_SDA_LOW();
-	i2c_dly();
+	hal_i2c_dly();
 	I2C_WR_SCL_LOW();
-	i2c_dly();
+	hal_i2c_dly();
 }
 
-static void i2c_stop()
+static void hal_i2c_stop()
 {
 	I2C_WR_SDA_LOW();	// i2c stop bit sequence
-	i2c_dly();
+	hal_i2c_dly();
 	I2C_WR_SCL_HIGH();
-	i2c_dly();
+	hal_i2c_dly();
 	I2C_WR_SDA_HIGH();
-	i2c_dly();
+	hal_i2c_dly();
 }
 
-static uint8_t i2c_rx(uint8_t ack)
+static uint8_t hal_i2c_rx(uint8_t ack)
 {
 	uint8_t x, d = 0;
 
@@ -65,11 +65,11 @@ static uint8_t i2c_rx(uint8_t ack)
 			I2C_WR_SCL_HIGH();
 		}
 		while (I2C_RD_SCL() == 0);    // wait for any SCL clock stretching
-		i2c_dly();
+		hal_i2c_dly();
 		if (I2C_RD_SDA())
 			d |= 1;
 		I2C_WR_SCL_LOW();
-		i2c_dly();
+		hal_i2c_dly();
 	} 
 
 	if (ack)
@@ -77,15 +77,15 @@ static uint8_t i2c_rx(uint8_t ack)
 	else
 		{ I2C_WR_SDA_HIGH(); }
 
-	i2c_dly();
+	hal_i2c_dly();
 	I2C_WR_SCL_HIGH();
-	i2c_dly();	// send (N)ACK bit
+	hal_i2c_dly();	// send (N)ACK bit
 	I2C_WR_SCL_LOW();
 	I2C_WR_SDA_HIGH();
 	return d;
 }
 
-static uint8_t NO_OPTIMIZE i2c_tx_addr(uint8_t d, uint8_t bits, uint8_t read)
+static uint8_t NO_OPTIMIZE hal_i2c_tx_addr(uint8_t d, uint8_t bits, uint8_t read)
 {
 	const uint8_t od = d;
 
@@ -96,12 +96,12 @@ static uint8_t NO_OPTIMIZE i2c_tx_addr(uint8_t d, uint8_t bits, uint8_t read)
 		else
 			{ I2C_WR_SDA_LOW(); }
 
-		i2c_dly();
+		hal_i2c_dly();
 
 		I2C_WR_SCL_HIGH();
-		i2c_dly();
+		hal_i2c_dly();
 		I2C_WR_SCL_LOW();
-		i2c_dly();
+		hal_i2c_dly();
 
 		d <<= 1;
 	}
@@ -113,22 +113,22 @@ static uint8_t NO_OPTIMIZE i2c_tx_addr(uint8_t d, uint8_t bits, uint8_t read)
 		else
 			{ I2C_WR_SDA_LOW(); }
 
-		i2c_dly();
+		hal_i2c_dly();
 
 		I2C_WR_SCL_HIGH();
-		i2c_dly();
+		hal_i2c_dly();
 		I2C_WR_SCL_LOW();
-		i2c_dly();			
+		hal_i2c_dly();			
 	}
 
 	// ACK/NAK
 	I2C_WR_SDA_HIGH();
-	i2c_dly();
+	hal_i2c_dly();
 	I2C_WR_SCL_HIGH();
-	i2c_dly();
+	hal_i2c_dly();
 	const uint8_t b = I2C_RD_SDA();
 	I2C_WR_SCL_LOW();
-	i2c_dly();
+	hal_i2c_dly();
 
 	// High means NAK.
 	// if (b)
@@ -137,7 +137,7 @@ static uint8_t NO_OPTIMIZE i2c_tx_addr(uint8_t d, uint8_t bits, uint8_t read)
 	return b;
 }
 
-static uint8_t NO_OPTIMIZE i2c_tx_data(uint8_t d)
+static uint8_t NO_OPTIMIZE hal_i2c_tx_data(uint8_t d)
 {
 	for (uint8_t i = 0; i < 8; ++i)
 	{
@@ -146,49 +146,49 @@ static uint8_t NO_OPTIMIZE i2c_tx_data(uint8_t d)
 		else
 			{ I2C_WR_SDA_LOW(); }
 
-		i2c_dly();
+		hal_i2c_dly();
 
 		I2C_WR_SCL_HIGH();
-		i2c_dly();
+		hal_i2c_dly();
 		I2C_WR_SCL_LOW();
-		i2c_dly();
+		hal_i2c_dly();
 
 		d <<= 1;
 	}
 
 	// ACK/NAK
 	I2C_WR_SDA_HIGH();
-	i2c_dly();
+	hal_i2c_dly();
 	I2C_WR_SCL_HIGH();
-	i2c_dly();
+	hal_i2c_dly();
 	const uint8_t b = I2C_RD_SDA();
 	I2C_WR_SCL_LOW();
-	i2c_dly();
+	hal_i2c_dly();
 
 	return b;
 }
 
-int32_t i2c_write(uint8_t deviceAddr, uint8_t controlAddr, uint8_t controlData)
+int32_t hal_i2c_write(uint8_t deviceAddr, uint8_t controlAddr, uint8_t controlData)
 {
-	i2c_start();
-	i2c_tx_addr(deviceAddr, 7, 0);
-	i2c_tx_data(controlAddr);
-	i2c_tx_data(controlData);
-	i2c_stop();
+	hal_i2c_start();
+	hal_i2c_tx_addr(deviceAddr, 7, 0);
+	hal_i2c_tx_data(controlAddr);
+	hal_i2c_tx_data(controlData);
+	hal_i2c_stop();
 	return 0;
 }
 
-int32_t i2c_read(uint8_t deviceAddr, uint8_t controlAddr, uint8_t* outControlData, int32_t nbytes)
+int32_t hal_i2c_read(uint8_t deviceAddr, uint8_t controlAddr, uint8_t* outControlData, int32_t nbytes)
 {
-	i2c_start();
-	i2c_tx_addr(deviceAddr, 7, 0);
-	i2c_tx_data(controlAddr);
+	hal_i2c_start();
+	hal_i2c_tx_addr(deviceAddr, 7, 0);
+	hal_i2c_tx_data(controlAddr);
 
-	i2c_start();  // restart
-	i2c_tx_addr(deviceAddr, 7, 1);
+	hal_i2c_start();  // restart
+	hal_i2c_tx_addr(deviceAddr, 7, 1);
 	for (int32_t i = 0; i < nbytes; ++i)
-		outControlData[i] = i2c_rx((i < nbytes - 1) ? 1 : 0);  // read
-	i2c_stop();
+		outControlData[i] = hal_i2c_rx((i < nbytes - 1) ? 1 : 0);  // read
+	hal_i2c_stop();
 
 	return 0;
 }

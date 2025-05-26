@@ -11,23 +11,23 @@
 
 static uint32_t s_channels = 0;
 
-void audio_init()
+void hal_audio_init()
 {
 	s_channels = 2;
 }
 
-void audio_set_playback_rate(uint32_t rate)
+void hal_audio_set_playback_rate(uint32_t rate)
 {
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
 	audio[1] = CPU_FREQUENCY / rate;
 }
 
-uint32_t audio_get_queued()
+uint32_t hal_audio_get_queued()
 {
 	return *(volatile uint32_t*)AUDIO_BASE;
 }
 
-void audio_play_mono(const int16_t* samples, uint32_t nsamples)
+void hal_audio_play_mono(const int16_t* samples, uint32_t nsamples)
 {
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
 	if (s_channels == 1)
@@ -53,7 +53,7 @@ void audio_play_mono(const int16_t* samples, uint32_t nsamples)
 	}
 }
 
-void audio_play_stereo(const int16_t* samples, uint32_t nsamples)
+void hal_audio_play_stereo(const int16_t* samples, uint32_t nsamples)
 {
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
 	if (s_channels == 1)

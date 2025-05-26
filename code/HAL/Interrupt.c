@@ -69,7 +69,7 @@ static void irq_entry() __attribute__ ((interrupt ("machine")));
 
 static void irq_entry()
 {
-	uint32_t cause = csr_read_mcause();
+	uint32_t cause = hal_csr_read_mcause();
 	if (cause & MCAUSE_INTERRUPT_BIT_MASK)
 	{
 		cause &= 0xffff;
@@ -105,41 +105,41 @@ static void irq_entry()
 
 #pragma GCC pop_options
 
-void interrupt_init()
+void hal_interrupt_init()
 {
 	// Global interrupt disable
-	csr_clr_bits_mstatus(MSTATUS_MIE_BIT_MASK);
-	csr_write_mie(0);
+	hal_csr_clr_bits_mstatus(MSTATUS_MIE_BIT_MASK);
+	hal_csr_write_mie(0);
 
 	// Setup the IRQ handler entry point
-	csr_write_mtvec((uint_xlen_t)irq_entry);
+	hal_csr_write_mtvec((uint_xlen_t)irq_entry);
 
 	// Global interrupt enable 
-	csr_set_bits_mie(MIE_MTI_BIT_MASK | MIE_MEI_BIT_MASK | MIE_MSI_BIT_MASK);
-	interrupt_enable();
+	hal_csr_set_bits_mie(MIE_MTI_BIT_MASK | MIE_MEI_BIT_MASK | MIE_MSI_BIT_MASK);
+	hal_interrupt_enable();
 
 	// Enable PLIC interrupts.
 	*PLIC_ENABLE = 2 | 4 | 8 | 16;
 }
 
-void interrupt_set_handler(uint32_t source, irq_handler_t handler)
+void hal_interrupt_set_handler(uint32_t source, irq_handler_t handler)
 {
 	g_handlers[source] = handler;
 }
 
-irq_handler_t* interrupt_get_handler(uint32_t source)
+irq_handler_t* hal_interrupt_get_handler(uint32_t source)
 {
 	return &g_handlers[source];
 }
 
-void interrupt_enable()
+void hal_interrupt_enable()
 {
 	if (g_interrupt_enable++ == 0)
-		csr_set_bits_mstatus(MSTATUS_MIE_BIT_MASK);
+		hal_csr_set_bits_mstatus(MSTATUS_MIE_BIT_MASK);
 }
 
-void interrupt_disable()
+void hal_interrupt_disable()
 {
 	if (--g_interrupt_enable == 0)
-		csr_clr_bits_mstatus(MSTATUS_MIE_BIT_MASK);
+		hal_csr_clr_bits_mstatus(MSTATUS_MIE_BIT_MASK);
 }

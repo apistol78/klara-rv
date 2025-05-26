@@ -14,7 +14,7 @@ typedef uint32_t uint_xlen_t;
 typedef uint32_t uint_csr32_t;
 typedef uint32_t uint_csr64_t;
 
-static inline uint_xlen_t csr_read_misa(void)
+static inline uint_xlen_t hal_csr_read_misa(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -26,7 +26,7 @@ static inline uint_xlen_t csr_read_misa(void)
 	return value;
 }
 
-static inline void csr_write_misa(uint_xlen_t value)
+static inline void hal_csr_write_misa(uint_xlen_t value)
 {
 	__asm__ volatile (
 		"csrw    misa, %0" 
@@ -36,7 +36,7 @@ static inline void csr_write_misa(uint_xlen_t value)
 	);
 }
 
-static inline uint_xlen_t csr_read_write_misa(uint_xlen_t new_value)
+static inline uint_xlen_t hal_csr_read_write_misa(uint_xlen_t new_value)
 {
 	uint_xlen_t prev_value;
 	__asm__ volatile (
@@ -48,7 +48,7 @@ static inline uint_xlen_t csr_read_write_misa(uint_xlen_t new_value)
 	return prev_value;
 }
 
-static inline uint32_t csr_read_mvendorid(void)
+static inline uint32_t hal_csr_read_mvendorid(void)
 {
 	uint_csr32_t value;        
 	__asm__ volatile (
@@ -60,7 +60,7 @@ static inline uint32_t csr_read_mvendorid(void)
 	return value;
 }
 
-static inline uint_xlen_t csr_read_marchid(void)
+static inline uint_xlen_t hal_csr_read_marchid(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -72,7 +72,7 @@ static inline uint_xlen_t csr_read_marchid(void)
 	return value;
 }
 
-static inline uint_xlen_t csr_read_mimpid(void)
+static inline uint_xlen_t hal_csr_read_mimpid(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -84,7 +84,7 @@ static inline uint_xlen_t csr_read_mimpid(void)
 	return value;
 }
 
-static inline uint_xlen_t csr_read_mhartid(void)
+static inline uint_xlen_t hal_csr_read_mhartid(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -96,7 +96,7 @@ static inline uint_xlen_t csr_read_mhartid(void)
 	return value;
 }
 
-static inline uint_xlen_t csr_read_mstatus(void)
+static inline uint_xlen_t hal_csr_read_mstatus(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -108,7 +108,7 @@ static inline uint_xlen_t csr_read_mstatus(void)
 	return value;
 }
 
-static inline void csr_write_mstatus(uint_xlen_t value)
+static inline void hal_csr_write_mstatus(uint_xlen_t value)
 {
 	__asm__ volatile (
 		"csrw    mstatus, %0" 
@@ -118,7 +118,7 @@ static inline void csr_write_mstatus(uint_xlen_t value)
 	);
 }
 
-static inline uint_xlen_t csr_read_write_mstatus(uint_xlen_t new_value)
+static inline uint_xlen_t hal_csr_read_write_mstatus(uint_xlen_t new_value)
 {
 	uint_xlen_t prev_value;
 	__asm__ volatile (
@@ -130,7 +130,7 @@ static inline uint_xlen_t csr_read_write_mstatus(uint_xlen_t new_value)
 	return prev_value;
 }
 
-static inline void csr_set_bits_mstatus(uint_xlen_t mask)
+static inline void hal_csr_set_bits_mstatus(uint_xlen_t mask)
 {
 	__asm__ volatile (
 		"csrrs    zero, mstatus, %0"  
@@ -140,7 +140,7 @@ static inline void csr_set_bits_mstatus(uint_xlen_t mask)
 	);
 }
 
-static inline void csr_clr_bits_mstatus(uint_xlen_t mask)
+static inline void hal_csr_clr_bits_mstatus(uint_xlen_t mask)
 {
 	__asm__ volatile (
 		"csrrc    zero, mstatus, %0"  
@@ -150,7 +150,7 @@ static inline void csr_clr_bits_mstatus(uint_xlen_t mask)
 	);
 }
 
-static inline uint_xlen_t csr_read_set_bits_mstatus(uint_xlen_t mask)
+static inline uint_xlen_t hal_csr_read_set_bits_mstatus(uint_xlen_t mask)
 {
 	uint_xlen_t value;
 	__asm__ volatile (
@@ -162,7 +162,7 @@ static inline uint_xlen_t csr_read_set_bits_mstatus(uint_xlen_t mask)
 	return value;
 }
 
-static inline uint_xlen_t csr_read_clr_bits_mstatus(uint_xlen_t mask)
+static inline uint_xlen_t hal_csr_read_clr_bits_mstatus(uint_xlen_t mask)
 {
 	uint_xlen_t value;
 	__asm__ volatile (
@@ -221,7 +221,7 @@ static inline uint_xlen_t csr_read_clr_bits_mstatus(uint_xlen_t mask)
 #define MSTATUS_SPP_BIT_MASK     0x100
 #define MSTATUS_SPP_ALL_SET_MASK 0x1
 
-static inline uint_xlen_t csr_read_mstatush(void)
+static inline uint_xlen_t hal_csr_read_mstatush(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -233,7 +233,7 @@ static inline uint_xlen_t csr_read_mstatush(void)
 	return value;
 }
 
-static inline void csr_write_mstatush(uint_xlen_t value)
+static inline void hal_csr_write_mstatush(uint_xlen_t value)
 {
 	__asm__ volatile (
 		"csrw    mstatush, %0" 
@@ -243,7 +243,7 @@ static inline void csr_write_mstatush(uint_xlen_t value)
 	);
 }
 
-static inline uint_xlen_t csr_read_write_mstatush(uint_xlen_t new_value)
+static inline uint_xlen_t hal_csr_read_write_mstatush(uint_xlen_t new_value)
 {
 	uint_xlen_t prev_value;
 	__asm__ volatile (
@@ -255,7 +255,7 @@ static inline uint_xlen_t csr_read_write_mstatush(uint_xlen_t new_value)
 	return prev_value;
 }
 
-static inline uint_xlen_t csr_read_mtvec(void)
+static inline uint_xlen_t hal_csr_read_mtvec(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -267,7 +267,7 @@ static inline uint_xlen_t csr_read_mtvec(void)
 	return value;
 }
 
-static inline void csr_write_mtvec(uint_xlen_t value)
+static inline void hal_csr_write_mtvec(uint_xlen_t value)
 {
 	__asm__ volatile (
 		"csrw    mtvec, %0" 
@@ -277,7 +277,7 @@ static inline void csr_write_mtvec(uint_xlen_t value)
 	);
 }
 
-static inline uint_xlen_t csr_read_write_mtvec(uint_xlen_t new_value)
+static inline uint_xlen_t hal_csr_read_write_mtvec(uint_xlen_t new_value)
 {
 	uint_xlen_t prev_value;
 	__asm__ volatile (
@@ -289,7 +289,7 @@ static inline uint_xlen_t csr_read_write_mtvec(uint_xlen_t new_value)
 	return prev_value;
 }
 
-static inline void csr_set_bits_mtvec(uint_xlen_t mask)
+static inline void hal_csr_set_bits_mtvec(uint_xlen_t mask)
 {
 	__asm__ volatile (
 		"csrrs    zero, mtvec, %0"  
@@ -299,7 +299,7 @@ static inline void csr_set_bits_mtvec(uint_xlen_t mask)
 	);
 }
 
-static inline void csr_clr_bits_mtvec(uint_xlen_t mask)
+static inline void hal_csr_clr_bits_mtvec(uint_xlen_t mask)
 {
 	__asm__ volatile (
 		"csrrc    zero, mtvec, %0"  
@@ -309,7 +309,7 @@ static inline void csr_clr_bits_mtvec(uint_xlen_t mask)
 	);
 }
 
-static inline uint_xlen_t csr_read_set_bits_mtvec(uint_xlen_t mask)
+static inline uint_xlen_t hal_csr_read_set_bits_mtvec(uint_xlen_t mask)
 {
 	uint_xlen_t value;
 	__asm__ volatile (
@@ -321,7 +321,7 @@ static inline uint_xlen_t csr_read_set_bits_mtvec(uint_xlen_t mask)
 	return value;
 }
 
-static inline uint_xlen_t csr_read_clr_bits_mtvec(uint_xlen_t mask)
+static inline uint_xlen_t hal_csr_read_clr_bits_mtvec(uint_xlen_t mask)
 {
 	uint_xlen_t value;
 	__asm__ volatile (
@@ -360,7 +360,7 @@ static inline uint_xlen_t csr_read_clr_bits_mtvec(uint_xlen_t mask)
 #define MTVEC_MODE_BIT_MASK     0x3
 #define MTVEC_MODE_ALL_SET_MASK 0x3
 
-static inline uint_xlen_t csr_read_medeleg(void)
+static inline uint_xlen_t hal_csr_read_medeleg(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -372,7 +372,7 @@ static inline uint_xlen_t csr_read_medeleg(void)
 	return value;
 }
 
-static inline void csr_write_medeleg(uint_xlen_t value)
+static inline void hal_csr_write_medeleg(uint_xlen_t value)
 {
 	__asm__ volatile (
 		"csrw    medeleg, %0" 
@@ -382,7 +382,7 @@ static inline void csr_write_medeleg(uint_xlen_t value)
 	);
 }
 
-static inline uint_xlen_t csr_read_write_medeleg(uint_xlen_t new_value)
+static inline uint_xlen_t hal_csr_read_write_medeleg(uint_xlen_t new_value)
 {
 	uint_xlen_t prev_value;
 	__asm__ volatile (
@@ -394,7 +394,7 @@ static inline uint_xlen_t csr_read_write_medeleg(uint_xlen_t new_value)
 	return prev_value;
 }
 
-static inline uint_xlen_t csr_read_mideleg(void)
+static inline uint_xlen_t hal_csr_read_mideleg(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -406,7 +406,7 @@ static inline uint_xlen_t csr_read_mideleg(void)
 	return value;
 }
 
-static inline void csr_write_mideleg(uint_xlen_t value)
+static inline void hal_csr_write_mideleg(uint_xlen_t value)
 {
 	__asm__ volatile (
 		"csrw    mideleg, %0" 
@@ -416,7 +416,7 @@ static inline void csr_write_mideleg(uint_xlen_t value)
 	);
 }
 
-static inline uint_xlen_t csr_read_write_mideleg(uint_xlen_t new_value)
+static inline uint_xlen_t hal_csr_read_write_mideleg(uint_xlen_t new_value)
 {
 	uint_xlen_t prev_value;
 	__asm__ volatile (
@@ -428,7 +428,7 @@ static inline uint_xlen_t csr_read_write_mideleg(uint_xlen_t new_value)
 	return prev_value;
 }
 
-static inline uint_xlen_t csr_read_mip(void)
+static inline uint_xlen_t hal_csr_read_mip(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -440,7 +440,7 @@ static inline uint_xlen_t csr_read_mip(void)
 	return value;
 }
 
-static inline void csr_write_mip(uint_xlen_t value)
+static inline void hal_csr_write_mip(uint_xlen_t value)
 {
 	__asm__ volatile (
 		"csrw    mip, %0" 
@@ -450,7 +450,7 @@ static inline void csr_write_mip(uint_xlen_t value)
 	);
 }
 
-static inline uint_xlen_t csr_read_write_mip(uint_xlen_t new_value)
+static inline uint_xlen_t hal_csr_read_write_mip(uint_xlen_t new_value)
 {
 	uint_xlen_t prev_value;
 	__asm__ volatile (
@@ -462,7 +462,7 @@ static inline uint_xlen_t csr_read_write_mip(uint_xlen_t new_value)
 	return prev_value;
 }
 
-static inline void csr_set_bits_mip(uint_xlen_t mask)
+static inline void hal_csr_set_bits_mip(uint_xlen_t mask)
 {
 	__asm__ volatile (
 		"csrrs    zero, mip, %0"  
@@ -472,7 +472,7 @@ static inline void csr_set_bits_mip(uint_xlen_t mask)
 	);
 }
 
-static inline void csr_clr_bits_mip(uint_xlen_t mask)
+static inline void hal_csr_clr_bits_mip(uint_xlen_t mask)
 {
 	__asm__ volatile (
 		"csrrc    zero, mip, %0"  
@@ -482,7 +482,7 @@ static inline void csr_clr_bits_mip(uint_xlen_t mask)
 	);
 }
 
-static inline uint_xlen_t csr_read_set_bits_mip(uint_xlen_t mask)
+static inline uint_xlen_t hal_csr_read_set_bits_mip(uint_xlen_t mask)
 {
 	uint_xlen_t value;
 	__asm__ volatile (
@@ -494,7 +494,7 @@ static inline uint_xlen_t csr_read_set_bits_mip(uint_xlen_t mask)
 	return value;
 }
 
-static inline uint_xlen_t csr_read_clr_bits_mip(uint_xlen_t mask)
+static inline uint_xlen_t hal_csr_read_clr_bits_mip(uint_xlen_t mask)
 {
 	uint_xlen_t value;
 	__asm__ volatile (
@@ -565,7 +565,7 @@ static inline uint_xlen_t csr_read_clr_bits_mip(uint_xlen_t mask)
 #define MIP_PLATFORM_DEFINED_BIT_MASK     ((1UL<<(((__riscv_xlen)-(16) + 1)-1)) << (16))
 #define MIP_PLATFORM_DEFINED_ALL_SET_MASK ((1UL<<(((__riscv_xlen)-(16) + 1)-1)) << (0))
 
-static inline uint_xlen_t csr_read_mie(void)
+static inline uint_xlen_t hal_csr_read_mie(void)
 {
 	uint_xlen_t value;        
 	__asm__ volatile (
@@ -577,7 +577,7 @@ static inline uint_xlen_t csr_read_mie(void)
 	return value;
 }
 
-static inline void csr_write_mie(uint_xlen_t value)
+static inline void hal_csr_write_mie(uint_xlen_t value)
 {
 	__asm__ volatile (
 		"csrw    mie, %0" 
@@ -587,7 +587,7 @@ static inline void csr_write_mie(uint_xlen_t value)
 	);
 }
 
-static inline uint_xlen_t csr_read_write_mie(uint_xlen_t new_value)
+static inline uint_xlen_t hal_csr_read_write_mie(uint_xlen_t new_value)
 {
 	uint_xlen_t prev_value;
 	__asm__ volatile (
@@ -599,7 +599,7 @@ static inline uint_xlen_t csr_read_write_mie(uint_xlen_t new_value)
 	return prev_value;
 }
 
-static inline void csr_set_bits_mie(uint_xlen_t mask)
+static inline void hal_csr_set_bits_mie(uint_xlen_t mask)
 {
 	__asm__ volatile (
 		"csrrs    zero, mie, %0"  
@@ -609,7 +609,7 @@ static inline void csr_set_bits_mie(uint_xlen_t mask)
 	);
 }
 
-static inline void csr_clr_bits_mie(uint_xlen_t mask)
+static inline void hal_csr_clr_bits_mie(uint_xlen_t mask)
 {
 	__asm__ volatile (
 		"csrrc    zero, mie, %0"  
@@ -619,7 +619,7 @@ static inline void csr_clr_bits_mie(uint_xlen_t mask)
 	);
 }
 
-static inline uint_xlen_t csr_read_set_bits_mie(uint_xlen_t mask)
+static inline uint_xlen_t hal_csr_read_set_bits_mie(uint_xlen_t mask)
 {
 	uint_xlen_t value;
 	__asm__ volatile (
@@ -631,7 +631,7 @@ static inline uint_xlen_t csr_read_set_bits_mie(uint_xlen_t mask)
 	return value;
 }
 
-static inline uint_xlen_t csr_read_clr_bits_mie(uint_xlen_t mask)
+static inline uint_xlen_t hal_csr_read_clr_bits_mie(uint_xlen_t mask)
 {
 	uint_xlen_t value;
 	__asm__ volatile (
@@ -702,7 +702,7 @@ static inline uint_xlen_t csr_read_clr_bits_mie(uint_xlen_t mask)
 #define MIE_PLATFORM_DEFINED_BIT_MASK     ((1UL<<(((__riscv_xlen)-(16) + 1)-1)) << (16))
 #define MIE_PLATFORM_DEFINED_ALL_SET_MASK ((1UL<<(((__riscv_xlen)-(16) + 1)-1)) << (0))
 
-static inline uint32_t csr_read_mcountinhibit(void)
+static inline uint32_t hal_csr_read_mcountinhibit(void)
 {
 	uint_csr32_t value;        
 	__asm__ volatile (
@@ -714,7 +714,7 @@ static inline uint32_t csr_read_mcountinhibit(void)
 	return value;
 }
 
-static inline void csr_write_mcountinhibit(uint_csr32_t value)
+static inline void hal_csr_write_mcountinhibit(uint_csr32_t value)
 {
 	__asm__ volatile (
 		"csrw    mcountinhibit, %0" 
@@ -724,7 +724,7 @@ static inline void csr_write_mcountinhibit(uint_csr32_t value)
 	);
 }
 
-static inline uint32_t csr_read_write_mcountinhibit(uint32_t new_value)
+static inline uint32_t hal_csr_read_write_mcountinhibit(uint32_t new_value)
 {
 	uint_csr32_t prev_value;
 	__asm__ volatile (
@@ -736,7 +736,7 @@ static inline uint32_t csr_read_write_mcountinhibit(uint32_t new_value)
 	return prev_value;
 }
 
-static inline void csr_set_bits_mcountinhibit(uint32_t mask)
+static inline void hal_csr_set_bits_mcountinhibit(uint32_t mask)
 {
 	__asm__ volatile (
 		"csrrs    zero, mcountinhibit, %0"  
@@ -746,7 +746,7 @@ static inline void csr_set_bits_mcountinhibit(uint32_t mask)
 	);
 }
 
-static inline void csr_clr_bits_mcountinhibit(uint32_t mask)
+static inline void hal_csr_clr_bits_mcountinhibit(uint32_t mask)
 {
 	__asm__ volatile (
 		"csrrc    zero, mcountinhibit, %0"  
@@ -756,7 +756,7 @@ static inline void csr_clr_bits_mcountinhibit(uint32_t mask)
 	);
 }
 
-static inline uint32_t csr_read_set_bits_mcountinhibit(uint32_t mask)
+static inline uint32_t hal_csr_read_set_bits_mcountinhibit(uint32_t mask)
 {
 	uint_csr32_t value;
 	__asm__ volatile (
@@ -768,7 +768,7 @@ static inline uint32_t csr_read_set_bits_mcountinhibit(uint32_t mask)
 	return value;
 }
 
-static inline uint32_t csr_read_clr_bits_mcountinhibit(uint32_t mask)
+static inline uint32_t hal_csr_read_clr_bits_mcountinhibit(uint32_t mask)
 {
 	uint_csr32_t value;
 	__asm__ volatile (
@@ -814,7 +814,7 @@ static inline uint32_t csr_read_clr_bits_mcountinhibit(uint32_t mask)
 /*******************************************
  * mcycle - MRW - Clock Cycles Executed Counter 
  */
-static inline uint64_t csr_read_mcycle(void) {
+static inline uint64_t hal_csr_read_mcycle(void) {
 	uint_csr64_t value;        
 	__asm__ volatile ("csrr    %0, mcycle" 
 					  : "=r" (value)
@@ -822,13 +822,13 @@ static inline uint64_t csr_read_mcycle(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mcycle(uint_csr64_t value) {
+static inline void hal_csr_write_mcycle(uint_csr64_t value) {
 	__asm__ volatile ("csrw    mcycle, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint64_t csr_read_write_mcycle(uint64_t new_value) {
+static inline uint64_t hal_csr_read_write_mcycle(uint64_t new_value) {
 	uint_csr64_t prev_value;
 	__asm__ volatile ("csrrw    %0, mcycle, %1"  
 					  : "=r" (prev_value)
@@ -840,7 +840,7 @@ static inline uint64_t csr_read_write_mcycle(uint64_t new_value) {
 /*******************************************
  * minstret - MRW - Number of Instructions Retired Counter 
  */
-static inline uint64_t csr_read_minstret(void) {
+static inline uint64_t hal_csr_read_minstret(void) {
 	uint_csr64_t value;        
 	__asm__ volatile ("csrr    %0, minstret" 
 					  : "=r" (value)
@@ -848,13 +848,13 @@ static inline uint64_t csr_read_minstret(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_minstret(uint_csr64_t value) {
+static inline void hal_csr_write_minstret(uint_csr64_t value) {
 	__asm__ volatile ("csrw    minstret, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint64_t csr_read_write_minstret(uint64_t new_value) {
+static inline uint64_t hal_csr_read_write_minstret(uint64_t new_value) {
 	uint_csr64_t prev_value;
 	__asm__ volatile ("csrrw    %0, minstret, %1"  
 					  : "=r" (prev_value)
@@ -866,7 +866,7 @@ static inline uint64_t csr_read_write_minstret(uint64_t new_value) {
 /*******************************************
  * mhpmcounter3 - MRW - Event Counters 
  */
-static inline uint64_t csr_read_mhpmcounter3(void) {
+static inline uint64_t hal_csr_read_mhpmcounter3(void) {
 	uint_csr64_t value;        
 	__asm__ volatile ("csrr    %0, mhpmcounter3" 
 					  : "=r" (value)
@@ -874,13 +874,13 @@ static inline uint64_t csr_read_mhpmcounter3(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmcounter3(uint_csr64_t value) {
+static inline void hal_csr_write_mhpmcounter3(uint_csr64_t value) {
 	__asm__ volatile ("csrw    mhpmcounter3, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint64_t csr_read_write_mhpmcounter3(uint64_t new_value) {
+static inline uint64_t hal_csr_read_write_mhpmcounter3(uint64_t new_value) {
 	uint_csr64_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmcounter3, %1"  
 					  : "=r" (prev_value)
@@ -892,7 +892,7 @@ static inline uint64_t csr_read_write_mhpmcounter3(uint64_t new_value) {
 /*******************************************
  * mhpmevent3 - MRW - Event Counter Event Select 
  */
-static inline uint_xlen_t csr_read_mhpmevent3(void) {
+static inline uint_xlen_t hal_csr_read_mhpmevent3(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mhpmevent3" 
 					  : "=r" (value)
@@ -900,13 +900,13 @@ static inline uint_xlen_t csr_read_mhpmevent3(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmevent3(uint_xlen_t value) {
+static inline void hal_csr_write_mhpmevent3(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mhpmevent3, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mhpmevent3(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mhpmevent3(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmevent3, %1"  
 					  : "=r" (prev_value)
@@ -918,7 +918,7 @@ static inline uint_xlen_t csr_read_write_mhpmevent3(uint_xlen_t new_value) {
 /*******************************************
  * mcounteren - MRW - Counter Enable 
  */
-static inline uint32_t csr_read_mcounteren(void) {
+static inline uint32_t hal_csr_read_mcounteren(void) {
 	uint_csr32_t value;        
 	__asm__ volatile ("csrr    %0, mcounteren" 
 					  : "=r" (value)
@@ -926,13 +926,13 @@ static inline uint32_t csr_read_mcounteren(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mcounteren(uint_csr32_t value) {
+static inline void hal_csr_write_mcounteren(uint_csr32_t value) {
 	__asm__ volatile ("csrw    mcounteren, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint32_t csr_read_write_mcounteren(uint32_t new_value) {
+static inline uint32_t hal_csr_read_write_mcounteren(uint32_t new_value) {
 	uint_csr32_t prev_value;
 	__asm__ volatile ("csrrw    %0, mcounteren, %1"  
 					  : "=r" (prev_value)
@@ -941,19 +941,19 @@ static inline uint32_t csr_read_write_mcounteren(uint32_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_mcounteren(uint32_t mask) {
+static inline void hal_csr_set_bits_mcounteren(uint32_t mask) {
 	__asm__ volatile ("csrrs    zero, mcounteren, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_mcounteren(uint32_t mask) {
+static inline void hal_csr_clr_bits_mcounteren(uint32_t mask) {
 	__asm__ volatile ("csrrc    zero, mcounteren, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint32_t csr_read_set_bits_mcounteren(uint32_t mask) {
+static inline uint32_t hal_csr_read_set_bits_mcounteren(uint32_t mask) {
 	uint_csr32_t value;
 	__asm__ volatile ("csrrs    %0, mcounteren, %1"  
 					  : "=r" (value)
@@ -961,7 +961,7 @@ static inline uint32_t csr_read_set_bits_mcounteren(uint32_t mask) {
 					  :);
 	return value;
 }
-static inline uint32_t csr_read_clr_bits_mcounteren(uint32_t mask) {
+static inline uint32_t hal_csr_read_clr_bits_mcounteren(uint32_t mask) {
 	uint_csr32_t value;
 	__asm__ volatile ("csrrc    %0, mcounteren, %1"  
 								  : "=r" (value)
@@ -1009,7 +1009,7 @@ static inline uint32_t csr_read_clr_bits_mcounteren(uint32_t mask) {
 /*******************************************
  * scounteren - SRW - Counter Enable 
  */
-static inline uint_xlen_t csr_read_scounteren(void) {
+static inline uint_xlen_t hal_csr_read_scounteren(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, scounteren" 
 					  : "=r" (value)
@@ -1017,13 +1017,13 @@ static inline uint_xlen_t csr_read_scounteren(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_scounteren(uint_xlen_t value) {
+static inline void hal_csr_write_scounteren(uint_xlen_t value) {
 	__asm__ volatile ("csrw    scounteren, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_scounteren(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_scounteren(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, scounteren, %1"  
 					  : "=r" (prev_value)
@@ -1035,7 +1035,7 @@ static inline uint_xlen_t csr_read_write_scounteren(uint_xlen_t new_value) {
 /*******************************************
  * mscratch - MRW - Machine Mode Scratch Register 
  */
-static inline uint_xlen_t csr_read_mscratch(void) {
+static inline uint_xlen_t hal_csr_read_mscratch(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mscratch" 
 					  : "=r" (value)
@@ -1043,13 +1043,13 @@ static inline uint_xlen_t csr_read_mscratch(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mscratch(uint_xlen_t value) {
+static inline void hal_csr_write_mscratch(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mscratch, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mscratch(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mscratch(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mscratch, %1"  
 					  : "=r" (prev_value)
@@ -1061,7 +1061,7 @@ static inline uint_xlen_t csr_read_write_mscratch(uint_xlen_t new_value) {
 /*******************************************
  * mepc - MRW - Machine Exception Program Counter 
  */
-static inline uint_xlen_t csr_read_mepc(void) {
+static inline uint_xlen_t hal_csr_read_mepc(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mepc" 
 					  : "=r" (value)
@@ -1069,13 +1069,13 @@ static inline uint_xlen_t csr_read_mepc(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mepc(uint_xlen_t value) {
+static inline void hal_csr_write_mepc(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mepc, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mepc(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mepc(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mepc, %1"  
 					  : "=r" (prev_value)
@@ -1087,7 +1087,7 @@ static inline uint_xlen_t csr_read_write_mepc(uint_xlen_t new_value) {
 /*******************************************
  * mcause - MRW - Machine Exception Cause 
  */
-static inline uint_xlen_t csr_read_mcause(void) {
+static inline uint_xlen_t hal_csr_read_mcause(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mcause" 
 					  : "=r" (value)
@@ -1095,13 +1095,13 @@ static inline uint_xlen_t csr_read_mcause(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mcause(uint_xlen_t value) {
+static inline void hal_csr_write_mcause(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mcause, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mcause(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mcause(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mcause, %1"  
 					  : "=r" (prev_value)
@@ -1110,19 +1110,19 @@ static inline uint_xlen_t csr_read_write_mcause(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_mcause(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_mcause(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, mcause, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_mcause(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_mcause(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, mcause, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_mcause(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_mcause(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, mcause, %1"  
 					  : "=r" (value)
@@ -1130,7 +1130,7 @@ static inline uint_xlen_t csr_read_set_bits_mcause(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_mcause(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_mcause(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, mcause, %1"  
 								  : "=r" (value)
@@ -1170,7 +1170,7 @@ static inline uint_xlen_t csr_read_clr_bits_mcause(uint_xlen_t mask) {
 /*******************************************
  * mtval - MRW - Machine Trap Value 
  */
-static inline uint_xlen_t csr_read_mtval(void) {
+static inline uint_xlen_t hal_csr_read_mtval(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mtval" 
 					  : "=r" (value)
@@ -1178,13 +1178,13 @@ static inline uint_xlen_t csr_read_mtval(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mtval(uint_xlen_t value) {
+static inline void hal_csr_write_mtval(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mtval, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mtval(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mtval(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mtval, %1"  
 					  : "=r" (prev_value)
@@ -1196,7 +1196,7 @@ static inline uint_xlen_t csr_read_write_mtval(uint_xlen_t new_value) {
 /*******************************************
  * sscratch - SRW - Supervisor Mode Scratch Register 
  */
-static inline uint_xlen_t csr_read_sscratch(void) {
+static inline uint_xlen_t hal_csr_read_sscratch(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, sscratch" 
 					  : "=r" (value)
@@ -1204,13 +1204,13 @@ static inline uint_xlen_t csr_read_sscratch(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_sscratch(uint_xlen_t value) {
+static inline void hal_csr_write_sscratch(uint_xlen_t value) {
 	__asm__ volatile ("csrw    sscratch, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_sscratch(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_sscratch(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, sscratch, %1"  
 					  : "=r" (prev_value)
@@ -1222,7 +1222,7 @@ static inline uint_xlen_t csr_read_write_sscratch(uint_xlen_t new_value) {
 /*******************************************
  * sepc - SRW - Supervisor Exception Program Counter 
  */
-static inline uint_xlen_t csr_read_sepc(void) {
+static inline uint_xlen_t hal_csr_read_sepc(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, sepc" 
 					  : "=r" (value)
@@ -1230,13 +1230,13 @@ static inline uint_xlen_t csr_read_sepc(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_sepc(uint_xlen_t value) {
+static inline void hal_csr_write_sepc(uint_xlen_t value) {
 	__asm__ volatile ("csrw    sepc, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_sepc(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_sepc(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, sepc, %1"  
 					  : "=r" (prev_value)
@@ -1248,7 +1248,7 @@ static inline uint_xlen_t csr_read_write_sepc(uint_xlen_t new_value) {
 /*******************************************
  * scause - SRW - Supervisor Exception Cause 
  */
-static inline uint_xlen_t csr_read_scause(void) {
+static inline uint_xlen_t hal_csr_read_scause(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, scause" 
 					  : "=r" (value)
@@ -1256,13 +1256,13 @@ static inline uint_xlen_t csr_read_scause(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_scause(uint_xlen_t value) {
+static inline void hal_csr_write_scause(uint_xlen_t value) {
 	__asm__ volatile ("csrw    scause, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_scause(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_scause(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, scause, %1"  
 					  : "=r" (prev_value)
@@ -1271,19 +1271,19 @@ static inline uint_xlen_t csr_read_write_scause(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_scause(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_scause(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, scause, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_scause(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_scause(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, scause, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_scause(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_scause(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, scause, %1"  
 					  : "=r" (value)
@@ -1291,7 +1291,7 @@ static inline uint_xlen_t csr_read_set_bits_scause(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_scause(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_scause(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, scause, %1"  
 								  : "=r" (value)
@@ -1331,7 +1331,7 @@ static inline uint_xlen_t csr_read_clr_bits_scause(uint_xlen_t mask) {
 /*******************************************
  * sstatus - SRW - Supervisor Status 
  */
-static inline uint_xlen_t csr_read_sstatus(void) {
+static inline uint_xlen_t hal_csr_read_sstatus(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, sstatus" 
 					  : "=r" (value)
@@ -1339,13 +1339,13 @@ static inline uint_xlen_t csr_read_sstatus(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_sstatus(uint_xlen_t value) {
+static inline void hal_csr_write_sstatus(uint_xlen_t value) {
 	__asm__ volatile ("csrw    sstatus, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_sstatus(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_sstatus(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, sstatus, %1"  
 					  : "=r" (prev_value)
@@ -1354,19 +1354,19 @@ static inline uint_xlen_t csr_read_write_sstatus(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_sstatus(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_sstatus(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, sstatus, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_sstatus(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_sstatus(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, sstatus, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_sstatus(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_sstatus(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, sstatus, %1"  
 					  : "=r" (value)
@@ -1374,7 +1374,7 @@ static inline uint_xlen_t csr_read_set_bits_sstatus(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_sstatus(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_sstatus(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, sstatus, %1"  
 								  : "=r" (value)
@@ -1418,7 +1418,7 @@ static inline uint_xlen_t csr_read_clr_bits_sstatus(uint_xlen_t mask) {
 /*******************************************
  * stvec - SRW - Supervisor Trap Vector Base Address 
  */
-static inline uint_xlen_t csr_read_stvec(void) {
+static inline uint_xlen_t hal_csr_read_stvec(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, stvec" 
 					  : "=r" (value)
@@ -1426,13 +1426,13 @@ static inline uint_xlen_t csr_read_stvec(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_stvec(uint_xlen_t value) {
+static inline void hal_csr_write_stvec(uint_xlen_t value) {
 	__asm__ volatile ("csrw    stvec, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_stvec(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_stvec(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, stvec, %1"  
 					  : "=r" (prev_value)
@@ -1441,19 +1441,19 @@ static inline uint_xlen_t csr_read_write_stvec(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_stvec(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_stvec(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, stvec, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_stvec(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_stvec(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, stvec, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_stvec(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_stvec(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, stvec, %1"  
 					  : "=r" (value)
@@ -1461,7 +1461,7 @@ static inline uint_xlen_t csr_read_set_bits_stvec(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_stvec(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_stvec(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, stvec, %1"  
 								  : "=r" (value)
@@ -1501,7 +1501,7 @@ static inline uint_xlen_t csr_read_clr_bits_stvec(uint_xlen_t mask) {
 /*******************************************
  * sideleg - SRW - Supervisor Interrupt Delegation 
  */
-static inline uint_xlen_t csr_read_sideleg(void) {
+static inline uint_xlen_t hal_csr_read_sideleg(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, sideleg" 
 					  : "=r" (value)
@@ -1509,13 +1509,13 @@ static inline uint_xlen_t csr_read_sideleg(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_sideleg(uint_xlen_t value) {
+static inline void hal_csr_write_sideleg(uint_xlen_t value) {
 	__asm__ volatile ("csrw    sideleg, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_sideleg(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_sideleg(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, sideleg, %1"  
 					  : "=r" (prev_value)
@@ -1527,7 +1527,7 @@ static inline uint_xlen_t csr_read_write_sideleg(uint_xlen_t new_value) {
 /*******************************************
  * sedeleg - SRW - Supervisor Exception Delegation 
  */
-static inline uint_xlen_t csr_read_sedeleg(void) {
+static inline uint_xlen_t hal_csr_read_sedeleg(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, sedeleg" 
 					  : "=r" (value)
@@ -1535,13 +1535,13 @@ static inline uint_xlen_t csr_read_sedeleg(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_sedeleg(uint_xlen_t value) {
+static inline void hal_csr_write_sedeleg(uint_xlen_t value) {
 	__asm__ volatile ("csrw    sedeleg, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_sedeleg(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_sedeleg(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, sedeleg, %1"  
 					  : "=r" (prev_value)
@@ -1553,7 +1553,7 @@ static inline uint_xlen_t csr_read_write_sedeleg(uint_xlen_t new_value) {
 /*******************************************
  * sip - SRW - Supervisor Interrupt Pending 
  */
-static inline uint_xlen_t csr_read_sip(void) {
+static inline uint_xlen_t hal_csr_read_sip(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, sip" 
 					  : "=r" (value)
@@ -1561,13 +1561,13 @@ static inline uint_xlen_t csr_read_sip(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_sip(uint_xlen_t value) {
+static inline void hal_csr_write_sip(uint_xlen_t value) {
 	__asm__ volatile ("csrw    sip, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_sip(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_sip(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, sip, %1"  
 					  : "=r" (prev_value)
@@ -1576,19 +1576,19 @@ static inline uint_xlen_t csr_read_write_sip(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_sip(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_sip(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, sip, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_sip(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_sip(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, sip, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_sip(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_sip(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, sip, %1"  
 					  : "=r" (value)
@@ -1596,7 +1596,7 @@ static inline uint_xlen_t csr_read_set_bits_sip(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_sip(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_sip(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, sip, %1"  
 								  : "=r" (value)
@@ -1652,7 +1652,7 @@ static inline uint_xlen_t csr_read_clr_bits_sip(uint_xlen_t mask) {
 /*******************************************
  * sie - SRW - Supervisor Interrupt Enable 
  */
-static inline uint_xlen_t csr_read_sie(void) {
+static inline uint_xlen_t hal_csr_read_sie(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, sie" 
 					  : "=r" (value)
@@ -1660,13 +1660,13 @@ static inline uint_xlen_t csr_read_sie(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_sie(uint_xlen_t value) {
+static inline void hal_csr_write_sie(uint_xlen_t value) {
 	__asm__ volatile ("csrw    sie, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_sie(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_sie(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, sie, %1"  
 					  : "=r" (prev_value)
@@ -1675,19 +1675,19 @@ static inline uint_xlen_t csr_read_write_sie(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_sie(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_sie(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, sie, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_sie(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_sie(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, sie, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_sie(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_sie(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, sie, %1"  
 					  : "=r" (value)
@@ -1695,7 +1695,7 @@ static inline uint_xlen_t csr_read_set_bits_sie(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_sie(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_sie(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, sie, %1"  
 								  : "=r" (value)
@@ -1751,7 +1751,7 @@ static inline uint_xlen_t csr_read_clr_bits_sie(uint_xlen_t mask) {
 /*******************************************
  * ustatus - URW - User mode restricted view of mstatus 
  */
-static inline uint_xlen_t csr_read_ustatus(void) {
+static inline uint_xlen_t hal_csr_read_ustatus(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, ustatus" 
 					  : "=r" (value)
@@ -1759,13 +1759,13 @@ static inline uint_xlen_t csr_read_ustatus(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_ustatus(uint_xlen_t value) {
+static inline void hal_csr_write_ustatus(uint_xlen_t value) {
 	__asm__ volatile ("csrw    ustatus, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_ustatus(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_ustatus(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, ustatus, %1"  
 					  : "=r" (prev_value)
@@ -1774,19 +1774,19 @@ static inline uint_xlen_t csr_read_write_ustatus(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_ustatus(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_ustatus(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, ustatus, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_ustatus(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_ustatus(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, ustatus, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_ustatus(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_ustatus(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, ustatus, %1"  
 					  : "=r" (value)
@@ -1794,7 +1794,7 @@ static inline uint_xlen_t csr_read_set_bits_ustatus(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_ustatus(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_ustatus(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, ustatus, %1"  
 								  : "=r" (value)
@@ -1834,7 +1834,7 @@ static inline uint_xlen_t csr_read_clr_bits_ustatus(uint_xlen_t mask) {
 /*******************************************
  * uip - URW - User Interrupt Pending 
  */
-static inline uint_xlen_t csr_read_uip(void) {
+static inline uint_xlen_t hal_csr_read_uip(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, uip" 
 					  : "=r" (value)
@@ -1842,13 +1842,13 @@ static inline uint_xlen_t csr_read_uip(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_uip(uint_xlen_t value) {
+static inline void hal_csr_write_uip(uint_xlen_t value) {
 	__asm__ volatile ("csrw    uip, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_uip(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_uip(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, uip, %1"  
 					  : "=r" (prev_value)
@@ -1857,19 +1857,19 @@ static inline uint_xlen_t csr_read_write_uip(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_uip(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_uip(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, uip, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_uip(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_uip(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, uip, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_uip(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_uip(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, uip, %1"  
 					  : "=r" (value)
@@ -1877,7 +1877,7 @@ static inline uint_xlen_t csr_read_set_bits_uip(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_uip(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_uip(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, uip, %1"  
 								  : "=r" (value)
@@ -1921,7 +1921,7 @@ static inline uint_xlen_t csr_read_clr_bits_uip(uint_xlen_t mask) {
 /*******************************************
  * uie - URW - User Interrupt Enable 
  */
-static inline uint_xlen_t csr_read_uie(void) {
+static inline uint_xlen_t hal_csr_read_uie(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, uie" 
 					  : "=r" (value)
@@ -1929,13 +1929,13 @@ static inline uint_xlen_t csr_read_uie(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_uie(uint_xlen_t value) {
+static inline void hal_csr_write_uie(uint_xlen_t value) {
 	__asm__ volatile ("csrw    uie, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_uie(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_uie(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, uie, %1"  
 					  : "=r" (prev_value)
@@ -1944,19 +1944,19 @@ static inline uint_xlen_t csr_read_write_uie(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_uie(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_uie(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, uie, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_uie(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_uie(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, uie, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_uie(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_uie(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, uie, %1"  
 					  : "=r" (value)
@@ -1964,7 +1964,7 @@ static inline uint_xlen_t csr_read_set_bits_uie(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_uie(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_uie(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, uie, %1"  
 								  : "=r" (value)
@@ -2008,7 +2008,7 @@ static inline uint_xlen_t csr_read_clr_bits_uie(uint_xlen_t mask) {
 /*******************************************
  * uscratch - URW - User Mode Scratch Register 
  */
-static inline uint_xlen_t csr_read_uscratch(void) {
+static inline uint_xlen_t hal_csr_read_uscratch(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, uscratch" 
 					  : "=r" (value)
@@ -2016,13 +2016,13 @@ static inline uint_xlen_t csr_read_uscratch(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_uscratch(uint_xlen_t value) {
+static inline void hal_csr_write_uscratch(uint_xlen_t value) {
 	__asm__ volatile ("csrw    uscratch, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_uscratch(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_uscratch(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, uscratch, %1"  
 					  : "=r" (prev_value)
@@ -2034,7 +2034,7 @@ static inline uint_xlen_t csr_read_write_uscratch(uint_xlen_t new_value) {
 /*******************************************
  * uepc - URW - User Exception Program Counter 
  */
-static inline uint_xlen_t csr_read_uepc(void) {
+static inline uint_xlen_t hal_csr_read_uepc(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, uepc" 
 					  : "=r" (value)
@@ -2042,13 +2042,13 @@ static inline uint_xlen_t csr_read_uepc(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_uepc(uint_xlen_t value) {
+static inline void hal_csr_write_uepc(uint_xlen_t value) {
 	__asm__ volatile ("csrw    uepc, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_uepc(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_uepc(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, uepc, %1"  
 					  : "=r" (prev_value)
@@ -2060,7 +2060,7 @@ static inline uint_xlen_t csr_read_write_uepc(uint_xlen_t new_value) {
 /*******************************************
  * ucause - URW - User Exception Cause 
  */
-static inline uint_xlen_t csr_read_ucause(void) {
+static inline uint_xlen_t hal_csr_read_ucause(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, ucause" 
 					  : "=r" (value)
@@ -2068,13 +2068,13 @@ static inline uint_xlen_t csr_read_ucause(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_ucause(uint_xlen_t value) {
+static inline void hal_csr_write_ucause(uint_xlen_t value) {
 	__asm__ volatile ("csrw    ucause, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_ucause(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_ucause(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, ucause, %1"  
 					  : "=r" (prev_value)
@@ -2083,19 +2083,19 @@ static inline uint_xlen_t csr_read_write_ucause(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_ucause(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_ucause(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, ucause, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_ucause(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_ucause(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, ucause, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_ucause(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_ucause(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, ucause, %1"  
 					  : "=r" (value)
@@ -2103,7 +2103,7 @@ static inline uint_xlen_t csr_read_set_bits_ucause(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_ucause(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_ucause(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, ucause, %1"  
 								  : "=r" (value)
@@ -2143,7 +2143,7 @@ static inline uint_xlen_t csr_read_clr_bits_ucause(uint_xlen_t mask) {
 /*******************************************
  * utvec - URW - User Trap Vector Base Address 
  */
-static inline uint_xlen_t csr_read_utvec(void) {
+static inline uint_xlen_t hal_csr_read_utvec(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, utvec" 
 					  : "=r" (value)
@@ -2151,13 +2151,13 @@ static inline uint_xlen_t csr_read_utvec(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_utvec(uint_xlen_t value) {
+static inline void hal_csr_write_utvec(uint_xlen_t value) {
 	__asm__ volatile ("csrw    utvec, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_utvec(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_utvec(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, utvec, %1"  
 					  : "=r" (prev_value)
@@ -2166,19 +2166,19 @@ static inline uint_xlen_t csr_read_write_utvec(uint_xlen_t new_value) {
 	return prev_value;
 }
 /* Register CSR bit set and clear instructions */
-static inline void csr_set_bits_utvec(uint_xlen_t mask) {
+static inline void hal_csr_set_bits_utvec(uint_xlen_t mask) {
 	__asm__ volatile ("csrrs    zero, utvec, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline void csr_clr_bits_utvec(uint_xlen_t mask) {
+static inline void hal_csr_clr_bits_utvec(uint_xlen_t mask) {
 	__asm__ volatile ("csrrc    zero, utvec, %0"  
 					  :
 					  : "r" (mask)
 					  :);
 }
-static inline uint_xlen_t csr_read_set_bits_utvec(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_set_bits_utvec(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrs    %0, utvec, %1"  
 					  : "=r" (value)
@@ -2186,7 +2186,7 @@ static inline uint_xlen_t csr_read_set_bits_utvec(uint_xlen_t mask) {
 					  :);
 	return value;
 }
-static inline uint_xlen_t csr_read_clr_bits_utvec(uint_xlen_t mask) {
+static inline uint_xlen_t hal_csr_read_clr_bits_utvec(uint_xlen_t mask) {
 	uint_xlen_t value;
 	__asm__ volatile ("csrrc    %0, utvec, %1"  
 								  : "=r" (value)
@@ -2226,7 +2226,7 @@ static inline uint_xlen_t csr_read_clr_bits_utvec(uint_xlen_t mask) {
 /*******************************************
  * utval - URW - User Trap Value 
  */
-static inline uint_xlen_t csr_read_utval(void) {
+static inline uint_xlen_t hal_csr_read_utval(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, utval" 
 					  : "=r" (value)
@@ -2234,13 +2234,13 @@ static inline uint_xlen_t csr_read_utval(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_utval(uint_xlen_t value) {
+static inline void hal_csr_write_utval(uint_xlen_t value) {
 	__asm__ volatile ("csrw    utval, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_utval(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_utval(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, utval, %1"  
 					  : "=r" (prev_value)
@@ -2252,7 +2252,7 @@ static inline uint_xlen_t csr_read_write_utval(uint_xlen_t new_value) {
 /*******************************************
  * fflags - URW - Floating-Point Accrued Exceptions. 
  */
-static inline uint_xlen_t csr_read_fflags(void) {
+static inline uint_xlen_t hal_csr_read_fflags(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, fflags" 
 					  : "=r" (value)
@@ -2260,13 +2260,13 @@ static inline uint_xlen_t csr_read_fflags(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_fflags(uint_xlen_t value) {
+static inline void hal_csr_write_fflags(uint_xlen_t value) {
 	__asm__ volatile ("csrw    fflags, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_fflags(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_fflags(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, fflags, %1"  
 					  : "=r" (prev_value)
@@ -2278,7 +2278,7 @@ static inline uint_xlen_t csr_read_write_fflags(uint_xlen_t new_value) {
 /*******************************************
  * frm - URW - Floating-Point Dynamic Rounding Mode. 
  */
-static inline uint_xlen_t csr_read_frm(void) {
+static inline uint_xlen_t hal_csr_read_frm(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, frm" 
 					  : "=r" (value)
@@ -2286,13 +2286,13 @@ static inline uint_xlen_t csr_read_frm(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_frm(uint_xlen_t value) {
+static inline void hal_csr_write_frm(uint_xlen_t value) {
 	__asm__ volatile ("csrw    frm, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_frm(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_frm(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, frm, %1"  
 					  : "=r" (prev_value)
@@ -2304,7 +2304,7 @@ static inline uint_xlen_t csr_read_write_frm(uint_xlen_t new_value) {
 /*******************************************
  * fcsr - URW - Floating-Point Control and Status 
  */
-static inline uint_xlen_t csr_read_fcsr(void) {
+static inline uint_xlen_t hal_csr_read_fcsr(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, fcsr" 
 					  : "=r" (value)
@@ -2312,13 +2312,13 @@ static inline uint_xlen_t csr_read_fcsr(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_fcsr(uint_xlen_t value) {
+static inline void hal_csr_write_fcsr(uint_xlen_t value) {
 	__asm__ volatile ("csrw    fcsr, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_fcsr(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_fcsr(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, fcsr, %1"  
 					  : "=r" (prev_value)
@@ -2330,7 +2330,7 @@ static inline uint_xlen_t csr_read_write_fcsr(uint_xlen_t new_value) {
 /*******************************************
  * cycle - URO - Cycle counter for RDCYCLE instruction. 
  */
-static inline uint_xlen_t csr_read_cycle(void) {
+static inline uint_xlen_t hal_csr_read_cycle(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, cycle" 
 					  : "=r" (value)
@@ -2342,7 +2342,7 @@ static inline uint_xlen_t csr_read_cycle(void) {
 /*******************************************
  * time - URO - Timer for RDTIME instruction. 
  */
-static inline uint_xlen_t csr_read_time(void) {
+static inline uint_xlen_t hal_csr_read_time(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, time" 
 					  : "=r" (value)
@@ -2354,7 +2354,7 @@ static inline uint_xlen_t csr_read_time(void) {
 /*******************************************
  * instret - URO - Instructions-retired counter for RDINSTRET instruction. 
  */
-static inline uint_xlen_t csr_read_instret(void) {
+static inline uint_xlen_t hal_csr_read_instret(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, instret" 
 					  : "=r" (value)
@@ -2366,7 +2366,7 @@ static inline uint_xlen_t csr_read_instret(void) {
 /*******************************************
  * hpmcounter3 - URO - Performance-monitoring counter. 
  */
-static inline uint_xlen_t csr_read_hpmcounter3(void) {
+static inline uint_xlen_t hal_csr_read_hpmcounter3(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hpmcounter3" 
 					  : "=r" (value)
@@ -2378,7 +2378,7 @@ static inline uint_xlen_t csr_read_hpmcounter3(void) {
 /*******************************************
  * hpmcounter4 - URO - Performance-monitoring counter. 
  */
-static inline uint_xlen_t csr_read_hpmcounter4(void) {
+static inline uint_xlen_t hal_csr_read_hpmcounter4(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hpmcounter4" 
 					  : "=r" (value)
@@ -2390,7 +2390,7 @@ static inline uint_xlen_t csr_read_hpmcounter4(void) {
 /*******************************************
  * hpmcounter31 - URO - Performance-monitoring counter. 
  */
-static inline uint_xlen_t csr_read_hpmcounter31(void) {
+static inline uint_xlen_t hal_csr_read_hpmcounter31(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hpmcounter31" 
 					  : "=r" (value)
@@ -2402,7 +2402,7 @@ static inline uint_xlen_t csr_read_hpmcounter31(void) {
 /*******************************************
  * cycleh - URO - Upper 32 bits of  cycle, RV32I only. 
  */
-static inline uint_xlen_t csr_read_cycleh(void) {
+static inline uint_xlen_t hal_csr_read_cycleh(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, cycleh" 
 					  : "=r" (value)
@@ -2414,7 +2414,7 @@ static inline uint_xlen_t csr_read_cycleh(void) {
 /*******************************************
  * timeh - URO - Upper 32 bits of  time, RV32I only. 
  */
-static inline uint_xlen_t csr_read_timeh(void) {
+static inline uint_xlen_t hal_csr_read_timeh(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, timeh" 
 					  : "=r" (value)
@@ -2426,7 +2426,7 @@ static inline uint_xlen_t csr_read_timeh(void) {
 /*******************************************
  * instreth - URO - Upper 32 bits of  instret, RV32I only. 
  */
-static inline uint_xlen_t csr_read_instreth(void) {
+static inline uint_xlen_t hal_csr_read_instreth(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, instreth" 
 					  : "=r" (value)
@@ -2438,7 +2438,7 @@ static inline uint_xlen_t csr_read_instreth(void) {
 /*******************************************
  * hpmcounter3h - URO - Upper 32 bits of  hpmcounter3, RV32I only. 
  */
-static inline uint_xlen_t csr_read_hpmcounter3h(void) {
+static inline uint_xlen_t hal_csr_read_hpmcounter3h(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hpmcounter3h" 
 					  : "=r" (value)
@@ -2450,7 +2450,7 @@ static inline uint_xlen_t csr_read_hpmcounter3h(void) {
 /*******************************************
  * hpmcounter4h - URO - Upper 32 bits of  hpmcounter4, RV32I only. 
  */
-static inline uint_xlen_t csr_read_hpmcounter4h(void) {
+static inline uint_xlen_t hal_csr_read_hpmcounter4h(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hpmcounter4h" 
 					  : "=r" (value)
@@ -2462,7 +2462,7 @@ static inline uint_xlen_t csr_read_hpmcounter4h(void) {
 /*******************************************
  * hpmcounter31h - URO - Upper 32 bits of  hpmcounter31, RV32I only. 
  */
-static inline uint_xlen_t csr_read_hpmcounter31h(void) {
+static inline uint_xlen_t hal_csr_read_hpmcounter31h(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hpmcounter31h" 
 					  : "=r" (value)
@@ -2474,7 +2474,7 @@ static inline uint_xlen_t csr_read_hpmcounter31h(void) {
 /*******************************************
  * stval - SRW - Supervisor bad address or instruction. 
  */
-static inline uint_xlen_t csr_read_stval(void) {
+static inline uint_xlen_t hal_csr_read_stval(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, stval" 
 					  : "=r" (value)
@@ -2482,13 +2482,13 @@ static inline uint_xlen_t csr_read_stval(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_stval(uint_xlen_t value) {
+static inline void hal_csr_write_stval(uint_xlen_t value) {
 	__asm__ volatile ("csrw    stval, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_stval(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_stval(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, stval, %1"  
 					  : "=r" (prev_value)
@@ -2500,7 +2500,7 @@ static inline uint_xlen_t csr_read_write_stval(uint_xlen_t new_value) {
 /*******************************************
  * satp - SRW - Supervisor address translation and protection. 
  */
-static inline uint_xlen_t csr_read_satp(void) {
+static inline uint_xlen_t hal_csr_read_satp(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, satp" 
 					  : "=r" (value)
@@ -2508,13 +2508,13 @@ static inline uint_xlen_t csr_read_satp(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_satp(uint_xlen_t value) {
+static inline void hal_csr_write_satp(uint_xlen_t value) {
 	__asm__ volatile ("csrw    satp, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_satp(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_satp(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, satp, %1"  
 					  : "=r" (prev_value)
@@ -2526,7 +2526,7 @@ static inline uint_xlen_t csr_read_write_satp(uint_xlen_t new_value) {
 /*******************************************
  * hstatus - HRW - Hypervisor status register. 
  */
-static inline uint_xlen_t csr_read_hstatus(void) {
+static inline uint_xlen_t hal_csr_read_hstatus(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hstatus" 
 					  : "=r" (value)
@@ -2534,13 +2534,13 @@ static inline uint_xlen_t csr_read_hstatus(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_hstatus(uint_xlen_t value) {
+static inline void hal_csr_write_hstatus(uint_xlen_t value) {
 	__asm__ volatile ("csrw    hstatus, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_hstatus(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_hstatus(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, hstatus, %1"  
 					  : "=r" (prev_value)
@@ -2552,7 +2552,7 @@ static inline uint_xlen_t csr_read_write_hstatus(uint_xlen_t new_value) {
 /*******************************************
  * hedeleg - HRW - Hypervisor exception delegation register. 
  */
-static inline uint_xlen_t csr_read_hedeleg(void) {
+static inline uint_xlen_t hal_csr_read_hedeleg(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hedeleg" 
 					  : "=r" (value)
@@ -2560,13 +2560,13 @@ static inline uint_xlen_t csr_read_hedeleg(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_hedeleg(uint_xlen_t value) {
+static inline void hal_csr_write_hedeleg(uint_xlen_t value) {
 	__asm__ volatile ("csrw    hedeleg, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_hedeleg(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_hedeleg(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, hedeleg, %1"  
 					  : "=r" (prev_value)
@@ -2578,7 +2578,7 @@ static inline uint_xlen_t csr_read_write_hedeleg(uint_xlen_t new_value) {
 /*******************************************
  * hideleg - HRW - Hypervisor interrupt delegation register. 
  */
-static inline uint_xlen_t csr_read_hideleg(void) {
+static inline uint_xlen_t hal_csr_read_hideleg(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hideleg" 
 					  : "=r" (value)
@@ -2586,13 +2586,13 @@ static inline uint_xlen_t csr_read_hideleg(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_hideleg(uint_xlen_t value) {
+static inline void hal_csr_write_hideleg(uint_xlen_t value) {
 	__asm__ volatile ("csrw    hideleg, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_hideleg(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_hideleg(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, hideleg, %1"  
 					  : "=r" (prev_value)
@@ -2604,7 +2604,7 @@ static inline uint_xlen_t csr_read_write_hideleg(uint_xlen_t new_value) {
 /*******************************************
  * hcounteren - HRW - Hypervisor counter enable. 
  */
-static inline uint_xlen_t csr_read_hcounteren(void) {
+static inline uint_xlen_t hal_csr_read_hcounteren(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hcounteren" 
 					  : "=r" (value)
@@ -2612,13 +2612,13 @@ static inline uint_xlen_t csr_read_hcounteren(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_hcounteren(uint_xlen_t value) {
+static inline void hal_csr_write_hcounteren(uint_xlen_t value) {
 	__asm__ volatile ("csrw    hcounteren, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_hcounteren(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_hcounteren(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, hcounteren, %1"  
 					  : "=r" (prev_value)
@@ -2630,7 +2630,7 @@ static inline uint_xlen_t csr_read_write_hcounteren(uint_xlen_t new_value) {
 /*******************************************
  * hgatp - HRW - Hypervisor guest address translation and protection. 
  */
-static inline uint_xlen_t csr_read_hgatp(void) {
+static inline uint_xlen_t hal_csr_read_hgatp(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hgatp" 
 					  : "=r" (value)
@@ -2638,13 +2638,13 @@ static inline uint_xlen_t csr_read_hgatp(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_hgatp(uint_xlen_t value) {
+static inline void hal_csr_write_hgatp(uint_xlen_t value) {
 	__asm__ volatile ("csrw    hgatp, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_hgatp(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_hgatp(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, hgatp, %1"  
 					  : "=r" (prev_value)
@@ -2656,7 +2656,7 @@ static inline uint_xlen_t csr_read_write_hgatp(uint_xlen_t new_value) {
 /*******************************************
  * htimedelta - HRW - Delta for VS/VU-mode timer. 
  */
-static inline uint_xlen_t csr_read_htimedelta(void) {
+static inline uint_xlen_t hal_csr_read_htimedelta(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, htimedelta" 
 					  : "=r" (value)
@@ -2664,13 +2664,13 @@ static inline uint_xlen_t csr_read_htimedelta(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_htimedelta(uint_xlen_t value) {
+static inline void hal_csr_write_htimedelta(uint_xlen_t value) {
 	__asm__ volatile ("csrw    htimedelta, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_htimedelta(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_htimedelta(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, htimedelta, %1"  
 					  : "=r" (prev_value)
@@ -2682,7 +2682,7 @@ static inline uint_xlen_t csr_read_write_htimedelta(uint_xlen_t new_value) {
 /*******************************************
  * htimedeltah - HRW - Upper 32 bits of  htimedelta, RV32I only. 
  */
-static inline uint_xlen_t csr_read_htimedeltah(void) {
+static inline uint_xlen_t hal_csr_read_htimedeltah(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, htimedeltah" 
 					  : "=r" (value)
@@ -2690,13 +2690,13 @@ static inline uint_xlen_t csr_read_htimedeltah(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_htimedeltah(uint_xlen_t value) {
+static inline void hal_csr_write_htimedeltah(uint_xlen_t value) {
 	__asm__ volatile ("csrw    htimedeltah, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_htimedeltah(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_htimedeltah(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, htimedeltah, %1"  
 					  : "=r" (prev_value)
@@ -2708,7 +2708,7 @@ static inline uint_xlen_t csr_read_write_htimedeltah(uint_xlen_t new_value) {
 /*******************************************
  * vsstatus - HRW - Virtual supervisor status register. 
  */
-static inline uint_xlen_t csr_read_vsstatus(void) {
+static inline uint_xlen_t hal_csr_read_vsstatus(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vsstatus" 
 					  : "=r" (value)
@@ -2716,13 +2716,13 @@ static inline uint_xlen_t csr_read_vsstatus(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vsstatus(uint_xlen_t value) {
+static inline void hal_csr_write_vsstatus(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vsstatus, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vsstatus(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vsstatus(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vsstatus, %1"  
 					  : "=r" (prev_value)
@@ -2734,7 +2734,7 @@ static inline uint_xlen_t csr_read_write_vsstatus(uint_xlen_t new_value) {
 /*******************************************
  * vsie - HRW - Virtual supervisor interrupt-enable register. 
  */
-static inline uint_xlen_t csr_read_vsie(void) {
+static inline uint_xlen_t hal_csr_read_vsie(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vsie" 
 					  : "=r" (value)
@@ -2742,13 +2742,13 @@ static inline uint_xlen_t csr_read_vsie(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vsie(uint_xlen_t value) {
+static inline void hal_csr_write_vsie(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vsie, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vsie(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vsie(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vsie, %1"  
 					  : "=r" (prev_value)
@@ -2760,7 +2760,7 @@ static inline uint_xlen_t csr_read_write_vsie(uint_xlen_t new_value) {
 /*******************************************
  * vstvec - HRW - Virtual supervisor trap handler base address. 
  */
-static inline uint_xlen_t csr_read_vstvec(void) {
+static inline uint_xlen_t hal_csr_read_vstvec(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vstvec" 
 					  : "=r" (value)
@@ -2768,13 +2768,13 @@ static inline uint_xlen_t csr_read_vstvec(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vstvec(uint_xlen_t value) {
+static inline void hal_csr_write_vstvec(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vstvec, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vstvec(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vstvec(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vstvec, %1"  
 					  : "=r" (prev_value)
@@ -2786,7 +2786,7 @@ static inline uint_xlen_t csr_read_write_vstvec(uint_xlen_t new_value) {
 /*******************************************
  * vsscratch - HRW - Virtual supervisor scratch register. 
  */
-static inline uint_xlen_t csr_read_vsscratch(void) {
+static inline uint_xlen_t hal_csr_read_vsscratch(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vsscratch" 
 					  : "=r" (value)
@@ -2794,13 +2794,13 @@ static inline uint_xlen_t csr_read_vsscratch(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vsscratch(uint_xlen_t value) {
+static inline void hal_csr_write_vsscratch(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vsscratch, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vsscratch(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vsscratch(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vsscratch, %1"  
 					  : "=r" (prev_value)
@@ -2812,7 +2812,7 @@ static inline uint_xlen_t csr_read_write_vsscratch(uint_xlen_t new_value) {
 /*******************************************
  * vsepc - HRW - Virtual supervisor exception program counter. 
  */
-static inline uint_xlen_t csr_read_vsepc(void) {
+static inline uint_xlen_t hal_csr_read_vsepc(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vsepc" 
 					  : "=r" (value)
@@ -2820,13 +2820,13 @@ static inline uint_xlen_t csr_read_vsepc(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vsepc(uint_xlen_t value) {
+static inline void hal_csr_write_vsepc(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vsepc, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vsepc(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vsepc(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vsepc, %1"  
 					  : "=r" (prev_value)
@@ -2838,7 +2838,7 @@ static inline uint_xlen_t csr_read_write_vsepc(uint_xlen_t new_value) {
 /*******************************************
  * vscause - HRW - Virtual supervisor trap cause. 
  */
-static inline uint_xlen_t csr_read_vscause(void) {
+static inline uint_xlen_t hal_csr_read_vscause(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vscause" 
 					  : "=r" (value)
@@ -2846,13 +2846,13 @@ static inline uint_xlen_t csr_read_vscause(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vscause(uint_xlen_t value) {
+static inline void hal_csr_write_vscause(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vscause, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vscause(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vscause(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vscause, %1"  
 					  : "=r" (prev_value)
@@ -2864,7 +2864,7 @@ static inline uint_xlen_t csr_read_write_vscause(uint_xlen_t new_value) {
 /*******************************************
  * vstval - HRW - Virtual supervisor bad address or instruction. 
  */
-static inline uint_xlen_t csr_read_vstval(void) {
+static inline uint_xlen_t hal_csr_read_vstval(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vstval" 
 					  : "=r" (value)
@@ -2872,13 +2872,13 @@ static inline uint_xlen_t csr_read_vstval(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vstval(uint_xlen_t value) {
+static inline void hal_csr_write_vstval(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vstval, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vstval(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vstval(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vstval, %1"  
 					  : "=r" (prev_value)
@@ -2890,7 +2890,7 @@ static inline uint_xlen_t csr_read_write_vstval(uint_xlen_t new_value) {
 /*******************************************
  * vsip - HRW - Virtual supervisor interrupt pending. 
  */
-static inline uint_xlen_t csr_read_vsip(void) {
+static inline uint_xlen_t hal_csr_read_vsip(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vsip" 
 					  : "=r" (value)
@@ -2898,13 +2898,13 @@ static inline uint_xlen_t csr_read_vsip(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vsip(uint_xlen_t value) {
+static inline void hal_csr_write_vsip(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vsip, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vsip(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vsip(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vsip, %1"  
 					  : "=r" (prev_value)
@@ -2916,7 +2916,7 @@ static inline uint_xlen_t csr_read_write_vsip(uint_xlen_t new_value) {
 /*******************************************
  * vsatp - HRW - Virtual supervisor address translation and protection. 
  */
-static inline uint_xlen_t csr_read_vsatp(void) {
+static inline uint_xlen_t hal_csr_read_vsatp(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, vsatp" 
 					  : "=r" (value)
@@ -2924,13 +2924,13 @@ static inline uint_xlen_t csr_read_vsatp(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_vsatp(uint_xlen_t value) {
+static inline void hal_csr_write_vsatp(uint_xlen_t value) {
 	__asm__ volatile ("csrw    vsatp, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_vsatp(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_vsatp(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, vsatp, %1"  
 					  : "=r" (prev_value)
@@ -2942,7 +2942,7 @@ static inline uint_xlen_t csr_read_write_vsatp(uint_xlen_t new_value) {
 /*******************************************
  * mbase - MRW - Base register. 
  */
-static inline uint_xlen_t csr_read_mbase(void) {
+static inline uint_xlen_t hal_csr_read_mbase(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mbase" 
 					  : "=r" (value)
@@ -2950,13 +2950,13 @@ static inline uint_xlen_t csr_read_mbase(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mbase(uint_xlen_t value) {
+static inline void hal_csr_write_mbase(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mbase, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mbase(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mbase(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mbase, %1"  
 					  : "=r" (prev_value)
@@ -2968,7 +2968,7 @@ static inline uint_xlen_t csr_read_write_mbase(uint_xlen_t new_value) {
 /*******************************************
  * mbound - MRW - Bound register. 
  */
-static inline uint_xlen_t csr_read_mbound(void) {
+static inline uint_xlen_t hal_csr_read_mbound(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mbound" 
 					  : "=r" (value)
@@ -2976,13 +2976,13 @@ static inline uint_xlen_t csr_read_mbound(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mbound(uint_xlen_t value) {
+static inline void hal_csr_write_mbound(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mbound, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mbound(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mbound(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mbound, %1"  
 					  : "=r" (prev_value)
@@ -2994,7 +2994,7 @@ static inline uint_xlen_t csr_read_write_mbound(uint_xlen_t new_value) {
 /*******************************************
  * mibase - MRW - Instruction base register. 
  */
-static inline uint_xlen_t csr_read_mibase(void) {
+static inline uint_xlen_t hal_csr_read_mibase(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mibase" 
 					  : "=r" (value)
@@ -3002,13 +3002,13 @@ static inline uint_xlen_t csr_read_mibase(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mibase(uint_xlen_t value) {
+static inline void hal_csr_write_mibase(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mibase, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mibase(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mibase(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mibase, %1"  
 					  : "=r" (prev_value)
@@ -3020,7 +3020,7 @@ static inline uint_xlen_t csr_read_write_mibase(uint_xlen_t new_value) {
 /*******************************************
  * mibound - MRW - Instruction bound register. 
  */
-static inline uint_xlen_t csr_read_mibound(void) {
+static inline uint_xlen_t hal_csr_read_mibound(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mibound" 
 					  : "=r" (value)
@@ -3028,13 +3028,13 @@ static inline uint_xlen_t csr_read_mibound(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mibound(uint_xlen_t value) {
+static inline void hal_csr_write_mibound(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mibound, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mibound(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mibound(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mibound, %1"  
 					  : "=r" (prev_value)
@@ -3046,7 +3046,7 @@ static inline uint_xlen_t csr_read_write_mibound(uint_xlen_t new_value) {
 /*******************************************
  * mdbase - MRW - Data base register. 
  */
-static inline uint_xlen_t csr_read_mdbase(void) {
+static inline uint_xlen_t hal_csr_read_mdbase(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mdbase" 
 					  : "=r" (value)
@@ -3054,13 +3054,13 @@ static inline uint_xlen_t csr_read_mdbase(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mdbase(uint_xlen_t value) {
+static inline void hal_csr_write_mdbase(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mdbase, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mdbase(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mdbase(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mdbase, %1"  
 					  : "=r" (prev_value)
@@ -3072,7 +3072,7 @@ static inline uint_xlen_t csr_read_write_mdbase(uint_xlen_t new_value) {
 /*******************************************
  * mdbound - MRW - Data bound register. 
  */
-static inline uint_xlen_t csr_read_mdbound(void) {
+static inline uint_xlen_t hal_csr_read_mdbound(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mdbound" 
 					  : "=r" (value)
@@ -3080,13 +3080,13 @@ static inline uint_xlen_t csr_read_mdbound(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mdbound(uint_xlen_t value) {
+static inline void hal_csr_write_mdbound(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mdbound, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mdbound(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mdbound(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mdbound, %1"  
 					  : "=r" (prev_value)
@@ -3098,7 +3098,7 @@ static inline uint_xlen_t csr_read_write_mdbound(uint_xlen_t new_value) {
 /*******************************************
  * pmpcfg0 - MRW - Physical memory protection configuration. 
  */
-static inline uint_xlen_t csr_read_pmpcfg0(void) {
+static inline uint_xlen_t hal_csr_read_pmpcfg0(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, pmpcfg0" 
 					  : "=r" (value)
@@ -3106,13 +3106,13 @@ static inline uint_xlen_t csr_read_pmpcfg0(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_pmpcfg0(uint_xlen_t value) {
+static inline void hal_csr_write_pmpcfg0(uint_xlen_t value) {
 	__asm__ volatile ("csrw    pmpcfg0, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_pmpcfg0(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_pmpcfg0(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, pmpcfg0, %1"  
 					  : "=r" (prev_value)
@@ -3124,7 +3124,7 @@ static inline uint_xlen_t csr_read_write_pmpcfg0(uint_xlen_t new_value) {
 /*******************************************
  * pmpcfg1 - MRW - Physical memory protection configuration, RV32 only. 
  */
-static inline uint_xlen_t csr_read_pmpcfg1(void) {
+static inline uint_xlen_t hal_csr_read_pmpcfg1(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, pmpcfg1" 
 					  : "=r" (value)
@@ -3132,13 +3132,13 @@ static inline uint_xlen_t csr_read_pmpcfg1(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_pmpcfg1(uint_xlen_t value) {
+static inline void hal_csr_write_pmpcfg1(uint_xlen_t value) {
 	__asm__ volatile ("csrw    pmpcfg1, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_pmpcfg1(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_pmpcfg1(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, pmpcfg1, %1"  
 					  : "=r" (prev_value)
@@ -3150,7 +3150,7 @@ static inline uint_xlen_t csr_read_write_pmpcfg1(uint_xlen_t new_value) {
 /*******************************************
  * pmpcfg2 - MRW - Physical memory protection configuration. 
  */
-static inline uint_xlen_t csr_read_pmpcfg2(void) {
+static inline uint_xlen_t hal_csr_read_pmpcfg2(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, pmpcfg2" 
 					  : "=r" (value)
@@ -3158,13 +3158,13 @@ static inline uint_xlen_t csr_read_pmpcfg2(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_pmpcfg2(uint_xlen_t value) {
+static inline void hal_csr_write_pmpcfg2(uint_xlen_t value) {
 	__asm__ volatile ("csrw    pmpcfg2, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_pmpcfg2(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_pmpcfg2(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, pmpcfg2, %1"  
 					  : "=r" (prev_value)
@@ -3176,7 +3176,7 @@ static inline uint_xlen_t csr_read_write_pmpcfg2(uint_xlen_t new_value) {
 /*******************************************
  * pmpcfg3 - MRW - Physical memory protection configuration, RV32 only. 
  */
-static inline uint_xlen_t csr_read_pmpcfg3(void) {
+static inline uint_xlen_t hal_csr_read_pmpcfg3(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, pmpcfg3" 
 					  : "=r" (value)
@@ -3184,13 +3184,13 @@ static inline uint_xlen_t csr_read_pmpcfg3(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_pmpcfg3(uint_xlen_t value) {
+static inline void hal_csr_write_pmpcfg3(uint_xlen_t value) {
 	__asm__ volatile ("csrw    pmpcfg3, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_pmpcfg3(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_pmpcfg3(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, pmpcfg3, %1"  
 					  : "=r" (prev_value)
@@ -3202,7 +3202,7 @@ static inline uint_xlen_t csr_read_write_pmpcfg3(uint_xlen_t new_value) {
 /*******************************************
  * pmpaddr0 - MRW - Physical memory protection address register. 
  */
-static inline uint_xlen_t csr_read_pmpaddr0(void) {
+static inline uint_xlen_t hal_csr_read_pmpaddr0(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, pmpaddr0" 
 					  : "=r" (value)
@@ -3210,13 +3210,13 @@ static inline uint_xlen_t csr_read_pmpaddr0(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_pmpaddr0(uint_xlen_t value) {
+static inline void hal_csr_write_pmpaddr0(uint_xlen_t value) {
 	__asm__ volatile ("csrw    pmpaddr0, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_pmpaddr0(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_pmpaddr0(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, pmpaddr0, %1"  
 					  : "=r" (prev_value)
@@ -3228,7 +3228,7 @@ static inline uint_xlen_t csr_read_write_pmpaddr0(uint_xlen_t new_value) {
 /*******************************************
  * pmpaddr1 - MRW - Physical memory protection address register. 
  */
-static inline uint_xlen_t csr_read_pmpaddr1(void) {
+static inline uint_xlen_t hal_csr_read_pmpaddr1(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, pmpaddr1" 
 					  : "=r" (value)
@@ -3236,13 +3236,13 @@ static inline uint_xlen_t csr_read_pmpaddr1(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_pmpaddr1(uint_xlen_t value) {
+static inline void hal_csr_write_pmpaddr1(uint_xlen_t value) {
 	__asm__ volatile ("csrw    pmpaddr1, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_pmpaddr1(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_pmpaddr1(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, pmpaddr1, %1"  
 					  : "=r" (prev_value)
@@ -3254,7 +3254,7 @@ static inline uint_xlen_t csr_read_write_pmpaddr1(uint_xlen_t new_value) {
 /*******************************************
  * pmpaddr15 - MRW - Physical memory protection address register. 
  */
-static inline uint_xlen_t csr_read_pmpaddr15(void) {
+static inline uint_xlen_t hal_csr_read_pmpaddr15(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, pmpaddr15" 
 					  : "=r" (value)
@@ -3262,13 +3262,13 @@ static inline uint_xlen_t csr_read_pmpaddr15(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_pmpaddr15(uint_xlen_t value) {
+static inline void hal_csr_write_pmpaddr15(uint_xlen_t value) {
 	__asm__ volatile ("csrw    pmpaddr15, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_pmpaddr15(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_pmpaddr15(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, pmpaddr15, %1"  
 					  : "=r" (prev_value)
@@ -3280,7 +3280,7 @@ static inline uint_xlen_t csr_read_write_pmpaddr15(uint_xlen_t new_value) {
 /*******************************************
  * mhpmcounter4 - MRW - Machine performance-monitoring counter. 
  */
-static inline uint_xlen_t csr_read_mhpmcounter4(void) {
+static inline uint_xlen_t hal_csr_read_mhpmcounter4(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mhpmcounter4" 
 					  : "=r" (value)
@@ -3288,13 +3288,13 @@ static inline uint_xlen_t csr_read_mhpmcounter4(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmcounter4(uint_xlen_t value) {
+static inline void hal_csr_write_mhpmcounter4(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mhpmcounter4, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mhpmcounter4(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mhpmcounter4(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmcounter4, %1"  
 					  : "=r" (prev_value)
@@ -3306,7 +3306,7 @@ static inline uint_xlen_t csr_read_write_mhpmcounter4(uint_xlen_t new_value) {
 /*******************************************
  * mhpmcounter31 - MRW - Machine performance-monitoring counter. 
  */
-static inline uint_xlen_t csr_read_mhpmcounter31(void) {
+static inline uint_xlen_t hal_csr_read_mhpmcounter31(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mhpmcounter31" 
 					  : "=r" (value)
@@ -3314,13 +3314,13 @@ static inline uint_xlen_t csr_read_mhpmcounter31(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmcounter31(uint_xlen_t value) {
+static inline void hal_csr_write_mhpmcounter31(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mhpmcounter31, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mhpmcounter31(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mhpmcounter31(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmcounter31, %1"  
 					  : "=r" (prev_value)
@@ -3332,7 +3332,7 @@ static inline uint_xlen_t csr_read_write_mhpmcounter31(uint_xlen_t new_value) {
 /*******************************************
  * mcycleh - MRW - Upper 32 bits of  mcycle, RV32I only. 
  */
-static inline uint32_t csr_read_mcycleh(void) {
+static inline uint32_t hal_csr_read_mcycleh(void) {
 	uint_csr32_t value;        
 	__asm__ volatile ("csrr    %0, mcycleh" 
 					  : "=r" (value)
@@ -3340,13 +3340,13 @@ static inline uint32_t csr_read_mcycleh(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mcycleh(uint_csr32_t value) {
+static inline void hal_csr_write_mcycleh(uint_csr32_t value) {
 	__asm__ volatile ("csrw    mcycleh, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint32_t csr_read_write_mcycleh(uint32_t new_value) {
+static inline uint32_t hal_csr_read_write_mcycleh(uint32_t new_value) {
 	uint_csr32_t prev_value;
 	__asm__ volatile ("csrrw    %0, mcycleh, %1"  
 					  : "=r" (prev_value)
@@ -3358,7 +3358,7 @@ static inline uint32_t csr_read_write_mcycleh(uint32_t new_value) {
 /*******************************************
  * minstreth - MRW - Upper 32 bits of  minstret, RV32I only. 
  */
-static inline uint32_t csr_read_minstreth(void) {
+static inline uint32_t hal_csr_read_minstreth(void) {
 	uint_csr32_t value;        
 	__asm__ volatile ("csrr    %0, minstreth" 
 					  : "=r" (value)
@@ -3366,13 +3366,13 @@ static inline uint32_t csr_read_minstreth(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_minstreth(uint_csr32_t value) {
+static inline void hal_csr_write_minstreth(uint_csr32_t value) {
 	__asm__ volatile ("csrw    minstreth, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint32_t csr_read_write_minstreth(uint32_t new_value) {
+static inline uint32_t hal_csr_read_write_minstreth(uint32_t new_value) {
 	uint_csr32_t prev_value;
 	__asm__ volatile ("csrrw    %0, minstreth, %1"  
 					  : "=r" (prev_value)
@@ -3384,7 +3384,7 @@ static inline uint32_t csr_read_write_minstreth(uint32_t new_value) {
 /*******************************************
  * mhpmcounter3h - MRW - Upper 32 bits of  mhpmcounter3, RV32I only. 
  */
-static inline uint32_t csr_read_mhpmcounter3h(void) {
+static inline uint32_t hal_csr_read_mhpmcounter3h(void) {
 	uint_csr32_t value;        
 	__asm__ volatile ("csrr    %0, mhpmcounter3h" 
 					  : "=r" (value)
@@ -3392,13 +3392,13 @@ static inline uint32_t csr_read_mhpmcounter3h(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmcounter3h(uint_csr32_t value) {
+static inline void hal_csr_write_mhpmcounter3h(uint_csr32_t value) {
 	__asm__ volatile ("csrw    mhpmcounter3h, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint32_t csr_read_write_mhpmcounter3h(uint32_t new_value) {
+static inline uint32_t hal_csr_read_write_mhpmcounter3h(uint32_t new_value) {
 	uint_csr32_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmcounter3h, %1"  
 					  : "=r" (prev_value)
@@ -3410,7 +3410,7 @@ static inline uint32_t csr_read_write_mhpmcounter3h(uint32_t new_value) {
 /*******************************************
  * mhpmcounter4h - MRW - Upper 32 bits of  mhpmcounter4, RV32I only. 
  */
-static inline uint32_t csr_read_mhpmcounter4h(void) {
+static inline uint32_t hal_csr_read_mhpmcounter4h(void) {
 	uint_csr32_t value;        
 	__asm__ volatile ("csrr    %0, mhpmcounter4h" 
 					  : "=r" (value)
@@ -3418,13 +3418,13 @@ static inline uint32_t csr_read_mhpmcounter4h(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmcounter4h(uint_csr32_t value) {
+static inline void hal_csr_write_mhpmcounter4h(uint_csr32_t value) {
 	__asm__ volatile ("csrw    mhpmcounter4h, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint32_t csr_read_write_mhpmcounter4h(uint32_t new_value) {
+static inline uint32_t hal_csr_read_write_mhpmcounter4h(uint32_t new_value) {
 	uint_csr32_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmcounter4h, %1"  
 					  : "=r" (prev_value)
@@ -3436,7 +3436,7 @@ static inline uint32_t csr_read_write_mhpmcounter4h(uint32_t new_value) {
 /*******************************************
  * mhpmcounter31h - MRW - Upper 32 bits of  mhpmcounter31, RV32I only. 
  */
-static inline uint32_t csr_read_mhpmcounter31h(void) {
+static inline uint32_t hal_csr_read_mhpmcounter31h(void) {
 	uint_csr32_t value;        
 	__asm__ volatile ("csrr    %0, mhpmcounter31h" 
 					  : "=r" (value)
@@ -3444,13 +3444,13 @@ static inline uint32_t csr_read_mhpmcounter31h(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmcounter31h(uint_csr32_t value) {
+static inline void hal_csr_write_mhpmcounter31h(uint_csr32_t value) {
 	__asm__ volatile ("csrw    mhpmcounter31h, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint32_t csr_read_write_mhpmcounter31h(uint32_t new_value) {
+static inline uint32_t hal_csr_read_write_mhpmcounter31h(uint32_t new_value) {
 	uint_csr32_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmcounter31h, %1"  
 					  : "=r" (prev_value)
@@ -3462,7 +3462,7 @@ static inline uint32_t csr_read_write_mhpmcounter31h(uint32_t new_value) {
 /*******************************************
  * mhpmevent4 - MRW - Machine performance-monitoring event selector. 
  */
-static inline uint_xlen_t csr_read_mhpmevent4(void) {
+static inline uint_xlen_t hal_csr_read_mhpmevent4(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mhpmevent4" 
 					  : "=r" (value)
@@ -3470,13 +3470,13 @@ static inline uint_xlen_t csr_read_mhpmevent4(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmevent4(uint_xlen_t value) {
+static inline void hal_csr_write_mhpmevent4(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mhpmevent4, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mhpmevent4(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mhpmevent4(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmevent4, %1"  
 					  : "=r" (prev_value)
@@ -3488,7 +3488,7 @@ static inline uint_xlen_t csr_read_write_mhpmevent4(uint_xlen_t new_value) {
 /*******************************************
  * mhpmevent31 - MRW - Machine performance-monitoring event selector. 
  */
-static inline uint_xlen_t csr_read_mhpmevent31(void) {
+static inline uint_xlen_t hal_csr_read_mhpmevent31(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mhpmevent31" 
 					  : "=r" (value)
@@ -3496,13 +3496,13 @@ static inline uint_xlen_t csr_read_mhpmevent31(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mhpmevent31(uint_xlen_t value) {
+static inline void hal_csr_write_mhpmevent31(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mhpmevent31, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mhpmevent31(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mhpmevent31(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mhpmevent31, %1"  
 					  : "=r" (prev_value)
@@ -3514,7 +3514,7 @@ static inline uint_xlen_t csr_read_write_mhpmevent31(uint_xlen_t new_value) {
 /*******************************************
  * tselect - MRW - Debug/Trace trigger register select. 
  */
-static inline uint_xlen_t csr_read_tselect(void) {
+static inline uint_xlen_t hal_csr_read_tselect(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, tselect" 
 					  : "=r" (value)
@@ -3522,13 +3522,13 @@ static inline uint_xlen_t csr_read_tselect(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_tselect(uint_xlen_t value) {
+static inline void hal_csr_write_tselect(uint_xlen_t value) {
 	__asm__ volatile ("csrw    tselect, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_tselect(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_tselect(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, tselect, %1"  
 					  : "=r" (prev_value)
@@ -3540,7 +3540,7 @@ static inline uint_xlen_t csr_read_write_tselect(uint_xlen_t new_value) {
 /*******************************************
  * tdata1 - MRW - First Debug/Trace trigger data register. 
  */
-static inline uint_xlen_t csr_read_tdata1(void) {
+static inline uint_xlen_t hal_csr_read_tdata1(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, tdata1" 
 					  : "=r" (value)
@@ -3548,13 +3548,13 @@ static inline uint_xlen_t csr_read_tdata1(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_tdata1(uint_xlen_t value) {
+static inline void hal_csr_write_tdata1(uint_xlen_t value) {
 	__asm__ volatile ("csrw    tdata1, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_tdata1(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_tdata1(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, tdata1, %1"  
 					  : "=r" (prev_value)
@@ -3566,7 +3566,7 @@ static inline uint_xlen_t csr_read_write_tdata1(uint_xlen_t new_value) {
 /*******************************************
  * tdata2 - MRW - Second Debug/Trace trigger data register. 
  */
-static inline uint_xlen_t csr_read_tdata2(void) {
+static inline uint_xlen_t hal_csr_read_tdata2(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, tdata2" 
 					  : "=r" (value)
@@ -3574,13 +3574,13 @@ static inline uint_xlen_t csr_read_tdata2(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_tdata2(uint_xlen_t value) {
+static inline void hal_csr_write_tdata2(uint_xlen_t value) {
 	__asm__ volatile ("csrw    tdata2, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_tdata2(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_tdata2(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, tdata2, %1"  
 					  : "=r" (prev_value)
@@ -3592,7 +3592,7 @@ static inline uint_xlen_t csr_read_write_tdata2(uint_xlen_t new_value) {
 /*******************************************
  * tdata3 - MRW - Third Debug/Trace trigger data register. 
  */
-static inline uint_xlen_t csr_read_tdata3(void) {
+static inline uint_xlen_t hal_csr_read_tdata3(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, tdata3" 
 					  : "=r" (value)
@@ -3600,13 +3600,13 @@ static inline uint_xlen_t csr_read_tdata3(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_tdata3(uint_xlen_t value) {
+static inline void hal_csr_write_tdata3(uint_xlen_t value) {
 	__asm__ volatile ("csrw    tdata3, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_tdata3(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_tdata3(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, tdata3, %1"  
 					  : "=r" (prev_value)
@@ -3618,7 +3618,7 @@ static inline uint_xlen_t csr_read_write_tdata3(uint_xlen_t new_value) {
 /*******************************************
  * dcsr - DRW - Debug control and status register. 
  */
-static inline uint_xlen_t csr_read_dcsr(void) {
+static inline uint_xlen_t hal_csr_read_dcsr(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, dcsr" 
 					  : "=r" (value)
@@ -3626,13 +3626,13 @@ static inline uint_xlen_t csr_read_dcsr(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_dcsr(uint_xlen_t value) {
+static inline void hal_csr_write_dcsr(uint_xlen_t value) {
 	__asm__ volatile ("csrw    dcsr, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_dcsr(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_dcsr(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, dcsr, %1"  
 					  : "=r" (prev_value)
@@ -3644,7 +3644,7 @@ static inline uint_xlen_t csr_read_write_dcsr(uint_xlen_t new_value) {
 /*******************************************
  * dpc - DRW - Debug PC. 
  */
-static inline uint_xlen_t csr_read_dpc(void) {
+static inline uint_xlen_t hal_csr_read_dpc(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, dpc" 
 					  : "=r" (value)
@@ -3652,13 +3652,13 @@ static inline uint_xlen_t csr_read_dpc(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_dpc(uint_xlen_t value) {
+static inline void hal_csr_write_dpc(uint_xlen_t value) {
 	__asm__ volatile ("csrw    dpc, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_dpc(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_dpc(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, dpc, %1"  
 					  : "=r" (prev_value)
@@ -3670,7 +3670,7 @@ static inline uint_xlen_t csr_read_write_dpc(uint_xlen_t new_value) {
 /*******************************************
  * dscratch0 - DRW - Debug scratch register 0. 
  */
-static inline uint_xlen_t csr_read_dscratch0(void) {
+static inline uint_xlen_t hal_csr_read_dscratch0(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, dscratch0" 
 					  : "=r" (value)
@@ -3678,13 +3678,13 @@ static inline uint_xlen_t csr_read_dscratch0(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_dscratch0(uint_xlen_t value) {
+static inline void hal_csr_write_dscratch0(uint_xlen_t value) {
 	__asm__ volatile ("csrw    dscratch0, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_dscratch0(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_dscratch0(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, dscratch0, %1"  
 					  : "=r" (prev_value)
@@ -3696,7 +3696,7 @@ static inline uint_xlen_t csr_read_write_dscratch0(uint_xlen_t new_value) {
 /*******************************************
  * dscratch1 - DRW - Debug scratch register 1. 
  */
-static inline uint_xlen_t csr_read_dscratch1(void) {
+static inline uint_xlen_t hal_csr_read_dscratch1(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, dscratch1" 
 					  : "=r" (value)
@@ -3704,13 +3704,13 @@ static inline uint_xlen_t csr_read_dscratch1(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_dscratch1(uint_xlen_t value) {
+static inline void hal_csr_write_dscratch1(uint_xlen_t value) {
 	__asm__ volatile ("csrw    dscratch1, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_dscratch1(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_dscratch1(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, dscratch1, %1"  
 					  : "=r" (prev_value)
@@ -3722,7 +3722,7 @@ static inline uint_xlen_t csr_read_write_dscratch1(uint_xlen_t new_value) {
 /*******************************************
  * hie - HRW - Hypervisor interrupt-enable register. 
  */
-static inline uint_xlen_t csr_read_hie(void) {
+static inline uint_xlen_t hal_csr_read_hie(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hie" 
 					  : "=r" (value)
@@ -3730,13 +3730,13 @@ static inline uint_xlen_t csr_read_hie(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_hie(uint_xlen_t value) {
+static inline void hal_csr_write_hie(uint_xlen_t value) {
 	__asm__ volatile ("csrw    hie, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_hie(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_hie(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, hie, %1"  
 					  : "=r" (prev_value)
@@ -3748,7 +3748,7 @@ static inline uint_xlen_t csr_read_write_hie(uint_xlen_t new_value) {
 /*******************************************
  * hgeie - HRW - Hypervisor guest external interrupt-enable register. 
  */
-static inline uint_xlen_t csr_read_hgeie(void) {
+static inline uint_xlen_t hal_csr_read_hgeie(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hgeie" 
 					  : "=r" (value)
@@ -3756,13 +3756,13 @@ static inline uint_xlen_t csr_read_hgeie(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_hgeie(uint_xlen_t value) {
+static inline void hal_csr_write_hgeie(uint_xlen_t value) {
 	__asm__ volatile ("csrw    hgeie, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_hgeie(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_hgeie(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, hgeie, %1"  
 					  : "=r" (prev_value)
@@ -3774,7 +3774,7 @@ static inline uint_xlen_t csr_read_write_hgeie(uint_xlen_t new_value) {
 /*******************************************
  * htval - HRW - Hypervisor bad guest physical address. 
  */
-static inline uint_xlen_t csr_read_htval(void) {
+static inline uint_xlen_t hal_csr_read_htval(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, htval" 
 					  : "=r" (value)
@@ -3782,13 +3782,13 @@ static inline uint_xlen_t csr_read_htval(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_htval(uint_xlen_t value) {
+static inline void hal_csr_write_htval(uint_xlen_t value) {
 	__asm__ volatile ("csrw    htval, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_htval(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_htval(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, htval, %1"  
 					  : "=r" (prev_value)
@@ -3800,7 +3800,7 @@ static inline uint_xlen_t csr_read_write_htval(uint_xlen_t new_value) {
 /*******************************************
  * hip - HRW - Hypervisor interrupt pending. 
  */
-static inline uint_xlen_t csr_read_hip(void) {
+static inline uint_xlen_t hal_csr_read_hip(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hip" 
 					  : "=r" (value)
@@ -3808,13 +3808,13 @@ static inline uint_xlen_t csr_read_hip(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_hip(uint_xlen_t value) {
+static inline void hal_csr_write_hip(uint_xlen_t value) {
 	__asm__ volatile ("csrw    hip, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_hip(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_hip(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, hip, %1"  
 					  : "=r" (prev_value)
@@ -3826,7 +3826,7 @@ static inline uint_xlen_t csr_read_write_hip(uint_xlen_t new_value) {
 /*******************************************
  * htinst - HRW - Hypervisor trap instruction (transformed). 
  */
-static inline uint_xlen_t csr_read_htinst(void) {
+static inline uint_xlen_t hal_csr_read_htinst(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, htinst" 
 					  : "=r" (value)
@@ -3834,13 +3834,13 @@ static inline uint_xlen_t csr_read_htinst(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_htinst(uint_xlen_t value) {
+static inline void hal_csr_write_htinst(uint_xlen_t value) {
 	__asm__ volatile ("csrw    htinst, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_htinst(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_htinst(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, htinst, %1"  
 					  : "=r" (prev_value)
@@ -3852,7 +3852,7 @@ static inline uint_xlen_t csr_read_write_htinst(uint_xlen_t new_value) {
 /*******************************************
  * hgeip - HRO - Hypervisor guest external interrupt pending. 
  */
-static inline uint_xlen_t csr_read_hgeip(void) {
+static inline uint_xlen_t hal_csr_read_hgeip(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, hgeip" 
 					  : "=r" (value)
@@ -3864,7 +3864,7 @@ static inline uint_xlen_t csr_read_hgeip(void) {
 /*******************************************
  * mtinst - MRW - Machine trap instruction (transformed). 
  */
-static inline uint_xlen_t csr_read_mtinst(void) {
+static inline uint_xlen_t hal_csr_read_mtinst(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mtinst" 
 					  : "=r" (value)
@@ -3872,13 +3872,13 @@ static inline uint_xlen_t csr_read_mtinst(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mtinst(uint_xlen_t value) {
+static inline void hal_csr_write_mtinst(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mtinst, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mtinst(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mtinst(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mtinst, %1"  
 					  : "=r" (prev_value)
@@ -3890,7 +3890,7 @@ static inline uint_xlen_t csr_read_write_mtinst(uint_xlen_t new_value) {
 /*******************************************
  * mtval2 - MRW - Machine bad guest physical address. 
  */
-static inline uint_xlen_t csr_read_mtval2(void) {
+static inline uint_xlen_t hal_csr_read_mtval2(void) {
 	uint_xlen_t value;        
 	__asm__ volatile ("csrr    %0, mtval2" 
 					  : "=r" (value)
@@ -3898,13 +3898,13 @@ static inline uint_xlen_t csr_read_mtval2(void) {
 					  :);
 	return value;
 }
-static inline void csr_write_mtval2(uint_xlen_t value) {
+static inline void hal_csr_write_mtval2(uint_xlen_t value) {
 	__asm__ volatile ("csrw    mtval2, %0" 
 					  :
 					  : "r" (value)
 					  :);
 }
-static inline uint_xlen_t csr_read_write_mtval2(uint_xlen_t new_value) {
+static inline uint_xlen_t hal_csr_read_write_mtval2(uint_xlen_t new_value) {
 	uint_xlen_t prev_value;
 	__asm__ volatile ("csrrw    %0, mtval2, %1"  
 					  : "=r" (prev_value)

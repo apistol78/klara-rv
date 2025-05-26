@@ -36,14 +36,14 @@ c_modes[] =
 	{ 720, 720, 720 * 720, 0b00 }
 };
 
-int32_t video_init()
+int32_t hal_video_init()
 {
 	s_primary_target = (uint32_t*)VIDEO_DATA_BASE;
-	video_set_mode(VMODE_720_720_8);
+	hal_video_set_mode(VMODE_720_720_8);
 	return 0;
 }
 
-int32_t video_set_mode(int32_t mode)
+int32_t hal_video_set_mode(int32_t mode)
 {
 	volatile uint32_t* control = (volatile uint32_t*)VIDEO_CONTROL_BASE;
 	control[1] = c_modes[mode].width;
@@ -51,7 +51,7 @@ int32_t video_set_mode(int32_t mode)
 	s_mode = mode;
 }
 
-void* video_create_target()
+void* hal_video_create_target()
 {
 	// void* target = malloc(c_modes[s_mode].pixels);
 	// memset(target, 0, c_modes[s_mode].pixels);
@@ -59,52 +59,52 @@ void* video_create_target()
 	return 0;
 }
 
-void video_destroy_target(void* target)
+void hal_video_destroy_target(void* target)
 {
 	// free(target);
 }
 
-int32_t video_get_resolution_width()
+int32_t hal_video_get_resolution_width()
 {
 	return c_modes[s_mode].width;
 }
 
-int32_t video_get_resolution_height()
+int32_t hal_video_get_resolution_height()
 {
 	return c_modes[s_mode].height;
 }
 
-void video_set_palette(uint8_t index, uint32_t color)
+void hal_video_set_palette(uint8_t index, uint32_t color)
 {
 	volatile uint32_t* palette = (volatile uint32_t*)VIDEO_PALETTE_BASE;
 	palette[index] = color;
 }
 
-void* video_get_primary_target()
+void* hal_video_get_primary_target()
 {
 	uint8_t* ptr = (uint8_t*)s_primary_target;
 	return ptr + s_visible_offset;
 }
 
-void* video_get_secondary_target()
+void* hal_video_get_secondary_target()
 {
 	uint8_t* ptr = (uint8_t*)s_primary_target;
 	return ptr + s_hidden_offset;
 }
 
-void video_clear(uint8_t idx)
+void hal_video_clear(uint8_t idx)
 {
-	uint8_t* framebuffer = (uint8_t*)video_get_secondary_target();
+	uint8_t* framebuffer = (uint8_t*)hal_video_get_secondary_target();
 	memset(framebuffer, idx, c_modes[s_mode].pixels);
 }
 
-void video_blit(const void* source)
+void hal_video_blit(const void* source)
 {
-	uint8_t* target = (uint8_t*)video_get_secondary_target();
+	uint8_t* target = (uint8_t*)hal_video_get_secondary_target();
 	memcpy(target, source, c_modes[s_mode].pixels);
 }
 
-void video_present()
+void hal_video_present()
 {
 	// Swap offsets.
 	const uint32_t tmp = s_hidden_offset;

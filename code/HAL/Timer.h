@@ -10,7 +10,7 @@
 
 #include "HAL/Common.h"
 
-inline volatile uint32_t timer_get_ms()
+inline volatile uint32_t hal_timer_get_ms()
 {
  	volatile uint32_t ms;
 	__asm__ volatile (
@@ -20,7 +20,7 @@ inline volatile uint32_t timer_get_ms()
 	return ms;   
 }
 
-inline volatile uint64_t timer_get_cycles()
+inline volatile uint64_t hal_timer_get_cycles()
 {
 	volatile uint32_t mtimeh;
 	volatile uint32_t mtimel;
@@ -40,4 +40,4 @@ inline volatile uint64_t timer_get_cycles()
 	);
 }
 
-EXTERN_C void timer_wait_ms(uint32_t ms);
+EXTERN_C void hal_timer_wait_ms(uint32_t ms);

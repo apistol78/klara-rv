@@ -81,7 +81,7 @@ typedef enum
 static int32_t s_mode = SD_MODE_SW;
 static int32_t s_dataBits = 1;
 
-static void sd_dummy_clock(uint32_t clockCnt)
+static void hal_sd_dummy_clock(uint32_t clockCnt)
 {
 	for (uint32_t i = 0; i < clockCnt; ++i)
 	{
@@ -90,7 +90,7 @@ static void sd_dummy_clock(uint32_t clockCnt)
     }
 }
 
-static void sd_send_cmd(uint8_t cmd[6], int32_t cmdLen)
+static void hal_sd_send_cmd(uint8_t cmd[6], int32_t cmdLen)
 {
 	SD_TRACE_INFO("[SD] sd_send_cmd %02x, len %d\n", cmd[0], cmdLen);
 
@@ -119,7 +119,7 @@ static void sd_send_cmd(uint8_t cmd[6], int32_t cmdLen)
 	// }
 }
 
-static int32_t sd_get_response(uint8_t* outResponse, int32_t responseLen)
+static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
 {
 	SD_TRACE_INFO("[SD] sd_get_response\n");
 
@@ -180,11 +180,11 @@ static int32_t sd_get_response(uint8_t* outResponse, int32_t responseLen)
 			bit++;
 	}
 
-	sd_dummy_clock(8);
+	hal_sd_dummy_clock(8);
 	return 1;	
 }
 
-static int32_t sd_cmd0()
+static int32_t hal_sd_cmd0()
 {
 	SD_TRACE_INFO("[SD] sd_cmd0\n");
 
@@ -194,13 +194,13 @@ static int32_t sd_cmd0()
 
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	sd_dummy_clock(1000);
+	hal_sd_dummy_clock(1000);
 	return 1;
 }
 
-static int32_t sd_cmd8(uint8_t voltId, uint8_t testPattern)
+static int32_t hal_sd_cmd8(uint8_t voltId, uint8_t testPattern)
 {
 	SD_TRACE_INFO("[SD] sd_cmd8\n");
 
@@ -215,9 +215,9 @@ static int32_t sd_cmd8(uint8_t voltId, uint8_t testPattern)
 	cmd[4] = testPattern;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 	
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -229,7 +229,7 @@ static int32_t sd_cmd8(uint8_t voltId, uint8_t testPattern)
 	return 1;
 }
 
-static int32_t sd_cmd55(uint16_t rca16)
+static int32_t hal_sd_cmd55(uint16_t rca16)
 {
 	SD_TRACE_INFO("[SD] sd_cmd55\n");
 
@@ -244,9 +244,9 @@ static int32_t sd_cmd55(uint16_t rca16)
 	cmd[2] = rca16 & 0xff;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	if (response[0] != c_cmd)
@@ -260,7 +260,7 @@ static int32_t sd_cmd55(uint16_t rca16)
 	return 1;
 }
 
-static int32_t sd_acmd41(uint32_t hostOCR32, uint32_t* outOCR)
+static int32_t hal_sd_acmd41(uint32_t hostOCR32, uint32_t* outOCR)
 {
 	SD_TRACE_INFO("[SD] sd_acmd41\n");
 
@@ -277,9 +277,9 @@ static int32_t sd_acmd41(uint32_t hostOCR32, uint32_t* outOCR)
 	cmd[4] = hostOCR32 & 0xff;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == 0x3f);
@@ -299,7 +299,7 @@ static int32_t sd_acmd41(uint32_t hostOCR32, uint32_t* outOCR)
 	return 1;
 }
 
-static int32_t sd_cmd2(uint8_t* cid, int32_t cidLen)
+static int32_t hal_sd_cmd2(uint8_t* cid, int32_t cidLen)
 {
 	SD_TRACE_INFO("[SD] sd_cmd2\n");
 
@@ -312,9 +312,9 @@ static int32_t sd_cmd2(uint8_t* cid, int32_t cidLen)
 	cmd[0] |= c_cmd;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	// \todo verify response
@@ -329,7 +329,7 @@ static int32_t sd_cmd2(uint8_t* cid, int32_t cidLen)
 	return 1;
 }
 
-static int32_t sd_cmd3(uint16_t* outRCA16)
+static int32_t hal_sd_cmd3(uint16_t* outRCA16)
 {
 	SD_TRACE_INFO("[SD] sd_cmd3\n");
 
@@ -342,16 +342,16 @@ static int32_t sd_cmd3(uint16_t* outRCA16)
 	cmd[0] |= c_cmd;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	*outRCA16 = (response[1] << 8) | response[2];
 	return 1;
 }
 
-static int32_t sd_cmd9(uint16_t RCA16, uint8_t* outCSD, int32_t CSDLen)
+static int32_t hal_sd_cmd9(uint16_t RCA16, uint8_t* outCSD, int32_t CSDLen)
 {
 	SD_TRACE_INFO("[SD] sd_cmd9\n");
 
@@ -366,9 +366,9 @@ static int32_t sd_cmd9(uint16_t RCA16, uint8_t* outCSD, int32_t CSDLen)
 	cmd[2] |= RCA16 & 0xff;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == 0x3f);
@@ -385,7 +385,7 @@ static int32_t sd_cmd9(uint16_t RCA16, uint8_t* outCSD, int32_t CSDLen)
 	return 1;
 }
 
-static int32_t sd_cmd7(uint16_t RCA16)
+static int32_t hal_sd_cmd7(uint16_t RCA16)
 {
 	SD_TRACE_INFO("[SD] sd_cmd7\n");
 
@@ -400,9 +400,9 @@ static int32_t sd_cmd7(uint16_t RCA16)
 	cmd[2] |= RCA16 & 0xff;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -410,7 +410,7 @@ static int32_t sd_cmd7(uint16_t RCA16)
 	return 1;
 }
 
-static int32_t sd_cmd16(uint32_t blockLength)
+static int32_t hal_sd_cmd16(uint32_t blockLength)
 {
 	SD_TRACE_INFO("[SD] sd_cmd16, blockLength %d\n", blockLength);
 
@@ -427,9 +427,9 @@ static int32_t sd_cmd16(uint32_t blockLength)
 	cmd[4] |= blockLength;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -437,7 +437,7 @@ static int32_t sd_cmd16(uint32_t blockLength)
 	return 1;
 }
 
-static int32_t sd_cmd17(uint32_t addr)
+static int32_t hal_sd_cmd17(uint32_t addr)
 {
 	SD_TRACE_INFO("[SD] sd_cmd17, addr %08x\n", addr);
 
@@ -454,15 +454,15 @@ static int32_t sd_cmd17(uint32_t addr)
 	cmd[4] |= addr;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	return 1;
 }
 
-static int32_t sd_cmd24(uint32_t addr)
+static int32_t hal_sd_cmd24(uint32_t addr)
 {
 	SD_TRACE_INFO("[SD] sd_cmd24, addr %08x\n", addr);
 
@@ -479,9 +479,9 @@ static int32_t sd_cmd24(uint32_t addr)
 	cmd[4] |= addr;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -491,7 +491,7 @@ static int32_t sd_cmd24(uint32_t addr)
 	return 1;
 }
 
-static int32_t sd_acmd6(int32_t bus4)
+static int32_t hal_sd_acmd6(int32_t bus4)
 {
 	SD_TRACE_INFO("[SD] sd_acmd6, bus4 %d\n", bus4);
 
@@ -505,9 +505,9 @@ static int32_t sd_acmd6(int32_t bus4)
 	cmd[4] |= bus4 ? 2 : 0;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -515,7 +515,7 @@ static int32_t sd_acmd6(int32_t bus4)
 	return 1;
 }
 
-static int32_t sd_acmd42(int32_t bus4)
+static int32_t hal_sd_acmd42(int32_t bus4)
 {
 	SD_TRACE_INFO("[SD] sd_acmd42, bus4 %d\n", bus4);
 
@@ -529,9 +529,9 @@ static int32_t sd_acmd42(int32_t bus4)
 	cmd[4] |= bus4 ? 2 : 0;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	if (!sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -541,7 +541,7 @@ static int32_t sd_acmd42(int32_t bus4)
 
 // public
 
-int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
+int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 {
 	SD_TRACE_INFO("[SD] sd_read_block512 %d, %d bytes\n", block, bufferLen);
 
@@ -554,7 +554,7 @@ int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 	int32_t result = 0;
 	for (int32_t i = 0; i < 10; ++i)
 	{
-		if (sd_cmd17(addr))
+		if (hal_sd_cmd17(addr))
 		{
 			result = 1;
 			break;
@@ -562,7 +562,7 @@ int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 		// kernel_leave_critical();
 		// kernel_sleep(100);
 		// kernel_enter_critical();
-		timer_wait_ms(100);
+		hal_timer_wait_ms(100);
 	}
 	if (!result)
 	{
@@ -683,7 +683,7 @@ int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 	return bufferLen;
 }
 
-int32_t sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bufferLen)
+int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bufferLen)
 {
 	SD_TRACE_INFO("[SD] sd_write_block512 %d, %d bytes\n", block, bufferLen);
 
@@ -696,7 +696,7 @@ int32_t sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t buffer
 	int32_t result = 0;
 	for (int32_t i = 0; i < 10; ++i)
 	{
-		if (sd_cmd24(addr))
+		if (hal_sd_cmd24(addr))
 		{
 			result = 1;
 			break;
@@ -704,7 +704,7 @@ int32_t sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t buffer
 		// kernel_leave_critical();
 		// kernel_sleep(100);
 		// kernel_enter_critical();
-		timer_wait_ms(100);
+		hal_timer_wait_ms(100);
 	}
 	if (!result)
 	{
@@ -846,14 +846,14 @@ int32_t sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t buffer
 		return 0;
 	}
 
-	sd_dummy_clock(100000);
+	hal_sd_dummy_clock(100000);
 
 	// kernel_leave_critical();
 	// sysreg_modify(SR_REG_LEDS, 1, 0);
 	return bufferLen;
 }
 
-int32_t sd_init(int32_t mode)
+int32_t hal_sd_init(int32_t mode)
 {
 	// const uint32_t deviceId = sysreg_read(SR_REG_DEVICE_ID);
 
@@ -873,13 +873,13 @@ int32_t sd_init(int32_t mode)
 	SD_WR_CMD_HIGH();
 	SD_WR_DAT(0x0);
 
-	sd_dummy_clock(100);
+	hal_sd_dummy_clock(100);
 
     // Set card to idle.
-	sd_cmd0();
+	hal_sd_cmd0();
 
 	// Negotiate voltage.
-	sd_cmd8(SD_VHS_2V7_3V6, CMD8_DEFAULT_TEST_PATTERN);
+	hal_sd_cmd8(SD_VHS_2V7_3V6, CMD8_DEFAULT_TEST_PATTERN);
 
 	// Determine capacity.
 	uint32_t hostOCR32 = 0x40FF8000;
@@ -888,14 +888,14 @@ int32_t sd_init(int32_t mode)
 
 	for (int32_t count = 0;; ++count)
 	{
-		if (!sd_cmd55(0x0000))
+		if (!hal_sd_cmd55(0x0000))
 			return 1;
 
-		if (!sd_acmd41(hostOCR32, &OCR))
+		if (!hal_sd_acmd41(hostOCR32, &OCR))
 		{
 			if (count > 100)
 				return 1;
-			timer_wait_ms(2);
+			hal_timer_wait_ms(2);
 		}
 		else
 			break;
@@ -903,30 +903,30 @@ int32_t sd_init(int32_t mode)
 
 	// Get card CID.
 	uint8_t cid[16];
-	sd_cmd2(cid, sizeof(cid));
+	hal_sd_cmd2(cid, sizeof(cid));
 
 	// Get card RCA identifier.
-	sd_cmd3(&RCA16);
+	hal_sd_cmd3(&RCA16);
 
 	// Enter data transfer mode, standby state.
 	uint8_t csd[17];
-	sd_cmd9(RCA16, csd, sizeof(csd));
+	hal_sd_cmd9(RCA16, csd, sizeof(csd));
 
 	// cmd10?
 
 	// Enter transfer state.
-	sd_cmd7(RCA16);
+	hal_sd_cmd7(RCA16);
 
 	// Select block length.
-	sd_cmd16(512);
+	hal_sd_cmd16(512);
 
 	// If 4 bit, set bus width.
 	if (s_dataBits == 4)
 	{
-		sd_cmd55(RCA16);
-		sd_acmd6(1);
-		sd_cmd55(RCA16);
-		sd_acmd42(1);
+		hal_sd_cmd55(RCA16);
+		hal_sd_acmd6(1);
+		hal_sd_cmd55(RCA16);
+		hal_sd_acmd42(1);
 	}
 
 	// Finally set desired acceleration mode;
