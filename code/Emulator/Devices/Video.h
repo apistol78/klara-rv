@@ -9,7 +9,6 @@
 #pragma once
 
 #include <Core/Ref.h>
-#include <Core/Math/Color4f.h>
 #include <Core/Misc/AutoPtr.h>
 #include "Emulator/CPU/IDevice.h"
 
@@ -37,7 +36,7 @@ public:
 
 private:
 	traktor::AlignedVector< uint8_t > m_framebuffer;
-	traktor::Color4f m_palette[256];
+	uint32_t m_palette[256];
 	uint32_t m_width = 0;
 	uint32_t m_height = 0;
 	uint32_t m_skip = 0b11;

@@ -43,7 +43,7 @@ uint32_t Timer::readU32(uint32_t address) const
 	switch (address >> 2)
 	{
 	case 0x0:
-		return m_ms;
+		return (uint32_t)(m_timer.getElapsedTime() * 1000.0);
 	case 0x1:
 		return (uint32_t)m_cycles;			// cycles low
 	case 0x2:
@@ -71,7 +71,6 @@ bool Timer::tick(CPU* cpu)
 			m_callback();
 	}
 
-	m_ms = (uint32_t)(m_timer.getElapsedTime() * 1000.0);
 	return true;
 }
 

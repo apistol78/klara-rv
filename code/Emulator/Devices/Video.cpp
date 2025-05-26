@@ -8,6 +8,7 @@
 */
 #include <cstdio>
 #include <Core/Log/Log.h>
+#include <Core/Misc/Endian.h>
 #include <Core/Misc/String.h>
 #include <Core/Thread/Thread.h>
 #include <Core/Thread/ThreadManager.h>
@@ -45,8 +46,9 @@ bool Video::writeU32(uint32_t address, uint32_t value)
 	}
 	else if ((address & 0x00f00000) == 0x00e00000)
 	{
+		swap8in32(value);
 		const uint32_t idx = (address >> 2) & 255;
-		m_palette[idx] = Color4f::fromColor4ub(Color4ub(value));
+		m_palette[idx] = value;
 	}
 	else
 	{
@@ -77,24 +79,29 @@ drawing::Image* Video::getImage()
 	if (!m_image)
 	{
 		m_image = new drawing::Image(
-			drawing::PixelFormat::getR8G8B8X8(),
+			drawing::PixelFormat::getX8R8G8B8(),
 			w,
 			h
 		);
 	}
 
-	uint32_t offset = 0; //m_readOffset;
+	uint32_t* dst = (uint32_t*)m_image->getData();
+	uint32_t offset = m_readOffset;
+
 	for (uint32_t y = 0; y < h; ++y)
 	{
 		for (uint32_t x = 0; x < w; x += 4)
 		{
 			const uint32_t value = *(uint32_t*)&m_framebuffer[offset];
-			m_image->setPixelUnsafe(x + 3, y, m_palette[(value & 0xff000000) >> 24]);
-			m_image->setPixelUnsafe(x + 2, y, m_palette[(value & 0x00ff0000) >> 16]);
-			m_image->setPixelUnsafe(x + 1, y, m_palette[(value & 0x0000ff00) >> 8]);
-			m_image->setPixelUnsafe(x + 0, y, m_palette[(value & 0x000000ff)]);
+
+			*dst++ = m_palette[(value & 0x000000ff)];
+			*dst++ = m_palette[(value & 0x0000ff00) >> 8];
+			*dst++ = m_palette[(value & 0x00ff0000) >> 16];
+			*dst++ = m_palette[(value & 0xff000000) >> 24];
+
 			offset += 4;
 		}
 	}
+
 	return m_image;
 }
