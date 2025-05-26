@@ -6,22 +6,23 @@
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-#include <stdio.h>
+// #include <stdio.h>
 #include <string.h>
 #include "hal/Common.h"
 #include "hal/CRC.h"
 #include "hal/SD.h"
 #include "hal/Timer.h"
 
-#define SD_TRACE_INFO(...) printf(__VA_ARGS__)
-//#define SD_TRACE_INFO(...)
-#define SD_TRACE_ERROR(...) printf(__VA_ARGS__)
-
+//#define SD_TRACE_INFO(...) printf(__VA_ARGS__)
+//#define SD_TRACE_ERROR(...) printf(__VA_ARGS__)
 // #define SD_ASSERT(cond) \
 // 	if (!(cond)) { \
 // 		SD_TRACE_ERROR("[SD] Condition \"%s\" failed\n", #cond); \
 // 		return 0; \
 // 	}
+
+#define SD_TRACE_INFO(...)
+#define SD_TRACE_ERROR(...)
 #define SD_ASSERT(cond) \
 	if (!(cond)) { \
 		return 0; \
@@ -603,7 +604,7 @@ int32_t sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 		{
 			// kernel_leave_critical();
 			// sysreg_modify(SR_REG_LEDS, 1, 0);
-			printf("[SD] No start bit detected\n");
+			// printf("[SD] No start bit detected\n");
 			return 0;
 		}
 

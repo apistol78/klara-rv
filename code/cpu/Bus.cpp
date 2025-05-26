@@ -74,7 +74,10 @@ bool Bus::tick(CPU* cpu) const
 	for (auto device : m_tickDevices)
 	{
 		if (!device->tick(cpu))
+		{
+			log::error << L"Device " << type_name(device) << L" failed to tick." << Endl;
 			return false;
+		}
 	}
 	return true;
 }

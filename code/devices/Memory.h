@@ -18,6 +18,8 @@ class Memory : public IDevice
 public:
 	explicit Memory(uint32_t capacity);
 
+	uint32_t getCapacity() const;
+
 	void setReadOnly(bool readOnly);
 
 	virtual bool writeU32(uint32_t address, uint32_t value) override final;

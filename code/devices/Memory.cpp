@@ -21,6 +21,11 @@ Memory::Memory(uint32_t capacity)
 	m_data.reset(new uint8_t [capacity]);
 }
 
+uint32_t Memory::getCapacity() const
+{
+	return m_capacity;
+}
+
 void Memory::setReadOnly(bool readOnly)
 {
 	m_readOnly = readOnly;

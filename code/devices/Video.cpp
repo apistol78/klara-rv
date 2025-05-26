@@ -83,7 +83,7 @@ drawing::Image* Video::getImage()
 		);
 	}
 
-	uint32_t offset = m_readOffset;
+	uint32_t offset = 0; //m_readOffset;
 	for (uint32_t y = 0; y < h; ++y)
 	{
 		for (uint32_t x = 0; x < w; x += 4)

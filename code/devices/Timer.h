@@ -17,6 +17,8 @@ class Timer : public IDevice
 	T_RTTI_CLASS;
 
 public:
+	Timer();
+
 	virtual bool writeU32(uint32_t address, uint32_t value) override final;
 
 	virtual uint32_t readU32(uint32_t address) const override final;
