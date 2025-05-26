@@ -7,7 +7,7 @@
 		<item type="traktor.sb.Project" version="1">
 			<enable>true</enable>
 			<name>KlaraRV.HAL</name>
-			<sourcePath>code/hal</sourcePath>
+			<sourcePath>code/HAL</sourcePath>
 			<configurations>
 				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugStatic</name>

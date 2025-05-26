@@ -7,7 +7,7 @@
 		<item type="traktor.sb.Project" version="1">
 			<enable>true</enable>
 			<name>KlaraRV.CPU</name>
-			<sourcePath>code/cpu</sourcePath>
+			<sourcePath>code/Emulator/CPU</sourcePath>
 			<configurations>
 				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugShared</name>
@@ -127,7 +127,7 @@
 		<item type="traktor.sb.Project" version="1">
 			<enable>true</enable>
 			<name>KlaraRV.Devices</name>
-			<sourcePath>code/devices</sourcePath>
+			<sourcePath>code/Emulator/Devices</sourcePath>
 			<configurations>
 				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugShared</name>
