@@ -21,6 +21,8 @@ class SD : public IDevice
 public:
 	explicit SD(traktor::IStream* source);
 
+	explicit SD(void* data, uint32_t size);
+
 	virtual bool writeU32(uint32_t address, uint32_t value) override final;
 
 	virtual uint32_t readU32(uint32_t address) const override final;

@@ -10,7 +10,7 @@
 #include <Core/Io/ChunkMemory.h>
 #include <Core/Io/ChunkMemoryStream.h>
 #include <Core/Io/FileSystem.h>
-#include <Core/Io/IStream.h>
+#include <Core/Io/MemoryStream.h>
 #include <Core/Io/StreamCopy.h>
 #include <Core/Log/Log.h>
 #include <Core/Misc/String.h>
@@ -26,6 +26,11 @@ SD::SD(IStream* source)
 	m_memory = new ChunkMemory();
 	m_stream = new ChunkMemoryStream(m_memory, true, true);
 	StreamCopy(m_stream, source).execute();
+}
+
+SD::SD(void* data, uint32_t size)
+:	m_stream(new MemoryStream(data, (int64_t)size))
+{
 }
 
 bool SD::writeU32(uint32_t address, uint32_t value)

@@ -51,7 +51,7 @@ public:
 
 	void setSP(uint32_t sp);
 
-	bool tick();
+	bool tick(uint32_t count);
 
 	void interrupt(uint32_t mask);
 

@@ -231,90 +231,94 @@ void CPU::setSP(uint32_t sp)
 	m_registers[2] = sp;
 }
 
-bool CPU::tick()
+bool CPU::tick(uint32_t count)
 {
 	// Check if CPU in low power mode and
 	// are waiting for interrupt.
 	if (m_waitForInterrupt && m_interrupt == 0)
 		return true;
 
-	// Handle interrupts.
-	const uint32_t mstatus = readCSR(CSR::MSTATUS);
-	const bool mie = (bool)((mstatus & (1 << 3)) != 0);
-	if (mie)
+	for (uint32_t i = 0; i < count; ++i)
 	{
-		const uint32_t mie = readCSR(CSR::MIE);
-		const uint32_t mask =
-			((mie & 0b000000000001000) ? SOFT : 0) |
-			((mie & 0b000000010000000) ? TIMER : 0) |
-			((mie & 0b000100000000000) ? EXTERNAL : 0);
-
-		const uint32_t pending = m_interrupt & mask;
-		if (pending != 0)
+		// Handle interrupts.
+		const uint32_t mstatus = readCSR(CSR::MSTATUS);
+		const bool mie = (bool)((mstatus & (1 << 3)) != 0);
+		if (mie)
 		{
-			writeCSR(CSR::MEPC, m_pc);
+			const uint32_t mie = readCSR(CSR::MIE);
+			const uint32_t mask =
+				((mie & 0b000000000001000) ? SOFT : 0) |
+				((mie & 0b000000010000000) ? TIMER : 0) |
+				((mie & 0b000100000000000) ? EXTERNAL : 0);
 
-			if ((pending & TIMER) != 0)
-				writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 7));	// Timer
-			else if ((pending & EXTERNAL) != 0)
-				writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 11));	// External
-			else if ((pending & SOFT) != 0)
-				writeCSR(CSR::MCAUSE, 0x00000000 | (1 << 11));	// Software
+			const uint32_t pending = m_interrupt & mask;
+			if (pending != 0)
+			{
+				writeCSR(CSR::MEPC, m_pc);
 
-			// Push MIE and then disable interrupts.
-			uint32_t mstatus = readCSR(CSR::MSTATUS);
-			const bool mie = (bool)((mstatus & (1 << 3)) != 0);
-			mstatus &= ~(1 << 3);
-			if (mie)
-				mstatus |= 1 << 4;
-			else
-				mstatus &= ~(1 << 4);
-			writeCSR(CSR::MSTATUS, mstatus);
+				if ((pending & TIMER) != 0)
+					writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 7));	// Timer
+				else if ((pending & EXTERNAL) != 0)
+					writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 11));	// External
+				else if ((pending & SOFT) != 0)
+					writeCSR(CSR::MCAUSE, 0x00000000 | (1 << 11));	// Software
 
-			const uint32_t mtvec = readCSR(CSR::MTVEC);
-			m_pc = mtvec;
+				// Push MIE and then disable interrupts.
+				uint32_t mstatus = readCSR(CSR::MSTATUS);
+				const bool mie = (bool)((mstatus & (1 << 3)) != 0);
+				mstatus &= ~(1 << 3);
+				if (mie)
+					mstatus |= 1 << 4;
+				else
+					mstatus &= ~(1 << 4);
+				writeCSR(CSR::MSTATUS, mstatus);
 
-			if ((pending & TIMER) != 0)
-				m_interrupt &= ~TIMER;
-			else if ((pending & EXTERNAL) != 0)
-				m_interrupt &= ~EXTERNAL;
-			else if ((pending & SOFT) != 0)
-				m_interrupt &= ~SOFT;
+				const uint32_t mtvec = readCSR(CSR::MTVEC);
+				m_pc = mtvec;
 
-			m_waitForInterrupt = false;
+				if ((pending & TIMER) != 0)
+					m_interrupt &= ~TIMER;
+				else if ((pending & EXTERNAL) != 0)
+					m_interrupt &= ~EXTERNAL;
+				else if ((pending & SOFT) != 0)
+					m_interrupt &= ~SOFT;
+
+				m_waitForInterrupt = false;
+			}
 		}
+
+		const uint32_t word = m_icache->readU32(m_pc);
+
+		if (m_trace)
+		{
+			*m_trace << str(L"%08x", m_pc);
+			for (int32_t i = 1; i < 32; ++i)
+				*m_trace << L" " << str(L"%08x", m_registers[i]);
+			*m_trace << Endl;
+		}
+
+		// if ((word & 0x3) == 0x3)
+			m_next = m_pc + 4;
+		// else
+		// 	m_next = m_pc + 2;
+
+		// zero register is hardcoded.
+		R(0) = 0;
+
+		if (!decode(word))
+		{
+			log::error << L"Decode (" << str(L"%08x", word) << L") failed at PC " << str(L"%08x", m_pc) << Endl;
+			return false;
+		}
+
+		m_pc = m_next;
+
+		if (!m_bus->tick(this))
+			return false;
+
+		m_cycles++;
 	}
-
-	const uint32_t word = m_icache->readU32(m_pc);
-
-	if (m_trace)
-	{
-		*m_trace << str(L"%08x", m_pc);
-		for (int32_t i = 1; i < 32; ++i)
-			*m_trace << L" " << str(L"%08x", m_registers[i]);
-		*m_trace << Endl;
-	}
-
-	// if ((word & 0x3) == 0x3)
-		m_next = m_pc + 4;
-	// else
-	// 	m_next = m_pc + 2;
-
-	// zero register is hardcoded.
-	R(0) = 0;
-
-	if (!decode(word))
-	{
-		log::error << L"Decode (" << str(L"%08x", word) << L") failed at PC " << str(L"%08x", m_pc) << Endl;
-		return false;
-	}
-
-	m_pc = m_next;
-
-	if (!m_bus->tick(this))
-		return false;
-
-	m_cycles++;
+	
 	return true;
 }
 
