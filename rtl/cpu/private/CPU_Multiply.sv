@@ -18,6 +18,7 @@ module CPU_Multiply(
 	input i_signed,
 	input [31:0] i_op1,
 	input [31:0] i_op2,
+	output o_ready,
 	output [63:0] o_result
 );
 
@@ -32,43 +33,34 @@ module CPU_Multiply(
 		if (i_latch)
 			s <= { s1, s2 };
 	end
-
-`ifdef USE_MULTIPLY_IP
-
-	wire [63:0] umul_result;
-	IP_UnsignedMultiply ip_unsigned_multiply(
-		.clock(i_clock),
-		.dataa(uop1),
-		.datab(uop2),
-		.result(umul_result)
-	);
-
-	always_comb begin
-		if (i_signed) begin
-			if (s[0] != s[1])
-				o_result = -$signed(umul_result);
-			else
-				o_result = umul_result;
-		end
-		else
-			o_result = umul_result;       
-	end
-
-`else
-
-	bit [63:0] p1;
-	bit [63:0] p2;
-	bit [63:0] p3;
 	
-	assign o_result = p3;
+	bit r0_request;
+	bit [31:0] r0_uop1;
+	bit [31:0] r0_uop2;
+
+	bit r1_request;
+	bit [63:0] r1_intermediate;
+
+	bit r2_request;
+	bit [63:0] r2_result;
+	
+	assign o_ready = r2_request;
+	assign o_result = r2_result;
 
 	always_ff @(posedge i_clock)
 	begin
-		p1 <= { 32'b0, uop1 } * { 32'b0, uop2 };
-		p2 <= p1;
-		p3 <= (i_signed && s[0] != s[1]) ? -$signed(p2) : p2;
-	end
+		// 1
+		r0_request <= i_latch;
+		r0_uop1 <= uop1;
+		r0_uop2 <= uop2;
 
-`endif
+		// 2
+		r1_request <= r0_request;
+		r1_intermediate <= { 32'b0, r0_uop1 } * { 32'b0, r0_uop2 };
+
+		// 3
+		r2_request <= r1_request;
+		r2_result <= (i_signed && s[0] != s[1]) ? -$signed(r1_intermediate) : r1_intermediate;
+	end
 
 endmodule

@@ -74,16 +74,12 @@ module CPU_Execute (
 	`define MRET				\
 		o_mret
 
-	`define CYCLE				\
-		cycle
-
 	`define EXECUTE_OP			\
 		i_data.op
 
 	`define EXECUTE_DONE				\
 		last_strobe <= i_data.strobe;	\
-		data.strobe <= ~data.strobe;	\
-		cycle <= 0;
+		data.strobe <= ~data.strobe;
 
 	// ====================
 	// ALU
@@ -129,26 +125,32 @@ module CPU_Execute (
 	// ====================
 	// MUL/DIV
 
+	bit mul_request = 1'b0;
 	wire mul_signed = (`EXECUTE_OP == OP_MUL) || (`EXECUTE_OP == OP_MULH);
+	wire mul_ready;
 	wire [63:0] mul_result;
 	CPU_Multiply multiply(
 		.i_clock(i_clock),
-		.i_latch(cycle == 0),
+		.i_latch(mul_request),
 		.i_signed(mul_signed),
 		.i_op1(`RS1),
 		.i_op2(`RS2),
+		.o_ready(mul_ready),
 		.o_result(mul_result)
 	);
 
+	bit div_request = 1'b0;
 	wire div_signed = (`EXECUTE_OP == OP_DIV) || (`EXECUTE_OP == OP_REM);
+	wire div_ready;
 	wire [31:0] div_result;
 	wire [31:0] div_remainder;
 	CPU_Divide divide(
 		.i_clock(i_clock),
-		.i_latch(cycle == 0),
+		.i_latch(div_request),
 		.i_signed(div_signed),
 		.i_numerator(`RS1),
 		.i_denominator(`RS2),
+		.o_ready(div_ready),
 		.o_result(div_result),
 		.o_remainder(div_remainder)
 	);
@@ -183,7 +185,6 @@ module CPU_Execute (
 	assign o_data = data;
 
 	bit last_strobe = 0;
-	bit [3:0] cycle = 0;
 	execute_data_t data = 0;
 
 `ifdef __VERILATOR__
@@ -215,7 +216,6 @@ module CPU_Execute (
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			last_strobe <= 1'b0;
-			cycle <= 0;
 			data <= 0;
 			o_csr_wdata_wr <= 1'b0;
 			o_csr_wdata <= 0;
@@ -231,6 +231,9 @@ module CPU_Execute (
 			o_jump <= 1'b0;
 			o_mret <= 1'b0;
 			o_ecall <= 1'b0;
+
+			mul_request <= 1'b0;
+			div_request <= 1'b0;
 
 			if (
 				!i_memory_busy &&
@@ -285,8 +288,6 @@ module CPU_Execute (
 					`EXECUTE_DONE;
 				end
 				else if (i_data.complx) begin
-					cycle <= cycle + 1;
-
 					// Note, input values are only valid in first cycle so
 					// in case of multicycle operations the inputs must be
 					// stored in temporary registers.

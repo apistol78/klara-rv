@@ -96,7 +96,7 @@ function main()
 	end
 
 	-- Place and route.
-	local xc = run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --timing-allow-fail --top SoC --json build/SoC.json --textcfg build/SoC.config --lpf SoC.lpf --report build/SoC.report.json")
+	local xc = run:execute("nextpnr-ecp5 --25k --package CABGA256 --speed 6 --freq 100 --timing-allow-fail --top SoC --json build/SoC.json --textcfg build/SoC.config --lpf SoC.lpf --report build/SoC.report.json")
 	if xc ~= 0 then
 		stderr:printLn("nextpnr-ecp5 failed; build aborted.")
 		return 1

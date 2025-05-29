@@ -19,18 +19,6 @@
 	`define REG_ID_SIZE				5
 `endif
 
-// Multiply and divide
-`ifdef USE_MULTIPLY_IP
-	`define MUL_CYCLE_LATENCY       2
-`else
-	`define MUL_CYCLE_LATENCY       4
-`endif
-`ifdef USE_DIVIDE_IP
-	`define DIV_CYCLE_LATENCY       14
-`else
-	`define DIV_CYCLE_LATENCY       2
-`endif
-
 // ALU operations
 `define OP_SIGNED_ADD               0
 `define OP_UNSIGNED_ADD             1

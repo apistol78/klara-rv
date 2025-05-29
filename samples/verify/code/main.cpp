@@ -2124,8 +2124,8 @@ int main(int argc, char **argv)
 	CHECK(verify_BLT);
 	CHECK(verify_BLTU);
 	CHECK(verify_BNE);
-	// CHECK(verify_DIV);
-	// CHECK(verify_UDIV);
+	CHECK(verify_DIV);
+	CHECK(verify_UDIV);
 	CHECK(verify_JAL);
 	CHECK(verify_JALR);
 	CHECK(verify_LB);
@@ -2139,8 +2139,8 @@ int main(int argc, char **argv)
 	CHECK(verify_MULHU);
 	CHECK(verify_OR);
 	CHECK(verify_ORI);
-	// CHECK(verify_REM);
-	// CHECK(verify_REMU);
+	CHECK(verify_REM);
+	CHECK(verify_REMU);
 	CHECK(verify_SB);
 	CHECK(verify_SH);
 	CHECK(verify_SLL);

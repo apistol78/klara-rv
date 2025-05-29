@@ -21,13 +21,15 @@ case (`EXECUTE_OP)
 		`EXECUTE_DONE;
 	end
 	OP_DIV: begin
-		if (`CYCLE == `DIV_CYCLE_LATENCY) begin
+		div_request <= 1'b1;
+		if (div_ready) begin
 			`RD <= div_result[31:0];
 			`EXECUTE_DONE;
 		end
 	end
 	OP_DIVU: begin
-		if (`CYCLE == `DIV_CYCLE_LATENCY) begin
+		div_request <= 1'b1;
+		if (div_ready) begin
 			`RD <= div_result[31:0];
 			`EXECUTE_DONE;
 		end
@@ -44,19 +46,22 @@ case (`EXECUTE_OP)
 		`EXECUTE_DONE;
 	end
 	OP_MUL: begin
-		if (`CYCLE == `MUL_CYCLE_LATENCY) begin
+		mul_request <= 1'b1;
+		if (mul_ready) begin
 			`RD <= mul_result[31:0];
 			`EXECUTE_DONE;
 		end
 	end
 	OP_MULH: begin
-		if (`CYCLE == `MUL_CYCLE_LATENCY) begin
+		mul_request <= 1'b1;
+		if (mul_ready) begin
 			`RD <= mul_result[63:32];
 			`EXECUTE_DONE;
 		end
 	end
 	OP_MULHU: begin
-		if (`CYCLE == `MUL_CYCLE_LATENCY) begin
+		mul_request <= 1'b1;
+		if (mul_ready) begin
 			`RD <= mul_result[63:32];
 			`EXECUTE_DONE;
 		end
@@ -67,13 +72,15 @@ case (`EXECUTE_OP)
 		`EXECUTE_DONE;
 	end
 	OP_REM: begin
-		if (`CYCLE == `DIV_CYCLE_LATENCY) begin
+		div_request <= 1'b1;
+		if (div_ready) begin
 			`RD <= div_remainder[31:0];
 			`EXECUTE_DONE;
 		end
 	end
 	OP_REMU: begin
-		if (`CYCLE == `DIV_CYCLE_LATENCY) begin
+		div_request <= 1'b1;
+		if (div_ready) begin
 			`RD <= div_remainder[31:0];
 			`EXECUTE_DONE;
 		end

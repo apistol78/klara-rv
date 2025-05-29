@@ -104,8 +104,9 @@ module SoC(
 	wire uart_ready;
 
 	UART #(
-		.PRESCALE(`FREQUENCY / (9600 * 8)),
-		.RX_FIFO_DEPTH(512)
+		.FREQUENCY(`FREQUENCY),
+		.BAUDRATE(115200),
+		.RX_FIFO_DEPTH(16)
 	) uart(
 		.i_reset(reset),
 		.i_clock(clock),
