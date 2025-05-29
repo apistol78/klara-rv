@@ -11,7 +11,8 @@
 
 module UART_TX #(
 	parameter FREQUENCY,
-	parameter BAUDRATE = 9600	
+	parameter BAUDRATE = 9600,
+	parameter FIFO_DEPTH = 16
 )(
 	input i_reset,
 	input i_clock,
@@ -36,7 +37,7 @@ module UART_TX #(
 	bit tx_fifo_read = 0;
 	wire [7:0] tx_fifo_rdata;
 	FIFO #(
-		.DEPTH(16),
+		.DEPTH(FIFO_DEPTH),
 		.WIDTH(8)
 	) tx_fifo(
 		.i_clock(i_clock),

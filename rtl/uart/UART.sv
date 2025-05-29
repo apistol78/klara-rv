@@ -12,7 +12,8 @@
 module UART #(
 	parameter FREQUENCY,
 	parameter BAUDRATE = 9600,
-	parameter RX_FIFO_DEPTH = 256
+	parameter RX_FIFO_DEPTH = 16,
+	parameter TX_FIFO_DEPTH = 16
 )(
 	input i_reset,
 	input i_clock,
@@ -50,9 +51,9 @@ module UART #(
 	bit tx_request;
 	wire tx_ready;
 	UART_TX #(
-		//.PRESCALE(PRESCALE)
 		.FREQUENCY(FREQUENCY),
-		.BAUDRATE(BAUDRATE)
+		.BAUDRATE(BAUDRATE),
+		.FIFO_DEPTH(TX_FIFO_DEPTH)
 	) tx(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
