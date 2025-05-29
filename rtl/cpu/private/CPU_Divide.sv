@@ -115,21 +115,22 @@ module CPU_Divide(
 	wire snumerator = i_numerator[31];
 	wire sdenominator = i_denominator[31];
 
-	wire [31:0] unumerator = (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
-	wire [31:0] udenominator = (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;
+	bit [31:0] unumerator;
+	bit [31:0] udenominator;
 
+	bit request = 1'b0;
 	bit [31:0] result;
 	bit [31:0] remainder;
 
 	divfunc #(
 		.XLEN(32),
-		.STAGE_LIST(32'b00001000010000100010001001001001)
+		.STAGE_LIST(32'b00100010001000100010001000100101)
 	) df(
 		.clk(i_clock),
 		.rst(1'b0),
 		.a(unumerator),
 		.b(udenominator),
-		.vld(i_latch),
+		.vld(request),
 		.quo(result),
 		.rem(remainder),
 		.ack(o_ready)
@@ -137,6 +138,10 @@ module CPU_Divide(
 
 	bit [1:0] s;
 	always_ff @(posedge i_clock) begin
+		request <= i_latch;
+		unumerator <= (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
+		udenominator <= (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;		
+
 		if (i_latch)
 			s <= { snumerator, sdenominator };
 	end

@@ -101,7 +101,7 @@ module CPU_ICache_Reg #(
 	// Compare read line with given input.
 	always_comb begin
 		o_ready = 0;
-		o_rdata = 0;
+		o_rdata = cache_rd_rdata.data;
 		
 		cache_rd_set = 0;
 		cache_invalid = 1'b0;
@@ -111,7 +111,6 @@ module CPU_ICache_Reg #(
 			if (set_r == i_set) begin
 				if (cache_rd_rdata.valid && cache_rd_rdata.tag == i_tag) begin
 					o_ready = 1;
-					o_rdata = cache_rd_rdata.data;
 					cache_rd_set = i_set + 1;
 				end
 				else
