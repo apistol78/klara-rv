@@ -30,4 +30,5 @@ private:
     uint32_t m_queued = 0;
     uint32_t m_counter = 0;
 	uint32_t m_written = 0;
+	uint32_t m_channel = 0;
 };

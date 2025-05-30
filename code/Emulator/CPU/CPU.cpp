@@ -314,7 +314,10 @@ bool CPU::tick(uint32_t count)
 		m_pc = m_next;
 
 		if (!m_bus->tick(this))
+		{
+			log::error << L"Bus tick failed at PC " << str(L"%08x", m_pc) << Endl;
 			return false;
+		}
 
 		m_cycles++;
 	}

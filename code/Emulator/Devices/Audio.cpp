@@ -20,15 +20,19 @@ Audio::Audio()
 
 bool Audio::writeU32(uint32_t address, uint32_t value)
 {
-    const int16_t sv = (int16_t)(value * 32767.0f);
-    if (m_written > 0 || abs(sv) > 256)
+    if (m_channel == 0) // left
     {
-        m_stream->write(&sv, sizeof(sv));
-        m_stream->flush();
-        m_written++;
+        const int16_t sv = *(int16_t*)&value;
+        if (m_written > 0 || abs(sv) > 256)
+        {
+            m_stream->write(&sv, sizeof(sv));
+            m_stream->flush();
+            m_written++;
+        }
     }
 
     m_queued++;
+    m_channel = (m_channel + 1) & 1;
 	return true;
 }
 

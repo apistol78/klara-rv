@@ -76,10 +76,11 @@ bool Bus::tick(CPU* cpu) const
 		if (!device->tick(cpu))
 		{
 			log::error << L"Device " << type_name(device) << L" failed to tick." << Endl;
+			m_error = true;
 			return false;
 		}
 	}
-	return true;
+	return !m_error;
 }
 
 const Bus::MappedDevice* Bus::findMappedDevice(uint32_t address) const
