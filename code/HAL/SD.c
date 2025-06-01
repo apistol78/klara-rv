@@ -28,43 +28,43 @@
 		return 0; \
 	}
 
-#define SD_CTRL 	(volatile uint32_t*)(SD_BASE)
-#define SD_HW_IO	(volatile uint32_t*)(SD_BASE + 4)
-#define SD_HW_RB4	(volatile uint32_t*)(SD_BASE + 8)
-#define SD_HW_RDW4	(volatile uint32_t*)(SD_BASE + 12)
+#define SD_CTRL(base) 		(volatile uint32_t*)(base)
+#define SD_HW_IO(base)		(volatile uint32_t*)(base + 4)
+#define SD_HW_RB4(base)		(volatile uint32_t*)(base + 8)
+#define SD_HW_RDW4(base)	(volatile uint32_t*)(base + 12)
 
 /*
 |x|x|x|x|x|x|x|x|dat|dat|dat|dat|cmd|dat dir|cmd dir|clk|
 */
-#define SD_WR_CLK_LOW() \
-	{ *SD_CTRL = 0x00000100; }
-#define SD_WR_CLK_HIGH() \
-	{ *SD_CTRL = 0x00000101; }
+#define SD_WR_CLK_LOW(base) \
+	{ *SD_CTRL(base) = 0x00000100; }
+#define SD_WR_CLK_HIGH(base) \
+	{ *SD_CTRL(base) = 0x00000101; }
 
-#define SD_WR_CMD_DIR_IN() \
-	{ *SD_CTRL = 0x00000200; }
-#define SD_WR_CMD_DIR_OUT() \
-	{ *SD_CTRL = 0x00000202; }
+#define SD_WR_CMD_DIR_IN(base) \
+	{ *SD_CTRL(base) = 0x00000200; }
+#define SD_WR_CMD_DIR_OUT(base) \
+	{ *SD_CTRL(base) = 0x00000202; }
 
-#define SD_WR_CMD_LOW() \
-	{ *SD_CTRL = 0x00000800; }
-#define SD_WR_CMD_HIGH() \
-	{ *SD_CTRL = 0x00000808; }
-#define SD_RD_CMD() \
-	( (*SD_CTRL & 0x00000008) == 0x00000008 )
+#define SD_WR_CMD_LOW(base) \
+	{ *SD_CTRL(base) = 0x00000800; }
+#define SD_WR_CMD_HIGH(base) \
+	{ *SD_CTRL(base) = 0x00000808; }
+#define SD_RD_CMD(base) \
+	( (*SD_CTRL(base) & 0x00000008) == 0x00000008 )
 
-#define SD_WR_DAT_DIR_IN() \
-	{ *SD_CTRL = 0x00000400; }
-#define SD_WR_DAT_DIR_OUT() \
-	{ *SD_CTRL = 0x00000404; }
-#define SD_WR_DAT(d4) \
-	{ *SD_CTRL = 0x0000f000 | ((d4 & 15) << 4); }
-#define SD_WR_DAT_HIGH() \
-	SD_WR_DAT(0x0f)
-#define SD_WR_DAT_LOW() \
-	SD_WR_DAT(0x00)
-#define SD_RD_DAT() \
-	( (*SD_CTRL & 0x000000f0) >> 4 )
+#define SD_WR_DAT_DIR_IN(base) \
+	{ *SD_CTRL(base) = 0x00000400; }
+#define SD_WR_DAT_DIR_OUT(base) \
+	{ *SD_CTRL(base) = 0x00000404; }
+#define SD_WR_DAT(base, d4) \
+	{ *SD_CTRL(base) = 0x0000f000 | ((d4 & 15) << 4); }
+#define SD_WR_DAT_HIGH(base) \
+	SD_WR_DAT(base, 0x0f)
+#define SD_WR_DAT_LOW(base) \
+	SD_WR_DAT(base, 0x00)
+#define SD_RD_DAT(base) \
+	( (*SD_CTRL(base) & 0x000000f0) >> 4 )
 
 #define SD_VHS_2V7_3V6				0x01
 #define CMD8_DEFAULT_TEST_PATTERN	0xaa
@@ -81,33 +81,31 @@ typedef enum
 static int32_t s_mode = SD_MODE_SW;
 static int32_t s_dataBits = 1;
 
-static void hal_sd_dummy_clock(uint32_t clockCnt)
+static void hal_sd_dummy_clock(void* base, uint32_t clockCnt)
 {
 	for (uint32_t i = 0; i < clockCnt; ++i)
 	{
-        SD_WR_CLK_LOW();
-        SD_WR_CLK_HIGH();
+        SD_WR_CLK_LOW(base);
+        SD_WR_CLK_HIGH(base);
     }
 }
 
-static void hal_sd_send_cmd(uint8_t cmd[6], int32_t cmdLen)
+static void hal_sd_send_cmd(void* base, uint8_t cmd[6], int32_t cmdLen)
 {
-	SD_TRACE_INFO("[SD] sd_send_cmd %02x, len %d\n", cmd[0], cmdLen);
-
 	//  if (s_mode == SD_MODE_SW)
 	{
-		SD_WR_CMD_DIR_OUT();
+		SD_WR_CMD_DIR_OUT(base);
 		for (int32_t i = 0; i < cmdLen; i++)
 		{
 			uint8_t data = cmd[i];
 			for (int32_t k = 0; k < 8; k++)
 			{
-				SD_WR_CLK_LOW();
+				SD_WR_CLK_LOW(base);
 				if (data & 0x80)
-					{ SD_WR_CMD_HIGH(); }
+					{ SD_WR_CMD_HIGH(base); }
 				else
-					{ SD_WR_CMD_LOW(); }
-				SD_WR_CLK_HIGH();  
+					{ SD_WR_CMD_LOW(base); }
+				SD_WR_CLK_HIGH(base);  
 				data <<= 1;
 			}
 		}
@@ -119,18 +117,16 @@ static void hal_sd_send_cmd(uint8_t cmd[6], int32_t cmdLen)
 	// }
 }
 
-static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
+static int32_t hal_sd_get_response(void* base, uint8_t* outResponse, int32_t responseLen)
 {
-	SD_TRACE_INFO("[SD] sd_get_response\n");
-
-	SD_WR_CMD_LOW();
-	SD_WR_CMD_DIR_IN();
+	SD_WR_CMD_LOW(base);
+	SD_WR_CMD_DIR_IN(base);
 	
 	for (int32_t try = 0;; ++try)
 	{
-		SD_WR_CLK_LOW();
-		SD_WR_CLK_HIGH();
-		if (!SD_RD_CMD())
+		SD_WR_CLK_LOW(base);
+		SD_WR_CLK_HIGH(base);
+		if (!SD_RD_CMD(base))
 			break;
 
 		__asm__ volatile (
@@ -153,9 +149,9 @@ static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
 		}
 	}
   
-	SD_WR_CLK_LOW();
-	SD_WR_CLK_HIGH();
-	if (SD_RD_CMD())
+	SD_WR_CLK_LOW(base);
+	SD_WR_CLK_HIGH(base);
+	if (SD_RD_CMD(base))
 	{
 		SD_TRACE_ERROR("[SD] Response, unexpected bit\n");
 		return 0;
@@ -165,9 +161,9 @@ static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
 	int32_t bit = 2;
 	for (int32_t index = 0; index < responseLen; )
 	{
-		SD_WR_CLK_LOW();
-		SD_WR_CLK_HIGH();
-		if (SD_RD_CMD())
+		SD_WR_CLK_LOW(base);
+		SD_WR_CLK_HIGH(base);
+		if (SD_RD_CMD(base))
 			value |= 0x80 >> bit;
 		if (bit >= 7)
 		{
@@ -180,30 +176,26 @@ static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
 			bit++;
 	}
 
-	hal_sd_dummy_clock(8);
+	hal_sd_dummy_clock(base, 8);
 	return 1;	
 }
 
-static int32_t hal_sd_cmd0()
+static int32_t hal_sd_cmd0(void* base)
 {
-	SD_TRACE_INFO("[SD] sd_cmd0\n");
-
 	uint8_t cmd[] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
 	uint8_t response[1];
 	uint8_t crc;
 
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	hal_sd_dummy_clock(1000);
+	hal_sd_dummy_clock(base, 1000);
 	return 1;
 }
 
-static int32_t hal_sd_cmd8(uint8_t voltId, uint8_t testPattern)
+static int32_t hal_sd_cmd8(void* base, uint8_t voltId, uint8_t testPattern)
 {
-	SD_TRACE_INFO("[SD] sd_cmd8\n");
-
 	const uint8_t c_cmd = 8;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -215,9 +207,9 @@ static int32_t hal_sd_cmd8(uint8_t voltId, uint8_t testPattern)
 	cmd[4] = testPattern;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 	
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -229,10 +221,8 @@ static int32_t hal_sd_cmd8(uint8_t voltId, uint8_t testPattern)
 	return 1;
 }
 
-static int32_t hal_sd_cmd55(uint16_t rca16)
+static int32_t hal_sd_cmd55(void* base, uint16_t rca16)
 {
-	SD_TRACE_INFO("[SD] sd_cmd55\n");
-
 	const uint8_t c_cmd = 55;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -244,9 +234,9 @@ static int32_t hal_sd_cmd55(uint16_t rca16)
 	cmd[2] = rca16 & 0xff;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	if (response[0] != c_cmd)
@@ -260,10 +250,8 @@ static int32_t hal_sd_cmd55(uint16_t rca16)
 	return 1;
 }
 
-static int32_t hal_sd_acmd41(uint32_t hostOCR32, uint32_t* outOCR)
+static int32_t hal_sd_acmd41(void* base, uint32_t hostOCR32, uint32_t* outOCR)
 {
-	SD_TRACE_INFO("[SD] sd_acmd41\n");
-
 	const uint8_t c_cmd = 41;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -277,9 +265,9 @@ static int32_t hal_sd_acmd41(uint32_t hostOCR32, uint32_t* outOCR)
 	cmd[4] = hostOCR32 & 0xff;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == 0x3f);
@@ -299,10 +287,8 @@ static int32_t hal_sd_acmd41(uint32_t hostOCR32, uint32_t* outOCR)
 	return 1;
 }
 
-static int32_t hal_sd_cmd2(uint8_t* cid, int32_t cidLen)
+static int32_t hal_sd_cmd2(void* base, uint8_t* cid, int32_t cidLen)
 {
-	SD_TRACE_INFO("[SD] sd_cmd2\n");
-
 	const uint8_t c_cmd = 2;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -312,9 +298,9 @@ static int32_t hal_sd_cmd2(uint8_t* cid, int32_t cidLen)
 	cmd[0] |= c_cmd;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	// \todo verify response
@@ -329,10 +315,8 @@ static int32_t hal_sd_cmd2(uint8_t* cid, int32_t cidLen)
 	return 1;
 }
 
-static int32_t hal_sd_cmd3(uint16_t* outRCA16)
+static int32_t hal_sd_cmd3(void* base, uint16_t* outRCA16)
 {
-	SD_TRACE_INFO("[SD] sd_cmd3\n");
-
 	const uint8_t c_cmd = 3;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -342,19 +326,17 @@ static int32_t hal_sd_cmd3(uint16_t* outRCA16)
 	cmd[0] |= c_cmd;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	*outRCA16 = (response[1] << 8) | response[2];
 	return 1;
 }
 
-static int32_t hal_sd_cmd9(uint16_t RCA16, uint8_t* outCSD, int32_t CSDLen)
+static int32_t hal_sd_cmd9(void* base, uint16_t RCA16, uint8_t* outCSD, int32_t CSDLen)
 {
-	SD_TRACE_INFO("[SD] sd_cmd9\n");
-
 	const uint8_t c_cmd = 9;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -366,9 +348,9 @@ static int32_t hal_sd_cmd9(uint16_t RCA16, uint8_t* outCSD, int32_t CSDLen)
 	cmd[2] |= RCA16 & 0xff;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == 0x3f);
@@ -385,10 +367,8 @@ static int32_t hal_sd_cmd9(uint16_t RCA16, uint8_t* outCSD, int32_t CSDLen)
 	return 1;
 }
 
-static int32_t hal_sd_cmd7(uint16_t RCA16)
+static int32_t hal_sd_cmd7(void* base, uint16_t RCA16)
 {
-	SD_TRACE_INFO("[SD] sd_cmd7\n");
-
 	const uint8_t c_cmd = 7;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -400,9 +380,9 @@ static int32_t hal_sd_cmd7(uint16_t RCA16)
 	cmd[2] |= RCA16 & 0xff;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -410,10 +390,8 @@ static int32_t hal_sd_cmd7(uint16_t RCA16)
 	return 1;
 }
 
-static int32_t hal_sd_cmd16(uint32_t blockLength)
+static int32_t hal_sd_cmd16(void* base, uint32_t blockLength)
 {
-	SD_TRACE_INFO("[SD] sd_cmd16, blockLength %d\n", blockLength);
-
 	const uint8_t c_cmd = 16;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -427,9 +405,9 @@ static int32_t hal_sd_cmd16(uint32_t blockLength)
 	cmd[4] |= blockLength;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -437,10 +415,8 @@ static int32_t hal_sd_cmd16(uint32_t blockLength)
 	return 1;
 }
 
-static int32_t hal_sd_cmd17(uint32_t addr)
+static int32_t hal_sd_cmd17(void* base, uint32_t addr)
 {
-	SD_TRACE_INFO("[SD] sd_cmd17, addr %08x\n", addr);
-
 	const uint8_t c_cmd = 17;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -454,18 +430,16 @@ static int32_t hal_sd_cmd17(uint32_t addr)
 	cmd[4] |= addr;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	return 1;
 }
 
-static int32_t hal_sd_cmd24(uint32_t addr)
+static int32_t hal_sd_cmd24(void* base, uint32_t addr)
 {
-	SD_TRACE_INFO("[SD] sd_cmd24, addr %08x\n", addr);
-
 	const uint8_t c_cmd = 24;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -479,9 +453,9 @@ static int32_t hal_sd_cmd24(uint32_t addr)
 	cmd[4] |= addr;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -491,10 +465,8 @@ static int32_t hal_sd_cmd24(uint32_t addr)
 	return 1;
 }
 
-static int32_t hal_sd_acmd6(int32_t bus4)
+static int32_t hal_sd_acmd6(void* base, int32_t bus4)
 {
-	SD_TRACE_INFO("[SD] sd_acmd6, bus4 %d\n", bus4);
-
 	const uint8_t c_cmd = 6;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -505,9 +477,9 @@ static int32_t hal_sd_acmd6(int32_t bus4)
 	cmd[4] |= bus4 ? 2 : 0;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -515,10 +487,8 @@ static int32_t hal_sd_acmd6(int32_t bus4)
 	return 1;
 }
 
-static int32_t hal_sd_acmd42(int32_t bus4)
+static int32_t hal_sd_acmd42(void* base, int32_t bus4)
 {
-	SD_TRACE_INFO("[SD] sd_acmd42, bus4 %d\n", bus4);
-
 	const uint8_t c_cmd = 42;
 
 	uint8_t cmd[6] = { 0x40, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -529,9 +499,9 @@ static int32_t hal_sd_acmd42(int32_t bus4)
 	cmd[4] |= bus4 ? 2 : 0;
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
-	hal_sd_send_cmd(cmd, sizeof(cmd));
+	hal_sd_send_cmd(base, cmd, sizeof(cmd));
 
-	if (!hal_sd_get_response(response, sizeof(response)))
+	if (!hal_sd_get_response(base, response, sizeof(response)))
 		return 0;
 
 	SD_ASSERT(response[0] == c_cmd);
@@ -541,10 +511,8 @@ static int32_t hal_sd_acmd42(int32_t bus4)
 
 // public
 
-int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen)
+int32_t hal_sd_read_block512(void* base, uint32_t block, uint8_t* buffer, uint32_t bufferLen)
 {
-	SD_TRACE_INFO("[SD] sd_read_block512 %d, %d bytes\n", block, bufferLen);
-
 	const uint32_t addr = block;	// SDHC take block number.
 	// \todo support non SDHC
 
@@ -554,7 +522,7 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 	int32_t result = 0;
 	for (int32_t i = 0; i < 10; ++i)
 	{
-		if (hal_sd_cmd17(addr))
+		if (hal_sd_cmd17(base, addr))
 		{
 			result = 1;
 			break;
@@ -572,24 +540,24 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 		return 0;
 	}
 
-	SD_WR_DAT_DIR_IN();
+	SD_WR_DAT_DIR_IN(base);
 
 	// Wait on start bits.
 	int32_t try = 0;
 	while(1)
 	{
-        SD_WR_CLK_LOW();
-        SD_WR_CLK_HIGH();
+        SD_WR_CLK_LOW(base);
+        SD_WR_CLK_HIGH(base);
 
 		// Check start bits (zero is expected).
 		if (s_dataBits == 4)
 		{
-			if((SD_RD_DAT() & 0x0f) == 0x00) 
+			if((SD_RD_DAT(base) & 0x0f) == 0x00) 
 				break;
 		}
 		else if (s_dataBits == 1)
 		{
-			if((SD_RD_DAT() & 0x01) == 0x00)
+			if((SD_RD_DAT(base) & 0x01) == 0x00)
 				break;
 		}
 
@@ -621,14 +589,14 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 			{
 				uint8_t data8 = 0;
 				{
-					SD_WR_CLK_LOW();
-					SD_WR_CLK_HIGH();
-					data8 = (SD_RD_DAT() & 0x0f) << 4;
+					SD_WR_CLK_LOW(base);
+					SD_WR_CLK_HIGH(base);
+					data8 = (SD_RD_DAT(base) & 0x0f) << 4;
 				}
 				{
-					SD_WR_CLK_LOW();
-					SD_WR_CLK_HIGH();
-					data8 |= (SD_RD_DAT() & 0x0f);
+					SD_WR_CLK_LOW(base);
+					SD_WR_CLK_HIGH(base);
+					data8 |= (SD_RD_DAT(base) & 0x0f);
 				}
 				buffer[i] = data8;
 			}
@@ -642,14 +610,14 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 			{
 				if ( ( ( (uint32_t)buffer ) & 3) == 0)
 					break;
-				*buffer++ = *SD_HW_RB4;
+				*buffer++ = *SD_HW_RB4(base);
 				count--;
 			}
 
 			// Read aligned dwords.
 			while (count >= 4)
 			{
-				*(uint32_t*)buffer = *SD_HW_RDW4;
+				*(uint32_t*)buffer = *SD_HW_RDW4(base);
 				buffer += 4;
 				count -= 4;
 			}
@@ -657,7 +625,7 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 			// Read last unaligned bytes last.
 			while (count > 0)
 			{
-				*buffer++ = *SD_HW_RB4;
+				*buffer++ = *SD_HW_RB4(base);
 				count--;
 			}
 		}
@@ -669,10 +637,10 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 			uint8_t data8 = 0;
 			for(int32_t j = 0; j < 8; j++)
 			{
-				SD_WR_CLK_LOW();
-				SD_WR_CLK_HIGH();
+				SD_WR_CLK_LOW(base);
+				SD_WR_CLK_HIGH(base);
 				data8 <<= 1; 
-				data8 |= (SD_RD_DAT() & 0x01);
+				data8 |= (SD_RD_DAT(base) & 0x01);
 			}
 			buffer[i] = data8;
 		}
@@ -683,10 +651,8 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 	return bufferLen;
 }
 
-int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bufferLen)
+int32_t hal_sd_write_block512(void* base, uint32_t block, const uint8_t* buffer, uint32_t bufferLen)
 {
-	SD_TRACE_INFO("[SD] sd_write_block512 %d, %d bytes\n", block, bufferLen);
-
 	const uint32_t addr = block;	// SDHC take block number.
 	// \todo support non SDHC
 
@@ -696,7 +662,7 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 	int32_t result = 0;
 	for (int32_t i = 0; i < 10; ++i)
 	{
-		if (hal_sd_cmd24(addr))
+		if (hal_sd_cmd24(base, addr))
 		{
 			result = 1;
 			break;
@@ -714,10 +680,10 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 		return 0;
 	}
 
-	SD_WR_DAT_DIR_OUT();
-	SD_WR_CLK_LOW();
-	SD_WR_DAT(0x00);  
-	SD_WR_CLK_HIGH();
+	SD_WR_DAT_DIR_OUT(base);
+	SD_WR_CLK_LOW(base);
+	SD_WR_DAT(base, 0x00);  
+	SD_WR_CLK_HIGH(base);
 
 	for (uint32_t i = 0; i < bufferLen; i++)
 	{
@@ -726,9 +692,9 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 		{
 			for (uint32_t j = 0; j < 2; j++)
 			{
-				SD_WR_CLK_LOW();
-				SD_WR_DAT((data8 >> 4) & 0x0f);
-				SD_WR_CLK_HIGH();
+				SD_WR_CLK_LOW(base);
+				SD_WR_DAT(base, (data8 >> 4) & 0x0f);
+				SD_WR_CLK_HIGH(base);
 				data8 <<= 4; 
 			}
 		}
@@ -736,13 +702,13 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 		{  
 			for (uint32_t j = 0; j < 8; j++)
 			{
-				SD_WR_CLK_LOW();
+				SD_WR_CLK_LOW(base);
 				if (data8 & 0x80) {
-					SD_WR_DAT_HIGH();
+					SD_WR_DAT_HIGH(base);
 				} else {
-					SD_WR_DAT_LOW();
+					SD_WR_DAT_LOW(base);
 				}
-				SD_WR_CLK_HIGH();
+				SD_WR_CLK_HIGH(base);
 				data8 <<= 1; 
 			} 
 		}
@@ -789,9 +755,9 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 			c |= (dataCrc16[2] & 0x8000) ? 4 : 0;
 			c |= (dataCrc16[3] & 0x8000) ? 8 : 0;
 
-			SD_WR_CLK_LOW();
-			SD_WR_DAT(c);
-			SD_WR_CLK_HIGH();
+			SD_WR_CLK_LOW(base);
+			SD_WR_DAT(base, c);
+			SD_WR_CLK_HIGH(base);
 
 			dataCrc16[0] <<= 1;         
 			dataCrc16[1] <<= 1;         
@@ -805,34 +771,34 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 		uint16_t dataCrc16 = crc16(buffer, bufferLen);
 		for (uint32_t i = 0; i < 16; i++)
 		{
-			SD_WR_CLK_LOW();
+			SD_WR_CLK_LOW(base);
 			if (dataCrc16 & 0x8000) {
-				SD_WR_DAT_HIGH();
+				SD_WR_DAT_HIGH(base);
 			} else {
-				SD_WR_DAT_LOW();
+				SD_WR_DAT_LOW(base);
 			}
-			SD_WR_CLK_HIGH();
+			SD_WR_CLK_HIGH(base);
 			dataCrc16 <<= 1;         
 		}
 	}
 
 	// Stop bits (value 'one').
-	SD_WR_CLK_LOW();
+	SD_WR_CLK_LOW(base);
 	if (s_dataBits == 4) {
-		SD_WR_DAT(0x0f);
+		SD_WR_DAT(base, 0x0f);
 	} else if (s_dataBits == 1) {
-		SD_WR_DAT_HIGH();
+		SD_WR_DAT_HIGH(base);
 	}
-	SD_WR_CLK_HIGH();
+	SD_WR_CLK_HIGH(base);
 
 	// Check busy bits (data0 only).
-	SD_WR_DAT_DIR_IN();
+	SD_WR_DAT_DIR_IN(base);
 	uint8_t writeSuccess = 0;    
 	for (uint32_t i = 0; i < 10000; i++)
 	{
-		SD_WR_CLK_LOW();
-		SD_WR_CLK_HIGH();
-		if ((SD_RD_DAT() & 0x01) == 0x01)
+		SD_WR_CLK_LOW(base);
+		SD_WR_CLK_HIGH(base);
+		if ((SD_RD_DAT(base) & 0x01) == 0x01)
 		{
 			writeSuccess = 1;
 			break;
@@ -846,40 +812,40 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 		return 0;
 	}
 
-	hal_sd_dummy_clock(100000);
+	hal_sd_dummy_clock(base, 100000);
 
 	// kernel_leave_critical();
 	// sysreg_modify(SR_REG_LEDS, 1, 0);
 	return bufferLen;
 }
 
-int32_t hal_sd_init(int32_t mode)
+int32_t hal_sd_init(void* base, int32_t mode)
 {
 	// const uint32_t deviceId = sysreg_read(SR_REG_DEVICE_ID);
 
 	// Use SW mode for initialization.
 	s_mode = SD_MODE_SW;
 
-	*SD_CTRL = 0x0000ff00;
+	*SD_CTRL(base) = 0x0000ff00;
 
 	// if (deviceId == SR_DEVICE_ID_RV32T || deviceId == SR_DEVICE_ID_RV32)
 		s_dataBits = 4;
 	// else
 	//   s_dataBits = 1;
 
-	SD_WR_CMD_DIR_OUT();
-	SD_WR_DAT_DIR_IN();
-	SD_WR_CLK_HIGH();
-	SD_WR_CMD_HIGH();
-	SD_WR_DAT(0x0);
+	SD_WR_CMD_DIR_OUT(base);
+	SD_WR_DAT_DIR_IN(base);
+	SD_WR_CLK_HIGH(base);
+	SD_WR_CMD_HIGH(base);
+	SD_WR_DAT(base, 0x0);
 
-	hal_sd_dummy_clock(100);
+	hal_sd_dummy_clock(base, 100);
 
     // Set card to idle.
-	hal_sd_cmd0();
+	hal_sd_cmd0(base);
 
 	// Negotiate voltage.
-	hal_sd_cmd8(SD_VHS_2V7_3V6, CMD8_DEFAULT_TEST_PATTERN);
+	hal_sd_cmd8(base, SD_VHS_2V7_3V6, CMD8_DEFAULT_TEST_PATTERN);
 
 	// Determine capacity.
 	uint32_t hostOCR32 = 0x40FF8000;
@@ -888,10 +854,10 @@ int32_t hal_sd_init(int32_t mode)
 
 	for (int32_t count = 0;; ++count)
 	{
-		if (!hal_sd_cmd55(0x0000))
+		if (!hal_sd_cmd55(base, 0x0000))
 			return 1;
 
-		if (!hal_sd_acmd41(hostOCR32, &OCR))
+		if (!hal_sd_acmd41(base, hostOCR32, &OCR))
 		{
 			if (count > 100)
 				return 1;
@@ -903,30 +869,30 @@ int32_t hal_sd_init(int32_t mode)
 
 	// Get card CID.
 	uint8_t cid[16];
-	hal_sd_cmd2(cid, sizeof(cid));
+	hal_sd_cmd2(base, cid, sizeof(cid));
 
 	// Get card RCA identifier.
-	hal_sd_cmd3(&RCA16);
+	hal_sd_cmd3(base, &RCA16);
 
 	// Enter data transfer mode, standby state.
 	uint8_t csd[17];
-	hal_sd_cmd9(RCA16, csd, sizeof(csd));
+	hal_sd_cmd9(base, RCA16, csd, sizeof(csd));
 
 	// cmd10?
 
 	// Enter transfer state.
-	hal_sd_cmd7(RCA16);
+	hal_sd_cmd7(base, RCA16);
 
 	// Select block length.
-	hal_sd_cmd16(512);
+	hal_sd_cmd16(base, 512);
 
 	// If 4 bit, set bus width.
 	if (s_dataBits == 4)
 	{
-		hal_sd_cmd55(RCA16);
-		hal_sd_acmd6(1);
-		hal_sd_cmd55(RCA16);
-		hal_sd_acmd42(1);
+		hal_sd_cmd55(base, RCA16);
+		hal_sd_acmd6(base, 1);
+		hal_sd_cmd55(base, RCA16);
+		hal_sd_acmd42(base, 1);
 	}
 
 	// Finally set desired acceleration mode;
