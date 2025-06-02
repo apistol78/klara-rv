@@ -316,6 +316,13 @@ bool CPU::tick(uint32_t count)
 		if (!m_bus->tick(this))
 		{
 			log::error << L"Bus tick failed at PC " << str(L"%08x", m_pc) << Endl;
+
+			log::info << str(L"%-5S", L"PC") << L" : " << str(L"%08x", pc()) << Endl;
+			log::info << L"---" << Endl;
+
+			for (uint32_t i = 0; i < 32; ++i)
+				log::info << str(L"%-5S", getRegisterName(i)) << L" : " << str(L"%08x", reg(i)) << Endl;
+
 			return false;
 		}
 

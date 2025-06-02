@@ -35,7 +35,7 @@ bool Memory::writeU32(uint32_t address, uint32_t value)
 {
 	if (address >= m_capacity)
 	{
-		log::error << L"Trying to write to memory at 0x" << str(L"%08x", address) << L", out of bounds!" << Endl;
+		log::error << L"Trying to write " << str(L"%08x", value) << L" to memory at 0x" << str(L"%08x", address) << L", out of bounds!" << Endl;
 		return false;
 	}
 
@@ -46,7 +46,7 @@ bool Memory::writeU32(uint32_t address, uint32_t value)
 	}
 	else
 	{
-		log::error << L"Trying to write to read-only memory at 0x" << str(L"%08x", address) << Endl;
+		log::error << L"Trying to write " << str(L"%08x", value) << L" to read-only memory at 0x" << str(L"%08x", address) << Endl;
 		return false;
 	}
 }
