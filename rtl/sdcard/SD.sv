@@ -21,15 +21,14 @@ module SD (
 	output bit o_ready,
 
 	output SD_CLK,
-`ifndef __VERILATOR__
-	inout SD_CMD,
-	inout [3:0] SD_DAT
-`else
+
+	output SD_CMD_dir,
 	input SD_CMD_in,
-	input [3:0] SD_DAT_in,
 	output SD_CMD_out,
+
+	output SD_DAT_dir,
+	input [3:0] SD_DAT_in,
 	output [3:0] SD_DAT_out
-`endif
 );
 	localparam DIR_IN = 1'b0;
 	localparam DIR_OUT = 1'b1;
@@ -74,20 +73,14 @@ module SD (
 
 	assign SD_CLK = clk;
 
-`ifndef __VERILATOR__
-	assign SD_CMD = (cdir == DIR_OUT) ? cmd : 1'bZ;
-	assign SD_DAT = (ddir == DIR_OUT) ? dat : 4'bZ;
-	
-	wire cmd_in = SD_CMD;
-	wire [3:0] dat_in = SD_DAT;
-`else
 	assign SD_CMD_out = cmd;
 	assign SD_DAT_out = dat;
 
 	wire cmd_in = SD_CMD_in;
 	wire [3:0] dat_in = SD_DAT_in;
-`endif
 
+	assign SD_CMD_dir = cdir;
+	assign SD_DAT_dir = ddir;
 
 	state_t state = IDLE;
 	bit [7:0] wcmddata;
@@ -135,6 +128,10 @@ module SD (
 								clk <= 1'b0;
 								state <= READ_DAT_DWORD_1;
 							end
+							else begin
+								// Invalid
+								o_ready <= 1'b1;
+							end
 						end
 						else begin
 							if (i_address == 0) begin
@@ -151,6 +148,10 @@ module SD (
 								wcmddata <= i_wdata[7:0];
 								wcmdcount <= 0;
 								state <= WRITE_CMD_BYTE;
+							end
+							else begin
+								// Invalid
+								o_ready <= 1'b1;
 							end
 						end
 					end
@@ -297,7 +298,7 @@ module SD (
 
 				default: begin
 					state <= IDLE;
-				end
+				end				
 			endcase
 		end
 	end
