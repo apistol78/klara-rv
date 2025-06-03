@@ -20,7 +20,7 @@ function main()
 	run:run("instructions.run verilog_fpu", "rtl/cpu/private/generated/Instructions_fpu.sv")
 
 	stdout:printLn("Generating emulator instructions...")
-	run:run("instructions.run cpp", "code/cpu/Instructions.inl")
+	run:run("instructions.run cpp", "code/Emulator/CPU/Instructions.inl")
 
 	stdout:printLn("Done")
 end
