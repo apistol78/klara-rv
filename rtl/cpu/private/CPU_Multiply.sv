@@ -7,9 +7,6 @@
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 
-// Since we're using DSP to implement multiplication
-// we need to pipeline result so we can meet timing.
-
 `timescale 1ns/1ns
 
 module CPU_Multiply(
@@ -25,15 +22,6 @@ module CPU_Multiply(
 	wire s1 = i_op1[31];
 	wire s2 = i_op2[31];
 
-	wire [31:0] uop1 = (i_signed && s1) ? -$signed(i_op1) : i_op1;
-	wire [31:0] uop2 = (i_signed && s2) ? -$signed(i_op2) : i_op2;
-
-	bit [1:0] s;
-	always_ff @(posedge i_clock) begin
-		if (i_latch)
-			s <= { s1, s2 };
-	end
-	
 	bit r0_request;
 	bit [31:0] r0_uop1;
 	bit [31:0] r0_uop2;
@@ -44,15 +32,15 @@ module CPU_Multiply(
 	bit r2_request;
 	bit [63:0] r2_result;
 	
-	assign o_ready = r2_request;
-	assign o_result = r2_result;
+	bit [1:0] s;
+	always_ff @(posedge i_clock) begin
+		if (i_latch)
+			s <= { s1, s2 };
 
-	always_ff @(posedge i_clock)
-	begin
 		// 1
 		r0_request <= i_latch;
-		r0_uop1 <= uop1;
-		r0_uop2 <= uop2;
+		r0_uop1 <= (i_signed && s1) ? -$signed(i_op1) : i_op1;
+		r0_uop2 <= (i_signed && s2) ? -$signed(i_op2) : i_op2;
 
 		// 2
 		r1_request <= r0_request;
@@ -62,5 +50,8 @@ module CPU_Multiply(
 		r2_request <= r1_request;
 		r2_result <= (i_signed && s[0] != s[1]) ? -$signed(r1_intermediate) : r1_intermediate;
 	end
+
+	assign o_ready = r2_request;
+	assign o_result = r2_result;
 
 endmodule
