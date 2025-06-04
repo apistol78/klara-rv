@@ -121,19 +121,20 @@ module CPU_Divide(
 	bit request = 1'b0;
 	bit [31:0] result;
 	bit [31:0] remainder;
+	bit ack = 1'b0;
 
 	divfunc #(
 		.XLEN(32),
 		.STAGE_LIST(32'b00100010001000100010001000100101)
 	) df(
 		.clk(i_clock),
-		.rst(1'b0),
+		.rst(~i_latch),
 		.a(unumerator),
 		.b(udenominator),
 		.vld(request),
 		.quo(result),
 		.rem(remainder),
-		.ack(o_ready)
+		.ack(ack)
 	);
 
 	bit [1:0] s;
@@ -146,6 +147,7 @@ module CPU_Divide(
 			s <= { snumerator, sdenominator };
 	end
 
+	assign o_ready = ack; // && i_latch;
 	assign o_result = (i_signed && s[0] != s[1]) ? -$signed(result) : result;
 	assign o_remainder = (i_signed && s[1]) ? -$signed(remainder) : remainder;
 

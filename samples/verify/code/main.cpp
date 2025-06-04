@@ -11,6 +11,8 @@
 #define S1 9
 #define S2 18
 #define S3 19
+#define S4 20
+#define S5 21
 #define A2 12
 #define A5 15
 #define RA 1
@@ -483,24 +485,29 @@ bool verify_DIV(const char* trace)
 	int32_t s2 = rnd32();
 	while (s2 == 0) s2 = rnd32();
 
+	int32_t s4 = rnd32();
+	int32_t s5 = rnd32();
+	while (s5 == 0) s5 = rnd32();
+
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = s1;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S2] = s2;
+
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S3] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S4] = s4;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S5] = s5;
+
 	tb->Verify__DOT__rom__DOT__data[0] = 0x0324c433; // div	s0,s1,s2
+	tb->Verify__DOT__rom__DOT__data[1] = 0x035a49b3; // div	s3,s4,s5
 
-	evaluate(verify, trace, 1);
-
-	// printf("DIV, %d / %d = %d (%d)\n",
-	// 	s1,
-	// 	s2,
-	// 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0],
-	// 	s1 / s2
-	// );
+	evaluate(verify, trace, 10);
 
 	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != (s1 / s2))
+		return false;
+	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S3] != (s4 / s5))
 		return false;
 
 	delete verify;
@@ -511,6 +518,7 @@ bool verify_UDIV(const char* trace)
 {
 	uint32_t s1 = urnd32();
 	uint32_t s2 = urnd32();
+	while (s2 == 0) s2 = rnd32();
 
 	auto verify = create_soc();
 	auto tb = verify->rootp;
@@ -521,13 +529,6 @@ bool verify_UDIV(const char* trace)
 	tb->Verify__DOT__rom__DOT__data[0] = 0x0324d433; // divu	s0,s1,s2
 
 	evaluate(verify, trace, 1);
-
-	// printf("DIV, %d / %d = %d (%d)\n",
-	// 	s1,
-	// 	s2,
-	// 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0],
-	// 	s1 / s2
-	// );
 
 	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != (s1 / s2))
 		return false;
@@ -700,8 +701,10 @@ bool verify_LW(const char* trace)
 
 bool verify_MUL(const char* trace)
 {
-	int32_t s1 = rnd32();
-	int32_t s2 = rnd32();
+	const int32_t s1 = rnd32();
+	const int32_t s2 = rnd32();
+	const int32_t s4 = rnd32();
+	const int32_t s5 = rnd32();
 
 	auto verify = create_soc();
 	auto tb = verify->rootp;
@@ -709,9 +712,15 @@ bool verify_MUL(const char* trace)
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = s1;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S2] = s2;
-	tb->Verify__DOT__rom__DOT__data[0] = 0x03248433; // mul	s0,s1,s2
 
-	evaluate(verify, trace, 1);
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S3] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S4] = s4;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S5] = s5;
+
+	tb->Verify__DOT__rom__DOT__data[0] = 0x03248433; // mul	s0,s1,s2
+	tb->Verify__DOT__rom__DOT__data[1] = 0x035a09b3; // mul	s3,s4,s5
+
+	evaluate(verify, trace, 10);
 
 	// printf("MUL, %d * %d = %d (%d)\n",
 	// 	s1,
@@ -721,6 +730,8 @@ bool verify_MUL(const char* trace)
 	// );
 
 	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != (s1 * s2))
+		return false;
+	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S3] != (s4 * s5))
 		return false;
 
 	delete verify;
@@ -2189,7 +2200,7 @@ int main(int argc, char **argv)
 
 #endif
 
-	// CHECK(verify_CSRRS);
+	CHECK(verify_CSRRS);
 
 	if (success)
 		printf("SUCCESS!\n");

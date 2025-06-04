@@ -31,6 +31,8 @@ module CPU_Multiply(
 
 	bit r2_request;
 	bit [63:0] r2_result;
+
+	wire progress = r0_request || r1_request || r2_request;
 	
 	bit [1:0] s;
 	always_ff @(posedge i_clock) begin
@@ -38,7 +40,7 @@ module CPU_Multiply(
 			s <= { s1, s2 };
 
 		// 1
-		r0_request <= i_latch;
+		r0_request <= i_latch && !progress;
 		r0_uop1 <= (i_signed && s1) ? -$signed(i_op1) : i_op1;
 		r0_uop2 <= (i_signed && s2) ? -$signed(i_op2) : i_op2;
 
