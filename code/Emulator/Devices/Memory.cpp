@@ -19,6 +19,11 @@ Memory::Memory(uint32_t capacity)
 :	m_capacity(capacity)
 {
 	m_data.reset(new uint8_t [capacity]);
+
+	// Ensure memory content is randomized initially
+	// so we can capture uninitialized access.
+	for (uint32_t i = 0; i < capacity; ++i)
+		m_data[i] = (uint8_t)rand();
 }
 
 uint32_t Memory::getCapacity() const
