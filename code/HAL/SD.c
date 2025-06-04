@@ -933,7 +933,7 @@ int32_t hal_sd_init(int32_t mode)
 	// not applicable for emulator.
 
 	// #fixme uncomment this for HW
-	//	s_mode = mode;
+	s_mode = mode;
 
 	return 0;
 }
