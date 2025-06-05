@@ -86,7 +86,6 @@ module SD (
 	bit [7:0] wcmddata;
 	bit [7:0] wcmdcount;
 
-
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			clk <= 1'b0;
