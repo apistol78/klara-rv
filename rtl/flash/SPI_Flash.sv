@@ -43,10 +43,10 @@ module SPI_Flash #(
     bit [7:0] count;
 
     assign o_rdata = { rdata[7:0], rdata[15:8], rdata[23:16], rdata[31:24] };
-    assign SPI_CLK = !SPI_nCS && !i_clock;
+    assign SPI_CLK = !SPI_nCS && i_clock;
     assign SPI_MOSI = caddr[31];
 
-    always_ff @(posedge i_clock) begin
+    always_ff @(negedge i_clock) begin
 
         o_ready <= 1'b0;
 
@@ -54,32 +54,28 @@ module SPI_Flash #(
             IDLE: begin
                 if (i_request) begin
                     SPI_nCS <= 1'b0;
-                    caddr <= { 8'h03, i_address[23:0] };
-                    count <= 32;
+                    caddr <= { 8'h0b, i_address[23:0] };
+                    count <= 0;
                     state <= SEND_CMD;
                 end
             end
 
             SEND_CMD: begin
-                if (count > 0) begin
-                    caddr <= { caddr[30:0], 1'b0 };
-                    count <= count - 1;
-                end
-                else begin
+                caddr <= { caddr[30:0], 1'b0 };
+                count <= count + 1;
+                if (count >= 32 + 8 - 1) begin
                     rdata <= 0;
-                    count <= 32;
-                    state <= RECV_DATA;
+                    count <= 0;
+                    state <= RECV_DAT;
                 end
             end
 
             RECV_DAT: begin
-                if (count > 0) begin
-                    rdata <= { rdata[30:0], SPI_MISO };
-                    count <= count - 1;
-                end
-                else begin
+                rdata <= { rdata[30:0], SPI_MISO };
+                count <= count + 1;
+                if (count >= 32 - 1) begin
                     SPI_nCS <= 1'b1;
-                    o_ready <= i_request;
+                    o_ready <= 1'b1;
                     state <= WAIT_EOT;
                 end
             end
@@ -89,8 +85,11 @@ module SPI_Flash #(
                 if (!i_request) begin
                     state <= IDLE;
                 end
-            end            
+            end
 
+            default: begin
+                state <= IDLE;
+            end     
         endcase
     end
 
