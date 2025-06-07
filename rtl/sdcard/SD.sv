@@ -21,11 +21,9 @@ module SD (
 	output bit o_ready,
 
 	output SD_CLK,
-
 	output SD_CMD_dir,
 	input SD_CMD_in,
 	output SD_CMD_out,
-
 	output SD_DAT_dir,
 	input [3:0] SD_DAT_in,
 	output [3:0] SD_DAT_out
@@ -33,7 +31,7 @@ module SD (
 	localparam DIR_IN = 1'b0;
 	localparam DIR_OUT = 1'b1;
 
-	typedef enum bit [7:0]
+	typedef enum bit [4:0]
 	{
 		IDLE,
 		WRITE_CMD_BYTE,
@@ -72,15 +70,12 @@ module SD (
 	initial o_rdata = 32'h0000_0000;
 
 	assign SD_CLK = clk;
-
-	assign SD_CMD_out = cmd;
-	assign SD_DAT_out = dat;
-
-	wire cmd_in = SD_CMD_in;
-	wire [3:0] dat_in = SD_DAT_in;
-
 	assign SD_CMD_dir = cdir;
+	assign SD_CMD_out = cmd;
+	wire cmd_in = SD_CMD_in;
 	assign SD_DAT_dir = ddir;
+	assign SD_DAT_out = dat;
+	wire [3:0] dat_in = SD_DAT_in;
 
 	state_t state = IDLE;
 	bit [7:0] wcmddata;
@@ -102,7 +97,7 @@ module SD (
 				IDLE: begin
 					if (i_request) begin
 						if (!i_rw) begin
-							if (i_address == 0) begin
+							if (i_address == 2'd0) begin
 								o_rdata <= {
 									24'b0,
 									(ddir == DIR_IN) ? dat_in : dat,
@@ -113,14 +108,14 @@ module SD (
 								};
 								o_ready <= 1'b1;
 							end
-							else if (i_address == 2) begin
+							else if (i_address == 2'd2) begin
 								// Read data byte.
 								o_rdata <= 0;
 								ddir <= DIR_IN;
 								clk <= 1'b0;
 								state <= READ_DAT_BYTE_1;
 							end
-							else if (i_address == 3) begin
+							else if (i_address == 2'd3) begin
 								// Read data dword.
 								o_rdata <= 0;
 								ddir <= DIR_IN;
@@ -133,7 +128,7 @@ module SD (
 							end
 						end
 						else begin
-							if (i_address == 0) begin
+							if (i_address == 2'd0) begin
 								clk  <= ( clk & ~mask[0]  ) | write[0];
 								cdir <= (cdir & ~mask[1]  ) | write[1];
 								ddir <= (ddir & ~mask[2]  ) | write[2];
@@ -141,7 +136,7 @@ module SD (
 								dat  <= ( dat & ~mask[7:4]) | write[7:4];
 								o_ready <= 1'b1;
 							end
-							else if (i_address == 1) begin
+							else if (i_address == 2'd1) begin
 								// Write command byte.
 								cdir <= DIR_OUT;
 								wcmddata <= i_wdata[7:0];
