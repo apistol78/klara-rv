@@ -17,7 +17,6 @@
 #define SD_BASE		        0x54000000
 #define TIMER_BASE	        0x55000000
 #define AUDIO_BASE	        0x56000000
-#define SD_EXTERNAL_BASE	0x57000000
 #define PLIC_BASE	        0x58000000
 #define VIDEO_BASE          0x5a000000
 
