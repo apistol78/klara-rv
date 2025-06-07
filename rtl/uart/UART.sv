@@ -25,6 +25,7 @@ module UART #(
 	output [31:0] o_rdata,
     output o_ready,
 	output o_interrupt,
+	output o_soft_reset,
 	
     input UART_RX,
     output UART_TX
@@ -45,6 +46,7 @@ module UART #(
 		.o_rdata(o_rdata),
 		.o_ready(rx_ready),
 		.o_interrupt(o_interrupt),
+		.o_soft_reset(o_soft_reset),
 		.UART_RX(UART_RX)
 	);
 

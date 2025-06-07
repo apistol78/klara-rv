@@ -26,6 +26,7 @@ module UART_TX #(
 	localparam CNT_WIDTH = $clog2(MAX_RATE);
 
 	bit [2:0] state = 0;
+	bit [2:0] lstate = 0;
 	bit [CNT_WIDTH:0] counter = 0;
 	bit [7:0] data = 0;
 	bit [8:0] bidx = 0;
@@ -40,6 +41,7 @@ module UART_TX #(
 		.DEPTH(FIFO_DEPTH),
 		.WIDTH(8)
 	) tx_fifo(
+		.i_reset(i_reset),
 		.i_clock(i_clock),
 		.o_empty(tx_fifo_empty),
 		.o_full(tx_fifo_full),
@@ -70,55 +72,73 @@ module UART_TX #(
 
 	// Read from FIFO and transmit each byte.
 	always_ff @(posedge i_clock) begin
-
-		if (counter >= MAX_RATE) begin
+		if (i_reset) begin
+			state <= 0;
+			lstate <= 0;
 			counter <= 0;
+			data <= 0;
+			bidx <= 0;
+			tx_fifo_read <= 1'b0;
+		end
+		else begin
+			if (counter >= MAX_RATE) begin
+				counter <= 0;
 
-			// Serial tick.
-			case (state)
+				// Serial tick.
+				case (state)
 
-				// Start bit.
-				1: begin
-					UART_TX <= 1'b0;
-					state <= 2;
-				end
-
-				// Clock data out.
-				2: begin
-					if (bidx < 8'd8) begin
-						UART_TX <= data[0];
-						data <= data >> 1;
-						bidx <= bidx + 1;
+					// Start bit.
+					1: begin
+						UART_TX <= 1'b0;
+						state <= 2;
 					end
-					else begin
-						// Send stop bit.
-						UART_TX <= 1'b1;
-						bidx <= 8'd0;
-						state <= 3;
+
+					// Clock data out.
+					2: begin
+						if (bidx < 8'd8) begin
+							UART_TX <= data[0];
+							data <= data >> 1;
+							bidx <= bidx + 1;
+						end
+						else begin
+							// Send stop bit.
+							UART_TX <= 1'b1;
+							bidx <= 8'd0;
+							state <= 3;
+						end
 					end
-				end
 
-				// TX done.
-				3: begin
-					state <= 0;
-				end
-			endcase
-
-		end else begin
-
-			counter <= counter + 1;
-
-			// Read from fifo.
-			if (state == 0) begin
-				if (!tx_fifo_empty) begin
-					if (!tx_fifo_read)
-						tx_fifo_read <= 1;
-					else begin
-						tx_fifo_read <= 0;
-						data <= tx_fifo_rdata;
-						bidx <= 0;
-						state <= 1;
+					// TX done.
+					3: begin
+						state <= 0;
 					end
+				endcase
+			end else begin
+				counter <= counter + 1;
+
+				// Read from fifo.
+				if (state == 0) begin
+					case (lstate)
+						0: begin
+							if (!tx_fifo_empty) begin
+								tx_fifo_read <= 1'b1;
+								lstate <= 1;
+							end
+						end
+						1: begin
+							tx_fifo_read <= 1'b0;
+							lstate <= 2;
+						end
+						2: begin
+							data <= tx_fifo_rdata;
+							bidx <= 0;
+							state <= 1;
+						end
+					endcase
+
+				end
+				else begin
+					lstate <= 0;
 				end
 			end
 		end

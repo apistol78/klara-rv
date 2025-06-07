@@ -13,6 +13,7 @@ module FIFO #(
 	parameter DEPTH,
 	parameter WIDTH
 )(
+	input i_reset,
 	input i_clock,
 	output o_empty,
 	output o_full,
@@ -34,13 +35,20 @@ module FIFO #(
 	assign o_queued = (in >= out) ? in - out : (DEPTH - out) + in;
 
 	always_ff @ (posedge i_clock) begin
-		if (i_write) begin
-			data[in] <= i_wdata;
-			in <= (in + 1) & (DEPTH - 1);
+		if (i_reset) begin
+			rdata <= 0;
+			in <= 0;
+			out <= 0;
 		end
-		if (i_read) begin
-			rdata <= data[out];
-			out <= (out + 1) & (DEPTH - 1);
+		else begin
+			if (i_write) begin
+				data[in] <= i_wdata;
+				in <= (in + 1) & (DEPTH - 1);
+			end
+			if (i_read) begin
+				rdata <= data[out];
+				out <= (out + 1) & (DEPTH - 1);
+			end
 		end
 	end
 

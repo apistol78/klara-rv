@@ -22,6 +22,7 @@ module UART_RX #(
     output o_ready,
 
 	output bit o_interrupt,
+	output bit o_soft_reset,
 	
     input UART_RX
 );
@@ -42,6 +43,7 @@ module UART_RX #(
 		.DEPTH(FIFO_DEPTH),
 		.WIDTH(8)
 	) rx_fifo(
+		.i_reset(i_reset),
 		.i_clock(i_clock),
 		.o_empty(rx_fifo_empty),
 		.o_full(),
@@ -55,6 +57,7 @@ module UART_RX #(
 	initial begin
 		o_rdata = 32'h0;
 		o_interrupt = 1'b0;
+		o_soft_reset = 1'b0;
 	end
 	
 	assign o_ready = (rds == 5) && i_request;
@@ -100,52 +103,64 @@ module UART_RX #(
 	
 	// Receive and put into FIFO.
 	always_ff @(posedge i_clock) begin
-		rx_fifo_write <= 0;
-		rx <= UART_RX;
-
-		o_interrupt <= 1'b0;
-	
-		if (prescale > 0) begin
-			prescale <= prescale - 1;
-		end
-		else if (bidx > 0) begin
-			if (bidx > 8 + 1) begin
-				if (!rx) begin
-					// Assume mid point of start bit,
-					// continue with data bits.
-					bidx <= bidx - 1;
-					prescale <= (PRESCALE << 3) - 1;
-				end
-				else begin
-					// Unexpected end of start bit.
-					bidx <= 0;
-					prescale <= 0;
-				end
-			end
-			else if (bidx > 1) begin
-				// Shift in data bits.
-				bidx <= bidx - 1;
-				prescale <= (PRESCALE << 3) - 1;
-				data <= { rx, data[8 - 1:1] };
-			end
-			else if (bidx == 1) begin
-				bidx <= bidx - 1;
-				if (rx) begin
-					// Stop bit found, save data into fifo.
-					rx_fifo_write <= 1;
-
-					// Issue interrupt.
-					o_interrupt <= 1'b1;
-				end
-				// Else stop bit expected.
-			end
+		if (i_reset) begin
+			o_interrupt <= 1'b0;
+			o_soft_reset <= 1'b0;
+			prescale <= 0;
+			bidx <= 0;
 		end
 		else begin
-			// Wait for start bit.
-			if (!rx) begin
-				prescale <= (PRESCALE << 2) - 2;
-				bidx <= 8 + 2;
-				data <= 0;
+			rx_fifo_write <= 0;
+			rx <= UART_RX;
+
+			o_interrupt <= 1'b0;
+			o_soft_reset <= 1'b0;
+		
+			if (prescale > 0) begin
+				prescale <= prescale - 1;
+			end
+			else if (bidx > 0) begin
+				if (bidx > 8 + 1) begin
+					if (!rx) begin
+						// Assume mid point of start bit,
+						// continue with data bits.
+						bidx <= bidx - 1;
+						prescale <= (PRESCALE << 3) - 1;
+					end
+					else begin
+						// Unexpected end of start bit.
+						bidx <= 0;
+						prescale <= 0;
+					end
+				end
+				else if (bidx > 1) begin
+					// Shift in data bits.
+					bidx <= bidx - 1;
+					prescale <= (PRESCALE << 3) - 1;
+					data <= { rx, data[8 - 1:1] };
+				end
+				else if (bidx == 1) begin
+					bidx <= bidx - 1;
+					if (rx) begin
+						// Stop bit found, save data into fifo.
+						rx_fifo_write <= 1;
+
+						// Issue interrupt.
+						o_interrupt <= 1'b1;
+
+						// Check for soft reset character.
+						o_soft_reset <= (data == 8'hff);
+					end
+					// Else stop bit expected.
+				end
+			end
+			else begin
+				// Wait for start bit.
+				if (!rx) begin
+					prescale <= (PRESCALE << 2) - 2;
+					bidx <= 8 + 2;
+					data <= 0;
+				end
 			end
 		end
 	end
