@@ -10,8 +10,8 @@
 `timescale 1ns/1ns
 
 module FIFO #(
-	parameter DEPTH,
-	parameter WIDTH
+	parameter DEPTH = 128,
+	parameter WIDTH = 8
 )(
 	input i_reset,
 	input i_clock,

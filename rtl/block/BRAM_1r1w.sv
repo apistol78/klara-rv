@@ -33,6 +33,7 @@ module BRAM_1r1w #(
 
 	initial begin
         o_pa_ready = 0;
+		o_pa_rdata = 0;
         o_pb_ready = 0;
     end
 

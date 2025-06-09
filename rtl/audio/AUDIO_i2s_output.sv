@@ -10,7 +10,7 @@
 `timescale 1ns/1ns
 
 module AUDIO_i2s_output #(
-	parameter FREQUENCY
+	parameter FREQUENCY = 100_000_000
 )(
 	input i_clock,
 
@@ -48,28 +48,33 @@ module AUDIO_i2s_output #(
 	assign o_i2s_mclk = mclk;
 	assign o_i2s_sclk = sclk;
 	assign o_i2s_lrck = lrck;
-	assign o_i2s_sdout = sdout;
+	assign o_i2s_sdout = sample[15];
 
-	bit [1:0] sclk_pp = 2'b0;
+	bit [1:0] sclk_pp = 2'b00;
 	bit [4:0] bitcnt = 0;
 	bit lrck = 0;
 	bit [15:0] sample = 0;
 	bit sdout = 0;
+	bit [1:0] busy = 2'b00;
+
+	assign o_busy = busy[0];
 
 	always_ff @(posedge i_clock) begin
+		busy <= { busy[0], 1'b1 };
+
 		sclk_pp <= { sclk_pp[0], sclk };
-		o_busy <= 1;
 		if (sclk_pp == 2'b10) begin
-			sdout <= sample[15];
 			sample <= { sample[14:0], 1'b0 };
 			bitcnt <= bitcnt + 1;
-			if (bitcnt >= 16-1) begin
+			if (bitcnt >= 16 - 1) begin
 				lrck <= ~lrck;
 				bitcnt <= 0;
-				sample <= i_sample;
-				o_busy <= 0;
+				busy[0] <= 1'b0;
 			end
 		end
+
+		if (busy == 2'b01)
+			sample <= i_sample;
 	end
 
 endmodule
