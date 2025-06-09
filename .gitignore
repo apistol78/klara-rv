@@ -6,3 +6,5 @@
 /samples/verify/code/verilator
 /samples/verify/verify
 /samples/verify/*.fst*
+/a.out
+/*.vcd
