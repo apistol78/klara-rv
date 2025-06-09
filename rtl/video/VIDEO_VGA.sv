@@ -34,11 +34,11 @@ module VIDEO_VGA #(
 
 	output bit o_data_enable,
 
-	output bit [10:0] o_pos_x,
-	output bit [10:0] o_pos_y
+	output bit [11:0] o_pos_x,
+	output bit [11:0] o_pos_y
 );
-	bit [10:0] vga_h = 0;
-	bit [10:0] vga_v = 0;
+	bit [11:0] vga_h = 0;
+	bit [11:0] vga_v = 0;
 
 	initial begin
 		o_hsync = 0;
@@ -98,10 +98,10 @@ module VIDEO_VGA #(
 		o_vblank <= pl_vblank_b;
 	end	
 
-	bit [10:0] pl_pos_x_a = 0;
-	bit [10:0] pl_pos_x_b = 0;
-	bit [10:0] pl_pos_y_a = 0;
-	bit [10:0] pl_pos_y_b = 0;
+	bit [11:0] pl_pos_x_a = 0;
+	bit [11:0] pl_pos_x_b = 0;
+	bit [11:0] pl_pos_y_a = 0;
+	bit [11:0] pl_pos_y_b = 0;
 
 	always_ff @(posedge i_clock_out) begin
 		pl_pos_x_a <= vga_h - HBACK;
