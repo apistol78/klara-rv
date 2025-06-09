@@ -7,6 +7,7 @@
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "HAL/I2C.h"
+#include "HAL/Timer.h"
 
 #define I2C_CTRL (volatile uint32_t*)(I2C_BASE)
 
@@ -60,11 +61,16 @@ static uint8_t hal_i2c_rx(uint8_t ack)
 	for (x = 0; x < 8; x++)
 	{
 		d <<= 1;
+		
+		const uint32_t ms = hal_timer_get_ms();
 		do
 		{
+			if ((hal_timer_get_ms() - ms) > 10)
+				break;
 			I2C_WR_SCL_HIGH();
 		}
 		while (I2C_RD_SCL() == 0);    // wait for any SCL clock stretching
+
 		hal_i2c_dly();
 		if (I2C_RD_SDA())
 			d |= 1;
