@@ -48,7 +48,7 @@ module AUDIO_i2s_output #(
 	assign o_i2s_mclk = mclk;
 	assign o_i2s_sclk = sclk;
 	assign o_i2s_lrck = lrck;
-	assign o_i2s_sdout = sample[15];
+	assign o_i2s_sdout = sdout; //sample[15];
 
 	bit [1:0] sclk_pp = 2'b00;
 	bit [4:0] bitcnt = 0;
@@ -64,6 +64,7 @@ module AUDIO_i2s_output #(
 
 		sclk_pp <= { sclk_pp[0], sclk };
 		if (sclk_pp == 2'b10) begin
+			sdout <= sample[15];
 			sample <= { sample[14:0], 1'b0 };
 			bitcnt <= bitcnt + 1;
 			if (bitcnt >= 16 - 1) begin
