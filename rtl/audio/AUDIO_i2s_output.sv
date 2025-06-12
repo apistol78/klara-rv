@@ -45,11 +45,6 @@ module AUDIO_i2s_output #(
 		.o_clock(sclk)
 	);
 
-	assign o_i2s_mclk = mclk;
-	assign o_i2s_sclk = sclk;
-	assign o_i2s_lrck = lrck;
-	assign o_i2s_sdout = sdout; //sample[15];
-
 	bit [1:0] sclk_pp = 2'b00;
 	bit [4:0] bitcnt = 0;
 	bit lrck = 0;
@@ -57,6 +52,10 @@ module AUDIO_i2s_output #(
 	bit sdout = 0;
 	bit [1:0] busy = 2'b00;
 
+	assign o_i2s_mclk = mclk;
+	assign o_i2s_sclk = sclk_pp[1];
+	assign o_i2s_lrck = lrck;
+	assign o_i2s_sdout = sdout;
 	assign o_busy = busy[0];
 
 	always_ff @(posedge i_clock) begin
