@@ -5,6 +5,7 @@
 #include "verilator/VVerify.h"
 #include "verilator/VVerify___024root.h"
 
+//#define CHECK_FPU
 #define ITERATIONS 10000
 
 #define S0 8
@@ -1479,9 +1480,9 @@ bool verify_FSUB(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[34];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[34];
 	
-	log::info << *(float*)&r << Endl;
+	printf("%f\n", *(float*)&r);
 
 	if (*(float*)&r != (v2 - v1))
 		return false;
@@ -1504,7 +1505,7 @@ bool verify_FMUL(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[34];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[34];
 	
 	// printf("%f * %f = %f\n", v1, v2, *(float*)&r);
 
@@ -1529,9 +1530,9 @@ bool verify_FDIV(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[34];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[34];
 	
-	log::info << *(float*)&r << Endl;
+	printf("%f\n", *(float*)&r);
 
 	if (*(float*)&r != (v2 / v1))
 		return false;
@@ -1553,7 +1554,7 @@ bool verify_FCVT(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	int32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0];
+	const int32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0];
 	
 	//printf("%f => %d\n", v1, r);
 
@@ -1578,7 +1579,7 @@ bool verify_FLW(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
 	
 	//printf("%f => %d\n", v1, r);
 
@@ -1603,7 +1604,7 @@ bool verify_FSW(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__ram__DOT__data[0];
+	const uint32_t r = tb->Verify__DOT__ram__DOT__data[0];
 	
 	//printf("%f => %d\n", v1, r);
 
@@ -1627,7 +1628,7 @@ bool verify_FMV_X_W(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0];
 	
 	//printf("%f => %d\n", v1, r);
 
@@ -1651,7 +1652,7 @@ bool verify_FMV_W_X(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
 	
 	//printf("%f => %d\n", v1, r);
 
@@ -1745,7 +1746,7 @@ bool verify_FMADD(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
 	//printf("%f * %f = %f\n", v1, v2, *(float*)&r);
 
 	if (*(float*)&r != (v1 * v2 + v3))
@@ -1772,7 +1773,7 @@ bool verify_FMSUB(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
 	//printf("%f * %f - %f = %f\n", v1, v2, v3, *(float*)&r);
 
 	if (*(float*)&r != (v1 * v2 - v3))
@@ -1799,7 +1800,7 @@ bool verify_FNMADD(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
 	//printf("%f * %f = %f\n", v1, v2, *(float*)&r);
 
 	if (*(float*)&r != -(v1 * v2 + v3))
@@ -1826,7 +1827,7 @@ bool verify_FNMSUB(const char* trace)
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[32];
 	//printf("%f * %f = %f\n", v1, v2, *(float*)&r);
 
 	if (*(float*)&r != -(v1 * v2 - v3))

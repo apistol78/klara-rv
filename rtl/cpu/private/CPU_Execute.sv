@@ -166,7 +166,7 @@ module CPU_Execute (
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 		.i_request(fpu_request),
-		.i_op(i_data.fpu_operation),
+		.i_op(i_data.op),
 		.i_op1(`RS1),
 		.i_op2(`RS2),
 		.i_op3(`RS3),

@@ -95,7 +95,6 @@ module CPU_Decode(
 				is_R ? inst_R_imm :
 				is_CSR ? inst_CSR_imm :
 				32'h0;
-			//data.imm <= i_data.imm;
 		
 			data.arithmetic <= is_ARITHMETIC;
 			data.shift <= is_SHIFT;
@@ -115,11 +114,16 @@ module CPU_Decode(
 			
 `ifdef FPU_ENABLE
 			data.fpu <= is_FPU;
-			data.fpu_operation <= fpu_operation;
+			if (is_FPU) begin
+				data.op <= fpu_operation;
+			end
+			else begin
 `endif
-
 			`define OP data.op
 			`include "private/generated/Instructions_decode_ops.sv"
+`ifdef FPU_ENABLE
+			end
+`endif
 
 			data.strobe <= i_data.strobe;
 		end

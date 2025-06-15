@@ -79,6 +79,9 @@ typedef struct packed
 	bit complx;					//!< Complex instruction.
 	bit jump;					//!< Jump instruction.
 	bit jump_conditional;		//!< Conditional jump instruction.
+`ifdef FPU_ENABLE
+	bit fpu;					//!< FPU instruction.
+`endif
 	bit [3:0] alu_operation;	//!< ALU operation code.
 	bit [4:0] alu_operand1;		//!< ALU operand 1, one hot.
 	bit [4:0] alu_operand2;		//!< ALU operand 2, one hot.
@@ -86,11 +89,7 @@ typedef struct packed
 	bit memory_write;			//!< Memory write instruction.
 	bit [1:0] memory_width;		//!< Memory access width (00 = 1, 01 = 2, 10 = 4, 11 = invalid) in bytes.
 	bit memory_signed;			//!< Signed extended memory access.
-	bit [4:0] op;				//!< Complex instruction operation code.
-`ifdef FPU_ENABLE
-	bit fpu;					//!< FPU instruction.
-	bit [4:0] fpu_operation;	//!< FPU operation code.
-`endif
+	bit [4:0] op;				//!< Complex or FPU instruction operation code.
 }
 decode_data_t;
 
