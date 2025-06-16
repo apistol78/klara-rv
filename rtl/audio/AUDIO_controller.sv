@@ -95,7 +95,7 @@ module AUDIO_controller #(
 		end
 	end
 
-	always_comb begin //ff @(posedge i_clock) begin
+	always_comb begin
 		output_fifo_rd = !i_output_busy && !output_fifo_empty;
 	end
 
