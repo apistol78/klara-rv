@@ -4,6 +4,27 @@
         "random": "cpp",
         "limits": "cpp",
         "semaphore": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "bit": "cpp",
+        "compare": "c",
+        "ranges": "c",
+        "sstream": "cpp",
+        "regex": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "optional": "cpp",
+        "ratio": "cpp",
+        "system_error": "cpp",
+        "array": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "variant": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "coroutine": "cpp"
     }
 }

@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Compile",
+			"group": "build",
+			"linux": {
+				"command": ". ${workspaceRoot}/3rdp/oss-cad-suite-build/oss-cad-suite/environment;${workspaceRoot}/../traktor/bin/linux/releasestatic/Traktor.Run.App ${workspaceRoot}/build.run;",
+				"problemMatcher": [
+					"$gcc"
+				]
+			},
+		},
+	]
+}
