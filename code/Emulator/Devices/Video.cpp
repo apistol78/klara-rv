@@ -60,7 +60,6 @@ bool Video::writeU32(uint32_t address, uint32_t value)
 	}
 	else if ((address & 0x00f00000) == 0x00e00000)
 	{
-		//swap8in32(value);
 		const uint32_t idx = (address >> 2) & 255;
 		m_palette[idx] = value;
 	}
