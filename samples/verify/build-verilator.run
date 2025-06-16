@@ -29,6 +29,7 @@ local SOURCE < const > =
 	PATH_CPU .. "/private/CPU_DCache_Comb.sv",
 	PATH_CPU .. "/private/CPU_DCache_None.sv",
 	PATH_CPU .. "/private/CPU_DCache_Reg.sv",
+	PATH_CPU .. "/private/CPU_DCache_WB.sv",
 	PATH_CPU .. "/private/CPU_Decode.sv",
 	PATH_CPU .. "/private/CPU_Defines.sv",
 	PATH_CPU .. "/private/CPU_Divide.sv",

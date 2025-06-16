@@ -24,7 +24,7 @@ class Video : public IDevice
 	T_RTTI_CLASS;
 
 public:
-	explicit Video(uint32_t width, uint32_t height);
+	explicit Video(uint32_t displayWidth, uint32_t displayHeight);
 
 	virtual bool writeU32(uint32_t address, uint32_t value) override final;
 
@@ -37,9 +37,12 @@ public:
 private:
 	traktor::AlignedVector< uint8_t > m_framebuffer;
 	uint32_t m_palette[256];
-	uint32_t m_width = 0;
-	uint32_t m_height = 0;
+	uint32_t m_displayWidth = 0;
+	uint32_t m_displayHeight = 0;
+	uint32_t m_pitch = 0;
 	uint32_t m_skip = 0b11;
+	uint32_t m_skipH = 0;
+	uint32_t m_skipV = 0;
 	uint32_t m_readOffset = 0;
 	traktor::Ref< traktor::drawing::Image > m_image;
 };

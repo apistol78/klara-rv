@@ -28,12 +28,15 @@ static const struct
 {
 	int32_t width;
 	int32_t height;
-	int32_t pixels;
 	uint8_t skip;
+	uint8_t skipH;
+	uint8_t skipV;
 }
 c_modes[] =
 {
-	{ 720, 720, 720 * 720, 0b00 }
+	{ 720, 720, 0b00, 0, 0 },
+	{ 360, 360, 0b11, 0, 0 },
+	{ 320, 200, 0b11, 40, 160 },
 };
 
 int32_t hal_video_init()
@@ -46,22 +49,11 @@ int32_t hal_video_init()
 int32_t hal_video_set_mode(int32_t mode)
 {
 	volatile uint32_t* control = (volatile uint32_t*)VIDEO_CONTROL_BASE;
-	control[1] = c_modes[mode].width;
-	control[2] = c_modes[mode].skip;
+	control[1] = c_modes[mode].width;	// 4
+	control[2] = c_modes[mode].skip;	// 8
+	control[3] = c_modes[mode].skipH;	// 12
+	control[4] = c_modes[mode].skipV;	// 16
 	s_mode = mode;
-}
-
-void* hal_video_create_target()
-{
-	// void* target = malloc(c_modes[s_mode].pixels);
-	// memset(target, 0, c_modes[s_mode].pixels);
-	// return target;
-	return 0;
-}
-
-void hal_video_destroy_target(void* target)
-{
-	// free(target);
 }
 
 int32_t hal_video_get_resolution_width()
@@ -90,18 +82,6 @@ void* hal_video_get_secondary_target()
 {
 	uint8_t* ptr = (uint8_t*)s_primary_target;
 	return ptr + s_hidden_offset;
-}
-
-void hal_video_clear(uint8_t idx)
-{
-	uint8_t* framebuffer = (uint8_t*)hal_video_get_secondary_target();
-	memset(framebuffer, idx, c_modes[s_mode].pixels);
-}
-
-void hal_video_blit(const void* source)
-{
-	uint8_t* target = (uint8_t*)hal_video_get_secondary_target();
-	memcpy(target, source, c_modes[s_mode].pixels);
 }
 
 void hal_video_present()

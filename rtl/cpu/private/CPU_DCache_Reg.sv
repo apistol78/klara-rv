@@ -60,17 +60,32 @@ module CPU_DCache_Reg #(
 	state_t state = INITIALIZE;
 	bit [SIZE:0] flush_address = 0;
 
-	// Debug, only for verilated.
-`ifdef __VERILATOR__
-	bit [31:0] hit = 0;
-	bit [31:0] miss = 0;
+	// Write buffer.
+	bit wb_rw = 1'b0;
+	bit wb_request = 1'b0;
+	wire wb_ready;
+	bit [31:0] wb_address = 0;
+	wire [31:0] wb_rdata;
+	bit [31:0] wb_wdata = 0;
 
-	assign o_hit = hit;
-	assign o_miss = miss;
-`else
-	assign o_hit = 0;
-	assign o_miss = 0;
-`endif
+	CPU_DCache_WB wb(
+		.i_reset(i_reset),
+		.i_clock(i_clock),
+
+		.o_bus_rw(o_bus_rw),
+		.o_bus_request(o_bus_request),
+		.i_bus_ready(i_bus_ready),
+		.o_bus_address(o_bus_address),
+		.i_bus_rdata(i_bus_rdata),
+		.o_bus_wdata(o_bus_wdata),
+
+		.i_rw(wb_rw),
+		.i_request(wb_request),
+		.o_ready(wb_ready),
+		.i_address(wb_address),
+		.o_rdata(wb_rdata),
+		.i_wdata(wb_wdata)
+	);
 
 	// Cache memory.
 	bit cache_rw = 0;
@@ -100,13 +115,13 @@ module CPU_DCache_Reg #(
 	wire [31:0] cache_entry_address = { cache_rdata[31:2], 2'b00 };
 	wire [31:0] cache_entry_data = cache_rdata[63:32];
 
-	initial begin
-		o_bus_rw = 0;
-		o_bus_request = 0;
-		o_bus_address = 0;
-		o_bus_wdata = 0;
-		o_rdata = 0;
-	end
+	// initial begin
+	// 	o_bus_rw = 0;
+	// 	o_bus_request = 0;
+	// 	o_bus_address = 0;
+	// 	o_bus_wdata = 0;
+	// 	o_rdata = 0;
+	// end
 
 	always_comb begin
 		if (state == FLUSH_SETUP || state == FLUSH_CHECK || state == FLUSH_WRITE || state == INITIALIZE)
@@ -136,9 +151,6 @@ module CPU_DCache_Reg #(
 							if (cache_entry_valid && cache_entry_address == i_address) begin
 								o_rdata <= cache_entry_data;
 								o_ready <= 1'b1;
-`ifdef __VERILATOR__
-								hit <= hit + 1;
-`endif
 							end
 							else
 								state <= READ_SETUP;
@@ -152,9 +164,6 @@ module CPU_DCache_Reg #(
 								cache_rw <= 1'b1;
 								cache_wdata <= { i_wdata, i_address[31:2], 2'b11 };
 								o_ready <= 1'b1;
-`ifdef __VERILATOR__
-								hit <= hit + 1;
-`endif
 							end
 							else
 								state <= WRITE_SETUP;
@@ -162,10 +171,10 @@ module CPU_DCache_Reg #(
 						end
 					end
 					else begin
-						o_bus_rw <= i_rw;
-						o_bus_address <= i_address;
-						o_bus_request <= 1'b1;
-						o_bus_wdata <= i_wdata;
+						wb_rw <= i_rw;
+						wb_address <= i_address;
+						wb_request <= 1'b1;
+						wb_wdata <= i_wdata;
 						state <= PASS_THROUGH;
 					end
 				end
@@ -175,7 +184,7 @@ module CPU_DCache_Reg #(
 			// FLUSH
 			// ================
 			FLUSH_SETUP: begin
-				if (!i_bus_ready) begin
+				if (!wb_ready) begin
 					if (flush_address < RANGE)
 						state <= FLUSH_CHECK;
 					else begin
@@ -187,10 +196,10 @@ module CPU_DCache_Reg #(
 
 			FLUSH_CHECK: begin
 				if (cache_entry_dirty) begin
-					o_bus_rw <= 1'b1;
-					o_bus_address <= cache_entry_address;
-					o_bus_request <= 1'b1;
-					o_bus_wdata <= cache_entry_data;
+					wb_rw <= 1'b1;
+					wb_address <= cache_entry_address;
+					wb_request <= 1'b1;
+					wb_wdata <= cache_entry_data;
 					state <= FLUSH_WRITE;
 				end
 				else begin
@@ -200,10 +209,10 @@ module CPU_DCache_Reg #(
 			end
 
 			FLUSH_WRITE: begin
-				if (i_bus_ready) begin
+				if (wb_ready) begin
 					cache_rw <= 1'b1;
 					cache_wdata <= { cache_entry_data, cache_entry_address[31:2], 2'b01 };
-					o_bus_request <= 1'b0;
+					wb_request <= 1'b0;
 					state <= FLUSH_NEXT;
 				end
 			end
@@ -219,9 +228,9 @@ module CPU_DCache_Reg #(
 
 			// Cache not initialized, pass through to bus.
 			PASS_THROUGH: begin
-				if (i_bus_ready) begin
-					o_bus_request <= 1'b0;
-					o_rdata <= i_bus_rdata;
+				if (wb_ready) begin
+					wb_request <= 1'b0;
+					o_rdata <= wb_rdata;
 					o_ready <= 1'b1;
 					state <= IDLE;
 				end
@@ -234,32 +243,26 @@ module CPU_DCache_Reg #(
 			// Write, write back if necessary.
 			WRITE_SETUP: begin
 				if (cache_entry_dirty && cache_entry_address != i_address) begin
-					o_bus_rw <= 1'b1;
-					o_bus_address <= cache_entry_address;
-					o_bus_request <= 1'b1;
-					o_bus_wdata <= cache_entry_data;
+					wb_rw <= 1'b1;
+					wb_address <= cache_entry_address;
+					wb_request <= 1'b1;
+					wb_wdata <= cache_entry_data;
 					state <= WRITE_WAIT;
-`ifdef __VERILATOR__
-					miss <= miss + 1;
-`endif
 				end
 				else begin
 					cache_rw <= 1'b1;
 					cache_wdata <= { i_wdata, i_address[31:2], 2'b11 };
 					o_ready <= 1'b1;
 					state <= IDLE;
-`ifdef __VERILATOR__
-					hit <= hit + 1;
-`endif
 				end
 			end
 
 			// Wait until write back finish.
 			WRITE_WAIT: begin
-				if (i_bus_ready) begin
+				if (wb_ready) begin
 					cache_rw <= 1'b1;
 					cache_wdata <= { i_wdata, i_address[31:2], 2'b11 };
-					o_bus_request <= 1'b0;
+					wb_request <= 1'b0;
 					o_ready <= 1'b1;
 					state <= IDLE;
 				end
@@ -275,48 +278,42 @@ module CPU_DCache_Reg #(
 					o_rdata <= cache_entry_data;
 					o_ready <= 1'b1;
 					state <= IDLE;
-`ifdef __VERILATOR__
-					hit <= hit + 1;
-`endif
 				end
 				else begin
 					if (/* cache_entry_valid && */ cache_entry_dirty) begin
-						o_bus_rw <= 1'b1;
-						o_bus_address <= cache_entry_address;
-						o_bus_request <= 1'b1;
-						o_bus_wdata <= cache_entry_data;
+						wb_rw <= 1'b1;
+						wb_address <= cache_entry_address;
+						wb_request <= 1'b1;
+						wb_wdata <= cache_entry_data;
 						state <= READ_WB_WAIT;
 					end
 					else begin
-						o_bus_rw <= 1'b0;
-						o_bus_address <= i_address;
-						o_bus_request <= 1'b1;
+						wb_rw <= 1'b0;
+						wb_address <= i_address;
+						wb_request <= 1'b1;
 						state <= READ_BUS_WAIT;
 					end
-`ifdef __VERILATOR__
-					miss <= miss + 1;
-`endif
 				end
 			end
 
 			// Write previous entry back to bus.
 			READ_WB_WAIT: begin
-				if (i_bus_ready) begin
-					o_bus_request <= 1'b0;
+				if (wb_ready) begin
+					wb_request <= 1'b0;
 					state <= READ_BUS_WAIT;
 				end
 			end
 
 			// Wait until new data read from bus.
 			READ_BUS_WAIT: begin
-				o_bus_rw <= 1'b0;
-				o_bus_address <= i_address;
-				o_bus_request <= 1'b1;
-				if (i_bus_ready) begin
+				wb_rw <= 1'b0;
+				wb_address <= i_address;
+				wb_request <= 1'b1;
+				if (wb_ready) begin
 					cache_rw <= 1'b1;
-					cache_wdata <= { i_bus_rdata, i_address[31:2], 2'b01 };
-					o_bus_request <= 1'b0;
-					o_rdata <= i_bus_rdata;
+					cache_wdata <= { wb_rdata, i_address[31:2], 2'b01 };
+					wb_request <= 1'b0;
+					o_rdata <= wb_rdata;
 					o_ready <= 1'b1;
 					state <= IDLE;
 				end

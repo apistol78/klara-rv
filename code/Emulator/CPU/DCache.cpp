@@ -9,6 +9,7 @@
 #include <Core/Log/Log.h>
 #include <Core/Misc/String.h>
 #include "Emulator/CPU/DCache.h"
+#include "Emulator/CPU/DCacheWB.h"
 #include "Emulator/CPU/Bus.h"
 
 using namespace traktor;
@@ -17,8 +18,7 @@ T_IMPLEMENT_RTTI_CLASS(L"DCache", DCache, Object)
 
 DCache::DCache(Bus* bus)
 :	m_bus(bus)
-,   m_hits(0)
-,   m_misses(0)
+,	m_wb(new DCacheWB(bus))
 {
     for (uint32_t i = 0; i < c_nlines; ++i)
 	{
@@ -40,7 +40,10 @@ void DCache::writeU32(uint32_t address, uint32_t value)
 		Line& line = m_data[tag];
 
 		if (line.address != address && line.valid && line.dirty)
-			m_bus->writeU32(line.address, line.word);
+		{
+			// Need to evict line which contain dirty data.
+			m_wb->writeU32(line.address, line.word);
+		}
 
 		line.address = address;
 		line.word = value;
@@ -48,7 +51,7 @@ void DCache::writeU32(uint32_t address, uint32_t value)
 		line.dirty = true;
 	}
 	else
-		m_bus->writeU32(address, value);
+		m_wb->writeU32(address, value);
 }
 
 uint32_t DCache::readU32(uint32_t address)
@@ -64,10 +67,13 @@ uint32_t DCache::readU32(uint32_t address)
 			return line.word;
 		}
 
-		if (line.valid && line.dirty)
-			m_bus->writeU32(line.address, line.word);
+		if (/*line.address != address && */ line.valid && line.dirty)
+		{
+			// Need to evict line which contain dirty data.
+			m_wb->writeU32(line.address, line.word);
+		}
 
-		const uint32_t word = m_bus->readU32(address);
+		const uint32_t word = m_wb->readU32(address);
 
 		line.address = address;
 		line.word = word;
@@ -78,7 +84,12 @@ uint32_t DCache::readU32(uint32_t address)
 	    return word;
 	}
 	else
-		return m_bus->readU32(address);
+		return m_wb->readU32(address);
+}
+
+void DCache::processWriteQueue()
+{
+	m_wb->process();
 }
 
 void DCache::flush()
@@ -88,7 +99,7 @@ void DCache::flush()
 		Line& line = m_data[i];
 		if (line.valid && line.dirty)
 		{
-			m_bus->writeU32(line.address, line.word);
+			m_wb->writeU32(line.address, line.word);
 			line.dirty = false;
 		}
 	}

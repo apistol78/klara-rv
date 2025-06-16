@@ -112,13 +112,10 @@ local function buildHostWin64()
 end
 
 function main()
-	
 	if os.identifier == "windows" then
 		if not buildHostWin64() then return 1 end
 	else
 		if not buildHostLinux() then return 1 end
 	end
-
 	stdout:printLn("Build successful.")
-	return 0
 end
