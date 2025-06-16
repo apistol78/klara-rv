@@ -562,7 +562,7 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 		// kernel_leave_critical();
 		// kernel_sleep(100);
 		// kernel_enter_critical();
-		hal_timer_wait_ms(100);
+		hal_timer_wait_ms(10);
 	}
 	if (!result)
 	{
@@ -599,6 +599,7 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 			// kernel_leave_critical();
 			// kernel_yield();
 			// kernel_enter_critical();
+			hal_timer_wait_ms(1);
 		}
 		else if (try > 10000)
 		{
@@ -704,7 +705,7 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 		// kernel_leave_critical();
 		// kernel_sleep(100);
 		// kernel_enter_critical();
-		hal_timer_wait_ms(100);
+		hal_timer_wait_ms(10);
 	}
 	if (!result)
 	{
