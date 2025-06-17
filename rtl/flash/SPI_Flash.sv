@@ -22,7 +22,7 @@ module SPI_Flash #(
     output bit SPI_nCS,
     output SPI_CLK,
     output SPI_MOSI,
-    input SPI_MISO,
+    input SPI_MISO
 );
 	typedef enum bit [7:0]
 	{
@@ -43,10 +43,10 @@ module SPI_Flash #(
     bit [7:0] count;
 
     assign o_rdata = { rdata[7:0], rdata[15:8], rdata[23:16], rdata[31:24] };
-    assign SPI_CLK = !SPI_nCS && i_clock;
+    assign SPI_CLK = !SPI_nCS && !i_clock;
     assign SPI_MOSI = caddr[31];
 
-    always_ff @(negedge i_clock) begin
+    always_ff @(posedge i_clock) begin
 
         o_ready <= 1'b0;
 
