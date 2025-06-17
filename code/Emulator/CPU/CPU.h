@@ -71,16 +71,15 @@ private:
 	traktor::Ref< DCache > m_dcache;
 	traktor::Ref< ICache > m_icache;
 	traktor::Ref< traktor::OutputStream > m_trace;
+	traktor::Timer m_timer;
 	uint32_t m_pc;
 	uint32_t m_next;
 	uint32_t m_registers[32];
 	float m_flt_registers[32];
 	uint32_t m_csr[4096];
 	uint32_t m_interrupt;
-	bool m_waitForInterrupt;
-
 	uint64_t m_cycles;
-	traktor::Timer m_timer;
+	bool m_waitForInterrupt;
 
 	bool decode(uint32_t word);
 

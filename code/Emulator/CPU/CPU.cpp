@@ -143,7 +143,7 @@ struct FormatU
 
 	inline static FormatU parse(uint32_t word)
 	{
-		FormatU f = {
+		const FormatU f = {
 			(word >> 7) & 0x1f,
 			(int32_t)(word & 0xfffff000)
 		};
