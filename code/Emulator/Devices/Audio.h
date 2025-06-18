@@ -9,8 +9,15 @@
 #pragma once
 
 #include <Core/Ref.h>
-#include <Core/Io/IStream.h>
 #include "Emulator/CPU/IDevice.h"
+
+namespace traktor::sound
+{
+
+class AudioSystem;
+class IAudioBuffer;
+
+}
 
 class Audio : public IDevice
 {
@@ -26,9 +33,7 @@ public:
 	virtual bool tick(CPU* cpu) override final;
 
 private:
-	traktor::Ref< traktor::IStream > m_stream;
-    uint32_t m_queued = 0;
-    uint32_t m_counter = 0;
-	uint32_t m_written = 0;
+	traktor::Ref< traktor::sound::AudioSystem > m_audioSystem;
+	traktor::Ref< traktor::sound::IAudioBuffer > m_audioBuffer;
 	uint32_t m_channel = 0;
 };
