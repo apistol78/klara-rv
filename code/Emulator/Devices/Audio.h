@@ -8,7 +8,10 @@
 */
 #pragma once
 
+#include <functional>
+
 #include <Core/Ref.h>
+
 #include "Emulator/CPU/IDevice.h"
 
 namespace traktor::sound
@@ -32,8 +35,12 @@ public:
 
 	virtual bool tick(CPU* cpu) override final;
 
+	void setCallback(const std::function< void() >& callback);
+
 private:
 	traktor::Ref< traktor::sound::AudioSystem > m_audioSystem;
 	traktor::Ref< traktor::sound::IAudioBuffer > m_audioBuffer;
+	std::function< void() > m_callback;
 	uint32_t m_channel = 0;
+	uint32_t m_lastQ = 0;
 };

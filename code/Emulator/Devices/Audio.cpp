@@ -135,5 +135,17 @@ uint32_t Audio::readU32(uint32_t address) const
 
 bool Audio::tick(CPU* cpu)
 {
+	WrappedAudioBuffer* wab = (WrappedAudioBuffer*)m_audioBuffer.ptr();
+	const uint32_t q = wab->queued();
+
+	if (m_lastQ >= 2048 && q < 2048)
+		m_callback();
+
+	m_lastQ = q;
 	return true;
+}
+
+void Audio::setCallback(const std::function< void() >& callback)
+{
+	m_callback = callback;
 }

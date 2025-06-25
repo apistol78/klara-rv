@@ -27,6 +27,8 @@ public:
 		virtual void write(uint8_t controlAddr, uint8_t data) = 0;
 
 		virtual void read(uint8_t controlAddr, uint8_t length, uint8_t* outData) = 0;
+
+		virtual bool tick(CPU* cpu) = 0;
 	};
 
 	virtual bool writeU32(uint32_t address, uint32_t value) override final;

@@ -9,7 +9,9 @@
 #pragma once
 
 #include <functional>
+
 #include <Core/Timer/Timer.h>
+
 #include "Emulator/CPU/IDevice.h"
 
 class Timer : public IDevice

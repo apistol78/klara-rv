@@ -60,7 +60,13 @@ uint32_t I2C::readU32(uint32_t address) const
 
 bool I2C::tick(CPU* cpu)
 {
-	return true;
+	bool result = true;
+	for (auto slave : m_slaves)
+	{
+		if (slave.second)
+			result &= slave.second->tick(cpu);
+	}
+	return result;
 }
 
 void I2C::addSlave(uint8_t address, ISlave* slave)
