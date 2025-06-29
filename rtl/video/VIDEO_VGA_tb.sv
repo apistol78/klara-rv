@@ -19,19 +19,19 @@ module VIDEO_VGA_tb();
 	wire vga_hblank;
 	wire vga_vblank;
 	wire vga_data_enable;
-	wire [11:0] vga_pos_x;
-	wire [11:0] vga_pos_y;
+	wire [10:0] vga_pos_x;
+	wire [10:0] vga_pos_y;
 
 	VIDEO_VGA #(
 		// 720 0 20 20 40 720 0 15 15 15 0 0 0 60 0 36720000 4
-		.HLINE(720+20+40),	    // whole line
-		.HBACK(40),		        // back porch
-		.HFRONT(20),	        // front porch
-		.HPULSE(20),	        // sync pulse
-		.VLINE(720+15+15+15),    // whole frame
-		.VBACK(15),		        // back porch
-		.VFRONT(15),	        // front porch
-		.VPULSE(15),	        // sync pulse
+		.HLINE(720),	// horizontal pixels
+		.HBACK(40),		// back porch
+		.HFRONT(20),	// front porch
+		.HPULSE(20),	// sync pulse
+		.VLINE(720),	// vertial lines
+		.VBACK(15),		// back porch
+		.VFRONT(15),	// front porch
+		.VPULSE(15),	// sync pulse
 		.VSPOL(0),
 		.HSPOL(0)
 	) vga(
@@ -54,11 +54,11 @@ module VIDEO_VGA_tb();
 		forever clk = #5 ~clk;        
 	end
 */
-    always #13.615 clk = ~clk;
+	always #13.615 clk = ~clk;
 
-    initial begin
-        $dumpfile("VIDEO_VGA_tb.vcd");
-        $dumpvars(0, VIDEO_VGA_tb);
+	initial begin
+		$dumpfile("VIDEO_VGA_tb.vcd");
+		$dumpvars(0, VIDEO_VGA_tb);
 
 		repeat (1000000) @ (posedge clk);
 
