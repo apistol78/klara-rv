@@ -26,12 +26,11 @@ module VIDEO_VGA #(
 	input i_clock_out,			//!< Signal output clock domain.
 
 	output bit o_clock,
-	
 	output bit o_hsync,			//!< 1 when sync.
 	output bit o_vsync,			//!< 1 when sync.
-
+	output bit o_hblank,		//!< 1 when output enable.
+	output bit o_vblank,		//!< 1 when output enable.
 	output bit o_data_enable,
-
 	output bit [10:0] o_pos_x,
 	output bit [10:0] o_pos_y
 );
@@ -54,11 +53,20 @@ module VIDEO_VGA #(
 	end
 
 	generate if (!USE_CLOCK_OUT) begin
-		assign o_clock = ~i_clock;
+		assign o_clock = i_clock;
 
 		always_comb begin
 			o_hsync = (vga_h >= HPULSE) ? HSPOL : (1 - HSPOL);
 			o_vsync = (vga_v >= VPULSE) ? VSPOL : (1 - VSPOL);
+		end
+
+		always_comb begin
+			o_hblank = 
+				(vga_h < HPULSE + HBACK) ||
+				(vga_h > HPULSE + HBACK + HLINE);
+			o_vblank = 
+				(vga_v < VPULSE + VBACK) ||
+				(vga_v > VPULSE + VBACK + VLINE);
 		end
 
 		always_ff @(posedge i_clock) begin
@@ -106,6 +114,24 @@ module VIDEO_VGA #(
 			o_hsync <= pl_hsync_b;
 			o_vsync <= pl_vsync_b;
 		end
+
+		bit pl_hblank_a = 0;
+		bit pl_hblank_b = 0;
+		bit pl_vblank_a = 0;
+		bit pl_vblank_b = 0;
+
+		always_ff @(posedge i_clock_out) begin
+			pl_hblank_a <= 
+				(vga_h < HPULSE + HBACK) ||
+				(vga_h > HPULSE + HBACK + HLINE);
+			pl_vblank_a <= 
+				(vga_v < VPULSE + VBACK) ||
+				(vga_v > VPULSE + VBACK + VLINE);
+			pl_hblank_b <= pl_hblank_a;
+			pl_vblank_b <= pl_vblank_a;
+			o_hblank <= pl_hblank_b;
+			o_vblank <= pl_vblank_b;
+		end	
 
 		bit [10:0] pl_pos_x_a = 0;
 		bit [10:0] pl_pos_x_b = 0;

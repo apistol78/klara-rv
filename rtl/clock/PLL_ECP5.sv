@@ -6,11 +6,14 @@ module PLL_ECP5 #(
 	parameter CLKOP_DIV = 1,     // primary output clock divider
 	parameter CLKOP_CPHASE = 0,  // primary output clock phase
 	parameter CLKOS_DIV = 1,     // secondary output clock divider
-	parameter CLKOS_CPHASE = 0   // secondary output clock phase
+	parameter CLKOS_CPHASE = 0,  // secondary output clock phase
+	parameter CLKOS2_DIV = 1,    // tertiary output clock divider
+	parameter CLKOS2_CPHASE = 0  // tertiary output clock phase
 )(
 	input  wire i_clk,      	// input clock
-	output wire o_clk1,  		// output 5x clock
+	output wire o_clk1,  		// output clock
 	output wire o_clk2,    		// output clock
+	output wire o_clk3,			// output clock
 	output reg  o_clk_locked   	// clock locked?
  );
 
@@ -32,14 +35,22 @@ module PLL_ECP5 #(
 		.OUTDIVIDER_MUXC("DIVC"),
 		.OUTDIVIDER_MUXD("DIVD"),
 		.CLKI_DIV(CLKI_DIV),
+
 		.CLKOP_ENABLE("ENABLED"),
 		.CLKOP_DIV(CLKOP_DIV),
 		.CLKOP_CPHASE(CLKOP_CPHASE),
 		.CLKOP_FPHASE(0),
+
 		.CLKOS_ENABLE("ENABLED"),
 		.CLKOS_DIV(CLKOS_DIV),
 		.CLKOS_CPHASE(CLKOS_CPHASE),
 		.CLKOS_FPHASE(0),
+
+		.CLKOS2_ENABLE("ENABLED"),
+		.CLKOS2_DIV(CLKOS2_DIV),
+		.CLKOS2_CPHASE(CLKOS2_CPHASE),
+		.CLKOS2_FPHASE(0),
+
 		.FEEDBK_PATH("CLKOP"),
 		.CLKFB_DIV(CLKFB_DIV)
 	) pll_i (
@@ -48,6 +59,7 @@ module PLL_ECP5 #(
 		.CLKI(i_clk),
 		.CLKOP(o_clk1),
 		.CLKOS(o_clk2),
+		.CLKOS2(o_clk3),
 		.CLKFB(o_clk1),
 		.CLKINTFB(),
 		.PHASESEL0(1'b0),

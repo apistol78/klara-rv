@@ -11,7 +11,7 @@
 
 module SRAM_controller #(
 	parameter FREQUENCY = 100_000_000,
-	params SRAM_ADDRESS_WIDTH = 18
+	parameter SRAM_ADDRESS_WIDTH = 18
 )(
 	input i_reset,
 	input i_clock,
@@ -23,7 +23,11 @@ module SRAM_controller #(
 	output bit o_ready,
 
 	output bit [SRAM_ADDRESS_WIDTH-1:0] SRAM_A,
-	inout [15:0] SRAM_D,
+	
+	output bit [15:0] SRAM_D_w,
+	input [15:0] SRAM_D_r,
+	output bit SRAM_D_rw,
+
 	output SRAM_CE_n,
 	output bit SRAM_OE_n,
 	output bit SRAM_WE_n,
@@ -48,7 +52,8 @@ module SRAM_controller #(
 	assign SRAM_UB_n = 1'b0;
 	
 	// Output 
-	assign SRAM_D = i_rw ? wdata : 16'hz;
+	assign SRAM_D_rw = i_request && i_rw;
+	assign SRAM_D_w = wdata;
 
 	always_comb begin
 		SRAM_OE_n = ~(i_request && !i_rw);
@@ -87,9 +92,9 @@ module SRAM_controller #(
 			if (i_request) begin
 				if (!i_rw) begin
 					if (count == READ_OFFSET)
-						o_rdata[15:0] <= SRAM_D;
+						o_rdata[15:0] <= SRAM_D_r;
 					else if (count == CYCLES / 2 + READ_OFFSET)
-						o_rdata[31:16] <= SRAM_D;
+						o_rdata[31:16] <= SRAM_D_r;
 				end
 			 	count <= count + 1;
 			end
