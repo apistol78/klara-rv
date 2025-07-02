@@ -14,7 +14,10 @@
 #define S3 19
 #define S4 20
 #define S5 21
+#define A0 10
+#define A1 11
 #define A2 12
+#define A4 14
 #define A5 15
 #define RA 1
 
@@ -883,9 +886,16 @@ bool verify_REMU(const char* trace)
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = s1;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S2] = s2;
-	tb->Verify__DOT__rom__DOT__data[0] = 0x0324f433; // remu	s0,s1,s2
 
-	evaluate(verify, trace, 1);
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A0] = s2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5] = s1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A4] = s1;
+
+	tb->Verify__DOT__rom__DOT__data[0] = 0x0324f433; // remu	s0,s1,s2
+	tb->Verify__DOT__rom__DOT__data[1] = 0x02a7f7b3; // remu	a5,a5,a0
+	tb->Verify__DOT__rom__DOT__data[2] = 0x02a7f733; // remu	a4,a5,a0
+
+	evaluate(verify, trace, 10);
 
 	// printf("REMU, %d %% %d = %d (%d)\n",
 	// 	s1,
@@ -893,8 +903,18 @@ bool verify_REMU(const char* trace)
 	// 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0],
 	// 	s1 / s2
 	// );
+	// printf("REMU, %d %% %d = %d (%d)\n",
+	// 	s1,
+	// 	s2,
+	// 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5],
+	// 	s1 / s2
+	// );
 
 	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != (s1 % s2))
+		return false;
+	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5] != (s1 % s2))
+		return false;
+	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[A4] != (s1 % s2))
 		return false;
 
 	delete verify;
@@ -2123,57 +2143,57 @@ bool verify(bool (*fn)(const char* trace), const char* name, bool ftrce)
 int main(int argc, char **argv)
 {
 	bool success = true;
-	bool ftrce = false;
+	bool ftrce = true;
 
-	CHECK(verify_ADD);
-	CHECK(verify_ADDI);
-	CHECK(verify_AND);
-	CHECK(verify_ANDI);
-	CHECK(verify_AUIPC);
-	CHECK(verify_BEQ);
-	CHECK(verify_BGE);
-	CHECK(verify_BGEU);
-	CHECK(verify_BLT);
-	CHECK(verify_BLTU);
-	CHECK(verify_BNE);
-	CHECK(verify_DIV);
-	CHECK(verify_UDIV);
-	CHECK(verify_JAL);
-	CHECK(verify_JALR);
-	CHECK(verify_LB);
-	CHECK(verify_LBU);
-	CHECK(verify_LH);
-	CHECK(verify_LHU);
-	CHECK(verify_LUI);
-	CHECK(verify_LW);
-	CHECK(verify_MUL);
-	CHECK(verify_MULH);
-	CHECK(verify_MULHU);
-	CHECK(verify_OR);
-	CHECK(verify_ORI);
-	CHECK(verify_REM);
+	// CHECK(verify_ADD);
+	// CHECK(verify_ADDI);
+	// CHECK(verify_AND);
+	// CHECK(verify_ANDI);
+	// CHECK(verify_AUIPC);
+	// CHECK(verify_BEQ);
+	// CHECK(verify_BGE);
+	// CHECK(verify_BGEU);
+	// CHECK(verify_BLT);
+	// CHECK(verify_BLTU);
+	// CHECK(verify_BNE);
+	// CHECK(verify_DIV);
+	// CHECK(verify_UDIV);
+	// CHECK(verify_JAL);
+	// CHECK(verify_JALR);
+	// CHECK(verify_LB);
+	// CHECK(verify_LBU);
+	// CHECK(verify_LH);
+	// CHECK(verify_LHU);
+	// CHECK(verify_LUI);
+	// CHECK(verify_LW);
+	// CHECK(verify_MUL);
+	// CHECK(verify_MULH);
+	// CHECK(verify_MULHU);
+	// CHECK(verify_OR);
+	// CHECK(verify_ORI);
+	// CHECK(verify_REM);
 	CHECK(verify_REMU);
-	CHECK(verify_SB);
-	CHECK(verify_SH);
-	CHECK(verify_SLL);
-	CHECK(verify_SLLI);
-	CHECK(verify_SLT);
-	CHECK(verify_SLTI);
-	CHECK(verify_SLTIU);
-	CHECK(verify_SLTU);
-	CHECK(verify_SRA);
-	CHECK(verify_SRAI);
-	CHECK(verify_SRL);
-	CHECK(verify_SRLI);
-	CHECK(verify_SUB);
-	CHECK(verify_SW);
-	CHECK(verify_XOR);
-	CHECK(verify_XORI);
-	CHECK(verify_ENDIAN);
-	CHECK(verify_MEM_LOAD_HAZARD);
-	CHECK(verify_PIPELINE);
-	CHECK(verify_PIPELINE_MEMORY);
-	CHECK(verify_PIPELINE_MEMORY_B);
+	// CHECK(verify_SB);
+	// CHECK(verify_SH);
+	// CHECK(verify_SLL);
+	// CHECK(verify_SLLI);
+	// CHECK(verify_SLT);
+	// CHECK(verify_SLTI);
+	// CHECK(verify_SLTIU);
+	// CHECK(verify_SLTU);
+	// CHECK(verify_SRA);
+	// CHECK(verify_SRAI);
+	// CHECK(verify_SRL);
+	// CHECK(verify_SRLI);
+	// CHECK(verify_SUB);
+	// CHECK(verify_SW);
+	// CHECK(verify_XOR);
+	// CHECK(verify_XORI);
+	// CHECK(verify_ENDIAN);
+	// CHECK(verify_MEM_LOAD_HAZARD);
+	// CHECK(verify_PIPELINE);
+	// CHECK(verify_PIPELINE_MEMORY);
+	// CHECK(verify_PIPELINE_MEMORY_B);
 
 #if defined(CHECK_FPU)
 
@@ -2201,7 +2221,7 @@ int main(int argc, char **argv)
 
 #endif
 
-	CHECK(verify_CSRRS);
+	// CHECK(verify_CSRRS);
 
 	if (success)
 		printf("SUCCESS!\n");

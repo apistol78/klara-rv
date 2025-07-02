@@ -107,9 +107,9 @@ module CPU_Divide(
 	input i_signed,
 	input [31:0] i_numerator,
 	input [31:0] i_denominator,
-	output o_ready,
-	output [31:0] o_result,
-	output [31:0] o_remainder
+	output bit o_ready,
+	output bit [31:0] o_result,
+	output bit [31:0] o_remainder
 );
 
 	wire snumerator = i_numerator[31];
@@ -118,37 +118,42 @@ module CPU_Divide(
 	bit [31:0] unumerator;
 	bit [31:0] udenominator;
 
-	bit request = 1'b0;
 	bit [31:0] result;
 	bit [31:0] remainder;
 	bit ack = 1'b0;
 
+	bit [1:0] s;
+	bit llth = 0;
+
+	wire valid = llth && i_latch;
+
 	divfunc #(
 		.XLEN(32),
-		.STAGE_LIST(32'b00100010001000100010001000100101)
+		.STAGE_LIST(32'b10100010001000100010001000100101)
 	) df(
 		.clk(i_clock),
 		.rst(~i_latch),
 		.a(unumerator),
 		.b(udenominator),
-		.vld(request),
+		.vld(valid),
 		.quo(result),
 		.rem(remainder),
 		.ack(ack)
 	);
 
-	bit [1:0] s;
 	always_ff @(posedge i_clock) begin
-		request <= i_latch;
-		unumerator <= (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
-		udenominator <= (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;		
-
-		if (i_latch)
+		llth <= i_latch;
+		if (i_latch) begin
+			unumerator <= (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
+			udenominator <= (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;		
 			s <= { snumerator, sdenominator };
+		end
 	end
 
-	assign o_ready = ack; // && i_latch;
-	assign o_result = (i_signed && s[0] != s[1]) ? -$signed(result) : result;
-	assign o_remainder = (i_signed && s[1]) ? -$signed(remainder) : remainder;
+	always_comb begin
+		o_ready = i_latch && ack;
+		o_result = (i_signed && s[0] != s[1]) ? -$signed(result) : result;
+		o_remainder = (i_signed && s[1]) ? -$signed(remainder) : remainder;
+	end
 
 endmodule
