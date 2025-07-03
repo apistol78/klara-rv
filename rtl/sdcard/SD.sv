@@ -70,9 +70,11 @@ module SD (
 	initial o_rdata = 32'h0000_0000;
 
 	assign SD_CLK = clk;
+	
 	assign SD_CMD_dir = cdir;
 	assign SD_CMD_out = cmd;
 	wire cmd_in = SD_CMD_in;
+
 	assign SD_DAT_dir = ddir;
 	assign SD_DAT_out = dat;
 	wire [3:0] dat_in = SD_DAT_in;

@@ -6,27 +6,29 @@
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-// #include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 #include "HAL/Common.h"
 #include "HAL/CRC.h"
 #include "HAL/SD.h"
 #include "HAL/Timer.h"
 
-//#define SD_TRACE_INFO(...) printf(__VA_ARGS__)
-//#define SD_TRACE_ERROR(...) printf(__VA_ARGS__)
-// #define SD_ASSERT(cond) \
-// 	if (!(cond)) { \
-// 		SD_TRACE_ERROR("[SD] Condition \"%s\" failed\n", #cond); \
-// 		return 0; \
-// 	}
-
-#define SD_TRACE_INFO(...)
-#define SD_TRACE_ERROR(...)
-#define SD_ASSERT(cond) \
+#if 0
+#	define SD_TRACE_INFO(...) printf(__VA_ARGS__)
+#	define SD_TRACE_ERROR(...) printf(__VA_ARGS__)
+#	define SD_ASSERT(cond) \
+	if (!(cond)) { \
+		SD_TRACE_ERROR("[SD] Condition \"%s\" failed\n", #cond); \
+		return 0; \
+	}
+#else
+#	define SD_TRACE_INFO(...)
+#	define SD_TRACE_ERROR(...)
+#	define SD_ASSERT(cond) \
 	if (!(cond)) { \
 		return 0; \
 	}
+#endif
 
 #define SD_CTRL 	(volatile uint32_t*)(SD_BASE)
 #define SD_HW_IO	(volatile uint32_t*)(SD_BASE + 4)
@@ -69,17 +71,29 @@
 #define SD_VHS_2V7_3V6				0x01
 #define CMD8_DEFAULT_TEST_PATTERN	0xaa
 
-typedef enum
-{
-    SD_STATE_IDLE = 0,
-    SD_STATE_READY = 1,    
-    SD_STATE_IDENT = 2,
-    SD_STATE_STBY = 3,
-    SD_STATE_TRAN    
-} SD_CURRENT_STATE;
-
 static int32_t s_mode = SD_MODE_SW;
 static int32_t s_dataBits = 1;
+
+#define SD_WAIT_SETUP() hal_sd_dummy_delay(1)
+
+static void hal_sd_dummy_delay(uint32_t clockCnt)
+{
+	for (uint32_t i = 0; i < clockCnt; ++i)
+	{
+		__asm__ volatile (
+			"nop	\n"
+			"nop	\n"
+			"nop	\n"
+			"nop	\n"
+			"nop	\n"
+			"nop	\n"
+			"nop	\n"
+			"nop	\n"
+			"nop	\n"
+			"nop	\n"
+		);		
+	}
+}
 
 static void hal_sd_dummy_clock(uint32_t clockCnt)
 {
@@ -94,29 +108,29 @@ static void hal_sd_send_cmd(uint8_t cmd[6], int32_t cmdLen)
 {
 	SD_TRACE_INFO("[SD] sd_send_cmd %02x, len %d\n", cmd[0], cmdLen);
 
-	//  if (s_mode == SD_MODE_SW)
+	SD_TRACE_INFO("[SD] >> ");
+	for (int32_t i = 0; i < cmdLen; i++)
 	{
-		SD_WR_CMD_DIR_OUT();
-		for (int32_t i = 0; i < cmdLen; i++)
+		const uint8_t data = cmd[i];
+		SD_TRACE_INFO("%02x ", data);
+	}
+	SD_TRACE_INFO("\n");
+
+	SD_WR_CMD_DIR_OUT();
+	for (int32_t i = 0; i < cmdLen; i++)
+	{
+		uint8_t data = cmd[i];
+		for (int32_t k = 0; k < 8; k++)
 		{
-			uint8_t data = cmd[i];
-			for (int32_t k = 0; k < 8; k++)
-			{
-				SD_WR_CLK_LOW();
-				if (data & 0x80)
-					{ SD_WR_CMD_HIGH(); }
-				else
-					{ SD_WR_CMD_LOW(); }
-				SD_WR_CLK_HIGH();  
-				data <<= 1;
-			}
+			SD_WR_CLK_LOW();
+			if (data & 0x80)
+				{ SD_WR_CMD_HIGH(); }
+			else
+				{ SD_WR_CMD_LOW(); }
+			SD_WR_CLK_HIGH();  
+			data <<= 1;
 		}
 	}
-	// else
-	// {
-	// 	for (int32_t i = 0; i < cmdLen; ++i)
-	// 		*SD_HW_IO = cmd[i];
-	// }
 }
 
 static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
@@ -130,35 +144,26 @@ static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
 	{
 		SD_WR_CLK_LOW();
 		SD_WR_CLK_HIGH();
+		SD_WAIT_SETUP();
 		if (!SD_RD_CMD())
 			break;
-
-		__asm__ volatile (
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-		);
 
 		if (try > 500000)
 		{
 			SD_TRACE_ERROR("[SD] No response, timeout\n");
 			return 0;
 		}
+
+		hal_sd_dummy_delay(1);
 	}
   
 	SD_WR_CLK_LOW();
 	SD_WR_CLK_HIGH();
+	SD_WAIT_SETUP();
 	if (SD_RD_CMD())
 	{
 		SD_TRACE_ERROR("[SD] Response, unexpected bit\n");
-		return 0;
+		// return 0;
 	}
 
 	int32_t value = 0;
@@ -167,6 +172,7 @@ static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
 	{
 		SD_WR_CLK_LOW();
 		SD_WR_CLK_HIGH();
+		SD_WAIT_SETUP();
 		if (SD_RD_CMD())
 			value |= 0x80 >> bit;
 		if (bit >= 7)
@@ -180,6 +186,14 @@ static int32_t hal_sd_get_response(uint8_t* outResponse, int32_t responseLen)
 			bit++;
 	}
 
+	SD_TRACE_INFO("[SD] << ");
+	for (int32_t i = 0; i < responseLen; i++)
+	{
+		const uint8_t data = outResponse[i];
+		SD_TRACE_INFO("%02x ", data);
+	}
+	SD_TRACE_INFO("\n");
+
 	hal_sd_dummy_clock(8);
 	return 1;	
 }
@@ -192,11 +206,20 @@ static int32_t hal_sd_cmd0()
 	uint8_t response[1];
 	uint8_t crc;
 
+	SD_WR_DAT_DIR_OUT();
+	SD_WR_DAT(0xf);
+
 	crc = crc7(0, cmd, 5);
 	cmd[5] = (crc << 1) | 0x01;
 	hal_sd_send_cmd(cmd, sizeof(cmd));
 
-	hal_sd_dummy_clock(1000);
+	if (!hal_sd_get_response(response, sizeof(response)))
+	{
+		SD_WR_DAT_DIR_IN();
+		return 0;
+	}
+
+	SD_WR_DAT_DIR_IN();
 	return 1;
 }
 
@@ -580,6 +603,7 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 	{
         SD_WR_CLK_LOW();
         SD_WR_CLK_HIGH();
+		SD_WAIT_SETUP();
 
 		// Check start bits (zero is expected).
 		if (s_dataBits == 4)
@@ -624,11 +648,13 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 				{
 					SD_WR_CLK_LOW();
 					SD_WR_CLK_HIGH();
+					SD_WAIT_SETUP();
 					data8 = (SD_RD_DAT() & 0x0f) << 4;
 				}
 				{
 					SD_WR_CLK_LOW();
 					SD_WR_CLK_HIGH();
+					SD_WAIT_SETUP();
 					data8 |= (SD_RD_DAT() & 0x0f);
 				}
 				buffer[i] = data8;
@@ -672,6 +698,7 @@ int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen
 			{
 				SD_WR_CLK_LOW();
 				SD_WR_CLK_HIGH();
+				SD_WAIT_SETUP();
 				data8 <<= 1; 
 				data8 |= (SD_RD_DAT() & 0x01);
 			}
@@ -856,17 +883,12 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 
 int32_t hal_sd_init(int32_t mode)
 {
-	// const uint32_t deviceId = sysreg_read(SR_REG_DEVICE_ID);
-
-	// Use SW mode for initialization.
+	// Use SW mode for initialization since HW uses a higher frequency
+	// and the card might not be ready for it yet.
 	s_mode = SD_MODE_SW;
+	s_dataBits = 4;
 
 	*SD_CTRL = 0x0000ff00;
-
-	// if (deviceId == SR_DEVICE_ID_RV32T || deviceId == SR_DEVICE_ID_RV32)
-		s_dataBits = 4;
-	// else
-	//   s_dataBits = 1;
 
 	SD_WR_CMD_DIR_OUT();
 	SD_WR_DAT_DIR_IN();
@@ -878,6 +900,7 @@ int32_t hal_sd_init(int32_t mode)
 
     // Set card to idle.
 	hal_sd_cmd0();
+	hal_sd_dummy_delay(1000);
 
 	// Negotiate voltage.
 	hal_sd_cmd8(SD_VHS_2V7_3V6, CMD8_DEFAULT_TEST_PATTERN);

@@ -48,6 +48,8 @@ module VIDEO_controller #(
 	bit [31:0] vram_read_offset = 0;
 	bit [31:0] vram_pitch = MAX_PITCH;
 	bit [1:0] vram_skip = 0;
+	bit [10:0] vram_skipX = 0;
+	bit [10:0] vram_skipY = 0;
 	bit [31:0] frame_counter = 0;
 
 	//===============================
@@ -179,16 +181,22 @@ module VIDEO_controller #(
 		// access registers.
 		3: begin
 			if (i_cpu_rw) begin
-				if (i_cpu_address[3:2] == 2'd0) begin
+				if (i_cpu_address[4:2] == 3'd0) begin
 					if (i_video_vblank)
 						$display("modifying read offset while scanning out screen (%d)", frame_counter);
 					vram_read_offset <= i_cpu_wdata;
 				end
-				else if (i_cpu_address[3:2] == 2'd1) begin
+				else if (i_cpu_address[4:2] == 3'd1) begin
 					vram_pitch <= i_cpu_wdata;
 				end
-				else if (i_cpu_address[3:2] == 2'd2) begin
+				else if (i_cpu_address[4:2] == 3'd2) begin
 					vram_skip <= i_cpu_wdata[1:0];
+				end
+				else if (i_cpu_address[4:2] == 3'd3) begin
+					vram_skipX <= i_cpu_wdata;
+				end
+				else if (i_cpu_address[4:2] == 3'd4) begin
+					vram_skipY <= i_cpu_wdata;
 				end
 			end
 			o_cpu_ready <= 1'b1;
@@ -234,8 +242,8 @@ module VIDEO_controller #(
 	);
 
 	bit [10:0] column;
-	bit [31:0] row;
-	bit line_odd_even = 1'b0;
+	bit [31:0] row_num;
+	bit [31:0] row_offset;
 	bit [1:0] hs = 2'b00;
 	bit [1:0] vs = 2'b00;
 
@@ -247,20 +255,23 @@ module VIDEO_controller #(
 		// Check if we have entered vblank.
 		if (vs == 2'b01) begin
 			column <= 0;
-			row <= 0;
-			line_odd_even <= 1'b1;
+			row_num <= 0;
+			row_offset <= 0;
 			frame_counter <= frame_counter + 1;
 		end
 
 		// At hblank we start read next line.
 		if (hs == 2'b01 && vs == 2'b00) begin
-			if (vram_skip[1] == 1'b0 || line_odd_even) begin
+			if (
+				(row_num >= vram_skipY && row_num < 720 - vram_skipY) &&
+				(vram_skip[1] == 1'b0 || row_num[0])
+			) begin
 				column <= 0;
-				row <= row + vram_pitch;
-				o_vram_pb_address <= vram_read_offset + row;
+				row_offset <= row_offset + vram_pitch;
+				o_vram_pb_address <= vram_read_offset + row_offset;
 				o_vram_pb_request <= 1'b1;
 			end
-			line_odd_even <= !line_odd_even;
+			row_num <= row_num + 1;
 		end
 
 		// Fill line buffer.
@@ -285,16 +296,26 @@ module VIDEO_controller #(
 		end
 	end
 
+
+	bit valid;
 	bit [8:0] pixel_x;
 	bit [1:0] switch_x;
 
 	always_comb begin
+		valid =
+			(i_video_pos_x >= vram_skipX) &&
+			(i_video_pos_x < 720 - vram_skipX) &&
+			(i_video_pos_y >= vram_skipY) &&
+			(i_video_pos_y < 720 - vram_skipY);
+	end
+
+	always_comb begin
 		if (vram_skip[0] == 1'b0) begin
-			pixel_x = i_video_pos_x[10:2];
+			pixel_x = i_video_pos_x[10:2] - vram_skipX[10:3];
 			switch_x = i_video_pos_x[1:0];
 		end
 		else begin
-			pixel_x = i_video_pos_x[10:3];
+			pixel_x = i_video_pos_x[10:3] - vram_skipX[10:3];
 			switch_x = i_video_pos_x[2:1];
 		end
 	end
@@ -313,7 +334,10 @@ module VIDEO_controller #(
 	end
 
 	always_ff @(posedge i_clock) begin
-		o_video_rdata <= { 8'h00, palette_video_rdata };
+		o_video_rdata <=
+			valid ?
+			{ 8'h00, palette_video_rdata } :
+			32'h0;
 	end
 
 endmodule

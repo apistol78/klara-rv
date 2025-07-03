@@ -24,11 +24,12 @@ module VIDEO_VGA_tb();
 
 	VIDEO_VGA #(
 		// 720 0 20 20 40 720 0 15 15 15 0 0 0 60 0 36720000 4
+		.USE_CLOCK_OUT(0),
 		.HLINE(720),	// horizontal pixels
 		.HBACK(40),		// back porch
 		.HFRONT(20),	// front porch
 		.HPULSE(20),	// sync pulse
-		.VLINE(720),	// vertial lines
+		.VLINE(720),	// vertical lines
 		.VBACK(15),		// back porch
 		.VFRONT(15),	// front porch
 		.VPULSE(15),	// sync pulse
