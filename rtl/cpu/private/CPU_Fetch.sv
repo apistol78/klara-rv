@@ -156,7 +156,6 @@ module CPU_Fetch #(
 	assign o_data = data;
 
 	bit irq_pending_r = 1'b0;
-	wire irq_pending_and_allowed = i_irq_pending && (state == WAIT_ICACHE || state == WAIT_IRQ);
 
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
@@ -167,9 +166,18 @@ module CPU_Fetch #(
 		end
 		else begin
 
+			o_irq_dispatched <= 1'b0;
+
 			case (state)
 				WAIT_ICACHE: begin
-					if (!i_busy && icache_ready) begin
+					// Issue interrupt if pending.
+					irq_pending_r <= i_irq_pending;
+					if ({ irq_pending_r, i_irq_pending } == 2'b01) begin
+						o_irq_dispatched <= 1'b1;
+						o_irq_epc <= pc;
+						pc <= i_irq_pc;
+					end
+					else if (!i_busy && icache_ready) begin
 						data.strobe <= ~data.strobe;
 						data.instruction <= icache_rdata;
 						data.pc <= pc;
@@ -206,6 +214,10 @@ module CPU_Fetch #(
 						// Move PC to next instruction.
 						pc <= pc + 4;
 					end
+`ifdef __VERILATOR__					
+					else if (!i_busy && !icache_ready)
+						starve <= starve + 1;
+`endif
 				end
 
 				WAIT_JUMP: begin
@@ -215,18 +227,21 @@ module CPU_Fetch #(
 						state <= WAIT_ICACHE;
 					end
 				end
-			endcase
 
-			// Check if interrupt are pending.
-			o_irq_dispatched <= 1'b0;
-			irq_pending_r <= irq_pending_and_allowed;
-			if ({ irq_pending_r, irq_pending_and_allowed } == 2'b01) begin
-				o_irq_dispatched <= 1'b1;
-				o_irq_epc <= pc;
-				pc <= i_irq_pc;
-				if (state == WAIT_IRQ)
+				WAIT_IRQ: begin
+					// Wait for soft IRQ signal.
+					irq_pending_r <= i_irq_pending;
+					if ({ irq_pending_r, i_irq_pending } == 2'b01) begin
+						o_irq_dispatched <= 1'b1;
+						o_irq_epc <= pc;
+						pc <= i_irq_pc;
+						state <= WAIT_ICACHE;
+					end					
+				end
+
+				default:
 					state <= WAIT_ICACHE;
-			end
+			endcase
 		end
 	end
 
