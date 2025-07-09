@@ -68,7 +68,6 @@ module Verify(
 
 	assign ram_select = bus_address[31:28] == 4'h1;
 	assign ram_address = { 4'h0, bus_address[27:0] };
-	assign ram_wdata = bus_wdata;
 
 	assign bus_rdata =
 		rom_select		? rom_rdata		:
@@ -91,7 +90,7 @@ module Verify(
 	wire [31:0] bus_wdata;
 
 	CPU_BusMux #(
-		.REGISTERED(1)
+		.REGISTERED(0)
 	) bus(
 		.i_reset(reset),
 		.i_clock(clock),

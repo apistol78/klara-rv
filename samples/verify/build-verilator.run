@@ -67,18 +67,12 @@ function main()
 	-- Concatenate all source files.
 	local f = ""
 	for _, sv in ipairs(SOURCE) do
-		local v = sv2v(
-			sv,
-			{ ".", PATH_PERIF, PATH_CPU },
-			{ "__VERILATOR__" },
-			"build/rtl-v"
-		)
-		f = f .. " " .. v
+		f = f .. " " .. sv
 	end
 	stdout:printLn(f)
 
 	-- Generate C++ from verilog files.
-	run:execute("verilator --trace-fst --trace-structs --cc -Ibuild/rtl-v -Wno-WIDTH -Wno-WIDTHCONCAT -Wno-TIMESCALEMOD --Mdir code/verilator --top-module Verify " .. f)
+	run:execute("verilator --trace-fst --trace-structs --cc -I" .. PATH_CPU .. " -I" .. PATH_CPU .. "/private -I" .. PATH_CPU .. "/private/fpu -Wno-WIDTH -Wno-WIDTHCONCAT -Wno-TIMESCALEMOD --Mdir code/verilator --top-module Verify " .. f)
 
 	-- Compile library from verilator files.
 	run:pushd("code/verilator")

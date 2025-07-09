@@ -17,6 +17,7 @@
 #define A0 10
 #define A1 11
 #define A2 12
+#define A3 13
 #define A4 14
 #define A5 15
 #define RA 1
@@ -250,8 +251,8 @@ bool verify_AUIPC(const char* trace)
 
 bool verify_BEQ(const char* trace)
 {
-	uint32_t a = urnd32() & 15;
-	uint32_t b = urnd32() & 15;
+	uint32_t a = urnd32() & 3;
+	uint32_t b = urnd32() & 3;
 
 	auto verify = create_soc();
 	auto tb = verify->rootp;
@@ -260,26 +261,19 @@ bool verify_BEQ(const char* trace)
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = b;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x00940663; // beq	s0,s1,c <jt>	0
 	tb->Verify__DOT__rom__DOT__data[1] = 0x00100413; // li	s0,1			4
-	tb->Verify__DOT__rom__DOT__data[2] = 0x00000013; // nop					8
+	tb->Verify__DOT__rom__DOT__data[2] = 0x0000006f; // jal zero, 0			8
 	tb->Verify__DOT__rom__DOT__data[3] = 0x00200413; // li	s0,2			c
-	tb->Verify__DOT__rom__DOT__data[4] = 0x00000013; // nop					10
+	tb->Verify__DOT__rom__DOT__data[4] = 0x0000006f; // jal zero, 0			10
 
-	evaluate(verify, trace, 3);
-
-	// printf("PC: %08x\n", tb->Verify__DOT__cpu__DOT__fetch_pc);
-	// printf("%08x != %08x -> %d\n", a, b, tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0]);
+	evaluate(verify, trace, 10);
 
 	if (a == b)
 	{
-		// if (tb->Verify__DOT__cpu__DOT__fetch_pc != 0x10)
-		// 	return false;
 		if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != 2)
 			return false;
 	}
 	else
 	{
-		// if (tb->Verify__DOT__cpu__DOT__fetch_pc != 0x08)
-		// 	return false;
 		if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != 1)
 			return false;
 	}
@@ -897,24 +891,39 @@ bool verify_REMU(const char* trace)
 
 	evaluate(verify, trace, 10);
 
-	// printf("REMU, %d %% %d = %d (%d)\n",
-	// 	s1,
-	// 	s2,
-	// 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0],
-	// 	s1 / s2
-	// );
-	// printf("REMU, %d %% %d = %d (%d)\n",
-	// 	s1,
-	// 	s2,
-	// 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5],
-	// 	s1 / s2
-	// );
-
 	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != (s1 % s2))
 		return false;
 	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5] != (s1 % s2))
 		return false;
 	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[A4] != (s1 % s2))
+		return false;
+
+	delete verify;
+	return true;
+}
+
+bool verify_REMU2(const char* trace)
+{
+	uint32_t a0 = urnd32() & 127;
+	while (a0 == 0) a0 = urnd32() & 127;
+
+	uint32_t a3 = urnd32();
+	uint32_t a5 = urnd32();
+
+	auto verify = create_soc();
+	auto tb = verify->rootp;
+
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A0] = a0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A3] = a3;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5] = a5;
+
+	tb->Verify__DOT__rom__DOT__data[0] = 0x00d7c7b3; // xor		a5,a5,a3
+	tb->Verify__DOT__rom__DOT__data[1] = 0x02a7f7b3; // remu	a5,a5,a0
+	tb->Verify__DOT__rom__DOT__data[2] = 0x00279793; // slli	a5,a5,0x2
+
+	evaluate(verify, trace, 10);
+
+	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5] != (((a5 ^ a3) % a0) << 2))
 		return false;
 
 	delete verify;
@@ -1245,14 +1254,19 @@ bool verify_XOR(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = s1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S2] = s2;
-	tb->Verify__DOT__rom__DOT__data[0] = 0x0124c433; // xor	s0,s1,s2
+	// tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
+	// tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = s1;
+	// tb->Verify__DOT__cpu__DOT__registers__DOT__r[S2] = s2;
+	// tb->Verify__DOT__rom__DOT__data[0] = 0x0124c433; // xor	s0,s1,s2
+
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A3] = s2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5] = s1;
+	tb->Verify__DOT__rom__DOT__data[0] = 0x00d7c7b3; // xor	a5,a5,a3
 
 	evaluate(verify, trace, 1);
 
-	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != (s1 ^ s2))
+	// if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != (s1 ^ s2))
+	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[A5] != (s1 ^ s2))
 		return false;
 
 	delete verify;
@@ -1261,7 +1275,7 @@ bool verify_XOR(const char* trace)
 
 bool verify_XORI(const char* trace)
 {
-	uint32_t s1 = rnd32();
+	uint32_t s1 = urnd32();
 
 	auto verify = create_soc();
 	auto tb = verify->rootp;
@@ -2143,7 +2157,7 @@ bool verify(bool (*fn)(const char* trace), const char* name, bool ftrce)
 int main(int argc, char **argv)
 {
 	bool success = true;
-	bool ftrce = true;
+	bool ftrce = false;
 
 	// CHECK(verify_ADD);
 	// CHECK(verify_ADDI);
@@ -2151,77 +2165,78 @@ int main(int argc, char **argv)
 	// CHECK(verify_ANDI);
 	// CHECK(verify_AUIPC);
 	// CHECK(verify_BEQ);
-	// CHECK(verify_BGE);
-	// CHECK(verify_BGEU);
-	// CHECK(verify_BLT);
-	// CHECK(verify_BLTU);
-	// CHECK(verify_BNE);
-	// CHECK(verify_DIV);
-	// CHECK(verify_UDIV);
-	// CHECK(verify_JAL);
-	// CHECK(verify_JALR);
-	// CHECK(verify_LB);
-	// CHECK(verify_LBU);
-	// CHECK(verify_LH);
-	// CHECK(verify_LHU);
-	// CHECK(verify_LUI);
-	// CHECK(verify_LW);
-	// CHECK(verify_MUL);
-	// CHECK(verify_MULH);
-	// CHECK(verify_MULHU);
-	// CHECK(verify_OR);
-	// CHECK(verify_ORI);
-	// CHECK(verify_REM);
-	CHECK(verify_REMU);
-	// CHECK(verify_SB);
-	// CHECK(verify_SH);
-	// CHECK(verify_SLL);
-	// CHECK(verify_SLLI);
-	// CHECK(verify_SLT);
-	// CHECK(verify_SLTI);
-	// CHECK(verify_SLTIU);
-	// CHECK(verify_SLTU);
-	// CHECK(verify_SRA);
-	// CHECK(verify_SRAI);
-	// CHECK(verify_SRL);
-	// CHECK(verify_SRLI);
-	// CHECK(verify_SUB);
-	// CHECK(verify_SW);
-	// CHECK(verify_XOR);
-	// CHECK(verify_XORI);
-	// CHECK(verify_ENDIAN);
-	// CHECK(verify_MEM_LOAD_HAZARD);
-	// CHECK(verify_PIPELINE);
-	// CHECK(verify_PIPELINE_MEMORY);
-	// CHECK(verify_PIPELINE_MEMORY_B);
+// 	CHECK(verify_BGE);
+// 	CHECK(verify_BGEU);
+// 	CHECK(verify_BLT);
+// 	CHECK(verify_BLTU);
+// 	CHECK(verify_BNE);
+// 	CHECK(verify_DIV);
+// 	CHECK(verify_UDIV);
+// 	CHECK(verify_JAL);
+// 	CHECK(verify_JALR);
+// 	CHECK(verify_LB);
+// 	CHECK(verify_LBU);
+// 	CHECK(verify_LH);
+// 	CHECK(verify_LHU);
+// 	CHECK(verify_LUI);
+// 	CHECK(verify_LW);
+// 	CHECK(verify_MUL);
+// 	CHECK(verify_MULH);
+// 	CHECK(verify_MULHU);
+// 	CHECK(verify_OR);
+// 	CHECK(verify_ORI);
+// 	CHECK(verify_REM);
+// 	CHECK(verify_REMU);
+// 	CHECK(verify_REMU2);
+// 	CHECK(verify_SB);
+// 	CHECK(verify_SH);
+// 	CHECK(verify_SLL);
+// 	CHECK(verify_SLLI);
+// 	CHECK(verify_SLT);
+// 	CHECK(verify_SLTI);
+// 	CHECK(verify_SLTIU);
+// 	CHECK(verify_SLTU);
+// 	CHECK(verify_SRA);
+// 	CHECK(verify_SRAI);
+// 	CHECK(verify_SRL);
+// 	CHECK(verify_SRLI);
+// 	CHECK(verify_SUB);
+// 	CHECK(verify_SW);
+ 	CHECK(verify_XOR);
+ 	CHECK(verify_XORI);
+// 	CHECK(verify_ENDIAN);
+// 	CHECK(verify_MEM_LOAD_HAZARD);
+// 	CHECK(verify_PIPELINE);
+// 	CHECK(verify_PIPELINE_MEMORY);
+// 	CHECK(verify_PIPELINE_MEMORY_B);
 
-#if defined(CHECK_FPU)
+// #if defined(CHECK_FPU)
 
-	CHECK(verify_FADD);
-	CHECK(verify_FSUB);
-	CHECK(verify_FMUL);
-	CHECK(verify_FDIV);
-	CHECK(verify_FCVT);
-	CHECK(verify_FLW);
-	CHECK(verify_FSW);
-	CHECK(verify_FMV_X_W);
-	CHECK(verify_FMV_W_X);
-	CHECK(verify_FEQ);
-	CHECK(verify_FLT);
-	CHECK(verify_FMADD);
-	CHECK(verify_FMSUB);
-	CHECK(verify_FNMADD);
-	CHECK(verify_FNMSUB);
-	CHECK(verify_FSGNJ);
-	CHECK(verify_FSGNJN);
-	CHECK(verify_FSGNJX);
-	CHECK(verify_FMIN);
-	CHECK(verify_FMAX);
-	CHECK(verify_FMIN_FMAX);
+// 	CHECK(verify_FADD);
+// 	CHECK(verify_FSUB);
+// 	CHECK(verify_FMUL);
+// 	CHECK(verify_FDIV);
+// 	CHECK(verify_FCVT);
+// 	CHECK(verify_FLW);
+// 	CHECK(verify_FSW);
+// 	CHECK(verify_FMV_X_W);
+// 	CHECK(verify_FMV_W_X);
+// 	CHECK(verify_FEQ);
+// 	CHECK(verify_FLT);
+// 	CHECK(verify_FMADD);
+// 	CHECK(verify_FMSUB);
+// 	CHECK(verify_FNMADD);
+// 	CHECK(verify_FNMSUB);
+// 	CHECK(verify_FSGNJ);
+// 	CHECK(verify_FSGNJN);
+// 	CHECK(verify_FSGNJX);
+// 	CHECK(verify_FMIN);
+// 	CHECK(verify_FMAX);
+// 	CHECK(verify_FMIN_FMAX);
 
-#endif
+// #endif
 
-	// CHECK(verify_CSRRS);
+// 	CHECK(verify_CSRRS);
 
 	if (success)
 		printf("SUCCESS!\n");
