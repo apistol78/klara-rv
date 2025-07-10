@@ -8,6 +8,36 @@
 */
 #include "HAL/Timer.h"
 
+uint32_t hal_timer_get_ms()
+{
+ 	uint32_t ms;
+	__asm__ volatile (
+		"rdtime %0"
+		: "=r" (ms)
+	);
+	return ms;   
+}
+
+uint64_t hal_timer_get_cycles()
+{
+	volatile uint32_t mtimeh;
+	volatile uint32_t mtimel;
+	volatile uint32_t tmp;
+
+	for (;;)
+	{
+		__asm__ volatile ( "rdcycleh %0" : "=r" (tmp) );
+		__asm__ volatile ( "rdcycle  %0" : "=r" (mtimel) );
+		__asm__ volatile ( "rdcycleh %0" : "=r" (mtimeh) );
+		if (mtimeh == tmp)
+			break;
+	}
+
+	return (uint64_t)(
+		(((uint64_t)mtimeh) << 32) | mtimel
+	);
+}
+
 void hal_timer_wait_ms(uint32_t ms)
 {
 	const uint32_t until = hal_timer_get_ms() + ms;

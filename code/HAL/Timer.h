@@ -10,34 +10,8 @@
 
 #include "HAL/Common.h"
 
-inline volatile uint32_t hal_timer_get_ms()
-{
- 	volatile uint32_t ms;
-	__asm__ volatile (
-		"rdtime %0"
-		: "=r" (ms)
-	);
-	return ms;   
-}
+EXTERN_C uint32_t hal_timer_get_ms();
 
-inline volatile uint64_t hal_timer_get_cycles()
-{
-	volatile uint32_t mtimeh;
-	volatile uint32_t mtimel;
-	volatile uint32_t tmp;
-
-	for (;;)
-	{
-		__asm__ volatile ( "rdcycleh %0" : "=r" (tmp) );
-		__asm__ volatile ( "rdcycle  %0" : "=r" (mtimel) );
-		__asm__ volatile ( "rdcycleh %0" : "=r" (mtimeh) );
-		if (mtimeh == tmp)
-			break;
-	}
-
-	return (uint64_t)(
-		(((uint64_t)mtimeh) << 32) | mtimel
-	);
-}
+EXTERN_C uint64_t hal_timer_get_cycles();
 
 EXTERN_C void hal_timer_wait_ms(uint32_t ms);
