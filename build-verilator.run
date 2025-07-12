@@ -1,0 +1,82 @@
+--[[
+ Klara-RV
+ Copyright (c) 2025 Anders Pistol.
+
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+]]
+
+import (traktor)
+
+run:loadScript("sv2v.run")
+
+local PATH_CPU < const > = "rtl/cpu"
+local PATH_OUTPUT < const > = "code/Emulator2/CPU/GL/verilator"
+
+local SOURCE < const > =
+{
+	PATH_CPU .. "/CPU_top.sv",
+	PATH_CPU .. "/CPU.sv",
+	PATH_CPU .. "/CPU_BusMux.sv",
+	PATH_CPU .. "/private/CPU_ALU.sv",
+	PATH_CPU .. "/private/CPU_BRAM.sv",
+	PATH_CPU .. "/private/CPU_BRAM_1r1w.sv",
+	PATH_CPU .. "/private/CPU_CSR.sv",
+	PATH_CPU .. "/private/CPU_DCache_Comb.sv",
+	PATH_CPU .. "/private/CPU_DCache_None.sv",
+	PATH_CPU .. "/private/CPU_DCache_Reg.sv",
+	PATH_CPU .. "/private/CPU_DCache_WB.sv",
+	PATH_CPU .. "/private/CPU_Decode.sv",
+	PATH_CPU .. "/private/CPU_Defines.sv",
+	PATH_CPU .. "/private/CPU_Divide.sv",
+	PATH_CPU .. "/private/CPU_Execute.sv",
+	PATH_CPU .. "/private/CPU_Fetch.sv",
+	PATH_CPU .. "/private/CPU_Forward.sv",
+	PATH_CPU .. "/private/CPU_ICache_Comb.sv",
+	PATH_CPU .. "/private/CPU_ICache_None.sv",
+	PATH_CPU .. "/private/CPU_ICache_Reg.sv",
+	PATH_CPU .. "/private/CPU_Memory.sv",
+	PATH_CPU .. "/private/CPU_Multiply.sv",
+	PATH_CPU .. "/private/CPU_PreDecode.sv",
+	PATH_CPU .. "/private/CPU_Registers.sv",
+	PATH_CPU .. "/private/CPU_SkidBuffer.sv",
+	PATH_CPU .. "/private/CPU_Types.sv",
+	PATH_CPU .. "/private/CPU_Writeback.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Add.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Compare.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Div.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Float.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Int.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_Mul.sv",
+	PATH_CPU .. "/private/fpu/CPU_FPU_MulAdd.sv"
+}
+
+function main()
+
+	-- Ensure we can launch yosys before all else.
+	if os:whereIs("yosys") == nil then
+		stderr:printLn("Unable to locate yosys; ensure it's accessible through PATH.")
+		return 1
+	end
+
+	-- Concatenate all source files.
+	local f = ""
+	for _, sv in ipairs(SOURCE) do
+		f = f .. " " .. sv
+	end
+	stdout:printLn(f)
+
+	-- Generate C++ from verilog files.
+	run:execute("verilator --trace-fst --trace-structs --cc -I" .. PATH_CPU .. " -I" .. PATH_CPU .. "/private -I" .. PATH_CPU .. "/private/fpu -Wno-WIDTH -Wno-WIDTHCONCAT -Wno-TIMESCALEMOD --Mdir " .. PATH_OUTPUT .. " --top-module CPU_top " .. f)
+
+	--[[
+	-- Compile library from verilator files.
+	run:pushd(PATH_OUTPUT)
+	run:execute("make -f VCPU_top.mk")
+	run:popd()
+	]]
+
+	stdout:printLn("Build successful.")
+end
