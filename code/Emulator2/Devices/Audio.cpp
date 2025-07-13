@@ -10,6 +10,7 @@
 
 #include <Core/Io/FileSystem.h>
 #include <Core/Log/Log.h>
+#include <Core/Thread/ThreadManager.h>
 #include <Sound/AudioChannel.h>
 #include <Sound/AudioSystem.h>
 #include <Sound/IAudioBuffer.h>
@@ -113,6 +114,9 @@ bool Audio::writeU32(uint32_t address, uint32_t value)
 
 	if (address == 0x0)
 	{
+		while (wab->queued() > 4096)
+			ThreadManager::getInstance().getCurrentThread()->sleep(1);
+
 		const int16_t sv = *(int16_t*)&value;
 		wab->write(m_channel, sv / 32767.0f);
 		m_channel = (m_channel + 1) & 1;
