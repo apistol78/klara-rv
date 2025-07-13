@@ -19,7 +19,7 @@ class CPU_gate : public ICPU
 	T_RTTI_CLASS;
 
 public:
-	explicit CPU_gate(Bus* bus);
+	explicit CPU_gate(Bus* bus, const char* trace);
 
 	virtual ~CPU_gate();
 
@@ -30,6 +30,10 @@ public:
 	virtual bool tick(uint32_t count) override final;
 
 	virtual void interrupt(uint32_t mask) override final;
+
+	virtual uint32_t getPC() const override final;
+
+	virtual uint32_t getRegister(uint32_t index) const override final;
 
 private:
 	traktor::Ref< Bus > m_bus;

@@ -200,6 +200,7 @@ CPU_hl::CPU_hl(Bus* bus, OutputStream* trace, bool twoWayICache)
 :   m_bus(bus)
 ,	m_trace(trace)
 ,   m_pc(0x00000000)
+,	m_retiredPC(0x00000000)
 ,	m_interrupt(0)
 ,	m_waitForInterrupt(false)
 ,	m_cycles(0)
@@ -312,22 +313,16 @@ bool CPU_hl::tick(uint32_t count)
 			return false;
 		}
 
+		// zero register is hardcoded.
+		R(0) = 0;
+
+		m_retiredPC = m_pc;
 		m_pc = m_next;
 
 		m_dcache->processWriteQueue();
 
 		if (!m_bus->tick(this))
-		{
-			log::error << L"Bus tick failed at PC " << str(L"%08x", m_pc) << Endl;
-
-			log::info << str(L"%-5S", L"PC") << L" : " << str(L"%08x", pc()) << Endl;
-			log::info << L"---" << Endl;
-
-			for (uint32_t i = 0; i < 32; ++i)
-				log::info << str(L"%-5S", getRegisterName(i)) << L" : " << str(L"%08x", reg(i)) << Endl;
-
 			return false;
-		}
 
 		m_cycles++;
 	}
@@ -338,6 +333,16 @@ bool CPU_hl::tick(uint32_t count)
 void CPU_hl::interrupt(uint32_t mask)
 {
 	m_interrupt |= mask;
+}
+
+uint32_t CPU_hl::getPC() const
+{
+	return m_retiredPC;
+}
+
+uint32_t CPU_hl::getRegister(uint32_t index) const
+{
+	return m_registers[index];
 }
 
 void CPU_hl::reset()

@@ -15,6 +15,7 @@ VCPU_top::VCPU_top(VerilatedContext* _vcontextp__, const char* _vcname__)
     , bus_rw{vlSymsp->TOP.bus_rw}
     , bus_request{vlSymsp->TOP.bus_request}
     , bus_ready{vlSymsp->TOP.bus_ready}
+    , cpu_fault{vlSymsp->TOP.cpu_fault}
     , bus_address{vlSymsp->TOP.bus_address}
     , bus_rdata{vlSymsp->TOP.bus_rdata}
     , bus_wdata{vlSymsp->TOP.bus_wdata}

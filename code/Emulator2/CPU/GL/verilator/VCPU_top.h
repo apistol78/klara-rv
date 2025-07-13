@@ -34,6 +34,7 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top VL_NOT_FINAL : public VerilatedModel
     VL_OUT8(&bus_rw,0,0);
     VL_OUT8(&bus_request,0,0);
     VL_IN8(&bus_ready,0,0);
+    VL_OUT8(&cpu_fault,0,0);
     VL_OUT(&bus_address,31,0);
     VL_IN(&bus_rdata,31,0);
     VL_OUT(&bus_wdata,31,0);

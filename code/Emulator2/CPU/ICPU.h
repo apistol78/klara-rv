@@ -40,4 +40,8 @@ public:
 	virtual void interrupt(uint32_t mask) = 0;
 
 	// void reset();
+
+	virtual uint32_t getPC() const = 0;
+
+	virtual uint32_t getRegister(uint32_t index) const = 0;
 };

@@ -40,6 +40,10 @@ public:
 
 	virtual void interrupt(uint32_t mask) override final;
 
+	virtual uint32_t getPC() const override final;
+
+	virtual uint32_t getRegister(uint32_t index) const override final;
+
 	void reset();
 
 	void push(uint32_t value);
@@ -58,6 +62,7 @@ private:
 	traktor::Ref< traktor::OutputStream > m_trace;
 	traktor::Timer m_timer;
 	uint32_t m_pc;
+	uint32_t m_retiredPC;
 	uint32_t m_next;
 	uint32_t m_registers[32];
 	float m_flt_registers[32];
