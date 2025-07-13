@@ -31,6 +31,8 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top VL_NOT_FINAL : public VerilatedModel
     // propagate new values into/out from the Verilated model.
     VL_IN8(&reset,0,0);
     VL_IN8(&clock,0,0);
+    VL_IN8(&timer_interrupt,0,0);
+    VL_IN8(&external_interrupt,0,0);
     VL_OUT8(&bus_rw,0,0);
     VL_OUT8(&bus_request,0,0);
     VL_IN8(&bus_ready,0,0);

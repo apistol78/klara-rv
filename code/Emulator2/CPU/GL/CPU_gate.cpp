@@ -68,6 +68,16 @@ bool CPU_gate::tick(uint32_t count)
 	const uint32_t from = m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__retired;
 	while (m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__retired == from)
 	{
+		// m_tb->timer_interrupt = 0;
+		// m_tb->external_interrupt = 0;
+
+		// if ((m_interrupt & TIMER) != 0)
+		// 	m_tb->timer_interrupt = 1;
+		// if ((m_interrupt & EXTERNAL) != 0)
+		// 	m_tb->external_interrupt = 1;
+
+		// m_interrupt = 0;
+
 		// Positive edge.
 		m_time++;
 
@@ -116,11 +126,11 @@ bool CPU_gate::tick(uint32_t count)
 
 void CPU_gate::interrupt(uint32_t mask)
 {
+	m_interrupt |= mask;
 }
 
 uint32_t CPU_gate::getPC() const
 {
-	// return m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__pc;
 	return m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__last_pc;
 }
 

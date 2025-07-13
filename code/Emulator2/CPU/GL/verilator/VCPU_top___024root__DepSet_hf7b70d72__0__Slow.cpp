@@ -106,13 +106,9 @@ VL_ATTR_COLD void VCPU_top___024root___eval_static__TOP(VCPU_top___024root* vlSe
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb_address = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb_wdata = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__cache_rw = 0U;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__cache_address = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_dirty = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_address = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_data = 0U;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_dirty = 0U;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_address = 0U;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_data = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__writeback__DOT__data = 0ULL;
     vlSelfRef.CPU_top__DOT__cpu__DOT__writeback__DOT__last_strobe = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__writeback__DOT__retired = 0ULL;
@@ -3555,6 +3551,8 @@ VL_ATTR_COLD void VCPU_top___024root___ctor_var_reset(VCPU_top___024root* vlSelf
     // Body
     vlSelf->reset = VL_RAND_RESET_I(1);
     vlSelf->clock = VL_RAND_RESET_I(1);
+    vlSelf->timer_interrupt = VL_RAND_RESET_I(1);
+    vlSelf->external_interrupt = VL_RAND_RESET_I(1);
     vlSelf->bus_rw = VL_RAND_RESET_I(1);
     vlSelf->bus_request = VL_RAND_RESET_I(1);
     vlSelf->bus_ready = VL_RAND_RESET_I(1);

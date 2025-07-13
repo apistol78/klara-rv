@@ -89,7 +89,7 @@ module CPU_DCache_Reg #(
 
 	// Cache memory.
 	bit cache_rw = 0;
-	bit [SIZE - 1:0] cache_address = 0;
+	bit [SIZE - 1:0] cache_address;
 	bit [63:0] cache_wdata;
 	wire [63:0] cache_rdata;
 
@@ -114,14 +114,6 @@ module CPU_DCache_Reg #(
 	wire cache_entry_dirty = cache_rdata[1];
 	wire [31:0] cache_entry_address = { cache_rdata[31:2], 2'b00 };
 	wire [31:0] cache_entry_data = cache_rdata[63:32];
-
-	// initial begin
-	// 	o_bus_rw = 0;
-	// 	o_bus_request = 0;
-	// 	o_bus_address = 0;
-	// 	o_bus_wdata = 0;
-	// 	o_rdata = 0;
-	// end
 
 	always_comb begin
 		if (state == FLUSH_SETUP || state == FLUSH_CHECK || state == FLUSH_WRITE || state == INITIALIZE)

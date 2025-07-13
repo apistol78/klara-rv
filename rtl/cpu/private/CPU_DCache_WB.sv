@@ -35,9 +35,9 @@ module CPU_DCache_WB(
 	bit [31:0] wb_address = 0;
 	bit [31:0] wb_data = 0;
 
-	bit next_wb_dirty = 1'b0;
-	bit [31:0] next_wb_address = 0;
-	bit [31:0] next_wb_data = 0;
+	bit next_wb_dirty;
+	bit [31:0] next_wb_address;
+	bit [31:0] next_wb_data;
 
 	always_ff @(posedge i_clock) begin
 		wb_dirty <= next_wb_dirty;

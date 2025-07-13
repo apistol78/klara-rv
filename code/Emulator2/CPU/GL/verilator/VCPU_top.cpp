@@ -12,6 +12,8 @@ VCPU_top::VCPU_top(VerilatedContext* _vcontextp__, const char* _vcname__)
     , vlSymsp{new VCPU_top__Syms(contextp(), _vcname__, this)}
     , reset{vlSymsp->TOP.reset}
     , clock{vlSymsp->TOP.clock}
+    , timer_interrupt{vlSymsp->TOP.timer_interrupt}
+    , external_interrupt{vlSymsp->TOP.external_interrupt}
     , bus_rw{vlSymsp->TOP.bus_rw}
     , bus_request{vlSymsp->TOP.bus_request}
     , bus_ready{vlSymsp->TOP.bus_ready}

@@ -14,6 +14,8 @@
 module CPU_top(
 	input reset,
 	input clock,
+	input timer_interrupt,
+	input external_interrupt,
 	output bus_rw,
 	output bus_request,
 	input bus_ready,
@@ -77,8 +79,8 @@ module CPU_top(
 		.i_clock(clock),
 
 		// Control
-		.i_timer_interrupt(1'b0),
-		.i_external_interrupt(1'b0),
+		.i_timer_interrupt(timer_interrupt),
+		.i_external_interrupt(external_interrupt),
 
 		// Instruction bus
 		.o_ibus_request(cpu_ibus_request),

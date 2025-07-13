@@ -40,5 +40,6 @@ private:
 	VCPU_top* m_tb = nullptr;
 	VerilatedFstC* m_tfp = nullptr;
 	int32_t m_time = 0;
+	uint32_t m_interrupt = 0;
     bool m_lastBusRequest = false;
 };

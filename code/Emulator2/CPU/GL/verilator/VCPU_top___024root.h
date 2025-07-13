@@ -19,6 +19,8 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         VL_IN8(reset,0,0);
         VL_IN8(clock,0,0);
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT____Vcellinp__df__rst;
+        VL_IN8(timer_interrupt,0,0);
+        VL_IN8(external_interrupt,0,0);
         VL_OUT8(bus_rw,0,0);
         VL_OUT8(bus_request,0,0);
         VL_IN8(bus_ready,0,0);
@@ -78,10 +80,10 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_R;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_S;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_U;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_CSR;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_FPU;
     };
     struct {
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_CSR;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_FPU;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__RD_bank;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__RS1_bank;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__RS2_bank;
@@ -144,10 +146,10 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__27__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__28__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__29__KET____DOT__q;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__30__KET____DOT__q;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__31__KET____DOT__q;
     };
     struct {
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__30__KET____DOT__q;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__31__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rw;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_request;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_flush;
@@ -210,10 +212,10 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__alu_operand2;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__alu_signed_sum_result;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_result;
-        IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_remainder;
-        IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_uop1;
     };
     struct {
+        IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_remainder;
+        IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_uop1;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_uop2;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__unumerator;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__udenominator;
