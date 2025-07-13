@@ -34,11 +34,7 @@ module CPU_Multiply(
 	bit r2_request;
 	bit [63:0] r2_result;
 
-	// bit last = 0;
-	// bit [1:0] s;
-
 	always_ff @(posedge i_clock) begin
-
 		r0_request <= i_latch;
 		r0_s <= i_signed ? { s1, s2 } : 2'b00;
 		r0_uop1 <= (i_signed && s1) ? -$signed(i_op1) : i_op1;
@@ -50,7 +46,6 @@ module CPU_Multiply(
 
 		r2_request <= r1_request;
 		r2_result <= (r1_s[0] != r1_s[1]) ? -$signed(r1_intermediate) : r1_intermediate;
-		
 	end
 
 	assign o_ready = i_latch && r2_request;

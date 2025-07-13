@@ -982,10 +982,9 @@ VL_INLINE_OPT void VCPU_top___024root___act_sequent__TOP__2(VCPU_top___024root* 
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend[0x1fU] 
         = (IData)(CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__30__KET____DOT__d);
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_remainder 
-        = (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed) 
-            & ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s) 
-               >> 1U)) ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
-                          [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
+        = ((2U & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s))
+            ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
+               [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
            [0x20U]);
 }
 
@@ -1061,11 +1060,10 @@ VL_INLINE_OPT void VCPU_top___024root___act_comb__TOP__0(VCPU_top___024root* vlS
         = (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
            [0x1eU] | VL_SHIFTL_III(32,32,32, (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__30__KET____DOT__q), 1U));
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_result 
-        = (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed) 
-            & ((1U & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s)) 
-               != (1U & ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s) 
-                         >> 1U)))) ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
-                                      [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
+        = (((1U & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s)) 
+            != (1U & ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s) 
+                      >> 1U))) ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
+                                  [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
            [0x20U]);
 }
 
@@ -1604,9 +1602,10 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
         vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__llth = 1U;
         vlSelfRef.CPU_top__DOT__bus__DOT__state = vlSelfRef.CPU_top__DOT__bus__DOT__next_state;
         vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s 
-            = ((2U & (vlSelfRef.CPU_top__DOT__cpu__DOT__forward__DOT__rs1 
-                      >> 0x1eU)) | (vlSelfRef.CPU_top__DOT__cpu__DOT__forward__DOT__rs2 
-                                    >> 0x1fU));
+            = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed)
+                ? ((2U & (vlSelfRef.CPU_top__DOT__cpu__DOT__forward__DOT__rs1 
+                          >> 0x1eU)) | (vlSelfRef.CPU_top__DOT__cpu__DOT__forward__DOT__rs2 
+                                        >> 0x1fU)) : 0U);
         vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__udenominator 
             = (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed) 
                 & (vlSelfRef.CPU_top__DOT__cpu__DOT__forward__DOT__rs2 
@@ -5951,17 +5950,15 @@ VL_INLINE_OPT void VCPU_top___024root___nba_comb__TOP__0(VCPU_top___024root* vlS
     auto& vlSelfRef = std::ref(*vlSelf).get();
     // Body
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_result 
-        = (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed) 
-            & ((1U & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s)) 
-               != (1U & ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s) 
-                         >> 1U)))) ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
-                                      [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
+        = (((1U & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s)) 
+            != (1U & ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s) 
+                      >> 1U))) ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
+                                  [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient
            [0x20U]);
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_remainder 
-        = (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed) 
-            & ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s) 
-               >> 1U)) ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
-                          [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
+        = ((2U & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s))
+            ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
+               [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
            [0x20U]);
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__ack 
         = vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__ready

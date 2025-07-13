@@ -146,14 +146,14 @@ module CPU_Divide(
 		if (i_latch) begin
 			unumerator <= (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
 			udenominator <= (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;		
-			s <= { snumerator, sdenominator };
+			s <= i_signed ? { snumerator, sdenominator } : 2'b00;
 		end
 	end
 
 	always_comb begin
 		o_ready = i_latch && ack;
-		o_result = (i_signed && s[0] != s[1]) ? -$signed(result) : result;
-		o_remainder = (i_signed && s[1]) ? -$signed(remainder) : remainder;
+		o_result = (s[0] != s[1]) ? -$signed(result) : result;
+		o_remainder = s[1] ? -$signed(remainder) : remainder;
 	end
 
 endmodule

@@ -318,6 +318,9 @@ VL_ATTR_COLD void VCPU_top___024root___stl_sequent__TOP__0(VCPU_top___024root* v
     CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21;
     CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21 = 0;
     // Body
+    vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed 
+        = ((4U == (0x1fU & vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[0U])) 
+           | (0xdU == (0x1fU & vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[0U])));
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_JUMP_CONDITIONAL 
         = ((0x63U == (0x707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | ((0x5063U == (0x707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
@@ -471,9 +474,6 @@ VL_ATTR_COLD void VCPU_top___024root___stl_sequent__TOP__0(VCPU_top___024root* v
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_signed 
         = ((9U == (0x1fU & vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[0U])) 
            | (0xaU == (0x1fU & vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[0U])));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed 
-        = ((4U == (0x1fU & vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[0U])) 
-           | (0xdU == (0x1fU & vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[0U])));
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_17 
         = ((0x2004033U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | (0x2005033U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
@@ -3165,10 +3165,9 @@ VL_ATTR_COLD void VCPU_top___024root___stl_comb__TOP__2(VCPU_top___024root* vlSe
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend[0x1fU] 
         = (IData)(CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__30__KET____DOT__d);
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_remainder 
-        = (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed) 
-            & ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s) 
-               >> 1U)) ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
-                          [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
+        = ((2U & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s))
+            ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
+               [0x20U]) : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend
            [0x20U]);
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__0__KET____DOT__q 
         = ((~ (IData)((0U != VL_SHIFTR_III(32,32,32, 
