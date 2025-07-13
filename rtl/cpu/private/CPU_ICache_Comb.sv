@@ -19,7 +19,6 @@ module CPU_ICache_Comb#(
 	input [31:0] i_input_pc,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
-	input i_stall,
 
 	// Bus
 	output bit o_bus_request,
@@ -36,17 +35,16 @@ module CPU_ICache_Comb#(
 
 	typedef enum bit [1:0]
 	{
-		IDLE		= 2'd0,
-		READ_SETUP	= 2'd1,
-		READ_BUS	= 2'd2,
-		INITIALIZE	= 2'd3
+		READ_SETUP	= 2'd0,
+		READ_BUS	= 2'd1,
+		INITIALIZE	= 2'd2
 	} state_t;
 
-	state_t next = INITIALIZE;
 	state_t state = INITIALIZE;
+	state_t next;
 
 	bit [SIZE:0] clear_address = 0;
-	bit [SIZE:0] next_clear_address = 0;
+	bit [SIZE:0] next_clear_address;
 
 	// Debug, only for verilated.
 `ifdef __VERILATOR__
@@ -63,8 +61,8 @@ module CPU_ICache_Comb#(
 `endif
 
 	// Cache memory.
-	bit cache_rw = 0;
-	bit [63:0] cache_wdata = 0;
+	bit cache_rw;
+	bit [63:0] cache_wdata;
 	wire [63:0] cache_rdata;
 	bit [31:0] cache_pc;
 	wire [SIZE - 1:0] cache_label = cache_pc[(SIZE - 1) + 2:2];	// 2 lowest bits are always zero.
@@ -116,34 +114,23 @@ module CPU_ICache_Comb#(
 `endif
 
 		case (state)
-			IDLE: begin
-				if (!i_stall) begin
-					next = READ_SETUP;
-				end
-			end
-			
 			READ_SETUP: begin
-				if (!i_stall) begin
-					if (cache_rdata[31:0] == { i_input_pc[31:2], 2'b01 }) begin
-						o_ready = 1;
-						o_rdata = cache_rdata[63:32];
-						cache_pc = i_input_pc + 4;
+				if (cache_rdata[31:0] == { i_input_pc[31:2], 2'b01 }) begin
+					o_ready = 1;
+					o_rdata = cache_rdata[63:32];
+					cache_pc = i_input_pc + 4;
 `ifdef __VERILATOR__
-						// \fixme I think this increase after a READ_BUS thus
-						// give false reading about hit rate.
-						next_hit = hit + 1;
+					// \fixme I think this increase after a READ_BUS thus
+					// give false reading about hit rate.
+					next_hit = hit + 1;
 `endif
-					end
-					else begin
-						o_bus_request = 1;
-						next = READ_BUS;
-`ifdef __VERILATOR__
-						next_miss = miss + 1;
-`endif
-					end
 				end
 				else begin
-					next = IDLE;		// We need to go back to IDLE, seems to become unstable if we stay.
+					o_bus_request = 1;
+					next = READ_BUS;
+`ifdef __VERILATOR__
+					next_miss = miss + 1;
+`endif
 				end
 			end
 
@@ -154,7 +141,7 @@ module CPU_ICache_Comb#(
 					cache_wdata = { i_bus_rdata, { i_input_pc[31:2], 2'b01 } };
 					o_ready = 1;
 					o_rdata = i_bus_rdata;
-					next = IDLE;
+					next = READ_SETUP;
 				end
 			end
 
@@ -167,8 +154,12 @@ module CPU_ICache_Comb#(
 				end
 				else begin
 					next_clear_address = 0;
-					next = IDLE;
+					next = READ_SETUP;
 				end				
+			end
+
+			default: begin
+				next = READ_SETUP;
 			end
 		endcase
 

@@ -190,6 +190,7 @@ module CPU_Memory #(
 						state <= FLUSH;
 					end
 					else begin
+						data.pc <= i_data.pc;
 						data.rd <= i_data.rd;
 						data.inst_rd <= i_data.inst_rd;
 						data.strobe <= ~data.strobe;
@@ -202,6 +203,7 @@ module CPU_Memory #(
 				if (dcache_ready) begin
 					dcache_request <= 0;
 					dcache_flush <= 0;
+					data.pc <= i_data.pc;
 					data.rd <= i_data.rd;
 					data.inst_rd <= i_data.inst_rd;				
 					data.strobe <= ~data.strobe;
@@ -213,6 +215,7 @@ module CPU_Memory #(
 			READ: begin
 				if (dcache_ready) begin
 					dcache_request <= 0;
+					data.pc <= i_data.pc;
 					case (i_data.mem_width)
 						`MEMW_4: data.rd <= dcache_rdata;
 						`MEMW_2: data.rd <= { { 16{ i_data.mem_signed & bus_rdata_half[15] } }, bus_rdata_half[15:0] };
@@ -230,6 +233,7 @@ module CPU_Memory #(
 				if (dcache_ready) begin
 					dcache_request <= 0;
 					dcache_rw <= 0;
+					data.pc <= i_data.pc;
 					data.rd <= i_data.rd;
 					data.inst_rd <= i_data.inst_rd;	
 					data.strobe <= ~data.strobe;
@@ -267,6 +271,7 @@ module CPU_Memory #(
 				if (dcache_ready) begin
 					dcache_request <= 0;
 					dcache_rw <= 0;
+					data.pc <= i_data.pc;
 					data.rd <= i_data.rd;
 					data.inst_rd <= i_data.inst_rd;	
 					data.strobe <= ~data.strobe;

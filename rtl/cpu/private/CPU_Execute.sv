@@ -237,10 +237,7 @@ module CPU_Execute (
 				i_data.strobe != last_strobe
 			) begin
 
-`ifdef __VERILATOR__
-				trace_pc <= i_data.pc;
-`endif
-
+				data.pc <= i_data.pc;
 				data.inst_rd <= register_t'(!i_data.memory_read ? i_data.inst_rd : 0);
 
 				data.mem_read <= i_data.memory_read;

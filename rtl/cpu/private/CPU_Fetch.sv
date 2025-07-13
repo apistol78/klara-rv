@@ -101,7 +101,6 @@ module CPU_Fetch #(
 			// Output
 			.o_rdata(icache_rdata),
 			.o_ready(icache_ready),
-			.i_stall(),
 
 			// Bus
 			.o_bus_request(o_bus_request),
@@ -197,8 +196,6 @@ module CPU_Fetch #(
 						data.inst_rd  <= register_t'(have_RD  ? { `INSTRUCTION[ 11:7] } : 0);
 `endif
 
-						// @todo Bad timing; is there any way we
-						// can skip decoding these...
 						if (is_JUMP || is_JUMP_CONDITIONAL || is_MRET) begin
 							// Branch instruction, need to wait
 							// for an explicit "goto" signal before
@@ -210,9 +207,11 @@ module CPU_Fetch #(
 							// for IRQ signal before continue.
 							state <= WAIT_IRQ;
 						end
+						else begin
+							// Move PC to next instruction.
+							pc <= pc + 4;
+						end
 
-						// Move PC to next instruction.
-						pc <= pc + 4;
 					end
 `ifdef __VERILATOR__					
 					else if (!i_busy && !icache_ready)

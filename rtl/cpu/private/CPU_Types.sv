@@ -97,6 +97,7 @@ decode_data_t;
 typedef struct packed
 {
 	bit strobe;					//!< Toggled each time data is updated.
+	bit [31:0] pc;				//!< Program counter.
 	register_t inst_rd;
 	bit [31:0] rd;
 	bit mem_read;
@@ -113,6 +114,7 @@ execute_data_t;
 typedef struct packed
 {
 	bit strobe;					//!< Toggled each time data is updated.
+	bit [31:0] pc;				//!< Program counter.
 	register_t inst_rd;
 	bit [31:0] rd;
 }

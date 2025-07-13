@@ -25,8 +25,10 @@ module CPU_Writeback(
 	assign o_retired = retired;
 
 	writeback_data_t data = 0;
-	bit [63:0] retired = 0;
 	bit last_strobe = 0;
+	
+	bit [63:0] retired = 0;
+	bit [31:0] last_pc = 0;
 
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
@@ -39,6 +41,7 @@ module CPU_Writeback(
 
 			if (i_data.strobe != last_strobe) begin
 				retired <= retired + 1;
+				last_pc <= i_data.pc;
 			end
 			last_strobe <= i_data.strobe;
 		end

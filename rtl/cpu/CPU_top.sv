@@ -19,7 +19,8 @@ module CPU_top(
 	input bus_ready,
 	output [31:0] bus_address,
 	input [31:0] bus_rdata,
-	output [31:0] bus_wdata
+	output [31:0] bus_wdata,
+	output cpu_fault
 );
 
 
@@ -64,7 +65,6 @@ module CPU_top(
 	wire [31:0] cpu_dbus_address;
 	wire [31:0] cpu_dbus_rdata;
 	wire [31:0] cpu_dbus_wdata;
-	wire cpu_fault;
 
 	CPU #(
 		.FREQUENCY(`FREQUENCY),

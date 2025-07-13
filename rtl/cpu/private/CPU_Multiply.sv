@@ -23,37 +23,37 @@ module CPU_Multiply(
 	wire s2 = i_op2[31];
 
 	bit r0_request;
+	bit [1:0] r0_s;
 	bit [31:0] r0_uop1;
 	bit [31:0] r0_uop2;
 
 	bit r1_request;
+	bit [1:0] r1_s;
 	bit [63:0] r1_intermediate;
 
 	bit r2_request;
 	bit [63:0] r2_result;
 
-	wire progress = r0_request || r1_request || r2_request;
-	
-	bit [1:0] s;
-	always_ff @(posedge i_clock) begin
-		if (i_latch)
-			s <= { s1, s2 };
+	// bit last = 0;
+	// bit [1:0] s;
 
-		// 1
-		r0_request <= i_latch && !progress;
+	always_ff @(posedge i_clock) begin
+
+		r0_request <= i_latch;
+		r0_s <= i_signed ? { s1, s2 } : 2'b00;
 		r0_uop1 <= (i_signed && s1) ? -$signed(i_op1) : i_op1;
 		r0_uop2 <= (i_signed && s2) ? -$signed(i_op2) : i_op2;
 
-		// 2
 		r1_request <= r0_request;
+		r1_s <= r0_s;
 		r1_intermediate <= { 32'b0, r0_uop1 } * { 32'b0, r0_uop2 };
 
-		// 3
 		r2_request <= r1_request;
-		r2_result <= (i_signed && s[0] != s[1]) ? -$signed(r1_intermediate) : r1_intermediate;
+		r2_result <= (r1_s[0] != r1_s[1]) ? -$signed(r1_intermediate) : r1_intermediate;
+		
 	end
 
-	assign o_ready = r2_request;
+	assign o_ready = i_latch && r2_request;
 	assign o_result = r2_result;
 
 endmodule
