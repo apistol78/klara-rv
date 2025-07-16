@@ -109,7 +109,7 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT____VdfgRegularize_h9a67d98d_0_0;
         CData/*1:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_s;
         CData/*1:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state;
-        CData/*2:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt;
+        CData/*7:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__ready;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m__DOT__valid_in;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m__DOT__valid_out;

@@ -852,7 +852,7 @@ VL_ATTR_COLD void VCPU_top___024root__trace_init_sub__TOP__0(VCPU_top___024root*
     tracep->declBus(c+330,0,"m_uop2",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 31,0);
     tracep->declQuad(c+331,0,"m_product",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC, false,-1, 63,0);
     tracep->declBus(c+333,0,"state",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 1,0);
-    tracep->declBus(c+334,0,"cnt",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 2,0);
+    tracep->declBus(c+334,0,"cnt",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 7,0);
     tracep->declQuad(c+317,0,"result",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 63,0);
     tracep->declBit(c+316,0,"ready",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1);
     tracep->pushPrefix("m", VerilatedTracePrefixType::SCOPE_MODULE);
@@ -2779,7 +2779,7 @@ VL_ATTR_COLD void VCPU_top___024root__trace_full_0_sub_0(VCPU_top___024root* vlS
     bufp->fullIData(oldp+330,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_uop2),32);
     bufp->fullQData(oldp+331,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_product),64);
     bufp->fullCData(oldp+333,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state),2);
-    bufp->fullCData(oldp+334,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt),3);
+    bufp->fullCData(oldp+334,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt),8);
     bufp->fullBit(oldp+335,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m__DOT__valid_out));
     bufp->fullQData(oldp+336,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m__DOT__partial_products[0]),64);
     bufp->fullQData(oldp+338,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m__DOT__partial_products[1]),64);

@@ -116,7 +116,7 @@ module CPU_Multiply(
 	);
 
 	bit [1:0] state = 2'd0;
-	bit [2:0] cnt = 0;
+	bit [7:0] cnt = 0;
 	bit [63:0] result = 64'd0;
 	bit ready = 1'b0;
 
@@ -124,7 +124,7 @@ module CPU_Multiply(
 
 		ready <= 1'b0;
 
-		case(state)
+		unique case (state)
 			2'd0: begin
 				if (i_latch) begin
 					m_s <= i_signed ? { s1, s2 } : 2'b00;
@@ -137,21 +137,22 @@ module CPU_Multiply(
 
 			2'd1: begin
 				cnt <= cnt + 1;
-				if (cnt >= 5) begin
+				if (i_latch && cnt >= 8) begin
 					ready <= 1'b1;
 					result <= (m_s[0] != m_s[1]) ? -$signed(m_product) : m_product;
-					cnt <= 0;
 					state <= 2;
 				end
+				else if (!i_latch)
+					state <= 0;
 			end
 
 			2'd2: begin
+				ready <= i_latch;
 				if (!i_latch)
 					state <= 0;
 			end
 
 			default: begin
-				cnt <= 0;
 				state <= 0;
 			end
 		endcase

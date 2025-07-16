@@ -1437,7 +1437,7 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
     VL_ZERO_W(113, __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__data);
     CData/*1:0*/ __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_s;
     __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_s = 0;
-    CData/*2:0*/ __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt;
+    CData/*7:0*/ __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt;
     __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt = 0;
     CData/*1:0*/ __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state;
     __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state = 0;
@@ -4050,23 +4050,26 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
         }
     } else if ((1U == (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state))) {
         __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt 
-            = (7U & ((IData)(1U) + (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt)));
-        if ((5U <= (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt))) {
+            = (0xffU & ((IData)(1U) + (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt)));
+        if (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_request) 
+             & (8U <= (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt)))) {
             vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__ready = 1U;
             vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__result 
                 = (((1U & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_s)) 
                     != (1U & ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_s) 
                               >> 1U))) ? (- vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_product)
                     : vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_product);
-            __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt = 0U;
             __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state = 2U;
+        } else if ((1U & (~ (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_request)))) {
+            __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state = 0U;
         }
     } else if ((2U == (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state))) {
+        vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__ready 
+            = vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_request;
         if ((1U & (~ (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_request)))) {
             __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state = 0U;
         }
     } else {
-        __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt = 0U;
         __Vdly__CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state = 0U;
     }
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_S 

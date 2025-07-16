@@ -1448,7 +1448,7 @@ void VCPU_top___024root__trace_chg_0_sub_0(VCPU_top___024root* vlSelf, Verilated
         bufp->chgIData(oldp+329,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_uop2),32);
         bufp->chgQData(oldp+330,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m_product),64);
         bufp->chgCData(oldp+332,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__state),2);
-        bufp->chgCData(oldp+333,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt),3);
+        bufp->chgCData(oldp+333,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__cnt),8);
         bufp->chgBit(oldp+334,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m__DOT__valid_out));
         bufp->chgQData(oldp+335,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m__DOT__partial_products[0]),64);
         bufp->chgQData(oldp+337,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__m__DOT__partial_products[1]),64);
