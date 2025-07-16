@@ -166,7 +166,7 @@ module CPU #(
 	fetch_data_t fetch_data;
 
 	CPU_SkidBuffer #(
-		.DW($bits(fetch_data_t))
+		.DW($bits(fetch_data))
 	) fetch_skid(
 		.i_reset(i_reset),
 		.i_clock(i_clock),

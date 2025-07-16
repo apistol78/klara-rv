@@ -69,7 +69,7 @@ module CPU_ICache_Reg #(
 	cache_entry_t cache_wr_wdata;
 
 	CPU_BRAM_1r1w #(
-		.WIDTH($bits(cache_entry_t)),
+		.WIDTH($bits(cache_rd_rdata)),
 		.SIZE(RANGE),
 		.ADDR_LSH(0)
 	) cache(

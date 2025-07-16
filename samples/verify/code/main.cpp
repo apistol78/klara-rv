@@ -2103,6 +2103,34 @@ bool verify_CSRRS(const char* trace)
 	return true;
 }
 
+
+bool verify_T0(const char* trace)
+{
+	auto verify = create_soc();
+	auto tb = verify->rootp;
+
+	// tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = a;
+	// tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = b;
+	tb->Verify__DOT__rom__DOT__data[0] = 0x00100413;
+	tb->Verify__DOT__rom__DOT__data[1] = 0x00200493;
+	tb->Verify__DOT__rom__DOT__data[2] = 0x00000913;
+	tb->Verify__DOT__rom__DOT__data[3] = 0x00000993;
+	tb->Verify__DOT__rom__DOT__data[4] = 0x00941663;
+	tb->Verify__DOT__rom__DOT__data[5] = 0x0324f433;
+	tb->Verify__DOT__rom__DOT__data[6] = 0x0080006f;
+	tb->Verify__DOT__rom__DOT__data[7] = 0x07b00913;
+
+	evaluate(verify, trace, 20);
+
+	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S2] != 123)
+		return false;
+	if (tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] != 1)
+		return false;
+		
+	delete verify;
+	return true;
+}
+
 // ========================================================
 
 bool verify(bool (*fn)(const char* trace), const char* name, bool ftrce)
@@ -2157,7 +2185,7 @@ bool verify(bool (*fn)(const char* trace), const char* name, bool ftrce)
 int main(int argc, char **argv)
 {
 	bool success = true;
-	bool ftrce = false;
+	bool ftrce = true;
 
 	// CHECK(verify_ADD);
 	// CHECK(verify_ADDI);
@@ -2165,24 +2193,24 @@ int main(int argc, char **argv)
 	// CHECK(verify_ANDI);
 	// CHECK(verify_AUIPC);
 	// CHECK(verify_BEQ);
-// 	CHECK(verify_BGE);
-// 	CHECK(verify_BGEU);
-// 	CHECK(verify_BLT);
-// 	CHECK(verify_BLTU);
-// 	CHECK(verify_BNE);
-// 	CHECK(verify_DIV);
-// 	CHECK(verify_UDIV);
-// 	CHECK(verify_JAL);
-// 	CHECK(verify_JALR);
-// 	CHECK(verify_LB);
-// 	CHECK(verify_LBU);
-// 	CHECK(verify_LH);
-// 	CHECK(verify_LHU);
-// 	CHECK(verify_LUI);
-// 	CHECK(verify_LW);
-// 	CHECK(verify_MUL);
-// 	CHECK(verify_MULH);
-// 	CHECK(verify_MULHU);
+	// CHECK(verify_BGE);
+	// CHECK(verify_BGEU);
+	// CHECK(verify_BLT);
+	// CHECK(verify_BLTU);
+	// CHECK(verify_BNE);
+	// CHECK(verify_DIV);
+	// CHECK(verify_UDIV);
+	// CHECK(verify_JAL);
+	// CHECK(verify_JALR);
+	// CHECK(verify_LB);
+	// CHECK(verify_LBU);
+	// CHECK(verify_LH);
+	// CHECK(verify_LHU);
+	// CHECK(verify_LUI);
+	// CHECK(verify_LW);
+	CHECK(verify_MUL);
+	CHECK(verify_MULH);
+	CHECK(verify_MULHU);
 // 	CHECK(verify_OR);
 // 	CHECK(verify_ORI);
 // 	CHECK(verify_REM);
@@ -2202,8 +2230,8 @@ int main(int argc, char **argv)
 // 	CHECK(verify_SRLI);
 // 	CHECK(verify_SUB);
 // 	CHECK(verify_SW);
- 	CHECK(verify_XOR);
- 	CHECK(verify_XORI);
+//  	CHECK(verify_XOR);
+//  	CHECK(verify_XORI);
 // 	CHECK(verify_ENDIAN);
 // 	CHECK(verify_MEM_LOAD_HAZARD);
 // 	CHECK(verify_PIPELINE);
@@ -2237,6 +2265,7 @@ int main(int argc, char **argv)
 // #endif
 
 // 	CHECK(verify_CSRRS);
+// 	CHECK(verify_T0);
 
 	if (success)
 		printf("SUCCESS!\n");
