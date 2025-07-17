@@ -143,7 +143,7 @@ module CPU_Divide(
 
 	always_ff @(posedge i_clock) begin
 		llth <= i_latch;
-		if (i_latch) begin
+		if (!llth && i_latch) begin
 			unumerator <= (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
 			udenominator <= (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;		
 			s <= i_signed ? { snumerator, sdenominator } : 2'b00;
