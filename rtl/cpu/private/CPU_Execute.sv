@@ -79,7 +79,8 @@ module CPU_Execute (
 
 	`define EXECUTE_DONE				\
 		last_strobe <= i_data.strobe;	\
-		data.strobe <= ~data.strobe;
+		data.strobe <= ~data.strobe;	\
+		data.inst_rd <= register_t'(!i_data.memory_read ? i_data.inst_rd : 0);
 
 	// ====================
 	// ALU
@@ -238,7 +239,7 @@ module CPU_Execute (
 			) begin
 
 				data.pc <= i_data.pc;
-				data.inst_rd <= register_t'(!i_data.memory_read ? i_data.inst_rd : 0);
+				data.inst_rd <= ZERO;
 
 				data.mem_read <= i_data.memory_read;
 				data.mem_write <= i_data.memory_write;
