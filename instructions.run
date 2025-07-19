@@ -429,6 +429,8 @@ local instructions = {
 				R_s(f.rd) = dividend / divisor;
 		]],
 		verilog_text = [[
+			div_request <= 1'b1;
+			div_signed <= 1'b1;
 			if (div_ready) begin
 				`RD <= div_result[31:0];
 				`EXECUTE_DONE;
@@ -451,6 +453,8 @@ local instructions = {
 				R_u(f.rd) = dividend / divisor;
 		]],
 		verilog_text = [[
+			div_request <= 1'b1;
+			div_signed <= 1'b0;
 			if (div_ready) begin
 				`RD <= div_result[31:0];
 				`EXECUTE_DONE;
@@ -1157,6 +1161,8 @@ local instructions = {
 			R_s(f.rd) = R_s(f.rs1) * R_s(f.rs2);
 		]],
 		verilog_text = [[
+			mul_request <= 1'b1;
+			mul_signed <= 1'b1;
 			if (mul_ready) begin
 				`RD <= mul_result[31:0];
 				`EXECUTE_DONE;
@@ -1176,6 +1182,8 @@ local instructions = {
 			R_s(f.rd) = (lh * rh) >> 32;
 		]],
 		verilog_text = [[
+			mul_request <= 1'b1;
+			mul_signed <= 1'b1;
 			if (mul_ready) begin
 				`RD <= mul_result[63:32];
 				`EXECUTE_DONE;
@@ -1195,6 +1203,8 @@ local instructions = {
 			R(f.rd) = (lh * rh) >> 32;
 		]],
 		verilog_text = [[
+			mul_request <= 1'b1;
+			mul_signed <= 1'b0;
 			if (mul_ready) begin
 				`RD <= mul_result[63:32];
 				`EXECUTE_DONE;
@@ -1279,6 +1289,8 @@ local instructions = {
 				R_s(f.rd) = dividend % divisor;
 		]],
 		verilog_text = [[
+			div_request <= 1'b1;
+			div_signed <= 1'b1;
 			if (div_ready) begin
 				`RD <= div_remainder[31:0];
 				`EXECUTE_DONE;
@@ -1301,6 +1313,8 @@ local instructions = {
 				R_u(f.rd) = dividend % divisor;
 		]],
 		verilog_text = [[
+			div_request <= 1'b1;
+			div_signed <= 1'b0;
 			if (div_ready) begin
 				`RD <= div_remainder[31:0];
 				`EXECUTE_DONE;

@@ -91,5 +91,5 @@ bool PLIC::tick(ICPU* cpu)
 void PLIC::raise(uint32_t channel)
 {
 	m_raised |= 1 << channel;
-	log::info << L"[PLIC] Interrupt raised " << channel << L" : " << fmt(m_raised) << L" / " << fmt(m_issued) << Endl;
+	// log::info << L"[PLIC] Interrupt raised " << channel << L" : " << fmt(m_raised) << L" / " << fmt(m_issued) << Endl;
 }

@@ -126,8 +126,10 @@ module CPU_Execute (
 	// ====================
 	// MUL/DIV
 
-	wire mul_request = (i_data.strobe != last_strobe) && (`EXECUTE_OP == OP_MUL || `EXECUTE_OP == OP_MULH || `EXECUTE_OP == OP_MULHU); 
-	wire mul_signed = (`EXECUTE_OP == OP_MUL || `EXECUTE_OP == OP_MULH);
+	// wire mul_request = (i_data.strobe != last_strobe) && (`EXECUTE_OP == OP_MUL || `EXECUTE_OP == OP_MULH || `EXECUTE_OP == OP_MULHU); 
+	// wire mul_signed = (`EXECUTE_OP == OP_MUL || `EXECUTE_OP == OP_MULH);
+	bit mul_request = 1'b0;
+	bit mul_signed = 1'b0;
 	wire mul_ready;
 	wire [63:0] mul_result;
 	CPU_Multiply multiply(
@@ -140,8 +142,10 @@ module CPU_Execute (
 		.o_result(mul_result)
 	);
 
-	wire div_request = (i_data.strobe != last_strobe) && (`EXECUTE_OP == OP_DIV || `EXECUTE_OP == OP_DIVU || `EXECUTE_OP == OP_REM || `EXECUTE_OP == OP_REMU); 
-	wire div_signed = (`EXECUTE_OP == OP_DIV || `EXECUTE_OP == OP_REM);
+	// wire div_request = (i_data.strobe != last_strobe) && (`EXECUTE_OP == OP_DIV || `EXECUTE_OP == OP_DIVU || `EXECUTE_OP == OP_REM || `EXECUTE_OP == OP_REMU); 
+	// wire div_signed = (`EXECUTE_OP == OP_DIV || `EXECUTE_OP == OP_REM);
+	bit div_request = 1'b0;
+	bit div_signed = 1'b0;
 	wire div_ready;
 	wire [31:0] div_result;
 	wire [31:0] div_remainder;
@@ -232,6 +236,12 @@ module CPU_Execute (
 			o_jump <= 1'b0;
 			o_mret <= 1'b0;
 			o_ecall <= 1'b0;
+
+			mul_request <= 1'b0;
+			mul_signed <= 1'b0;
+
+			div_request <= 1'b0;
+			div_signed <= 1'b0;
 
 			if (
 				!i_memory_busy &&

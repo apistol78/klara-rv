@@ -112,6 +112,7 @@ local function buildHostWin64()
 end
 
 function main()
+	run:run("generate-instructions.run")
 	run:run("build-verilator.run")
 
 	if os.identifier == "windows" then

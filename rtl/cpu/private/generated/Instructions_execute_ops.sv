@@ -21,12 +21,16 @@ case (`EXECUTE_OP)
 		`EXECUTE_DONE;
 	end
 	OP_DIV: begin
+		div_request <= 1'b1;
+		div_signed <= 1'b1;
 		if (div_ready) begin
 			`RD <= div_result[31:0];
 			`EXECUTE_DONE;
 		end
 	end
 	OP_DIVU: begin
+		div_request <= 1'b1;
+		div_signed <= 1'b0;
 		if (div_ready) begin
 			`RD <= div_result[31:0];
 			`EXECUTE_DONE;
@@ -44,18 +48,24 @@ case (`EXECUTE_OP)
 		`EXECUTE_DONE;
 	end
 	OP_MUL: begin
+		mul_request <= 1'b1;
+		mul_signed <= 1'b1;
 		if (mul_ready) begin
 			`RD <= mul_result[31:0];
 			`EXECUTE_DONE;
 		end
 	end
 	OP_MULH: begin
+		mul_request <= 1'b1;
+		mul_signed <= 1'b1;
 		if (mul_ready) begin
 			`RD <= mul_result[63:32];
 			`EXECUTE_DONE;
 		end
 	end
 	OP_MULHU: begin
+		mul_request <= 1'b1;
+		mul_signed <= 1'b0;
 		if (mul_ready) begin
 			`RD <= mul_result[63:32];
 			`EXECUTE_DONE;
@@ -67,12 +77,16 @@ case (`EXECUTE_OP)
 		`EXECUTE_DONE;
 	end
 	OP_REM: begin
+		div_request <= 1'b1;
+		div_signed <= 1'b1;
 		if (div_ready) begin
 			`RD <= div_remainder[31:0];
 			`EXECUTE_DONE;
 		end
 	end
 	OP_REMU: begin
+		div_request <= 1'b1;
+		div_signed <= 1'b0;
 		if (div_ready) begin
 			`RD <= div_remainder[31:0];
 			`EXECUTE_DONE;

@@ -115,17 +115,17 @@ module CPU_Divide(
 	wire snumerator = i_numerator[31];
 	wire sdenominator = i_denominator[31];
 
-	bit [31:0] unumerator;
-	bit [31:0] udenominator;
+	wire [31:0] unumerator = (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;;
+	wire [31:0] udenominator = (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;
+	wire [1:0] s = i_signed ? { snumerator, sdenominator } : 2'b00;;
 
 	bit [31:0] result;
 	bit [31:0] remainder;
 	bit ack = 1'b0;
 
-	bit [1:0] s;
-	bit llth = 0;
+	// bit llth = 0;
 
-	wire valid = llth && i_latch;
+	wire valid = /*llth &&*/ i_latch;
 
 	divfunc #(
 		.XLEN(32),
@@ -141,14 +141,14 @@ module CPU_Divide(
 		.ack(ack)
 	);
 
-	always_ff @(posedge i_clock) begin
-		llth <= i_latch;
-		if (!llth && i_latch) begin
-			unumerator <= (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
-			udenominator <= (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;		
-			s <= i_signed ? { snumerator, sdenominator } : 2'b00;
-		end
-	end
+	// always_ff @(posedge i_clock) begin
+	// 	llth <= i_latch;
+	// 	if (!llth && i_latch) begin
+	// 		unumerator <= (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
+	// 		udenominator <= (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;		
+	// 		s <= i_signed ? { snumerator, sdenominator } : 2'b00;
+	// 	end
+	// end
 
 	always_comb begin
 		o_ready = i_latch && ack;

@@ -10,7 +10,7 @@
 
 uint32_t hal_timer_get_ms()
 {
- 	uint32_t ms;
+ 	volatile uint32_t ms;
 	__asm__ volatile (
 		"rdtime %0"
 		: "=r" (ms)
