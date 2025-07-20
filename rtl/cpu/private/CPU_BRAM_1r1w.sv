@@ -6,8 +6,6 @@
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-`include "CPU_Defines.sv"
-
 `timescale 1ns/1ns
 
 module CPU_BRAM_1r1w #(

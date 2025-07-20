@@ -6,8 +6,6 @@
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
-`include "CPU_Defines.sv"
-
 `timescale 1ns/1ns
 
 module CPU_ICache_Reg #(
@@ -30,7 +28,6 @@ module CPU_ICache_Reg #(
 	output [31:0] o_hit,
 	output [31:0] o_miss
 );
-
 	localparam RANGE = 1 << SIZE;
 	localparam SET_BITS = SIZE;
 	localparam TAG_BITS = 30 - SIZE;
@@ -43,17 +40,8 @@ module CPU_ICache_Reg #(
 	}
 	cache_entry_t;
 
-	// Debug, only for verilated.
-`ifdef __VERILATOR__
-	bit [31:0] hit = 0;
-	bit [31:0] miss = 0;
-
-	assign o_hit = hit;
-	assign o_miss = miss;
-`else
 	assign o_hit = 0;
 	assign o_miss = 0;
-`endif
 
 	bit initialized = 1'b0;
 	bit [31:0] clear_set = 0;
@@ -124,12 +112,6 @@ module CPU_ICache_Reg #(
 		cache_wr_request <= 1'b0;
 
 		if (initialized) begin
-`ifdef __VERILATOR__
-			if (cache_rd_rdata.valid && cache_rd_rdata.tag == i_tag)
-				hit <= hit + 1;
-			else
-				miss <= miss + 1;
-`endif
 
 			// Check if cache line is invalid and need to be refilled.
 			if (
