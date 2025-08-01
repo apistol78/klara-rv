@@ -126,8 +126,6 @@ module CPU_Execute (
 	// ====================
 	// MUL/DIV
 
-	// wire mul_request = (i_data.strobe != last_strobe) && (`EXECUTE_OP == OP_MUL || `EXECUTE_OP == OP_MULH || `EXECUTE_OP == OP_MULHU); 
-	// wire mul_signed = (`EXECUTE_OP == OP_MUL || `EXECUTE_OP == OP_MULH);
 	bit mul_request = 1'b0;
 	bit mul_signed = 1'b0;
 	wire mul_ready;
@@ -142,8 +140,6 @@ module CPU_Execute (
 		.o_result(mul_result)
 	);
 
-	// wire div_request = (i_data.strobe != last_strobe) && (`EXECUTE_OP == OP_DIV || `EXECUTE_OP == OP_DIVU || `EXECUTE_OP == OP_REM || `EXECUTE_OP == OP_REMU); 
-	// wire div_signed = (`EXECUTE_OP == OP_DIV || `EXECUTE_OP == OP_REM);
 	bit div_request = 1'b0;
 	bit div_signed = 1'b0;
 	wire div_ready;
@@ -164,7 +160,7 @@ module CPU_Execute (
 	// FPU
 
 `ifdef FPU_ENABLE
-	reg fpu_request;
+	bit fpu_request;
 	wire fpu_ready;
 	wire [31:0] fpu_result;
 	CPU_FPU fpu(
@@ -191,10 +187,6 @@ module CPU_Execute (
 
 	bit last_strobe = 0;
 	execute_data_t data = 0;
-
-`ifdef __VERILATOR__
-	bit [31:0] trace_pc = 32'h0;
-`endif
 
 	initial begin
 		o_csr_wdata_wr = 1'b0;
