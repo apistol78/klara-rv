@@ -30,13 +30,21 @@ module VIDEO_controller #(
 	output bit [31:0] o_video_rdata,
 
 	// Memory
-	output o_vram_request,
-	output o_vram_rw,
-	output [31:0] o_vram_address,
-	output [31:0] o_vram_wdata,
-	input [31:0] i_vram_rdata,
-	input i_vram_ready
+	output o_vram_pa_request,
+	output o_vram_pa_rw,
+	output [31:0] o_vram_pa_address,
+	output [31:0] o_vram_pa_wdata,
+	input [31:0] i_vram_pa_rdata,
+	input i_vram_pa_ready,
+
+	output o_vram_pb_request,
+	output o_vram_pb_rw,
+	output [31:0] o_vram_pb_address,
+	output [31:0] o_vram_pb_wdata,
+	input [31:0] i_vram_pb_rdata,
+	input i_vram_pb_ready
 );
+
 	bit [31:0] vram_read_offset = 0;
 	bit [31:0] vram_pitch = MAX_PITCH;
 	bit [1:0] vram_skip = 0;
@@ -45,57 +53,15 @@ module VIDEO_controller #(
 	bit [31:0] frame_counter = 0;
 
 	//===============================
+
 	initial begin
 		o_cpu_ready = 1'b0;
 		o_video_rdata = 1'b0;
 	end
 
-	//====================================================
-	// Multiplex vram access.
-	wire vram_pa_request;
-	wire vram_pa_rw;
-	wire [31:0] vram_pa_address;
-	wire [31:0] vram_pa_wdata;
-	wire [31:0] vram_pa_rdata;
-	wire vram_pa_ready;
-
-	wire vram_pb_request;
-	wire vram_pb_rw;
-	wire [31:0] vram_pb_address;
-	wire [31:0] vram_pb_wdata;
-	wire [31:0] vram_pb_rdata;
-	wire vram_pb_ready;
-
-	DualPort vram_bus(
-		.i_reset(reset),
-		.i_clock(clock),
-
-		.o_bus_rw(o_vram_rw),
-		.o_bus_request(o_vram_request),
-		.i_bus_ready(i_vram_ready),
-		.o_bus_address(o_vram_address),
-		.i_bus_rdata(i_vram_rdata),
-		.o_bus_wdata(o_vram_wdata),
-
-		// Video output access.
-		.i_pb_rw(vram_pb_rw),
-		.i_pb_request(vram_pb_request),
-		.o_pb_ready(vram_pb_ready),
-		.i_pb_address(vram_pb_address),
-		.o_pb_rdata(vram_pb_rdata),
-		.i_pb_wdata(vram_pb_wdata),
-
-		// Video CPU access.
-		.i_pc_rw(vram_pa_rw),
-		.i_pc_request(vram_pa_request),
-		.o_pc_ready(vram_pa_ready),
-		.i_pc_address(vram_pa_address),
-		.o_pc_rdata(vram_pa_rdata),
-		.i_pc_wdata(vram_pa_wdata)
-	);
-
 	//===============================
 	// Palette
+
 	bit palette_cpu_request = 0;
 	bit [7:0] palette_cpu_address = 0;
 	bit [23:0] palette_cpu_wdata = 0;
@@ -123,7 +89,8 @@ module VIDEO_controller #(
 	);	
 
 	//===============================
-	// VRAM write buffer.
+	// VRAM write buffer
+
 	bit wb_rw;
 	bit wb_request;
 	wire wb_ready;
@@ -141,12 +108,12 @@ module VIDEO_controller #(
 		.o_empty(),
 		.o_full(),
 
-		.o_bus_rw(vram_pa_rw),
-		.o_bus_request(vram_pa_request),
-		.i_bus_ready(vram_pa_ready),
-		.o_bus_address(vram_pa_address),
-		.i_bus_rdata(vram_pa_rdata),
-		.o_bus_wdata(vram_pa_wdata),
+		.o_bus_rw(o_vram_pa_rw),
+		.o_bus_request(o_vram_pa_request),
+		.i_bus_ready(i_vram_pa_ready),
+		.o_bus_address(o_vram_pa_address),
+		.i_bus_rdata(i_vram_pa_rdata),
+		.o_bus_wdata(o_vram_pa_wdata),
 
 		.i_rw(wb_rw),
 		.i_request(wb_request),
@@ -164,7 +131,8 @@ module VIDEO_controller #(
 	end
 
 	//===============================
-	// CPU access.
+	// CPU
+
 	bit [3:0] state = 0;
 
 	always_ff @(posedge i_clock) begin
@@ -247,7 +215,8 @@ module VIDEO_controller #(
 	end
 
 	//===============================
-	// Video output.
+	// Video
+
 	bit line_r_request = 0;
 	bit [31:0] line_r_address;
 	wire [31:0] line_r_rdata;
@@ -299,33 +268,34 @@ module VIDEO_controller #(
 			) begin
 				column <= 0;
 				row_offset <= row_offset + vram_pitch;
-				vram_pb_address <= vram_read_offset + row_offset;
-				vram_pb_request <= 1'b1;
+				o_vram_pb_address <= vram_read_offset + row_offset;
+				o_vram_pb_request <= 1'b1;
 			end
 			row_num <= row_num + 1;
 		end
 
 		// Fill line buffer.
 		line_w_request <= 1'b0;
-		if (vram_pb_request) begin
-			if (vram_pb_ready) begin
+		if (o_vram_pb_request) begin
+			if (i_vram_pb_ready) begin
 				
 				line_w_request <= 1'b1;
 				line_w_address <= column;
-				line_w_wdata <= vram_pb_rdata;
+				line_w_wdata <= i_vram_pb_rdata;
 
 				column <= column + 1;
 
 				if (column < vram_pitch / 4) begin
-					vram_pb_address <= vram_pb_address + 4;
-					vram_pb_request <= 1'b1;
+					o_vram_pb_address <= o_vram_pb_address + 4;
+					o_vram_pb_request <= 1'b1;
 				end
 				else begin
-					vram_pb_request <= 1'b0;
+					o_vram_pb_request <= 1'b0;
 				end
 			end
 		end
 	end
+
 
 	bit valid;
 	bit [8:0] pixel_x;
