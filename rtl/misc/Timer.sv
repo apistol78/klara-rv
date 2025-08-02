@@ -23,7 +23,7 @@ module Timer#(
 
 	output bit o_interrupt
 );
-	localparam PRESCALE = FREQUENCY / 1000;
+	localparam PRESCALE = FREQUENCY / 1000 - 1;
 	localparam PRESCALE_WIDTH = $clog2(PRESCALE);
 
 	bit [PRESCALE_WIDTH - 1:0] prescale = 0;
@@ -66,7 +66,7 @@ module Timer#(
 			end
 
 			// Interrupt mode.
-			case (mode)
+			unique case (mode)
 				1: o_interrupt <= (cycles == compare) ? 1'b1 : 1'b0;
 				2: o_interrupt <= (countdown == 32'd1) ? 1'b1 : 1'b0;
 				default: o_interrupt <= 1'b0;
@@ -76,7 +76,7 @@ module Timer#(
 			request <= i_request;
 			if (i_request && !request) begin
 				if (!i_rw) begin
-					case (i_address)
+					unique case (i_address)
 						4'h0: o_rdata <= ms;
 						4'h1: o_rdata <= cycles[31:0];
 						4'h2: o_rdata <= cycles[63:32];
@@ -87,7 +87,7 @@ module Timer#(
 					endcase
 				end
 				else begin
-					case (i_address)
+					unique case (i_address)
 						4'h3: begin compare[31:0] <= i_wdata; mode <= 1; end
 						4'h4: begin compare[63:32] <= i_wdata; mode <= 1; end
 						4'h5: begin countdown <= i_wdata; mode <= 2; end
