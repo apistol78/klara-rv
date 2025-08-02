@@ -25,13 +25,13 @@
 #define I2C_WR_SCL_HIGH() \
 	{ *I2C_CTRL = 0x0022; }
 
-static void hal_i2c_dly()
+static void NO_OPTIMIZE hal_i2c_dly()
 {
-	for (uint32_t i = 0; i < 80; ++i)
+	for (uint32_t i = 0; i < 160; ++i)
 		__asm__ volatile ("nop");
 }
 
-static void hal_i2c_start()
+static void NO_OPTIMIZE hal_i2c_start()
 {
 	I2C_WR_SDA_HIGH();	// i2c start bit sequence
 	hal_i2c_dly();
@@ -43,7 +43,7 @@ static void hal_i2c_start()
 	hal_i2c_dly();
 }
 
-static void hal_i2c_stop()
+static void NO_OPTIMIZE hal_i2c_stop()
 {
 	I2C_WR_SDA_LOW();	// i2c stop bit sequence
 	hal_i2c_dly();
@@ -53,7 +53,7 @@ static void hal_i2c_stop()
 	hal_i2c_dly();
 }
 
-static uint8_t hal_i2c_rx(uint8_t ack)
+static uint8_t NO_OPTIMIZE hal_i2c_rx(uint8_t ack)
 {
 	uint8_t x, d = 0;
 
