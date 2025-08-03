@@ -37,10 +37,10 @@ module VIDEO_controller #(
 	input [31:0] i_vram_pa_rdata,
 	input i_vram_pa_ready,
 
-	output o_vram_pb_request,
-	output o_vram_pb_rw,
-	output [31:0] o_vram_pb_address,
-	output [31:0] o_vram_pb_wdata,
+	output bit o_vram_pb_request,
+	output bit o_vram_pb_rw,
+	output bit [31:0] o_vram_pb_address,
+	output bit [31:0] o_vram_pb_wdata,
 	input [31:0] i_vram_pb_rdata,
 	input i_vram_pb_ready
 );
@@ -57,6 +57,11 @@ module VIDEO_controller #(
 	initial begin
 		o_cpu_ready = 1'b0;
 		o_video_rdata = 1'b0;
+
+		o_vram_pb_request = 1'b0;
+		o_vram_pb_rw = 1'b0;
+		o_vram_pb_address = 0;
+		o_vram_pb_wdata = 0;
 	end
 
 	//===============================
