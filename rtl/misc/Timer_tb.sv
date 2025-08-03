@@ -33,7 +33,7 @@ module Timer_tb();
 	end
 
     initial begin
-        $dumpfile("Timer_tb.vcd");
+        $dumpfile("build/test/Timer_tb.vcd");
         $dumpvars(0, Timer_tb);
 
         // Count down

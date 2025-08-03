@@ -50,7 +50,7 @@ module CPU_DCache_WB_tb();
 	end
 
     initial begin
-        $dumpfile("CPU_DCache_WB_tb.vcd");
+        $dumpfile("build/test/CPU_DCache_WB_tb.vcd");
         $dumpvars(0, CPU_DCache_WB_tb);
 
 		repeat (10) @ (posedge clk);

@@ -53,7 +53,7 @@ module CPU_ICache_Reg_tb();
 	end
 
     initial begin
-        $dumpfile("CPU_ICache_Reg_tb.vcd");
+        $dumpfile("build/test/CPU_ICache_Reg_tb.vcd");
         $dumpvars(0, CPU_ICache_Reg_tb);
 
 		repeat (10) @(posedge clk);

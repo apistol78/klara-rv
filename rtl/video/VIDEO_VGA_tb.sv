@@ -58,7 +58,7 @@ module VIDEO_VGA_tb();
 	always #13.615 clk = ~clk;
 
 	initial begin
-		$dumpfile("VIDEO_VGA_tb.vcd");
+		$dumpfile("build/test/VIDEO_VGA_tb.vcd");
 		$dumpvars(0, VIDEO_VGA_tb);
 
 		repeat (1000000) @ (posedge clk);

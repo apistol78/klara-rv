@@ -28,7 +28,7 @@ module SPI_Flash_tb();
 	end
 
     initial begin
-        $dumpfile("SPI_Flash_tb.vcd");
+        $dumpfile("build/test/SPI_Flash_tb.vcd");
         $dumpvars(0, SPI_Flash_tb);
 
 		repeat (10) @ (posedge clk);

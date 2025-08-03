@@ -59,7 +59,7 @@ module AUDIO_tb();
 	end
 
     initial begin
-        $dumpfile("AUDIO_tb.vcd");
+        $dumpfile("build/test/AUDIO_tb.vcd");
         $dumpvars(0, AUDIO_tb);
 
 		repeat (100) @ (posedge clk);

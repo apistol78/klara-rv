@@ -102,7 +102,6 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__alu_compare_result;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__mul_request;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__mul_signed;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__mul_ready;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_request;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_signed;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_ready;
@@ -112,6 +111,7 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_request;
         CData/*1:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_s;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_request;
+        CData/*1:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__latch;
         CData/*1:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__ack;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__0__KET____DOT__q;

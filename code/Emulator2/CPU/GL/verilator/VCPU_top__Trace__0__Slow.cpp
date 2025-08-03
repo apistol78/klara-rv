@@ -853,8 +853,9 @@ VL_ATTR_COLD void VCPU_top___024root__trace_init_sub__TOP__0(VCPU_top___024root*
     tracep->declBit(c+327,0,"r1_request",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1);
     tracep->declBus(c+328,0,"r1_s",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 1,0);
     tracep->declQuad(c+329,0,"r1_intermediate",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 63,0);
-    tracep->declBit(c+331,0,"r2_request",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1);
+    tracep->declBit(c+316,0,"r2_request",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1);
     tracep->declQuad(c+317,0,"r2_result",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 63,0);
+    tracep->declBus(c+331,0,"latch",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::BIT, false,-1, 1,0);
     tracep->popPrefix();
     tracep->popPrefix();
     tracep->pushPrefix("fetch", VerilatedTracePrefixType::SCOPE_MODULE);
@@ -2728,7 +2729,7 @@ VL_ATTR_COLD void VCPU_top___024root__trace_full_0_sub_0(VCPU_top___024root* vlS
     bufp->fullCData(oldp+313,(vlSelfRef.CPU_top__DOT__cpu__DOT__csr__DOT__issued),3);
     bufp->fullBit(oldp+314,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_request));
     bufp->fullBit(oldp+315,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_signed));
-    bufp->fullBit(oldp+316,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_ready));
+    bufp->fullBit(oldp+316,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_request));
     bufp->fullQData(oldp+317,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_result),64);
     bufp->fullBit(oldp+319,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_request));
     bufp->fullBit(oldp+320,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_signed));
@@ -2742,7 +2743,7 @@ VL_ATTR_COLD void VCPU_top___024root__trace_full_0_sub_0(VCPU_top___024root* vlS
     bufp->fullBit(oldp+327,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_request));
     bufp->fullCData(oldp+328,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_s),2);
     bufp->fullQData(oldp+329,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_intermediate),64);
-    bufp->fullBit(oldp+331,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_request));
+    bufp->fullCData(oldp+331,(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__latch),2);
     bufp->fullBit(oldp+332,((0x33U == (0xfe00707fU 
                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))));
     bufp->fullBit(oldp+333,((0x13U == (0x707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))));

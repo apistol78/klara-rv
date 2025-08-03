@@ -91,6 +91,7 @@ VL_ATTR_COLD void VCPU_top___024root___eval_static__TOP(VCPU_top___024root* vlSe
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[2U] = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[3U] = 0U;
+    vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__latch = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__ack = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rw = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_request = 0U;
@@ -404,9 +405,6 @@ VL_ATTR_COLD void VCPU_top___024root___stl_sequent__TOP__0(VCPU_top___024root* v
                         VL_SHIFTL_III(32,32,32, (3U 
                                                  & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
                                                     >> 5U)), 3U));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_ready 
-        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__mul_request) 
-           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_request));
     vlSelfRef.CPU_top__DOT__cpu_ibus_ready = ((IData)(vlSelfRef.CPU_top__DOT__cpu_ibus_request) 
                                               & ((1U 
                                                   == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state)) 
@@ -3660,7 +3658,6 @@ VL_ATTR_COLD void VCPU_top___024root___ctor_var_reset(VCPU_top___024root* vlSelf
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__alu_compare_result = VL_RAND_RESET_I(1);
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__mul_request = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__mul_signed = 0;
-    vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__mul_ready = VL_RAND_RESET_I(1);
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__div_request = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__div_signed = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__div_ready = VL_RAND_RESET_I(1);
@@ -3677,6 +3674,7 @@ VL_ATTR_COLD void VCPU_top___024root___ctor_var_reset(VCPU_top___024root* vlSelf
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_intermediate = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_request = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_result = 0;
+    vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__latch = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__s = VL_RAND_RESET_I(2);
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__ack = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT____Vcellinp__df__rst = VL_RAND_RESET_I(1);

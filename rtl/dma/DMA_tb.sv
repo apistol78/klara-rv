@@ -65,7 +65,7 @@ module DMA_tb();
 	end
 
     initial begin
-        $dumpfile("DMA_tb.vcd");
+        $dumpfile("build/test/DMA_tb.vcd");
         $dumpvars(0, DMA_tb);
 
 		repeat (100) @ (posedge clk);

@@ -28,7 +28,7 @@ module UART_TX_tb();
 	end
 
     initial begin
-        $dumpfile("UART_TX_tb.vcd");
+        $dumpfile("build/test/UART_TX_tb.vcd");
         $dumpvars(0, UART_TX_tb);
 
 		repeat (1000) @ (posedge clk);

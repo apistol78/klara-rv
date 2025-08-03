@@ -10,7 +10,7 @@ module CPU_Multiply_tb();
 	bit [31:0] m_op1;
 	bit [31:0] m_op2;
 	wire m_ready;
-	wire [31:0] m_result;
+	wire [63:0] m_result;
 
 	CPU_Multiply m(
 		.i_clock(clk),
@@ -29,7 +29,7 @@ module CPU_Multiply_tb();
 	end
 
 	initial begin
-		$dumpfile("CPU_Multiply_tb.vcd");
+		$dumpfile("build/test/CPU_Multiply_tb.vcd");
 		$dumpvars(0, CPU_Multiply_tb);
 
 		repeat (10) @ (posedge clk);
@@ -37,11 +37,6 @@ module CPU_Multiply_tb();
 		m_latch = 1'b1;
 		m_op1 = 32'd111;
 		m_op2 = 32'd222;
-
-		@(posedge clk);
-
-		m_op1 = 32'd333;
-		m_op2 = 32'd444;
 
 		while (!m_ready) begin
 			@(posedge clk);
@@ -60,11 +55,6 @@ module CPU_Multiply_tb();
 		m_latch = 1'b1;
 		m_op1 = 32'd555;
 		m_op2 = 32'd666;
-
-		@(posedge clk);
-
-		m_op1 = 32'd777;
-		m_op2 = 32'd888;
 
 		while (!m_ready) begin
 			@(posedge clk);

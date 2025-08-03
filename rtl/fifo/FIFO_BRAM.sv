@@ -29,6 +29,9 @@ module FIFO_BRAM #(
 );
 	localparam DB = $clog2(DEPTH) - 1;
 
+	bit [DB:0] r_in = 0;
+	bit [DB:0] r_out = 0;
+
 	BRAM_1r1w #(
 		.WIDTH(WIDTH),
 		.SIZE(DEPTH),
@@ -37,35 +40,32 @@ module FIFO_BRAM #(
 		.i_clock(i_clock),
 
 		.i_pa_request(i_read),
-		.i_pa_address(out),
+		.i_pa_address(r_out),
 		.o_pa_rdata(o_rdata),
 		.o_pa_ready(),
 
 		.i_pb_request(i_write),
-		.i_pb_address(in),
+		.i_pb_address(r_in),
 		.i_pb_wdata(i_wdata),
 		.o_pb_ready()
 	);
 
-	bit [DB:0] in = 0;
-	bit [DB:0] out = 0;
-
-	assign o_empty = (in == out) ? 1'b1 : 1'b0;
-	assign o_full = (((in + 1) & (DEPTH - 1)) == out) ? 1'b1 : 1'b0;
-	assign o_queued = (in >= out) ? in - out : (DEPTH - out) + in;
+	assign o_empty = (r_in == r_out) ? 1'b1 : 1'b0;
+	assign o_full = (((r_in + 1) & (DEPTH - 1)) == r_out) ? 1'b1 : 1'b0;
+	assign o_queued = (r_in >= r_out) ? r_in - r_out : (DEPTH - r_out) + r_in;
 
 	always_ff @ (posedge i_clock) begin
 		if (!i_reset) begin
 			if (i_write) begin
-				in <= (in + 1) & (DEPTH - 1);
+				r_in <= (r_in + 1) & (DEPTH - 1);
 			end
 			if (i_read) begin
-				out <= (out + 1) & (DEPTH - 1);
+				r_out <= (r_out + 1) & (DEPTH - 1);
 			end
 		end
 		else begin
-			in <= 0;
-			out <= 0;
+			r_in <= 0;
+			r_out <= 0;
 		end
 	end
 

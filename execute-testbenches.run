@@ -1,0 +1,29 @@
+import(traktor)
+
+local TESTBENCHES =
+{
+	{ "rtl/audio/AUDIO_tb.sv", "rtl/audio/AUDIO_i2s_output.sv", "rtl/audio/AUDIO_controller.sv", "rtl/misc/ClockDivider.sv", "rtl/fifo/FIFO_BRAM.sv", "rtl/block/BRAM_1r1w.sv" },
+	{ "rtl/cpu/private/CPU_DCache_WB_tb.sv", "rtl/cpu/private/CPU_DCache_WB.sv" },
+	{ "rtl/cpu/private/CPU_ICache_Reg_tb.sv", "rtl/cpu/private/CPU_ICache_Reg.sv" , "rtl/cpu/private/CPU_BRAM_1r1w.sv" },
+	{ "rtl/cpu/private/CPU_Multiply_tb.sv", "rtl/cpu/private/CPU_Multiply.sv" },
+	{ "rtl/dma/DMA_tb.sv", "rtl/dma/DMA.sv", "rtl/block/BRAM.sv", "rtl/fifo/FIFO.sv" },
+	{ "rtl/flash/SPI_Flash_tb.sv", "rtl/flash/SPI_Flash.sv" },
+	{ "rtl/misc/Timer_tb.sv", "rtl/misc/Timer.sv" },
+	-- { "rtl/sdram/SDRAM_controller_tb.sv", "rtl/sdram/SDRAM_controller.sv" },
+	{ "rtl/uart/UART_TX_tb.sv", "rtl/uart/UART_TX.sv", "rtl/fifo/FIFO.sv" },
+	{ "rtl/video/VIDEO_VGA_tb.sv", "rtl/video/VIDEO_VGA.sv" }
+}
+
+function main()
+	run:mkdir("build/test")
+	for _, tb in ipairs(TESTBENCHES) do
+		local cmd = "iverilog -g2005-sv -I rtl/cpu/private"
+		for _, sv in pairs(tb) do
+			cmd = cmd .. " " .. sv
+		end
+		stdout:printLn(cmd)
+		run:execute(cmd)
+		run:execute("./a.out")
+		run:rm("./a.out")
+	end
+end
