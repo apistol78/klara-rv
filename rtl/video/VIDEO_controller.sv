@@ -222,7 +222,6 @@ module VIDEO_controller #(
 	//===============================
 	// Video
 
-	bit line_r_request = 0;
 	bit [31:0] line_r_address;
 	wire [31:0] line_r_rdata;
 

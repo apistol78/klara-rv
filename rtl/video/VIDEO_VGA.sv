@@ -41,7 +41,7 @@ module VIDEO_VGA #(
 	localparam VTOTAL = VPULSE + VBACK + VLINE + VFRONT;
 
 	always_ff @(posedge i_clock) begin
-		if (vga_h == HTOTAL - 1) begin
+		if (vga_h == HTOTAL - HFRONT - 1) begin
 			vga_h <= 0;
 			if (vga_v == VTOTAL - 1)
 				vga_v <= 0;
@@ -63,15 +63,15 @@ module VIDEO_VGA #(
 		always_comb begin
 			o_hblank = 
 				(vga_h < HPULSE + HBACK) ||
-				(vga_h > HPULSE + HBACK + HLINE);
+				(vga_h >= HPULSE + HBACK + HLINE);
 			o_vblank = 
 				(vga_v < VPULSE + VBACK) ||
-				(vga_v > VPULSE + VBACK + VLINE);
+				(vga_v >= VPULSE + VBACK + VLINE);
 		end
 
 		always_ff @(posedge i_clock) begin
-			o_pos_x <= vga_h - HBACK;
-			o_pos_y <= vga_v - VBACK;
+			o_pos_x <= vga_h - (HPULSE + HBACK - 1);
+			o_pos_y <= vga_v - (VPULSE + VBACK);
 		end
 
 		always_comb begin

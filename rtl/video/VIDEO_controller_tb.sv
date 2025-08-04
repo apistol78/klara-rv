@@ -85,7 +85,7 @@ module VIDEO_controller_tb();
 
 	DualPort vram_bus(
 		.i_reset(reset),
-		.i_clock(clock),
+		.i_clock(clk),
 
 		.o_bus_rw(video_ram_rw),
 		.o_bus_request(video_ram_request),
