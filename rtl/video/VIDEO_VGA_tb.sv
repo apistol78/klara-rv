@@ -11,7 +11,11 @@
 
 module VIDEO_VGA_tb();
 
-	bit clk;
+	bit clk_100;
+	bit clk_33;
+
+	always #1 clk_100 = ~clk_100;
+	always #13.615 clk_33 = ~clk_33;
 
 	wire vga_clock;
 	wire vga_hsync;
@@ -36,8 +40,8 @@ module VIDEO_VGA_tb();
 		.VSPOL(0),
 		.HSPOL(0)
 	) vga(
-		.i_clock(clk),
-		.i_clock_out(clk),
+		.i_clock(clk_33),
+		.i_clock_out(clk_100),
 		.o_clock(vga_clock),
 		.o_hsync(vga_hsync),
 		.o_vsync(vga_vsync),
@@ -48,20 +52,30 @@ module VIDEO_VGA_tb();
 		.o_pos_y(vga_pos_y)
 	);
 
-/*
-	initial begin
-		clk = 0;
-		#1;
-		forever clk = #5 ~clk;        
+
+	bit last_vga_hblank = 1'b0;
+	integer hblank_counter = 0;
+	always_ff @(posedge clk_100) begin
+		if (!vga_vblank) begin
+			if (vga_hblank && !last_vga_hblank)
+				hblank_counter <= hblank_counter + 1;
+		end
+		else
+			hblank_counter <= 0;
+		last_vga_hblank <= vga_hblank;
 	end
-*/
-	always #13.615 clk = ~clk;
+
 
 	initial begin
 		$dumpfile("build/test/VIDEO_VGA_tb.vcd");
 		$dumpvars(0, VIDEO_VGA_tb);
 
-		repeat (1000000) @ (posedge clk);
+		// repeat (600000) @ (posedge clk_33);
+		#15920000;	// 15.92 ms
+
+		assert(hblank_counter == 720);
+
+		#80000;	// 16 ms
 
 		$finish;
 	end

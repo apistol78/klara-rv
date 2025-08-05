@@ -69,18 +69,15 @@ module VIDEO_VGA #(
 				(vga_v >= VPULSE + VBACK + VLINE);
 		end
 
-		always_ff @(posedge i_clock) begin
-			o_pos_x <= vga_h - (HPULSE + HBACK - 1);
-			o_pos_y <= vga_v - (VPULSE + VBACK);
+		always_comb begin
+			o_data_enable = ~o_vblank && ~o_hblank;
 		end
 
 		always_comb begin
-			o_data_enable =
-				(
-					(vga_h >= HPULSE + HBACK && vga_h < (HPULSE + HBACK + HLINE)) &&
-					(vga_v >= VPULSE + VBACK && vga_v < (VPULSE + VBACK + VLINE))
-				);
+			o_pos_x = ~o_hblank ? vga_h - (HPULSE + HBACK) : 0;
+			o_pos_y = ~o_vblank ? vga_v - (VPULSE + VBACK) : 0;
 		end
+
 	end endgenerate
 
 	generate if (USE_CLOCK_OUT) begin
