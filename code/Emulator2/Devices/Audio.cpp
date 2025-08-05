@@ -47,6 +47,9 @@ public:
 
 	virtual bool getBlock(sound::IAudioBufferCursor* cursor, const sound::IAudioMixer* mixer, sound::AudioBlock& outBlock) const
 	{
+		while (queued() < 1024)
+			ThreadManager::getInstance().getCurrentThread()->sleep(1);
+	
 		uint32_t samplesCount = std::min< uint32_t >(outBlock.samplesCount, queued());
 		samplesCount = std::min< uint32_t >(samplesCount, 1024);
 

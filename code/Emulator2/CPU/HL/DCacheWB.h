@@ -30,9 +30,12 @@ public:
 
 private:
 	traktor::Ref< Bus > m_bus;
-	uint32_t m_address;
-	uint32_t m_word;
-	bool m_dirty = false;
+	
+	uint32_t m_address[4];
+	uint32_t m_word[4];
+	bool m_dirty[4] = { false, false, false, false };
+	uint8_t m_count = 0;
+
 	uint64_t m_stalls = 0;
 	uint64_t m_transactions = 0;
 };

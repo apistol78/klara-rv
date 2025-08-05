@@ -7,8 +7,8 @@
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include <Core/Log/Log.h>
-#include "Emulator/CPU/DCacheWB.h"
-#include "Emulator/CPU/Bus.h"
+#include "Emulator2/CPU/Bus.h"
+#include "Emulator2/CPU/HL/DCacheWB.h"
 
 using namespace traktor;
 
@@ -26,35 +26,47 @@ DCacheWB::~DCacheWB()
 
 void DCacheWB::writeU32(uint32_t address, uint32_t value)
 {
-	if (m_dirty)
+	if (m_dirty[m_count])
 	{
-		m_bus->writeU32(m_address, m_word);
+		m_bus->writeU32(m_address[m_count], m_word[m_count]);
 		m_stalls++;
 	}
 
-	m_address = address;
-	m_word = value;
-	m_dirty = true;
+	m_address[m_count] = address;
+	m_word[m_count] = value;
+	m_dirty[m_count] = true;
+	m_count = (m_count + 1) & 3;
+
 	m_transactions++;
 }
 
 uint32_t DCacheWB::readU32(uint32_t address)
 {
-	if (m_dirty)
+	bool stalled = false;
+	for (int32_t i = 0; i < 4; ++i)
 	{
-		m_bus->writeU32(m_address, m_word);
-		m_stalls++;
-		m_dirty = false;
+		if (m_dirty[i])
+		{
+			m_bus->writeU32(m_address[i], m_word[i]);
+			m_dirty[i] = false;
+			stalled = true;
+		}
 	}
+	if (stalled)
+		m_stalls++;
 
 	return m_bus->readU32(address);
 }
 
 void DCacheWB::process()
 {
-	if (m_dirty)
+	for (int32_t i = 0; i < 4; ++i)
 	{
-		m_bus->writeU32(m_address, m_word);
-		m_dirty = false;
+		if (m_dirty[i])
+		{
+			m_bus->writeU32(m_address[i], m_word[i]);
+			m_dirty[i] = false;
+			break;
+		}
 	}
 }

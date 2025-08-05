@@ -8,8 +8,8 @@
 */
 #include <Core/Log/Log.h>
 #include <Core/Misc/String.h>
-#include "Emulator/CPU/BusAccess.h"
-#include "Emulator/CPU/DCache.h"
+#include "Emulator2/CPU/HL/BusAccess.h"
+#include "Emulator2/CPU/HL/DCache.h"
 
 using namespace traktor;
 
