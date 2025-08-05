@@ -10,6 +10,7 @@
 
 #include <Core/Io/FileSystem.h>
 #include <Core/Log/Log.h>
+#include <Core/Memory/Alloc.h>
 #include <Core/Thread/ThreadManager.h>
 #include <Sound/AudioChannel.h>
 #include <Sound/AudioSystem.h>
@@ -19,7 +20,6 @@
 #include "Emulator2/Devices/Audio.h"
 
 using namespace traktor;
-
 
 class WrappedAudioBufferCursor : public RefCountImpl< sound::IAudioBufferCursor >
 {
@@ -34,6 +34,12 @@ public:
 class WrappedAudioBuffer : public sound::IAudioBuffer
 {
 public:
+	WrappedAudioBuffer()
+	{
+		m_buffer[0] = (float*)Alloc::acquireAlign(1024 * sizeof(float), 16, "");
+		m_buffer[1] = (float*)Alloc::acquireAlign(1024 * sizeof(float), 16, "");
+	}
+
 	virtual Ref< sound::IAudioBufferCursor > createCursor() const
 	{
 		return new WrappedAudioBufferCursor();
@@ -41,19 +47,19 @@ public:
 
 	virtual bool getBlock(sound::IAudioBufferCursor* cursor, const sound::IAudioMixer* mixer, sound::AudioBlock& outBlock) const
 	{
-		const uint32_t samplesCount = std::min(outBlock.samplesCount, queued());
+		uint32_t samplesCount = std::min< uint32_t >(outBlock.samplesCount, queued());
+		samplesCount = std::min< uint32_t >(samplesCount, 1024);
 
 		for (int32_t i = 0; i < 2; ++i)
 		{
-			m_buffer[i].resize(samplesCount, 0.0f);
-			std::memcpy(m_buffer[i].ptr(), m_queued[i].ptr(), samplesCount * sizeof(float));
+			std::memcpy(m_buffer[i], m_queued[i].ptr(), samplesCount * sizeof(float));
 
 			if (samplesCount < m_queued[i].size())
 				m_queued[i].erase(m_queued[i].begin(), m_queued[i].begin() + samplesCount);
 			else
 				m_queued[i].resize(0);
 
-			outBlock.samples[i] = m_buffer[i].ptr();
+			outBlock.samples[i] = m_buffer[i];
 		}
 
 		outBlock.sampleRate = m_rate;
@@ -63,9 +69,22 @@ public:
 		return true;
 	}
 
-	void write(int32_t channel, float sample)
+	void write(uint32_t value)
 	{
-		m_queued[channel].push_back(sample);
+		if (queued() >= 4096)
+		{
+			log::info << L"Stalling audio writing; not enough space in FIFO." << Endl;
+			while (queued() >= 4096)
+				ThreadManager::getInstance().getCurrentThread()->sleep(1);
+		}
+
+		const uint16_t lh = (value >> 16);
+		const uint16_t rh = (value & 0xffff);
+		const float flh = (*(int16_t*)&lh) / 32767.0f;
+		const float frh = (*(int16_t*)&rh) / 32767.0f;
+
+		m_queued[0].push_back(flh);
+		m_queued[1].push_back(frh);
 	}
 
 	uint32_t queued() const
@@ -80,7 +99,7 @@ public:
 
 private:
 	mutable AlignedVector< float > m_queued[2];
-	mutable AlignedVector< float > m_buffer[2];
+	float* m_buffer[2];
 	uint32_t m_rate = 44100;
 };
 
@@ -97,7 +116,7 @@ Audio::Audio()
 	desc.driverDesc.sampleRate = 44100;
 	desc.driverDesc.bitsPerSample = 16;
 	desc.driverDesc.hwChannels = 2;
-	desc.driverDesc.frameSamples = 1024;
+	desc.driverDesc.frameSamples = 128;
 
 	m_audioSystem = new sound::AudioSystem(audioDriver);
 	m_audioSystem->create(desc);
@@ -114,12 +133,7 @@ bool Audio::writeU32(uint32_t address, uint32_t value)
 
 	if (address == 0x0)
 	{
-		while (wab->queued() > 4096)
-			ThreadManager::getInstance().getCurrentThread()->sleep(1);
-
-		const int16_t sv = *(int16_t*)&value;
-		wab->write(m_channel, sv / 32767.0f);
-		m_channel = (m_channel + 1) & 1;
+		wab->write(value);
 	}
 	else if (address == 0x4)
 	{

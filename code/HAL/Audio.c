@@ -29,8 +29,8 @@ uint32_t hal_audio_get_queued()
 
 void hal_audio_play_mono(const int16_t* samples, uint32_t nsamples)
 {
-	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
-	if (s_channels == 1)
+	volatile uint32_t* audio = (volatile uint32_t*)AUDIO_BASE;
+	/*if (s_channels == 1)
 	{
 		uint32_t i = 0;
 		for (; nsamples >= 4 && i < nsamples - 4; i += 4)
@@ -43,12 +43,12 @@ void hal_audio_play_mono(const int16_t* samples, uint32_t nsamples)
 		for (; i < nsamples; ++i)
 			*audio = samples[i];
 	}
-	else if (s_channels == 2)
+	else*/ if (s_channels == 2)
 	{
 		for (uint32_t i = 0; i < nsamples; ++i)
 		{
-			*audio = samples[i];
-			*audio = samples[i];
+			const uint16_t v = *(uint16_t*)&samples[i];
+			*audio = (v << 16) | v;
 		}
 	}
 }
@@ -56,7 +56,7 @@ void hal_audio_play_mono(const int16_t* samples, uint32_t nsamples)
 void hal_audio_play_stereo(const int16_t* samples, uint32_t nsamples)
 {
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
-	if (s_channels == 1)
+	/*if (s_channels == 1)
 	{
 		uint32_t i = 0;
 		for (; nsamples >= 2 * 8 && i < nsamples - 2 * 8; i += 2 * 8)
@@ -109,12 +109,13 @@ void hal_audio_play_stereo(const int16_t* samples, uint32_t nsamples)
 			*audio = (int16_t)((lh + rh) >> 1);
 		}
 	}
-	else if (s_channels == 2)
+	else*/ if (s_channels == 2)
 	{
 		for (uint32_t i = 0; i < nsamples; i += 2)
 		{
-			*audio = samples[i + 0];
-			*audio = samples[i + 1];
+			const uint16_t lh = *(uint16_t*)&samples[i];
+			const uint16_t rh = *(uint16_t*)&samples[i + 1];
+			*audio = (lh << 16) | rh;
 		}
 	}
 }

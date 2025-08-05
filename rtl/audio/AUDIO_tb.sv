@@ -16,13 +16,14 @@ module AUDIO_tb();
     bit ac_request = 1'b0;
     bit ac_rw = 1'b0;
     bit [3:0] ac_address;
-    bit [15:0] ac_wdata;
+    bit [31:0] ac_wdata;
     wire [31:0] ac_rdata;
     wire ac_ready;
     wire ac_interrupt;
 
     wire ac_output_busy;
-    wire [15:0] ac_output_sample;
+    wire [15:0] ac_output_sample_left;
+    wire [15:0] ac_output_sample_right;
     wire [31:0] ac_output_reload;
 
     AUDIO_i2s_output #(
@@ -30,7 +31,8 @@ module AUDIO_tb();
     ) ao(
         .i_clock(clk),
         .o_busy(ac_output_busy),
-        .i_sample(ac_output_sample)
+        .i_sample_left(ac_output_sample_left),
+        .i_sample_right(ac_output_sample_right)
     );
 
     AUDIO_controller #(
@@ -48,7 +50,8 @@ module AUDIO_tb();
         .o_interrupt(ac_interrupt),
 
         .i_output_busy(ac_output_busy),
-        .o_output_sample(ac_output_sample),
+        .o_output_sample_left(ac_output_sample_left),
+        .o_output_sample_right(ac_output_sample_right),
         .o_output_reload(ac_output_reload)
     );
 
@@ -64,7 +67,7 @@ module AUDIO_tb();
 
 		repeat (100) @ (posedge clk);
 
-        ac_wdata <= 16'h01;
+        ac_wdata <= { 16'h01, 16'h81 };
         repeat (100) begin
             @(posedge clk);
             ac_request <= 1'b1;
@@ -72,7 +75,7 @@ module AUDIO_tb();
             ac_address <= 0;
             while (!ac_ready) @(posedge clk);
             ac_request <= 1'b0;
-            ac_wdata <= ac_wdata + 16'h01;
+            ac_wdata <= ac_wdata + { 16'h01, 16'h01 };
             @(posedge clk);
         end
 

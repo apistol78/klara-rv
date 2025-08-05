@@ -19,14 +19,15 @@ module AUDIO_controller #(
 	input i_request,
 	input i_rw,
 	input [3:0] i_address,
-	input [15:0] i_wdata,
+	input [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 	output bit o_interrupt,
 
 	// Audio output
 	input i_output_busy,
-	output [15:0] o_output_sample,
+	output [15:0] o_output_sample_left,
+	output [15:0] o_output_sample_right,
 	output bit [31:0] o_output_reload
 );
 	// Sample FIFO.
@@ -34,10 +35,11 @@ module AUDIO_controller #(
 	wire output_fifo_full;
 	bit output_fifo_wr = 0;
 	bit output_fifo_rd = 0;
+	wire [31:0] output_sample;
 	wire [$clog2(BUFFER_SIZE)-1:0] output_fifo_queued;
 	FIFO_BRAM #(
 		.DEPTH(BUFFER_SIZE),
-		.WIDTH(16)
+		.WIDTH(32)
 	) output_fifo(
 		.i_reset(i_reset),
         .i_clock(i_clock),
@@ -46,9 +48,12 @@ module AUDIO_controller #(
 		.i_write(output_fifo_wr),
 		.i_wdata(i_wdata),
 		.i_read(output_fifo_rd),
-		.o_rdata(o_output_sample),
+		.o_rdata(output_sample),
 		.o_queued(output_fifo_queued)
 	);
+
+	assign o_output_sample_left = output_sample[31:16];
+	assign o_output_sample_right = output_sample[15:0];
 
     initial begin
 		o_ready = 0;

@@ -15,7 +15,8 @@ module AUDIO_i2s_output #(
 	input i_clock,
 
 	output bit o_busy,
-	input [15:0] i_sample,
+	input [15:0] i_sample_left,
+	input [15:0] i_sample_right,
 
 	output bit o_i2s_sdout,
 	output bit o_i2s_sclk,
@@ -48,7 +49,7 @@ module AUDIO_i2s_output #(
 	bit [1:0] sclk_pp = 2'b00;
 	bit [4:0] bitcnt = 0;
 	bit lrck = 0;
-	bit [15:0] sample = 0;
+	bit [31:0] sample = 0;
 	bit sdout = 0;
 	bit [1:0] busy = 2'b00;
 
@@ -63,18 +64,24 @@ module AUDIO_i2s_output #(
 
 		sclk_pp <= { sclk_pp[0], sclk };
 		if (sclk_pp == 2'b10) begin
-			sdout <= sample[15];
-			sample <= { sample[14:0], 1'b0 };
+			sdout <= sample[31];
+			sample <= { sample[30:0], 1'b0 };
+
 			bitcnt <= bitcnt + 1;
-			if (bitcnt >= 16 - 1) begin
+
+			// Swap channel.
+			if (bitcnt == 16 - 1)
 				lrck <= ~lrck;
+
+			// End transmission.
+			else if (bitcnt == 32 - 1) begin
 				bitcnt <= 0;
 				busy[0] <= 1'b0;
 			end
 		end
 
 		if (busy == 2'b01)
-			sample <= i_sample;
+			sample <= { i_sample_left, i_sample_right };
 	end
 
 endmodule
