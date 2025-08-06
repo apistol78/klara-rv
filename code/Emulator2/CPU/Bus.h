@@ -39,12 +39,18 @@ private:
 	{
 		uint32_t start;
 		uint32_t end;
-		bool cacheable;
 		traktor::Ref< IDevice > device;
+	};
+
+	struct CacheableRange
+	{
+		uint32_t start;
+		uint32_t end;
 	};
 
 	traktor::StaticVector< MappedDevice, 32 > m_mappedDevices;
 	traktor::StaticVector< IDevice*, 32 > m_tickDevices;
+	traktor::StaticVector< CacheableRange, 32 > m_cacheableRanges;
 	mutable const MappedDevice* m_last = nullptr;
 	mutable bool m_error = false;
 
