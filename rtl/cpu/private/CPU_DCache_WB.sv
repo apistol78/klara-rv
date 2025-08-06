@@ -28,7 +28,8 @@ module CPU_DCache_WB(
 	output bit o_ready,
 	input [31:0] i_address,
 	output bit [31:0] o_rdata,
-	input [31:0] i_wdata
+	input [31:0] i_wdata,
+	input i_cached
 );
 
 	bit wb_dirty [4];
@@ -88,8 +89,16 @@ module CPU_DCache_WB(
 			o_bus_address = i_address;
 			o_ready = i_bus_ready;
 		end
-		// Write request; need to have at least one slot free.
-		else if (i_request && i_rw && !all_dirty) begin
+		// Non-cached write request; cannot have any queued writes.
+		else if (i_request && i_rw && !i_cached && !any_dirty) begin
+			o_bus_rw = 1'b1;
+			o_bus_request = 1'b1;
+			o_bus_address = i_address;
+			o_bus_wdata = i_wdata;
+			o_ready = i_bus_ready;
+		end
+		// Cached write request; need to have at least one slot free.
+		else if (i_request && i_rw && i_cached && !all_dirty) begin
 			if (!wb_dirty[0]) begin
 				next_wb_address[0] = i_address;
 				next_wb_data[0] = i_wdata;

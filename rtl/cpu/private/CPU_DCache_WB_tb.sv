@@ -15,6 +15,7 @@ module CPU_DCache_WB_tb();
 	bit [31:0] wb_address = 0;
 	wire [31:0] wb_rdata;
 	bit [31:0] wb_wdata = 0;
+	bit wb_cached = 1'b1;
 
 	CPU_DCache_WB wb(
 		.i_reset(1'b0),
@@ -28,7 +29,8 @@ module CPU_DCache_WB_tb();
 		.o_ready(wb_ready),
 		.i_address(wb_address),
 		.o_rdata(wb_rdata),
-		.i_wdata(wb_wdata)
+		.i_wdata(wb_wdata),
+		.i_cached(wb_cached)
 	);
 
 	initial begin

@@ -65,61 +65,65 @@ void CPU_gate::setSP(uint32_t sp)
 
 bool CPU_gate::tick(uint32_t count)
 {
-	const uint32_t from = m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__retired;
-	while (m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__retired == from)
+	for (uint32_t i = 0; i < count; ++i)
 	{
-		// m_tb->timer_interrupt = 0;
-		// m_tb->external_interrupt = 0;
-
-		// if ((m_interrupt & TIMER) != 0)
-		// 	m_tb->timer_interrupt = 1;
-		// if ((m_interrupt & EXTERNAL) != 0)
-		// 	m_tb->external_interrupt = 1;
-
-		// m_interrupt = 0;
-
-		// Positive edge.
-		m_time++;
-
-		m_tb->clock = 1;
-		m_tb->eval();
-
-		if (m_tfp)
-			m_tfp->dump(m_time);
-
-		// Handle bus request.
-		m_tb->bus_ready = 0;
-		if (m_tb->bus_request)
+		const uint32_t from = m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__retired;
+		while (m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__retired == from)
 		{
-			if (!m_lastBusRequest)
+			// Dispatch interrupt signals.
+			m_tb->timer_interrupt = 0;
+			m_tb->external_interrupt = 0;
+
+			if ((m_interrupt & TIMER) != 0)
+				m_tb->timer_interrupt = 1;
+			if ((m_interrupt & EXTERNAL) != 0)
+				m_tb->external_interrupt = 1;
+
+			m_interrupt = 0;
+
+			// Positive edge.
+			m_time++;
+
+			m_tb->clock = 1;
+			m_tb->eval();
+
+			if (m_tfp)
+				m_tfp->dump(m_time);
+
+			// Handle bus request.
+			m_tb->bus_ready = 0;
+			if (m_tb->bus_request)
 			{
-				if (!m_tb->bus_rw)
+				if (!m_lastBusRequest)
 				{
-					const uint32_t data = m_bus->readU32(m_tb->bus_address);
-					m_tb->bus_rdata = data;
+					if (!m_tb->bus_rw)
+					{
+						const uint32_t data = m_bus->readU32(m_tb->bus_address);
+						m_tb->bus_rdata = data;
+					}
+					else
+					{
+						m_bus->writeU32(m_tb->bus_address, m_tb->bus_wdata);
+					}
 				}
-				else
-				{
-					m_bus->writeU32(m_tb->bus_address, m_tb->bus_wdata);
-				}
+
+				m_tb->bus_ready = 1;
 			}
+			m_lastBusRequest = (bool)m_tb->bus_request;
 
-			m_tb->bus_ready = 1;
+			// Tick devices attached to bus.
+			if (!m_bus->tick(this))
+				return false;
+
+			// Negative edge.
+			m_time++;
+
+			m_tb->clock = 0;
+			m_tb->eval();
+
+			if (m_tfp)
+				m_tfp->dump(m_time);
 		}
-		m_lastBusRequest = (bool)m_tb->bus_request;
-
-		// Tick devices attached to bus.
-		if (!m_bus->tick(this))
-			return false;
-
-		// Negative edge.
-		m_time++;
-
-		m_tb->clock = 0;
-		m_tb->eval();
-
-		if (m_tfp)
-			m_tfp->dump(m_time);
 	}
 	return true;
 }

@@ -67,6 +67,7 @@ module CPU_DCache_Reg #(
 	bit [31:0] wb_address = 0;
 	wire [31:0] wb_rdata;
 	bit [31:0] wb_wdata = 0;
+	bit wb_cached = 0;
 
 	CPU_DCache_WB wb(
 		.i_reset(i_reset),
@@ -84,7 +85,8 @@ module CPU_DCache_Reg #(
 		.o_ready(wb_ready),
 		.i_address(wb_address),
 		.o_rdata(wb_rdata),
-		.i_wdata(wb_wdata)
+		.i_wdata(wb_wdata),
+		.i_cached(wb_cached)
 	);
 
 	// Cache memory.
@@ -167,6 +169,7 @@ module CPU_DCache_Reg #(
 						wb_address <= i_address;
 						wb_request <= 1'b1;
 						wb_wdata <= i_wdata;
+						wb_cached <= 1'b0;
 						state <= PASS_THROUGH;
 					end
 				end
@@ -192,6 +195,7 @@ module CPU_DCache_Reg #(
 					wb_address <= cache_entry_address;
 					wb_request <= 1'b1;
 					wb_wdata <= cache_entry_data;
+					wb_cached <= 1'b1;
 					state <= FLUSH_WRITE;
 				end
 				else begin
@@ -239,6 +243,7 @@ module CPU_DCache_Reg #(
 					wb_address <= cache_entry_address;
 					wb_request <= 1'b1;
 					wb_wdata <= cache_entry_data;
+					wb_cached <= 1'b1;
 					state <= WRITE_WAIT;
 				end
 				else begin
@@ -277,12 +282,14 @@ module CPU_DCache_Reg #(
 						wb_address <= cache_entry_address;
 						wb_request <= 1'b1;
 						wb_wdata <= cache_entry_data;
+						wb_cached <= 1'b1;
 						state <= READ_WB_WAIT;
 					end
 					else begin
 						wb_rw <= 1'b0;
 						wb_address <= i_address;
 						wb_request <= 1'b1;
+						wb_cached <= 1'b1;
 						state <= READ_BUS_WAIT;
 					end
 				end
@@ -301,6 +308,7 @@ module CPU_DCache_Reg #(
 				wb_rw <= 1'b0;
 				wb_address <= i_address;
 				wb_request <= 1'b1;
+				wb_cached <= 1'b1;
 				if (wb_ready) begin
 					cache_rw <= 1'b1;
 					cache_wdata <= { wb_rdata, i_address[31:2], 2'b01 };
