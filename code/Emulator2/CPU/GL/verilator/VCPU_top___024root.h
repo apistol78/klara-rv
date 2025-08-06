@@ -159,8 +159,8 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb_request;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb_ready;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__cache_rw;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_dirty;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_dirty;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__all_dirty;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__any_dirty;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__cache__DOT__o_ready;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__cache__DOT__o_valid;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__writeback__DOT__last_strobe;
@@ -185,6 +185,7 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         VL_OUT(bus_wdata,31,0);
         IData/*31:0*/ CPU_top__DOT__cpu_ibus_address;
         IData/*31:0*/ CPU_top__DOT__cpu_dbus_address;
+        IData/*31:0*/ CPU_top__DOT__cpu_dbus_wdata;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__o_dcache_hit;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__o_dcache_miss;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__csr_rdata;
@@ -211,9 +212,9 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__alu_signed_sum_result;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_result;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_remainder;
-        IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_uop1;
     };
     struct {
+        IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_uop1;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_uop2;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__31__KET____DOT__t;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rdata;
@@ -222,10 +223,8 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h9eb5ee7c_0_0;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb_address;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb_wdata;
-        IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_address;
-        IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_data;
-        IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_address;
-        IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_data;
+        IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__unnamedblk1__DOT__i;
+        IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__unnamedblk2__DOT__i;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__writeback__DOT__last_pc;
         IData/*31:0*/ __VactIterCount;
         VlWide<4>/*116:0*/ CPU_top__DOT__cpu__DOT__fetch_data;
@@ -259,6 +258,12 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         VlUnpacked<IData/*31:0*/, 33> CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend;
         VlUnpacked<IData/*31:0*/, 33> CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__divisor;
         VlUnpacked<IData/*31:0*/, 33> CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient;
+        VlUnpacked<CData/*0:0*/, 4> CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_dirty;
+        VlUnpacked<IData/*31:0*/, 4> CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_address;
+        VlUnpacked<IData/*31:0*/, 4> CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__wb_data;
+        VlUnpacked<CData/*0:0*/, 4> CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_dirty;
+        VlUnpacked<IData/*31:0*/, 4> CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_address;
+        VlUnpacked<IData/*31:0*/, 4> CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__wb__DOT__next_wb_data;
         VlUnpacked<QData/*63:0*/, 4096> CPU_top__DOT__cpu__DOT__memory__DOT__genblk1__DOT__dcache__DOT__cache__DOT__data;
         VlUnpacked<IData/*31:0*/, 33> __Vtrigprevexpr___TOP__CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__quotient__0;
         VlUnpacked<IData/*31:0*/, 33> __Vtrigprevexpr___TOP__CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend__0;
@@ -268,7 +273,7 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         VlUnpacked<IData/*31:0*/, 33> __Vtrigprevexpr___TOP__CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__dividend__1;
         VlUnpacked<IData/*31:0*/, 33> __Vtrigprevexpr___TOP__CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__divisor__1;
         VlUnpacked<CData/*0:0*/, 33> __Vtrigprevexpr___TOP__CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__ready__1;
-        VlUnpacked<CData/*0:0*/, 10> __Vm_traceActivity;
+        VlUnpacked<CData/*0:0*/, 11> __Vm_traceActivity;
     };
     VlTriggerVec<5> __VstlTriggered;
     VlTriggerVec<1> __VicoTriggered;
