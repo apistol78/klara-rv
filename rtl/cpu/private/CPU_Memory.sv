@@ -12,7 +12,8 @@
 
 module CPU_Memory #(
 	parameter DCACHE_SIZE,
-	parameter DCACHE_REGISTERED
+	parameter DCACHE_REGISTERED,
+	parameter DCACHE_WB_QUEUE
 )(
 	input i_reset,
 	input i_clock,
@@ -47,6 +48,57 @@ module CPU_Memory #(
 		FLUSH
 	} state_t;
 
+	// ================
+	// Write back queue
+
+	bit wb_rw = 1'b0;
+	bit wb_request = 1'b0;
+	wire wb_ready;
+	bit [31:0] wb_address = 0;
+	wire [31:0] wb_rdata;
+	bit [31:0] wb_wdata = 0;
+	wire wb_cacheable = (wb_address == 4'h2);
+
+	generate if (DCACHE_WB_QUEUE != 0) begin
+
+	// Write queue.
+	CPU_DCache_WB wb(
+		.i_reset(i_reset),
+		.i_clock(i_clock),
+
+		.o_bus_rw(o_bus_rw),
+		.o_bus_request(o_bus_request),
+		.i_bus_ready(i_bus_ready),
+		.o_bus_address(o_bus_address),
+		.i_bus_rdata(i_bus_rdata),
+		.o_bus_wdata(o_bus_wdata),
+
+		.i_rw(wb_rw),
+		.i_request(wb_request),
+		.o_ready(wb_ready),
+		.i_address(wb_address),
+		.o_rdata(wb_rdata),
+		.i_wdata(wb_wdata),
+		.i_cached(wb_cacheable)
+	);
+
+	end endgenerate
+	
+	generate if (DCACHE_WB_QUEUE == 0) begin
+
+	// No write queue.
+	assign o_bus_rw = wb_rw;
+	assign o_bus_request = wb_request;
+	assign wb_ready = i_bus_ready;
+	assign o_bus_address = wb_address;
+	assign wb_rdata = i_bus_rdata;
+	assign o_bus_wdata = wb_wdata;
+
+	end endgenerate
+
+	// ================
+	// DCache
+
 	bit dcache_rw = 0;
 	bit dcache_request = 0;
 	bit dcache_flush = 0;
@@ -55,8 +107,6 @@ module CPU_Memory #(
 	wire [31:0] dcache_rdata;
 	bit [31:0] dcache_wdata = 0;
 	wire dcache_need_flush;
-
-	// Only access SDRAM using DCACHE, since other are fast enough or periferials.
 	wire dcache_cacheable = (i_data.mem_address[31:28] == 4'h2);
 
 	generate if (DCACHE_SIZE > 0 && DCACHE_REGISTERED != 0) begin
@@ -67,12 +117,12 @@ module CPU_Memory #(
 			.i_reset(i_reset),
 			.i_clock(i_clock),
 
-			.o_bus_rw(o_bus_rw),
-			.o_bus_request(o_bus_request),
-			.i_bus_ready(i_bus_ready),
-			.o_bus_address(o_bus_address),
-			.i_bus_rdata(i_bus_rdata),
-			.o_bus_wdata(o_bus_wdata),
+			.o_bus_rw(wb_rw),
+			.o_bus_request(wb_request),
+			.i_bus_ready(wb_ready),
+			.o_bus_address(wb_address),
+			.i_bus_rdata(wb_rdata),
+			.o_bus_wdata(wb_wdata),
 
 			.i_rw(dcache_rw),
 			.i_request(dcache_request),

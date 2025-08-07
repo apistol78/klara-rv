@@ -27,7 +27,8 @@ module CPU #(
 	parameter ICACHE_SIZE = 13,
 	parameter ICACHE_REGISTERED = 0,
 	parameter DCACHE_SIZE = 14,
-	parameter DCACHE_REGISTERED = 1
+	parameter DCACHE_REGISTERED = 1,
+	parameter DCACHE_WB_QUEUE = 0
 )(
 	input i_reset,
 	input i_clock,					// CPU clock
@@ -265,7 +266,8 @@ module CPU #(
 
 	CPU_Memory #(
 		.DCACHE_SIZE(DCACHE_SIZE),
-		.DCACHE_REGISTERED(DCACHE_REGISTERED)
+		.DCACHE_REGISTERED(DCACHE_REGISTERED),
+		.DCACHE_WB_QUEUE(DCACHE_WB_QUEUE)
 	) memory(
 		.i_reset(i_reset),
 		.i_clock(i_clock),

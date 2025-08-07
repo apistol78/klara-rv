@@ -25,7 +25,6 @@ module CPU_top(
 	output cpu_fault
 );
 
-
 	//====================================================
 	// CPU BusMux
 	CPU_BusMux #(
@@ -54,7 +53,6 @@ module CPU_top(
 		.i_pb_wdata(cpu_dbus_wdata)
 	);
 
-
 	//====================================================
 	// CPU
 	wire cpu_ibus_request;
@@ -72,8 +70,9 @@ module CPU_top(
 		.FREQUENCY(`FREQUENCY),
 		.DCACHE_SIZE(12),
 		.DCACHE_REGISTERED(1),
+		.DCACHE_WB_QUEUE(0),
 		.ICACHE_SIZE(12),
-		.ICACHE_REGISTERED(1)		
+		.ICACHE_REGISTERED(1)
 	) cpu(
 		.i_reset(reset),
 		.i_clock(clock),
