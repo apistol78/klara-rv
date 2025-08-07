@@ -6,8 +6,8 @@
 	<projects>
 		<item type="traktor.sb.Project" version="1">
 			<enable>true</enable>
-			<name>KlaraRV.CPU</name>
-			<sourcePath>code/Emulator/CPU</sourcePath>
+			<name>KlaraRV.Emulator2</name>
+			<sourcePath>code/Emulator2</sourcePath>
 			<configurations>
 				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugShared</name>
@@ -15,11 +15,12 @@
 					<targetProfile>TpDebug</targetProfile>
 					<precompiledHeader/>
 					<includePaths>
-						<item>$(TRAKTOR_HOME)/code</item>
 						<item>code</item>
+						<item>$(VERILATOR_ROOT)</item>
+						<item>$(VERILATOR_ROOT)/include</item>
 					</includePaths>
 					<definitions>
-						<item>_DEBUG</item>
+						<item>T_EMULATOR2_EXPORT</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -39,11 +40,12 @@
 					<targetProfile>TpRelease</targetProfile>
 					<precompiledHeader/>
 					<includePaths>
-						<item>$(TRAKTOR_HOME)/code</item>
 						<item>code</item>
+						<item>$(VERILATOR_ROOT)</item>
+						<item>$(VERILATOR_ROOT)/include</item>
 					</includePaths>
 					<definitions>
-						<item>NDEBUG</item>
+						<item>T_EMULATOR2_EXPORT</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -63,13 +65,11 @@
 					<targetProfile>TpDebug</targetProfile>
 					<precompiledHeader/>
 					<includePaths>
-						<item>$(TRAKTOR_HOME)/code</item>
 						<item>code</item>
+						<item>$(VERILATOR_ROOT)</item>
+						<item>$(VERILATOR_ROOT)/include</item>
 					</includePaths>
-					<definitions>
-						<item>T_STATIC</item>
-						<item>_DEBUG</item>
-					</definitions>
+					<definitions/>
 					<libraryPaths/>
 					<libraries/>
 					<warningLevel>WlCompilerDefault</warningLevel>
@@ -88,13 +88,11 @@
 					<targetProfile>TpRelease</targetProfile>
 					<precompiledHeader/>
 					<includePaths>
-						<item>$(TRAKTOR_HOME)/code</item>
 						<item>code</item>
+						<item>$(VERILATOR_ROOT)</item>
+						<item>$(VERILATOR_ROOT)/include</item>
 					</includePaths>
-					<definitions>
-						<item>T_STATIC</item>
-						<item>NDEBUG</item>
-					</definitions>
+					<definitions/>
 					<libraryPaths/>
 					<libraries/>
 					<warningLevel>WlCompilerDefault</warningLevel>
@@ -109,6 +107,56 @@
 				</item>
 			</configurations>
 			<items>
+				<item type="traktor.sb.Filter">
+					<name>CPU</name>
+					<items>
+						<item type="traktor.sb.File" version="1">
+							<fileName>CPU/*.*</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+						<item type="traktor.sb.Filter">
+							<name>GL</name>
+							<items>
+								<item type="traktor.sb.File" version="1">
+									<fileName>CPU/GL/*.*</fileName>
+									<excludeFilter/>
+									<items/>
+								</item>
+								<item type="traktor.sb.Filter">
+									<name>verilator</name>
+									<items>
+										<item type="traktor.sb.File" version="1">
+											<fileName>CPU/GL/verilator/*.*</fileName>
+											<excludeFilter/>
+											<items/>
+										</item>
+									</items>
+								</item>
+							</items>
+						</item>
+						<item type="traktor.sb.Filter">
+							<name>HL</name>
+							<items>
+								<item type="traktor.sb.File" version="1">
+									<fileName>CPU/HL/*.*</fileName>
+									<excludeFilter/>
+									<items/>
+								</item>
+							</items>
+						</item>
+					</items>
+				</item>
+				<item type="traktor.sb.Filter">
+					<name>Devices</name>
+					<items>
+						<item type="traktor.sb.File" version="1">
+							<fileName>Devices/*.*</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
 				<item type="traktor.sb.File" version="1">
 					<fileName>*.*</fileName>
 					<excludeFilter/>
@@ -121,131 +169,6 @@
 					<link>LnkYes</link>
 					<solutionFileName>$(TRAKTOR_HOME)/resources/build/TraktorWin64.xms</solutionFileName>
 					<projectName>Traktor.Core</projectName>
-				</item>
-			</dependencies>
-		</item>
-		<item type="traktor.sb.Project" version="1">
-			<enable>true</enable>
-			<name>KlaraRV.Devices</name>
-			<sourcePath>code/Emulator/Devices</sourcePath>
-			<configurations>
-				<item type="traktor.sb.Configuration" version="5">
-					<name>DebugShared</name>
-					<targetFormat>TfStaticLibrary</targetFormat>
-					<targetProfile>TpDebug</targetProfile>
-					<precompiledHeader/>
-					<includePaths>
-						<item>$(TRAKTOR_HOME)/code</item>
-						<item>code</item>
-					</includePaths>
-					<definitions>
-						<item>_DEBUG</item>
-					</definitions>
-					<libraryPaths/>
-					<libraries/>
-					<warningLevel>WlCompilerDefault</warningLevel>
-					<additionalCompilerOptions/>
-					<additionalLinkerOptions/>
-					<debugExecutable/>
-					<debugArguments/>
-					<debugEnvironment/>
-					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
-				</item>
-				<item type="traktor.sb.Configuration" version="5">
-					<name>ReleaseShared</name>
-					<targetFormat>TfStaticLibrary</targetFormat>
-					<targetProfile>TpRelease</targetProfile>
-					<precompiledHeader/>
-					<includePaths>
-						<item>$(TRAKTOR_HOME)/code</item>
-						<item>code</item>
-					</includePaths>
-					<definitions>
-						<item>NDEBUG</item>
-					</definitions>
-					<libraryPaths/>
-					<libraries/>
-					<warningLevel>WlCompilerDefault</warningLevel>
-					<additionalCompilerOptions/>
-					<additionalLinkerOptions/>
-					<debugExecutable/>
-					<debugArguments/>
-					<debugEnvironment/>
-					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
-				</item>
-				<item type="traktor.sb.Configuration" version="5">
-					<name>DebugStatic</name>
-					<targetFormat>TfStaticLibrary</targetFormat>
-					<targetProfile>TpDebug</targetProfile>
-					<precompiledHeader/>
-					<includePaths>
-						<item>$(TRAKTOR_HOME)/code</item>
-						<item>code</item>
-					</includePaths>
-					<definitions>
-						<item>T_STATIC</item>
-						<item>_DEBUG</item>
-					</definitions>
-					<libraryPaths/>
-					<libraries/>
-					<warningLevel>WlCompilerDefault</warningLevel>
-					<additionalCompilerOptions/>
-					<additionalLinkerOptions/>
-					<debugExecutable/>
-					<debugArguments/>
-					<debugEnvironment/>
-					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
-				</item>
-				<item type="traktor.sb.Configuration" version="5">
-					<name>ReleaseStatic</name>
-					<targetFormat>TfStaticLibrary</targetFormat>
-					<targetProfile>TpRelease</targetProfile>
-					<precompiledHeader/>
-					<includePaths>
-						<item>$(TRAKTOR_HOME)/code</item>
-						<item>code</item>
-					</includePaths>
-					<definitions>
-						<item>T_STATIC</item>
-						<item>NDEBUG</item>
-					</definitions>
-					<libraryPaths/>
-					<libraries/>
-					<warningLevel>WlCompilerDefault</warningLevel>
-					<additionalCompilerOptions/>
-					<additionalLinkerOptions/>
-					<debugExecutable/>
-					<debugArguments/>
-					<debugEnvironment/>
-					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
-				</item>
-			</configurations>
-			<items>
-				<item type="traktor.sb.File" version="1">
-					<fileName>*.*</fileName>
-					<excludeFilter/>
-					<items/>
-				</item>
-			</items>
-			<dependencies>
-				<item type="traktor.sb.ExternalDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<solutionFileName>$(TRAKTOR_HOME)/resources/build/TraktorWin64.xms</solutionFileName>
-					<projectName>Traktor.Core</projectName>
-				</item>
-				<item type="traktor.sb.ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item"/>
 				</item>
 				<item type="traktor.sb.ExternalDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
@@ -253,7 +176,141 @@
 					<solutionFileName>$(TRAKTOR_HOME)/resources/build/TraktorWin64.xms</solutionFileName>
 					<projectName>Traktor.Drawing</projectName>
 				</item>
+				<item type="traktor.sb.ExternalDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<solutionFileName>$(TRAKTOR_HOME)/resources/build/TraktorWin64.xms</solutionFileName>
+					<projectName>Traktor.Sound</projectName>
+				</item>
+				<item type="traktor.sb.ExternalDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<solutionFileName>$(TRAKTOR_HOME)/resources/build/TraktorWin64.xms</solutionFileName>
+					<projectName>Traktor.Sound.XAudio2</projectName>
+				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project type="traktor.sb.Project" version="1">
+						<enable>true</enable>
+						<name>KlaraRV.Emulator2.Verilated</name>
+						<sourcePath>$(VERILATOR_ROOT)/include</sourcePath>
+						<configurations>
+							<item type="traktor.sb.Configuration" version="5">
+								<name>DebugShared</name>
+								<targetFormat>TfStaticLibrary</targetFormat>
+								<targetProfile>TpDebug</targetProfile>
+								<precompiledHeader/>
+								<includePaths>
+									<item>$(VERILATOR_ROOT)/include</item>
+								</includePaths>
+								<definitions/>
+								<libraryPaths/>
+								<libraries>
+									<item>z</item>
+								</libraries>
+								<warningLevel>WlCompilerDefault</warningLevel>
+								<additionalCompilerOptions/>
+								<additionalLinkerOptions/>
+								<debugExecutable/>
+								<debugArguments/>
+								<debugEnvironment/>
+								<debugWorkingDirectory/>
+								<aggregationItems/>
+								<consumerLibraryPath/>
+							</item>
+							<item type="traktor.sb.Configuration" version="5">
+								<name>ReleaseShared</name>
+								<targetFormat>TfStaticLibrary</targetFormat>
+								<targetProfile>TpRelease</targetProfile>
+								<precompiledHeader/>
+								<includePaths>
+									<item>$(VERILATOR_ROOT)/include</item>
+								</includePaths>
+								<definitions/>
+								<libraryPaths/>
+								<libraries>
+									<item>z</item>
+								</libraries>
+								<warningLevel>WlCompilerDefault</warningLevel>
+								<additionalCompilerOptions/>
+								<additionalLinkerOptions/>
+								<debugExecutable/>
+								<debugArguments/>
+								<debugEnvironment/>
+								<debugWorkingDirectory/>
+								<aggregationItems/>
+								<consumerLibraryPath/>
+							</item>
+							<item type="traktor.sb.Configuration" version="5">
+								<name>DebugStatic</name>
+								<targetFormat>TfStaticLibrary</targetFormat>
+								<targetProfile>TpDebug</targetProfile>
+								<precompiledHeader/>
+								<includePaths>
+									<item>$(VERILATOR_ROOT)/include</item>
+								</includePaths>
+								<definitions/>
+								<libraryPaths/>
+								<libraries>
+									<item>z</item>
+								</libraries>
+								<warningLevel>WlCompilerDefault</warningLevel>
+								<additionalCompilerOptions/>
+								<additionalLinkerOptions/>
+								<debugExecutable/>
+								<debugArguments/>
+								<debugEnvironment/>
+								<debugWorkingDirectory/>
+								<aggregationItems/>
+								<consumerLibraryPath/>
+							</item>
+							<item type="traktor.sb.Configuration" version="5">
+								<name>ReleaseStatic</name>
+								<targetFormat>TfStaticLibrary</targetFormat>
+								<targetProfile>TpRelease</targetProfile>
+								<precompiledHeader/>
+								<includePaths>
+									<item>$(VERILATOR_ROOT)/include</item>
+								</includePaths>
+								<definitions/>
+								<libraryPaths/>
+								<libraries>
+									<item>z</item>
+								</libraries>
+								<warningLevel>WlCompilerDefault</warningLevel>
+								<additionalCompilerOptions/>
+								<additionalLinkerOptions/>
+								<debugExecutable/>
+								<debugArguments/>
+								<debugEnvironment/>
+								<debugWorkingDirectory/>
+								<aggregationItems/>
+								<consumerLibraryPath/>
+							</item>
+						</configurations>
+						<items>
+							<item type="traktor.sb.File" version="1">
+								<fileName>verilated.cpp</fileName>
+								<excludeFilter/>
+								<items/>
+							</item>
+							<item type="traktor.sb.File" version="1">
+								<fileName>verilated_fst_c.cpp</fileName>
+								<excludeFilter/>
+								<items/>
+							</item>
+							<item type="traktor.sb.File" version="1">
+								<fileName>verilated_threads.cpp</fileName>
+								<excludeFilter/>
+								<items/>
+							</item>
+						</items>
+						<dependencies/>
+					</project>
+				</item>
 			</dependencies>
 		</item>
+		<item ref="/object/projects/item/dependencies/item[4]/project"/>
 	</projects>
 </object>

@@ -55,12 +55,6 @@ local SOURCE < const > =
 
 function main()
 
-	-- Ensure we can launch yosys before all else.
-	if os:whereIs("yosys") == nil then
-		stderr:printLn("Unable to locate yosys; ensure it's accessible through PATH.")
-		return 1
-	end
-
 	-- Concatenate all source files.
 	local f = ""
 	for _, sv in ipairs(SOURCE) do
@@ -69,14 +63,12 @@ function main()
 	stdout:printLn(f)
 
 	-- Generate C++ from verilog files.
-	run:execute("verilator --trace-fst --trace-structs --cc -I" .. PATH_CPU .. " -I" .. PATH_CPU .. "/private -I" .. PATH_CPU .. "/private/fpu -Wno-WIDTH -Wno-WIDTHCONCAT -Wno-TIMESCALEMOD --Mdir " .. PATH_OUTPUT .. " --top-module CPU_top " .. f)
-
-	--[[
-	-- Compile library from verilator files.
-	run:pushd(PATH_OUTPUT)
-	run:execute("make -f VCPU_top.mk")
-	run:popd()
-	]]
+	local xc = run:execute("verilator --trace-fst --trace-structs --cc -I" .. PATH_CPU .. " -I" .. PATH_CPU .. "/private -I" .. PATH_CPU .. "/private/fpu -Wno-WIDTH -Wno-WIDTHCONCAT -Wno-TIMESCALEMOD --Mdir " .. PATH_OUTPUT .. " --top-module CPU_top " .. f)
+	if xc ~= 0 then
+		stdout:printLn("Unable to create verilator files!")
+		return 1
+	end
 
 	stdout:printLn("Build successful.")
+	return 0
 end
