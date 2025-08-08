@@ -93,10 +93,6 @@ VL_ATTR_COLD void VCPU_top___024root___eval_static__TOP(VCPU_top___024root* vlSe
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[3U] = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__latch = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__ack = 0U;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw = 0U;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request = 0U;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address = 0U;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rw = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_request = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_flush = 0U;
@@ -403,14 +399,6 @@ VL_ATTR_COLD void VCPU_top___024root___stl_sequent__TOP__0(VCPU_top___024root* v
                                                  & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
                                                     >> 5U)), 3U));
     vlSelfRef.bus_request = 0U;
-    if ((0U != (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-        if ((1U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            vlSelfRef.bus_request = vlSelfRef.CPU_top__DOT__cpu_ibus_request;
-        } else if ((2U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            vlSelfRef.bus_request = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request;
-        }
-    }
-    vlSelfRef.bus_wdata = 0U;
     vlSelfRef.CPU_top__DOT__cpu_ibus_ready = ((IData)(vlSelfRef.CPU_top__DOT__cpu_ibus_request) 
                                               & ((1U 
                                                   == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state)) 
@@ -428,39 +416,56 @@ VL_ATTR_COLD void VCPU_top___024root___stl_sequent__TOP__0(VCPU_top___024root* v
                       : ((vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
                           << 0x19U) | (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
                                        >> 7U))));
-    vlSelfRef.CPU_top__DOT__bus__DOT__next_state = vlSelfRef.CPU_top__DOT__bus__DOT__state;
+    vlSelfRef.bus_wdata = 0U;
     vlSelfRef.bus_rw = 0U;
+    vlSelfRef.CPU_top__DOT__bus__DOT__next_state = vlSelfRef.CPU_top__DOT__bus__DOT__state;
+    if ((4U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+        vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+    } else if ((2U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+        if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+            if (vlSelfRef.bus_ready) {
+                vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+            }
+        } else if (vlSelfRef.bus_ready) {
+            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+        }
+    } else if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+        if (vlSelfRef.bus_ready) {
+            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+        }
+    } else if (vlSelfRef.CPU_top__DOT__cpu_ibus_request) {
+        vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 1U;
+    } else if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) {
+        vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 2U;
+    }
     vlSelfRef.bus_address = 0U;
-    if ((0U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-        if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) {
-            vlSelfRef.bus_wdata = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 2U;
-            vlSelfRef.bus_rw = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw;
-            vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address;
-        } else if (vlSelfRef.CPU_top__DOT__cpu_ibus_request) {
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 1U;
+    if ((1U & (~ ((IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state) 
+                  >> 2U)))) {
+        if ((2U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+            vlSelfRef.bus_request = ((1U & (~ (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) 
+                                     && (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request));
+            if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+                vlSelfRef.bus_wdata = 0U;
+                vlSelfRef.bus_address = 0U;
+            } else {
+                vlSelfRef.bus_wdata = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
+                vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address;
+            }
+            vlSelfRef.bus_rw = ((1U & (~ (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) 
+                                && (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw));
+        } else if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+            vlSelfRef.bus_request = vlSelfRef.CPU_top__DOT__cpu_ibus_request;
+            vlSelfRef.bus_wdata = 0U;
             vlSelfRef.bus_rw = 0U;
             vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu_ibus_address;
-        }
-    } else {
-        if ((1U != (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            if ((2U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-                vlSelfRef.bus_wdata = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
-                vlSelfRef.bus_rw = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw;
-            }
-        }
-        if ((1U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            if (vlSelfRef.bus_ready) {
-                vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
-            }
+        } else if (vlSelfRef.CPU_top__DOT__cpu_ibus_request) {
+            vlSelfRef.bus_wdata = 0U;
+            vlSelfRef.bus_rw = 0U;
             vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu_ibus_address;
-        } else if ((2U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            if (vlSelfRef.bus_ready) {
-                vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
-            }
+        } else if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) {
+            vlSelfRef.bus_wdata = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
+            vlSelfRef.bus_rw = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw;
             vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address;
-        } else {
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
         }
     }
     vlSelfRef.CPU_top__DOT__cpu__DOT__forward__DOT__rs3 = 0U;

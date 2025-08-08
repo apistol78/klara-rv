@@ -31,22 +31,24 @@ VL_INLINE_OPT void VCPU_top___024root___ico_sequent__TOP__0(VCPU_top___024root* 
                                                   == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state)) 
                                                  & (IData)(vlSelfRef.bus_ready)));
     vlSelfRef.CPU_top__DOT__bus__DOT__next_state = vlSelfRef.CPU_top__DOT__bus__DOT__state;
-    if ((0U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-        if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) {
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 2U;
-        } else if (vlSelfRef.CPU_top__DOT__cpu_ibus_request) {
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 1U;
-        }
-    } else if ((1U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-        if (vlSelfRef.bus_ready) {
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
-        }
-    } else if ((2U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-        if (vlSelfRef.bus_ready) {
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
-        }
-    } else {
+    if ((4U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
         vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+    } else if ((2U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+        if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+            if (vlSelfRef.bus_ready) {
+                vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+            }
+        } else if (vlSelfRef.bus_ready) {
+            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+        }
+    } else if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+        if (vlSelfRef.bus_ready) {
+            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+        }
+    } else if (vlSelfRef.CPU_top__DOT__cpu_ibus_request) {
+        vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 1U;
+    } else if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) {
+        vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 2U;
     }
 }
 
@@ -3500,7 +3502,6 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
             = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__cache__DOT__data
             [vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__cache_address];
     }
-    vlSelfRef.bus_wdata = 0U;
     vlSelfRef.CPU_top__DOT__cpu_dbus_ready = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) 
                                               & ((2U 
                                                   == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state)) 
@@ -3735,50 +3736,60 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
         }
     }
     vlSelfRef.bus_request = 0U;
-    if ((0U != (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-        if ((1U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            vlSelfRef.bus_request = vlSelfRef.CPU_top__DOT__cpu_ibus_request;
-        } else if ((2U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            vlSelfRef.bus_request = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request;
-        }
-    }
     vlSelfRef.CPU_top__DOT__cpu_ibus_ready = ((IData)(vlSelfRef.CPU_top__DOT__cpu_ibus_request) 
                                               & ((1U 
                                                   == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state)) 
                                                  & (IData)(vlSelfRef.bus_ready)));
-    vlSelfRef.CPU_top__DOT__bus__DOT__next_state = vlSelfRef.CPU_top__DOT__bus__DOT__state;
+    vlSelfRef.bus_wdata = 0U;
     vlSelfRef.bus_rw = 0U;
+    vlSelfRef.CPU_top__DOT__bus__DOT__next_state = vlSelfRef.CPU_top__DOT__bus__DOT__state;
+    if ((4U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+        vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+    } else if ((2U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+        if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+            if (vlSelfRef.bus_ready) {
+                vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+            }
+        } else if (vlSelfRef.bus_ready) {
+            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+        }
+    } else if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+        if (vlSelfRef.bus_ready) {
+            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
+        }
+    } else if (vlSelfRef.CPU_top__DOT__cpu_ibus_request) {
+        vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 1U;
+    } else if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) {
+        vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 2U;
+    }
     vlSelfRef.bus_address = 0U;
-    if ((0U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-        if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) {
-            vlSelfRef.bus_wdata = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 2U;
-            vlSelfRef.bus_rw = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw;
-            vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address;
-        } else if (vlSelfRef.CPU_top__DOT__cpu_ibus_request) {
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 1U;
+    if ((1U & (~ ((IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state) 
+                  >> 2U)))) {
+        if ((2U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+            vlSelfRef.bus_request = ((1U & (~ (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) 
+                                     && (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request));
+            if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+                vlSelfRef.bus_wdata = 0U;
+                vlSelfRef.bus_address = 0U;
+            } else {
+                vlSelfRef.bus_wdata = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
+                vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address;
+            }
+            vlSelfRef.bus_rw = ((1U & (~ (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) 
+                                && (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw));
+        } else if ((1U & (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
+            vlSelfRef.bus_request = vlSelfRef.CPU_top__DOT__cpu_ibus_request;
+            vlSelfRef.bus_wdata = 0U;
             vlSelfRef.bus_rw = 0U;
             vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu_ibus_address;
-        }
-    } else {
-        if ((1U != (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            if ((2U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-                vlSelfRef.bus_wdata = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
-                vlSelfRef.bus_rw = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw;
-            }
-        }
-        if ((1U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            if (vlSelfRef.bus_ready) {
-                vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
-            }
+        } else if (vlSelfRef.CPU_top__DOT__cpu_ibus_request) {
+            vlSelfRef.bus_wdata = 0U;
+            vlSelfRef.bus_rw = 0U;
             vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu_ibus_address;
-        } else if ((2U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state))) {
-            if (vlSelfRef.bus_ready) {
-                vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
-            }
+        } else if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) {
+            vlSelfRef.bus_wdata = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
+            vlSelfRef.bus_rw = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw;
             vlSelfRef.bus_address = vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address;
-        } else {
-            vlSelfRef.CPU_top__DOT__bus__DOT__next_state = 0U;
         }
     }
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata 

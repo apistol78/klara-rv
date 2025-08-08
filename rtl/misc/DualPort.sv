@@ -21,6 +21,14 @@ module DualPort(
 	input [31:0] i_bus_rdata,			// Read data
 	output bit [31:0] o_bus_wdata,		// Write data,
 
+	// Port A
+	input i_pa_rw,
+	input i_pa_request,
+	output bit o_pa_ready,
+	input [31:0] i_pa_address,
+	output bit [31:0] o_pa_rdata,
+	input [31:0] i_pa_wdata,
+
 	// Port B
 	input i_pb_rw,
 	input i_pb_request,
@@ -38,12 +46,14 @@ module DualPort(
 	input [31:0] i_pc_wdata
 );
 
-	bit [1:0] state = 0;
-	bit [1:0] next_state;
+	bit [2:0] state = 0;
+	bit [2:0] next_state;
 
-	assign o_pb_ready = i_pb_request && (state == 2'd1) ? i_bus_ready : 1'b0;
-	assign o_pc_ready = i_pc_request && (state == 2'd2) ? i_bus_ready : 1'b0;
+	assign o_pa_ready = i_pa_request && (state == 3'd1) ? i_bus_ready : 1'b0;
+	assign o_pb_ready = i_pb_request && (state == 3'd2) ? i_bus_ready : 1'b0;
+	assign o_pc_ready = i_pc_request && (state == 3'd3) ? i_bus_ready : 1'b0;
 
+	assign o_pa_rdata = i_bus_rdata;
 	assign o_pb_rdata = i_bus_rdata;
 	assign o_pc_rdata = i_bus_rdata;
 
@@ -55,51 +65,66 @@ module DualPort(
 
 		next_state = state;
 
-		o_bus_request = 0;
-		o_bus_rw = 0;
+		o_bus_request = 1'b0;
+		o_bus_rw = 1'b0;
 		o_bus_address = 0;
 		o_bus_wdata = 0;
 		
-		case (state)
+		unique case (state)
 
 			// Wait for any request.
-			2'd0: begin
-				if (i_pb_request) begin
+			3'd0: begin
+				if (i_pa_request) begin
+					o_bus_rw = i_pa_rw;
+					o_bus_address = i_pa_address;
+					o_bus_wdata = i_pa_wdata;
+					next_state = 3'd1;
+				end
+				else if (i_pb_request) begin
 					o_bus_rw = i_pb_rw;
 					o_bus_address = i_pb_address;
 					o_bus_wdata = i_pb_wdata;
-					next_state = 2'd1;
+					next_state = 3'd2;
 				end
 				else if (i_pc_request) begin
 					o_bus_rw = i_pc_rw;
 					o_bus_address = i_pc_address;
 					o_bus_wdata = i_pc_wdata;
-					next_state = 2'd2;
+					next_state = 3'd3;
 				end					
 			end
 
 			// Wait until request has been processed.
-			2'd1: begin
+			3'd1: begin
+				o_bus_request = i_pa_request;
+				o_bus_rw = i_pa_rw;
+				o_bus_address = i_pa_address;
+				o_bus_wdata = i_pa_wdata;
+				if (i_bus_ready) begin
+					next_state = 3'd0;
+				end
+			end
+			3'd2: begin
 				o_bus_request = i_pb_request;
 				o_bus_rw = i_pb_rw;
 				o_bus_address = i_pb_address;
 				o_bus_wdata = i_pb_wdata;
 				if (i_bus_ready) begin
-					next_state = 2'd0;
+					next_state = 3'd0;
 				end
 			end
-			2'd2: begin
+			3'd3: begin
 				o_bus_request = i_pc_request;
 				o_bus_rw = i_pc_rw;
 				o_bus_address = i_pc_address;
 				o_bus_wdata = i_pc_wdata;
 				if (i_bus_ready) begin
-					next_state = 2'd0;
+					next_state = 3'd0;
 				end
 			end
 
 			default:
-				next_state = 2'd0;
+				next_state = 3'd0;
 
 		endcase
 	end

@@ -12,13 +12,13 @@ import (traktor)
 run:loadScript("sv2v.run")
 
 local PATH_CPU < const > = "rtl/cpu"
+local PATH_MISC < const > = "rtl/misc"
 local PATH_OUTPUT < const > = "code/Emulator2/CPU/GL/verilator"
 
 local SOURCE < const > =
 {
 	PATH_CPU .. "/CPU_top.sv",
 	PATH_CPU .. "/CPU.sv",
-	PATH_CPU .. "/CPU_BusMux.sv",
 	PATH_CPU .. "/private/CPU_ALU.sv",
 	PATH_CPU .. "/private/CPU_BRAM.sv",
 	PATH_CPU .. "/private/CPU_BRAM_1r1w.sv",
@@ -50,7 +50,8 @@ local SOURCE < const > =
 	PATH_CPU .. "/private/fpu/CPU_FPU_Float.sv",
 	PATH_CPU .. "/private/fpu/CPU_FPU_Int.sv",
 	PATH_CPU .. "/private/fpu/CPU_FPU_Mul.sv",
-	PATH_CPU .. "/private/fpu/CPU_FPU_MulAdd.sv"
+	PATH_CPU .. "/private/fpu/CPU_FPU_MulAdd.sv",
+	PATH_MISC .. "/DualPort.sv",
 }
 
 function main()

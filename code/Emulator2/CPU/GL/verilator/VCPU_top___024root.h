@@ -28,8 +28,8 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu_ibus_request;
         CData/*0:0*/ CPU_top__DOT__cpu_ibus_ready;
         CData/*0:0*/ CPU_top__DOT__cpu_dbus_ready;
-        CData/*1:0*/ CPU_top__DOT__bus__DOT__state;
-        CData/*1:0*/ CPU_top__DOT__bus__DOT__next_state;
+        CData/*2:0*/ CPU_top__DOT__bus__DOT__state;
+        CData/*2:0*/ CPU_top__DOT__bus__DOT__next_state;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__csr_wdata_wr;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__csr_irq_pending;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__csr_irq_dispatched;

@@ -1284,7 +1284,7 @@ void VCPU_top___024root__trace_chg_0_sub_0(VCPU_top___024root* vlSelf, Verilated
         bufp->chgBit(oldp+227,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request));
         bufp->chgIData(oldp+228,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address),32);
         bufp->chgIData(oldp+229,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata),32);
-        bufp->chgCData(oldp+230,(vlSelfRef.CPU_top__DOT__bus__DOT__state),2);
+        bufp->chgCData(oldp+230,(vlSelfRef.CPU_top__DOT__bus__DOT__state),3);
         bufp->chgBit(oldp+231,((((1U & (vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[3U] 
                                         >> 0x15U)) 
                                  != (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__last_strobe)) 
@@ -2595,7 +2595,7 @@ void VCPU_top___024root__trace_chg_0_sub_0(VCPU_top___024root* vlSelf, Verilated
     bufp->chgBit(oldp+696,(((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_request) 
                             & ((2U == (IData)(vlSelfRef.CPU_top__DOT__bus__DOT__state)) 
                                & (IData)(vlSelfRef.bus_ready)))));
-    bufp->chgCData(oldp+697,(vlSelfRef.CPU_top__DOT__bus__DOT__next_state),2);
+    bufp->chgCData(oldp+697,(vlSelfRef.CPU_top__DOT__bus__DOT__next_state),3);
     bufp->chgIData(oldp+698,(((0U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[0U] 
                                               >> 0x14U)))
                                ? vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__alu_signed_sum_result

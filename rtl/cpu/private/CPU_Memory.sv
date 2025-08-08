@@ -51,12 +51,12 @@ module CPU_Memory #(
 	// ================
 	// Write back queue
 
-	bit wb_rw = 1'b0;
-	bit wb_request = 1'b0;
+	bit wb_rw;
+	bit wb_request;
 	wire wb_ready;
-	bit [31:0] wb_address = 0;
+	bit [31:0] wb_address;
 	wire [31:0] wb_rdata;
-	bit [31:0] wb_wdata = 0;
+	bit [31:0] wb_wdata;
 	wire wb_cacheable = (wb_address == 4'h2);
 
 	generate if (DCACHE_WB_QUEUE != 0) begin
