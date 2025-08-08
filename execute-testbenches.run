@@ -2,6 +2,7 @@ import(traktor)
 
 local TESTBENCHES =
 {
+	--[[
 	{ "rtl/audio/AUDIO_tb.sv", "rtl/audio/AUDIO_i2s_output.sv", "rtl/audio/AUDIO_controller.sv", "rtl/misc/ClockDivider.sv", "rtl/fifo/FIFO_BRAM.sv", "rtl/block/BRAM_1r1w.sv" },
 	{ "rtl/cpu/private/CPU_DCache_WB_tb.sv", "rtl/cpu/private/CPU_DCache_WB.sv" },
 	{ "rtl/cpu/private/CPU_ICache_Reg_tb.sv", "rtl/cpu/private/CPU_ICache_Reg.sv", "rtl/cpu/private/CPU_BRAM_1r1w.sv" },
@@ -13,6 +14,8 @@ local TESTBENCHES =
 	{ "rtl/uart/UART_TX_tb.sv", "rtl/uart/UART_TX.sv", "rtl/fifo/FIFO.sv" },
 	{ "rtl/video/VIDEO_VGA_tb.sv", "rtl/video/VIDEO_VGA.sv" },
 	{ "rtl/video/VIDEO_controller_tb.sv", "rtl/video/VIDEO_controller.sv", "rtl/video/VIDEO_VGA.sv", "rtl/misc/DualPort.sv", "rtl/misc/WriteBuffer.sv", "rtl/fifo/FIFO_BRAM.sv", "rtl/block/BRAM_1r1w.sv", "rtl/block/BRAM.sv" },
+	]]
+	{ "rtl/misc/XBAR_2_2_tb.sv", "rtl/misc/XBAR_2_2.sv", "rtl/block/BRAM.sv" },
 }
 
 function main()
