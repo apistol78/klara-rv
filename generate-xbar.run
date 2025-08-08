@@ -1,0 +1,131 @@
+import(traktor)
+
+function main()
+
+	local NMASTERS = 3  -- cpu ibus, cpu dbus, dma
+	local NSLAVES = 9   -- spif, sdram, uart, i2c, sd, timer, audio, plic, video
+
+
+    local o = stdout
+
+
+    o:printLn("module XBAR_" .. NMASTERS .. "_" ..NSLAVES .. "(")
+    o:printLn("\tinput i_reset,")
+    o:printLn("\tinput i_clock,")
+
+    -- Masters
+    for i = 0, NMASTERS - 1 do
+        o:printLn()
+        o:printLn("\t// Master " .. i)
+        o:printLn("\tinput i_m" .. i .. "_rw,")
+        o:printLn("\tinput i_m" .. i .. "_request,")
+        o:printLn("\toutput bit o_m" .. i .. "_ready,")
+        o:printLn("\tinput [31:0] i_m" .. i .. "_address,")
+        o:printLn("\toutput bit [31:0] o_m" .. i .. "_rdata,")
+        o:printLn("\tinput [31:0] i_m" .. i .. "_wdata,")
+    end
+
+    -- Slaves
+    for i = 0, NSLAVES - 1 do
+        o:printLn()
+        o:printLn("\t// Slave " .. i)
+	    o:printLn("\toutput bit o_s" .. i .. "_rw,")
+	    o:printLn("\toutput bit o_s" .. i .. "_request,")
+	    o:printLn("\tinput i_s" .. i .. "_ready,")
+	    o:printLn("\toutput bit [31:0] o_s" .. i .. "_address,")
+	    o:printLn("\tinput [31:0] i_s" .. i .. "_rdata,")
+	    o:printLn("\toutput bit [31:0] o_s" .. i .. "_wdata,")
+    end
+
+    o:printLn(");")
+
+    for i = 0, NSLAVES - 1 do
+        o:printLn("\tbit [3:0] s" .. i .. "_source;")
+        o:printLn("\tbit [3:0] next_s" .. i .. "_source;")
+    end
+    o:printLn()
+
+    o:printLn("\talways_ff @(posedge i_clock) begin")
+    for i = 0, NSLAVES - 1 do
+        o:printLn("\t\ts" .. i .. "_source <= next_s" .. i .. "_source;")
+    end
+    o:printLn("\tend")
+    o:printLn()
+
+    o:printLn("\talways_comb begin")
+    for i = 0, NSLAVES - 1 do
+        o:printLn("\t\tnext_s" .. i .. "_source = 4'h0;")
+    end
+    o:printLn()
+    for i = 0, NSLAVES - 1 do
+        o:printLn("\t\to_s" .. i .. "_rw = 1'b0;")
+        o:printLn("\t\to_s" .. i .. "_request = 1'b0;")
+        o:printLn("\t\to_s" .. i .. "_address = 32'h0;")
+        o:printLn("\t\to_s" .. i .. "_wdata = 32'h0;")
+    end
+    o:printLn()
+    for i = 0, NMASTERS - 1 do
+        o:printLn("\t\to_m" .. i .. "_ready = 1'b0;")
+        o:printLn("\t\to_m" .. i .. "_rdata = 32'h0;")
+    end
+    for i = 0, NMASTERS - 1 do
+        o:printLn()
+        o:printLn("\t\tif (i_m" .. i .. "_request) begin")
+        for j = 0, NSLAVES - 1 do
+            o:printLn("\t\t\tif (")
+            o:printLn("\t\t\t\ti_m" .. i .. "_address[31:28] == 4'h" .. string.format("%x", j) .. " &&")
+            o:printLn("\t\t\t\t(s" .. j .. "_source == 4'h0 || s_" .. j .. "_source == 4'h" .. string.format("%x", i + 1) .. ")")
+            o:printLn("\t\t\t) begin")
+
+            o:printLn("\t\t\t\to_s" .. j .. "_rw = i_m" .. i .. "_rw;")
+            o:printLn("\t\t\t\to_s" .. j .. "_request = 1'b1;")
+            o:printLn("\t\t\t\to_m" .. i .. "_ready = i_s" .. j .. "_ready;")
+            o:printLn("\t\t\t\to_s" .. j .. "_address = i_m" .. i .. "_address;")
+            o:printLn("\t\t\t\to_m" .. i .. "_rdata = i_s" .. j .. "_rdata;")
+            o:printLn("\t\t\t\to_s" .. j .. "_wdata = i_m" .. i .. "_wdata;")
+
+            o:printLn("\t\t\t\tnext_s" .. j .. "_source = i_s" .. j .. "_ready ? 4'h0 : 4'h" .. string.format("%x", i + 1) .. ";")
+            o:printLn("\t\t\tend")
+        end
+        o:printLn("\t\tend")
+    end
+    o:printLn("\tend")
+
+    --[[
+
+
+    bit next_s0_request;
+
+    always_comb begin
+        next_s0_request = o_s0_request;
+        if (i_m0_request) begin
+            if (
+                i_m0_address[31:28] == 4'h0 &&
+                o_s0_request == 1'b0
+            ) begin
+                next_s0_request = 1'b1;
+            end
+        end
+    end
+
+
+
+    if (i_m0_request) begin
+
+        if (m0_granted) begin
+
+            if (i_m0_address[31:28] == 4'h0) begin
+                o_s0_address = i_m0_request;
+            end
+
+        end
+
+    end
+
+
+    ]]
+
+    o:printLn("endmodule")
+
+
+end

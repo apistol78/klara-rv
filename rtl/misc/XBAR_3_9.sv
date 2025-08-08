@@ -1,0 +1,520 @@
+module XBAR_3_9(
+	input i_reset,
+	input i_clock,
+
+	// Master 0
+	input i_m0_rw,
+	input i_m0_request,
+	output bit o_m0_ready,
+	input [31:0] i_m0_address,
+	output bit [31:0] o_m0_rdata,
+	input [31:0] i_m0_wdata,
+
+	// Master 1
+	input i_m1_rw,
+	input i_m1_request,
+	output bit o_m1_ready,
+	input [31:0] i_m1_address,
+	output bit [31:0] o_m1_rdata,
+	input [31:0] i_m1_wdata,
+
+	// Master 2
+	input i_m2_rw,
+	input i_m2_request,
+	output bit o_m2_ready,
+	input [31:0] i_m2_address,
+	output bit [31:0] o_m2_rdata,
+	input [31:0] i_m2_wdata,
+
+	// Slave 0
+	output bit o_s0_rw,
+	output bit o_s0_request,
+	input i_s0_ready,
+	output bit [31:0] o_s0_address,
+	input [31:0] i_s0_rdata,
+	output bit [31:0] o_s0_wdata,
+
+	// Slave 1
+	output bit o_s1_rw,
+	output bit o_s1_request,
+	input i_s1_ready,
+	output bit [31:0] o_s1_address,
+	input [31:0] i_s1_rdata,
+	output bit [31:0] o_s1_wdata,
+
+	// Slave 2
+	output bit o_s2_rw,
+	output bit o_s2_request,
+	input i_s2_ready,
+	output bit [31:0] o_s2_address,
+	input [31:0] i_s2_rdata,
+	output bit [31:0] o_s2_wdata,
+
+	// Slave 3
+	output bit o_s3_rw,
+	output bit o_s3_request,
+	input i_s3_ready,
+	output bit [31:0] o_s3_address,
+	input [31:0] i_s3_rdata,
+	output bit [31:0] o_s3_wdata,
+
+	// Slave 4
+	output bit o_s4_rw,
+	output bit o_s4_request,
+	input i_s4_ready,
+	output bit [31:0] o_s4_address,
+	input [31:0] i_s4_rdata,
+	output bit [31:0] o_s4_wdata,
+
+	// Slave 5
+	output bit o_s5_rw,
+	output bit o_s5_request,
+	input i_s5_ready,
+	output bit [31:0] o_s5_address,
+	input [31:0] i_s5_rdata,
+	output bit [31:0] o_s5_wdata,
+
+	// Slave 6
+	output bit o_s6_rw,
+	output bit o_s6_request,
+	input i_s6_ready,
+	output bit [31:0] o_s6_address,
+	input [31:0] i_s6_rdata,
+	output bit [31:0] o_s6_wdata,
+
+	// Slave 7
+	output bit o_s7_rw,
+	output bit o_s7_request,
+	input i_s7_ready,
+	output bit [31:0] o_s7_address,
+	input [31:0] i_s7_rdata,
+	output bit [31:0] o_s7_wdata,
+
+	// Slave 8
+	output bit o_s8_rw,
+	output bit o_s8_request,
+	input i_s8_ready,
+	output bit [31:0] o_s8_address,
+	input [31:0] i_s8_rdata,
+	output bit [31:0] o_s8_wdata
+);
+	bit [3:0] s0_source;
+	bit [3:0] next_s0_source;
+	bit [3:0] s1_source;
+	bit [3:0] next_s1_source;
+	bit [3:0] s2_source;
+	bit [3:0] next_s2_source;
+	bit [3:0] s3_source;
+	bit [3:0] next_s3_source;
+	bit [3:0] s4_source;
+	bit [3:0] next_s4_source;
+	bit [3:0] s5_source;
+	bit [3:0] next_s5_source;
+	bit [3:0] s6_source;
+	bit [3:0] next_s6_source;
+	bit [3:0] s7_source;
+	bit [3:0] next_s7_source;
+	bit [3:0] s8_source;
+	bit [3:0] next_s8_source;
+
+	always_ff @(posedge i_clock) begin
+		s0_source <= next_s0_source;
+		s1_source <= next_s1_source;
+		s2_source <= next_s2_source;
+		s3_source <= next_s3_source;
+		s4_source <= next_s4_source;
+		s5_source <= next_s5_source;
+		s6_source <= next_s6_source;
+		s7_source <= next_s7_source;
+		s8_source <= next_s8_source;
+	end
+
+	always_comb begin
+		next_s0_source = 4'h0;
+		next_s1_source = 4'h0;
+		next_s2_source = 4'h0;
+		next_s3_source = 4'h0;
+		next_s4_source = 4'h0;
+		next_s5_source = 4'h0;
+		next_s6_source = 4'h0;
+		next_s7_source = 4'h0;
+		next_s8_source = 4'h0;
+
+		o_s0_rw = 1'b0;
+		o_s0_request = 1'b0;
+		o_s0_address = 32'h0;
+		o_s0_wdata = 32'h0;
+		o_s1_rw = 1'b0;
+		o_s1_request = 1'b0;
+		o_s1_address = 32'h0;
+		o_s1_wdata = 32'h0;
+		o_s2_rw = 1'b0;
+		o_s2_request = 1'b0;
+		o_s2_address = 32'h0;
+		o_s2_wdata = 32'h0;
+		o_s3_rw = 1'b0;
+		o_s3_request = 1'b0;
+		o_s3_address = 32'h0;
+		o_s3_wdata = 32'h0;
+		o_s4_rw = 1'b0;
+		o_s4_request = 1'b0;
+		o_s4_address = 32'h0;
+		o_s4_wdata = 32'h0;
+		o_s5_rw = 1'b0;
+		o_s5_request = 1'b0;
+		o_s5_address = 32'h0;
+		o_s5_wdata = 32'h0;
+		o_s6_rw = 1'b0;
+		o_s6_request = 1'b0;
+		o_s6_address = 32'h0;
+		o_s6_wdata = 32'h0;
+		o_s7_rw = 1'b0;
+		o_s7_request = 1'b0;
+		o_s7_address = 32'h0;
+		o_s7_wdata = 32'h0;
+		o_s8_rw = 1'b0;
+		o_s8_request = 1'b0;
+		o_s8_address = 32'h0;
+		o_s8_wdata = 32'h0;
+
+		o_m0_ready = 1'b0;
+		o_m0_rdata = 32'h0;
+		o_m1_ready = 1'b0;
+		o_m1_rdata = 32'h0;
+		o_m2_ready = 1'b0;
+		o_m2_rdata = 32'h0;
+
+		if (i_m0_request) begin
+			if (
+				i_m0_address[31:28] == 4'h0 &&
+				(s0_source == 4'h0 || s_0_source == 4'h1)
+			) begin
+				o_s0_rw = i_m0_rw;
+				o_s0_request = 1'b1;
+				o_m0_ready = i_s0_ready;
+				o_s0_address = i_m0_address;
+				o_m0_rdata = i_s0_rdata;
+				o_s0_wdata = i_m0_wdata;
+				next_s0_source = i_s0_ready ? 4'h0 : 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h1 &&
+				(s1_source == 4'h0 || s_1_source == 4'h1)
+			) begin
+				o_s1_rw = i_m0_rw;
+				o_s1_request = 1'b1;
+				o_m0_ready = i_s1_ready;
+				o_s1_address = i_m0_address;
+				o_m0_rdata = i_s1_rdata;
+				o_s1_wdata = i_m0_wdata;
+				next_s1_source = i_s1_ready ? 4'h0 : 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h2 &&
+				(s2_source == 4'h0 || s_2_source == 4'h1)
+			) begin
+				o_s2_rw = i_m0_rw;
+				o_s2_request = 1'b1;
+				o_m0_ready = i_s2_ready;
+				o_s2_address = i_m0_address;
+				o_m0_rdata = i_s2_rdata;
+				o_s2_wdata = i_m0_wdata;
+				next_s2_source = i_s2_ready ? 4'h0 : 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h3 &&
+				(s3_source == 4'h0 || s_3_source == 4'h1)
+			) begin
+				o_s3_rw = i_m0_rw;
+				o_s3_request = 1'b1;
+				o_m0_ready = i_s3_ready;
+				o_s3_address = i_m0_address;
+				o_m0_rdata = i_s3_rdata;
+				o_s3_wdata = i_m0_wdata;
+				next_s3_source = i_s3_ready ? 4'h0 : 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h4 &&
+				(s4_source == 4'h0 || s_4_source == 4'h1)
+			) begin
+				o_s4_rw = i_m0_rw;
+				o_s4_request = 1'b1;
+				o_m0_ready = i_s4_ready;
+				o_s4_address = i_m0_address;
+				o_m0_rdata = i_s4_rdata;
+				o_s4_wdata = i_m0_wdata;
+				next_s4_source = i_s4_ready ? 4'h0 : 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h5 &&
+				(s5_source == 4'h0 || s_5_source == 4'h1)
+			) begin
+				o_s5_rw = i_m0_rw;
+				o_s5_request = 1'b1;
+				o_m0_ready = i_s5_ready;
+				o_s5_address = i_m0_address;
+				o_m0_rdata = i_s5_rdata;
+				o_s5_wdata = i_m0_wdata;
+				next_s5_source = i_s5_ready ? 4'h0 : 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h6 &&
+				(s6_source == 4'h0 || s_6_source == 4'h1)
+			) begin
+				o_s6_rw = i_m0_rw;
+				o_s6_request = 1'b1;
+				o_m0_ready = i_s6_ready;
+				o_s6_address = i_m0_address;
+				o_m0_rdata = i_s6_rdata;
+				o_s6_wdata = i_m0_wdata;
+				next_s6_source = i_s6_ready ? 4'h0 : 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h7 &&
+				(s7_source == 4'h0 || s_7_source == 4'h1)
+			) begin
+				o_s7_rw = i_m0_rw;
+				o_s7_request = 1'b1;
+				o_m0_ready = i_s7_ready;
+				o_s7_address = i_m0_address;
+				o_m0_rdata = i_s7_rdata;
+				o_s7_wdata = i_m0_wdata;
+				next_s7_source = i_s7_ready ? 4'h0 : 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h8 &&
+				(s8_source == 4'h0 || s_8_source == 4'h1)
+			) begin
+				o_s8_rw = i_m0_rw;
+				o_s8_request = 1'b1;
+				o_m0_ready = i_s8_ready;
+				o_s8_address = i_m0_address;
+				o_m0_rdata = i_s8_rdata;
+				o_s8_wdata = i_m0_wdata;
+				next_s8_source = i_s8_ready ? 4'h0 : 4'h1;
+			end
+		end
+
+		if (i_m1_request) begin
+			if (
+				i_m1_address[31:28] == 4'h0 &&
+				(s0_source == 4'h0 || s_0_source == 4'h2)
+			) begin
+				o_s0_rw = i_m1_rw;
+				o_s0_request = 1'b1;
+				o_m1_ready = i_s0_ready;
+				o_s0_address = i_m1_address;
+				o_m1_rdata = i_s0_rdata;
+				o_s0_wdata = i_m1_wdata;
+				next_s0_source = i_s0_ready ? 4'h0 : 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h1 &&
+				(s1_source == 4'h0 || s_1_source == 4'h2)
+			) begin
+				o_s1_rw = i_m1_rw;
+				o_s1_request = 1'b1;
+				o_m1_ready = i_s1_ready;
+				o_s1_address = i_m1_address;
+				o_m1_rdata = i_s1_rdata;
+				o_s1_wdata = i_m1_wdata;
+				next_s1_source = i_s1_ready ? 4'h0 : 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h2 &&
+				(s2_source == 4'h0 || s_2_source == 4'h2)
+			) begin
+				o_s2_rw = i_m1_rw;
+				o_s2_request = 1'b1;
+				o_m1_ready = i_s2_ready;
+				o_s2_address = i_m1_address;
+				o_m1_rdata = i_s2_rdata;
+				o_s2_wdata = i_m1_wdata;
+				next_s2_source = i_s2_ready ? 4'h0 : 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h3 &&
+				(s3_source == 4'h0 || s_3_source == 4'h2)
+			) begin
+				o_s3_rw = i_m1_rw;
+				o_s3_request = 1'b1;
+				o_m1_ready = i_s3_ready;
+				o_s3_address = i_m1_address;
+				o_m1_rdata = i_s3_rdata;
+				o_s3_wdata = i_m1_wdata;
+				next_s3_source = i_s3_ready ? 4'h0 : 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h4 &&
+				(s4_source == 4'h0 || s_4_source == 4'h2)
+			) begin
+				o_s4_rw = i_m1_rw;
+				o_s4_request = 1'b1;
+				o_m1_ready = i_s4_ready;
+				o_s4_address = i_m1_address;
+				o_m1_rdata = i_s4_rdata;
+				o_s4_wdata = i_m1_wdata;
+				next_s4_source = i_s4_ready ? 4'h0 : 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h5 &&
+				(s5_source == 4'h0 || s_5_source == 4'h2)
+			) begin
+				o_s5_rw = i_m1_rw;
+				o_s5_request = 1'b1;
+				o_m1_ready = i_s5_ready;
+				o_s5_address = i_m1_address;
+				o_m1_rdata = i_s5_rdata;
+				o_s5_wdata = i_m1_wdata;
+				next_s5_source = i_s5_ready ? 4'h0 : 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h6 &&
+				(s6_source == 4'h0 || s_6_source == 4'h2)
+			) begin
+				o_s6_rw = i_m1_rw;
+				o_s6_request = 1'b1;
+				o_m1_ready = i_s6_ready;
+				o_s6_address = i_m1_address;
+				o_m1_rdata = i_s6_rdata;
+				o_s6_wdata = i_m1_wdata;
+				next_s6_source = i_s6_ready ? 4'h0 : 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h7 &&
+				(s7_source == 4'h0 || s_7_source == 4'h2)
+			) begin
+				o_s7_rw = i_m1_rw;
+				o_s7_request = 1'b1;
+				o_m1_ready = i_s7_ready;
+				o_s7_address = i_m1_address;
+				o_m1_rdata = i_s7_rdata;
+				o_s7_wdata = i_m1_wdata;
+				next_s7_source = i_s7_ready ? 4'h0 : 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h8 &&
+				(s8_source == 4'h0 || s_8_source == 4'h2)
+			) begin
+				o_s8_rw = i_m1_rw;
+				o_s8_request = 1'b1;
+				o_m1_ready = i_s8_ready;
+				o_s8_address = i_m1_address;
+				o_m1_rdata = i_s8_rdata;
+				o_s8_wdata = i_m1_wdata;
+				next_s8_source = i_s8_ready ? 4'h0 : 4'h2;
+			end
+		end
+
+		if (i_m2_request) begin
+			if (
+				i_m2_address[31:28] == 4'h0 &&
+				(s0_source == 4'h0 || s_0_source == 4'h3)
+			) begin
+				o_s0_rw = i_m2_rw;
+				o_s0_request = 1'b1;
+				o_m2_ready = i_s0_ready;
+				o_s0_address = i_m2_address;
+				o_m2_rdata = i_s0_rdata;
+				o_s0_wdata = i_m2_wdata;
+				next_s0_source = i_s0_ready ? 4'h0 : 4'h3;
+			end
+			if (
+				i_m2_address[31:28] == 4'h1 &&
+				(s1_source == 4'h0 || s_1_source == 4'h3)
+			) begin
+				o_s1_rw = i_m2_rw;
+				o_s1_request = 1'b1;
+				o_m2_ready = i_s1_ready;
+				o_s1_address = i_m2_address;
+				o_m2_rdata = i_s1_rdata;
+				o_s1_wdata = i_m2_wdata;
+				next_s1_source = i_s1_ready ? 4'h0 : 4'h3;
+			end
+			if (
+				i_m2_address[31:28] == 4'h2 &&
+				(s2_source == 4'h0 || s_2_source == 4'h3)
+			) begin
+				o_s2_rw = i_m2_rw;
+				o_s2_request = 1'b1;
+				o_m2_ready = i_s2_ready;
+				o_s2_address = i_m2_address;
+				o_m2_rdata = i_s2_rdata;
+				o_s2_wdata = i_m2_wdata;
+				next_s2_source = i_s2_ready ? 4'h0 : 4'h3;
+			end
+			if (
+				i_m2_address[31:28] == 4'h3 &&
+				(s3_source == 4'h0 || s_3_source == 4'h3)
+			) begin
+				o_s3_rw = i_m2_rw;
+				o_s3_request = 1'b1;
+				o_m2_ready = i_s3_ready;
+				o_s3_address = i_m2_address;
+				o_m2_rdata = i_s3_rdata;
+				o_s3_wdata = i_m2_wdata;
+				next_s3_source = i_s3_ready ? 4'h0 : 4'h3;
+			end
+			if (
+				i_m2_address[31:28] == 4'h4 &&
+				(s4_source == 4'h0 || s_4_source == 4'h3)
+			) begin
+				o_s4_rw = i_m2_rw;
+				o_s4_request = 1'b1;
+				o_m2_ready = i_s4_ready;
+				o_s4_address = i_m2_address;
+				o_m2_rdata = i_s4_rdata;
+				o_s4_wdata = i_m2_wdata;
+				next_s4_source = i_s4_ready ? 4'h0 : 4'h3;
+			end
+			if (
+				i_m2_address[31:28] == 4'h5 &&
+				(s5_source == 4'h0 || s_5_source == 4'h3)
+			) begin
+				o_s5_rw = i_m2_rw;
+				o_s5_request = 1'b1;
+				o_m2_ready = i_s5_ready;
+				o_s5_address = i_m2_address;
+				o_m2_rdata = i_s5_rdata;
+				o_s5_wdata = i_m2_wdata;
+				next_s5_source = i_s5_ready ? 4'h0 : 4'h3;
+			end
+			if (
+				i_m2_address[31:28] == 4'h6 &&
+				(s6_source == 4'h0 || s_6_source == 4'h3)
+			) begin
+				o_s6_rw = i_m2_rw;
+				o_s6_request = 1'b1;
+				o_m2_ready = i_s6_ready;
+				o_s6_address = i_m2_address;
+				o_m2_rdata = i_s6_rdata;
+				o_s6_wdata = i_m2_wdata;
+				next_s6_source = i_s6_ready ? 4'h0 : 4'h3;
+			end
+			if (
+				i_m2_address[31:28] == 4'h7 &&
+				(s7_source == 4'h0 || s_7_source == 4'h3)
+			) begin
+				o_s7_rw = i_m2_rw;
+				o_s7_request = 1'b1;
+				o_m2_ready = i_s7_ready;
+				o_s7_address = i_m2_address;
+				o_m2_rdata = i_s7_rdata;
+				o_s7_wdata = i_m2_wdata;
+				next_s7_source = i_s7_ready ? 4'h0 : 4'h3;
+			end
+			if (
+				i_m2_address[31:28] == 4'h8 &&
+				(s8_source == 4'h0 || s_8_source == 4'h3)
+			) begin
+				o_s8_rw = i_m2_rw;
+				o_s8_request = 1'b1;
+				o_m2_ready = i_s8_ready;
+				o_s8_address = i_m2_address;
+				o_m2_rdata = i_s8_rdata;
+				o_s8_wdata = i_m2_wdata;
+				next_s8_source = i_s8_ready ? 4'h0 : 4'h3;
+			end
+		end
+	end
+endmodule
