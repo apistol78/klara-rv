@@ -117,9 +117,9 @@ module XBAR_2_2_tb();
 		m0_request = 1'b1;
 		m0_address = 32'h0000_0001;
 
-		m1_rw = 1'b1;
-		m1_request = 1'b1;
-		m1_address = 32'h0000_0002;
+		// m1_rw = 1'b1;
+		// m1_request = 1'b1;
+		// m1_address = 32'h0000_0002;
 
 		while (!m0_ready) @(posedge clk);
 		@(posedge clk);
@@ -129,6 +129,17 @@ module XBAR_2_2_tb();
 		m0_request = 1'b1;
 		m0_address = 32'h1000_0003;
 
+
+		// while (!m1_ready) @(posedge clk);
+		// @(posedge clk);
+		// assert(m1_request == 1'b0);
+
+		//@(posedge clk);
+		@(posedge clk);
+
+		m1_rw = 1'b1;
+		m1_request = 1'b1;
+		m1_address = 32'h0000_0004;
 
 
 		repeat (200000) @ (posedge clk);

@@ -57,7 +57,7 @@ module CPU_Memory #(
 	bit [31:0] wb_address;
 	wire [31:0] wb_rdata;
 	bit [31:0] wb_wdata;
-	wire wb_cacheable = (wb_address == 4'h2);
+	wire wb_cacheable = (wb_address == 4'h1);
 
 	generate if (DCACHE_WB_QUEUE != 0) begin
 
@@ -107,7 +107,7 @@ module CPU_Memory #(
 	wire [31:0] dcache_rdata;
 	bit [31:0] dcache_wdata = 0;
 	wire dcache_need_flush;
-	wire dcache_cacheable = (i_data.mem_address[31:28] == 4'h2);
+	wire dcache_cacheable = (i_data.mem_address[31:28] == 4'h1);
 
 	generate if (DCACHE_SIZE > 0 && DCACHE_REGISTERED != 0) begin
 

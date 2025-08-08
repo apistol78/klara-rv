@@ -3001,7 +3001,7 @@ VL_ATTR_COLD void VCPU_top___024root__trace_full_0_sub_0(VCPU_top___024root* vlS
     bufp->fullBit(oldp+457,(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT__cache__DOT__o_pb_ready));
     bufp->fullWData(oldp+458,(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__data),117);
     bufp->fullWData(oldp+462,(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_skid__DOT__r_data),117);
-    bufp->fullBit(oldp+466,((2U == vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address)));
+    bufp->fullBit(oldp+466,((1U == vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address)));
     bufp->fullBit(oldp+467,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rw));
     bufp->fullBit(oldp+468,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_request));
     bufp->fullBit(oldp+469,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_flush));
@@ -3013,7 +3013,7 @@ VL_ATTR_COLD void VCPU_top___024root__trace_full_0_sub_0(VCPU_top___024root* vlS
                                                     >> 5U))))),32);
     bufp->fullIData(oldp+472,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rdata),32);
     bufp->fullIData(oldp+473,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_wdata),32);
-    bufp->fullBit(oldp+474,((2U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
+    bufp->fullBit(oldp+474,((1U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
                                             >> 1U)))));
     bufp->fullCData(oldp+475,((3U & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
                                      >> 5U))),2);
