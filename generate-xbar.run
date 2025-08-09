@@ -55,10 +55,6 @@ function main()
 
 	o:printLn("\talways_comb begin")
 	for i = 0, NSLAVES - 1 do
-		o:printLn("\t\tnext_s" .. i .. "_source = 4'h0;")
-	end
-	o:printLn()
-	for i = 0, NSLAVES - 1 do
 		o:printLn("\t\to_s" .. i .. "_rw = 1'b0;")
 		o:printLn("\t\to_s" .. i .. "_request = 1'b0;")
 		o:printLn("\t\to_s" .. i .. "_address = 32'h0;")
@@ -69,6 +65,29 @@ function main()
 		o:printLn("\t\to_m" .. i .. "_ready = 1'b0;")
 		o:printLn("\t\to_m" .. i .. "_rdata = 32'h0;")
 	end
+	o:printLn()
+	for i = 0, NSLAVES - 1 do
+		for j = 0, NMASTERS - 1 do
+			o:print("\t\t")
+			if j > 0 then o:print("else ") end
+			o:printLn("if (next_s" .. i .. "_source == 4'h" .. string.format("%x", j + 1) .. ") begin")
+			o:printLn("\t\t\to_s" .. i .. "_rw = i_m" .. j .. "_rw;")
+			o:printLn("\t\t\to_s" .. i .. "_request = 1'b1;")
+			o:printLn("\t\t\to_m" .. j .. "_ready = i_s" .. i .. "_ready;")
+			o:printLn("\t\t\to_s" .. i .. "_address = i_m" .. j .. "_address;")
+			o:printLn("\t\t\to_m" .. j .. "_rdata = i_s" .. i .. "_rdata;")
+			o:printLn("\t\t\to_s" .. i .. "_wdata = i_m" .. j .. "_wdata;")
+			o:printLn("\t\tend")
+		end
+		if i < NSLAVES - 1 then o:printLn() end
+	end
+	o:printLn("\tend")
+	o:printLn()
+
+	o:printLn("\talways_comb begin")
+	for i = 0, NSLAVES - 1 do
+		o:printLn("\t\tnext_s" .. i .. "_source = 4'h0;")
+	end
 	for i = NMASTERS - 1, 0, -1 do
 		o:printLn()
 		o:printLn("\t\tif (i_m" .. i .. "_request) begin")
@@ -78,12 +97,12 @@ function main()
 			o:printLn("\t\t\t\t(s" .. j .. "_source == 4'h0 || s" .. j .. "_source == 4'h" .. string.format("%x", i + 1) .. ")")
 			o:printLn("\t\t\t) begin")
 
-			o:printLn("\t\t\t\to_s" .. j .. "_rw = i_m" .. i .. "_rw;")
-			o:printLn("\t\t\t\to_s" .. j .. "_request = 1'b1;")
-			o:printLn("\t\t\t\to_m" .. i .. "_ready = i_s" .. j .. "_ready;")
-			o:printLn("\t\t\t\to_s" .. j .. "_address = { 4'b0, i_m" .. i .. "_address[27:0] };")
-			o:printLn("\t\t\t\to_m" .. i .. "_rdata = i_s" .. j .. "_rdata;")
-			o:printLn("\t\t\t\to_s" .. j .. "_wdata = i_m" .. i .. "_wdata;")
+			-- o:printLn("\t\t\t\to_s" .. j .. "_rw = i_m" .. i .. "_rw;")
+			-- o:printLn("\t\t\t\to_s" .. j .. "_request = 1'b1;")
+			-- o:printLn("\t\t\t\to_m" .. i .. "_ready = i_s" .. j .. "_ready;")
+			-- o:printLn("\t\t\t\to_s" .. j .. "_address = { 4'b0, i_m" .. i .. "_address[27:0] };")
+			-- o:printLn("\t\t\t\to_m" .. i .. "_rdata = i_s" .. j .. "_rdata;")
+			-- o:printLn("\t\t\t\to_s" .. j .. "_wdata = i_m" .. i .. "_wdata;")
 
 			--o:printLn("\t\t\t\tnext_s" .. j .. "_source = i_s" .. j .. "_ready ? 4'h0 : 4'h" .. string.format("%x", i + 1) .. ";")
 			o:printLn("\t\t\t\tnext_s" .. j .. "_source = 4'h" .. string.format("%x", i + 1) .. ";")

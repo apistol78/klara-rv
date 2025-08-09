@@ -36,8 +36,6 @@ module XBAR_2_1(
 	end
 
 	always_comb begin
-		next_s0_source = 4'h0;
-
 		o_s0_rw = 1'b0;
 		o_s0_request = 1'b0;
 		o_s0_address = 32'h0;
@@ -48,17 +46,32 @@ module XBAR_2_1(
 		o_m1_ready = 1'b0;
 		o_m1_rdata = 32'h0;
 
+		if (next_s0_source == 4'h1) begin
+			o_s0_rw = i_m0_rw;
+			o_s0_request = 1'b1;
+			o_m0_ready = i_s0_ready;
+			o_s0_address = i_m0_address;
+			o_m0_rdata = i_s0_rdata;
+			o_s0_wdata = i_m0_wdata;
+		end
+		else if (next_s0_source == 4'h2) begin
+			o_s0_rw = i_m1_rw;
+			o_s0_request = 1'b1;
+			o_m1_ready = i_s0_ready;
+			o_s0_address = i_m1_address;
+			o_m1_rdata = i_s0_rdata;
+			o_s0_wdata = i_m1_wdata;
+		end
+	end
+
+	always_comb begin
+		next_s0_source = 4'h0;
+
 		if (i_m1_request) begin
 			if (
 				i_m1_address[31:28] == 4'h0 &&
 				(s0_source == 4'h0 || s0_source == 4'h2)
 			) begin
-				o_s0_rw = i_m1_rw;
-				o_s0_request = 1'b1;
-				o_m1_ready = i_s0_ready;
-				o_s0_address = { 4'b0, i_m1_address[27:0] };
-				o_m1_rdata = i_s0_rdata;
-				o_s0_wdata = i_m1_wdata;
 				next_s0_source = 4'h2;
 			end
 		end
@@ -68,12 +81,6 @@ module XBAR_2_1(
 				i_m0_address[31:28] == 4'h0 &&
 				(s0_source == 4'h0 || s0_source == 4'h1)
 			) begin
-				o_s0_rw = i_m0_rw;
-				o_s0_request = 1'b1;
-				o_m0_ready = i_s0_ready;
-				o_s0_address = { 4'b0, i_m0_address[27:0] };
-				o_m0_rdata = i_s0_rdata;
-				o_s0_wdata = i_m0_wdata;
 				next_s0_source = 4'h1;
 			end
 		end
