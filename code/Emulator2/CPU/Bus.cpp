@@ -73,11 +73,11 @@ uint32_t Bus::readU32(uint32_t address) const
 	}
 }
 
-bool Bus::tick(ICPU* cpu) const
+bool Bus::tick(ICPU* cpu)
 {
 	for (auto device : m_tickDevices)
 	{
-		if (!device->tick(cpu))
+		if (!device->tick(cpu, this))
 		{
 			log::error << L"Device " << type_name(device) << L" failed to tick." << Endl;
 			m_error = true;

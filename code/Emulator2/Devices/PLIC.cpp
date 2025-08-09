@@ -63,7 +63,7 @@ uint32_t PLIC::readU32(uint32_t address) const
 	return 0;
 }
 
-bool PLIC::tick(ICPU* cpu)
+bool PLIC::tick(ICPU* cpu, Bus* bus)
 {
 	bool issueInterrupt = false;
 	for (uint32_t i = 0; i < 4; ++i)

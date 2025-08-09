@@ -78,7 +78,7 @@ uint32_t SD::readU32(uint32_t address) const
 	return v;
 }
 
-bool SD::tick(ICPU* cpu)
+bool SD::tick(ICPU* cpu, Bus* bus)
 {
 	bool& cmd = m_r_cmd;
 	uint8_t& dat = m_r_dat;

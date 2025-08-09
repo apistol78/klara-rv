@@ -10,6 +10,7 @@
 
 #include <Core/Object.h>
 
+class Bus;
 class ICPU;
 
 class IDevice : public traktor::Object
@@ -21,5 +22,5 @@ public:
 
 	virtual uint32_t readU32(uint32_t address) const = 0;
 
-	virtual bool tick(ICPU* cpu) = 0;
+	virtual bool tick(ICPU* cpu, Bus* bus) = 0;
 };

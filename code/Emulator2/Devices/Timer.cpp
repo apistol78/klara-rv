@@ -61,7 +61,7 @@ uint32_t Timer::readU32(uint32_t address) const
 	return 0;
 }
 
-bool Timer::tick(ICPU* cpu)
+bool Timer::tick(ICPU* cpu, Bus* bus)
 {
 	if (++m_cycles == m_compare && m_compare != 0)
 		m_callback();

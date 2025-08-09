@@ -25,7 +25,7 @@ public:
 
 	virtual uint32_t readU32(uint32_t address) const override final;
 
-	virtual bool tick(ICPU* cpu) override final;
+	virtual bool tick(ICPU* cpu, Bus* bus) override final;
 
 	void setCallback(const std::function< void() >& callback);
 

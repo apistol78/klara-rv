@@ -58,7 +58,7 @@ uint32_t I2C::readU32(uint32_t address) const
 		return 0;
 }
 
-bool I2C::tick(ICPU* cpu)
+bool I2C::tick(ICPU* cpu, Bus* bus)
 {
 	bool result = true;
 	for (auto slave : m_slaves)

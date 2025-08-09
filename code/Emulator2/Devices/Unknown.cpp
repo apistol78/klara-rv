@@ -20,7 +20,7 @@ uint32_t Unknown::readU32(uint32_t address) const
 	return 0;
 }
 
-bool Unknown::tick(ICPU* cpu)
+bool Unknown::tick(ICPU* cpu, Bus* bus)
 {
 	return true;
 }

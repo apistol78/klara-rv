@@ -154,7 +154,7 @@ uint32_t Audio::readU32(uint32_t address) const
 	return wab->queued();
 }
 
-bool Audio::tick(ICPU* cpu)
+bool Audio::tick(ICPU* cpu, Bus* bus)
 {
 	WrappedAudioBuffer* wab = (WrappedAudioBuffer*)m_audioBuffer.ptr();
 	const uint32_t q = wab->queued();

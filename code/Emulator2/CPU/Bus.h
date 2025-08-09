@@ -30,7 +30,7 @@ public:
 
 	uint32_t readU32(uint32_t address) const;
 
-	bool tick(ICPU* cpu) const;
+	bool tick(ICPU* cpu);
 
 	bool error() const { return m_error; }
 

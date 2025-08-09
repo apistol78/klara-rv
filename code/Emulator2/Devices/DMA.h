@@ -10,7 +10,7 @@
 
 #include "Emulator2/CPU/IDevice.h"
 
-class PLIC : public IDevice
+class DMA : public IDevice
 {
 	T_RTTI_CLASS;
 
@@ -21,10 +21,9 @@ public:
 
 	virtual bool tick(ICPU* cpu, Bus* bus) override final;
 
-	void raise(uint32_t channel);
-
 private:
-	uint32_t m_enable = 0;
-	uint32_t m_raised = 0;
-	uint32_t m_issued = 0;
+    uint32_t m_from = 0;
+    uint32_t m_to = 0;
+    uint32_t m_count = 0;
+    uint32_t m_run = 0;
 };

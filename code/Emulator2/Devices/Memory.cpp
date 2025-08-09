@@ -69,7 +69,7 @@ uint32_t Memory::readU32(uint32_t address) const
 	return *(const uint32_t*)(m_data.c_ptr() + address);
 }
 
-bool Memory::tick(ICPU* cpu)
+bool Memory::tick(ICPU* cpu, Bus* bus)
 {
 	return true;
 }

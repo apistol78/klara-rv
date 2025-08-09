@@ -19,6 +19,7 @@
 #define AUDIO_BASE	        0x60000000
 #define PLIC_BASE	        0x70000000
 #define VIDEO_BASE          0x80000000
+#define DMA_BASE            0x90000000
 
 #define NO_OPTIMIZE	__attribute__((optimize("O0")))
 
