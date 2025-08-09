@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module SPI_Flash #(
 	parameter FREQUENCY = 100_000_000

@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module BRAM_latency #(
 	parameter WIDTH = 32,

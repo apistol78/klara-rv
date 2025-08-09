@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module VIDEO_controller #(
 	parameter MAX_PITCH = 640

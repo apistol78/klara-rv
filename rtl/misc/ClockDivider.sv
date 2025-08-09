@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module ClockDivider #(
     parameter CLOCK_RATE = 50000000,

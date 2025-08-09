@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module VIDEO_LCD_i80_16bit(
 	input i_reset,

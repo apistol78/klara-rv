@@ -11,6 +11,7 @@
 // https://zipcpu.com/blog/2017/08/14/strategies-for-pipelining.html
 
 `timescale 1ns/1ns
+`default_nettype none
 
 interface CPU_XCPI;
 	logic [31:0] instruction;

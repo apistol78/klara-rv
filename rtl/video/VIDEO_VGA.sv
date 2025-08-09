@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module VIDEO_VGA #(
 	parameter USE_CLOCK_OUT,

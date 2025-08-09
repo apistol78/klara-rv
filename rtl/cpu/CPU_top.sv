@@ -8,6 +8,8 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
+
 `define FREQUENCY 10000000
 
 (* top *)

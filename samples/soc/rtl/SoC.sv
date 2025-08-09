@@ -8,13 +8,14 @@
 */
 
 `timescale 1ns/1ns
-`define FREQUENCY 25000000
+`default_nettype none
+
+`define FREQUENCY 100_000_000
 
 (* top *)
 module SoC(
       input CLOCK_p,
       output LED_p,
-	  output IO_p,
 	  input UART_RX,
 	  output UART_TX
 );
@@ -22,51 +23,35 @@ module SoC(
 	wire reset = 1'b0;
 
 
-	// current 1.04 MhZ signal at 125 MHz
-
-	// 125 MHz
 	PLL_ECP5 #(
 		.CLKI_DIV(1),
-		.CLKFB_DIV(5),
-		.CLKOP_DIV(5),
-		.CLKOP_CPHASE(0)
+		.CLKFB_DIV(4),
+		.CLKOP_DIV(6),
+		.CLKOP_CPHASE(0),
+		.CLKOS_DIV(6),
+		.CLKOS_CPHASE(5),
+		.CLKOS2_DIV(6*3),
+		.CLKOS2_CPHASE(0)
 	) pll(
 		.i_clk(CLOCK_p),
 		.o_clk1(clock),
 		.o_clk2(),
+		.o_clk3(),
 		.o_clk_locked()
 	);
 
-
 	//assign LED_p = cpu_dbus_request;
-	assign IO_p = pin_value;
-
-
-	bit pin_value = 1'b0;
-	wire pin_select;
-	bit pin_ready = 1'b0;
-
-	always @(posedge clock) begin
-		if (bus_request && pin_select) begin
-			pin_value <= bus_wdata[0];
-			pin_ready <= 1'b1;
-		end
-		else begin
-			pin_ready <= 1'b0;
-		end
-	end
-
 
 	//====================================================
 	// ROM
-	wire rom_select;
+	wire rom_request;
 	wire [31:0] rom_address;
 	wire [31:0] rom_rdata;
 	wire rom_ready;
 
 	SoC_BROM rom(
 		.i_clock(clock),
-		.i_request(bus_request && rom_select),
+		.i_request(rom_request),
 		.i_address(rom_address),
 		.o_rdata(rom_rdata),
 		.o_ready(rom_ready)
@@ -75,7 +60,8 @@ module SoC(
 
 	//====================================================
 	// RAM
-	wire ram_select;
+	wire ram_request;
+	wire ram_rw;
 	wire [31:0] ram_address;
 	wire [31:0] ram_wdata;
 	wire [31:0] ram_rdata;
@@ -85,8 +71,8 @@ module SoC(
 		.SIZE(32'h400)
 	) ram(
 		.i_clock(clock),
-		.i_request(bus_request && ram_select),
-		.i_rw(bus_rw),
+		.i_request(ram_request),
+		.i_rw(ram_rw),
 		.i_address(ram_address),
 		.i_wdata(ram_wdata),
 		.o_rdata(ram_rdata),
@@ -97,8 +83,9 @@ module SoC(
 
 	//====================================================
 	// UART
-	wire uart_select;
-	wire [1:0] uart_address;
+	wire uart_request;
+	wire uart_rw;
+	wire [31:0] uart_address;
 	wire [31:0] uart_wdata;
 	wire [31:0] uart_rdata;
 	wire uart_ready;
@@ -106,85 +93,64 @@ module SoC(
 	UART #(
 		.FREQUENCY(`FREQUENCY),
 		.BAUDRATE(115200),
-		.RX_FIFO_DEPTH(16)
+		.RX_FIFO_DEPTH(16),
+		.TX_FIFO_DEPTH(16)
 	) uart(
 		.i_reset(reset),
 		.i_clock(clock),
-		.i_request(bus_request && uart_select),
-		.i_rw(bus_rw),
-		.i_address(uart_address),
+		.i_request(uart_request),
+		.i_rw(uart_rw),
+		.i_address(uart_address[1:0]),
 		.i_wdata(uart_wdata),
 		.o_rdata(uart_rdata),
 		.o_ready(uart_ready),
 		.o_interrupt(),
+		.o_soft_reset(),
 		// ---
 		.UART_RX(UART_RX),
 		.UART_TX(UART_TX)
 	);
 
-
 	//====================================================
-	// Chip select
-	assign rom_select = bus_address[31:28] == 4'h0;
-	assign rom_address = { 4'h0, bus_address[27:0] };
 
-	assign ram_select = bus_address[31:28] == 4'h1;
-	assign ram_address = { 4'h0, bus_address[27:0] };
-	assign ram_wdata = bus_wdata;
-
-	assign uart_select = bus_address[31:28] == 4'h3;
-	assign uart_address = { 4'h0, bus_address[27:0] };
-	assign uart_wdata = bus_wdata;
-
-	assign pin_select = bus_address[31:28] == 4'h4;
-
-	assign bus_rdata =
-		rom_select		? rom_rdata		:
-		ram_select		? ram_rdata		:
-		uart_select		? uart_rdata	:
-		32'h00000000;
-
-	assign bus_ready =
-		rom_select		? rom_ready		:
-		ram_select		? ram_ready		:
-		uart_select		? uart_ready	:
-		pin_select		? pin_ready		:
-		1'b0;
-
-
-	//====================================================
-	// CPU BusMux
-	wire bus_rw;
-	wire bus_request;
-	wire bus_ready;
-	wire [31:0] bus_address;
-	wire [31:0] bus_rdata;
-	wire [31:0] bus_wdata;
-
-	CPU_BusMux #(
-		.REGISTERED(1)
-	) bus(
+	XBAR_2_3 bus(
 		.i_reset(reset),
 		.i_clock(clock),
 
-		.o_bus_rw(bus_rw),
-		.o_bus_request(bus_request),
-		.i_bus_ready(bus_ready),
-		.o_bus_address(bus_address),
-		.i_bus_rdata(bus_rdata),
-		.o_bus_wdata(bus_wdata),
+		.o_s0_rw(),
+		.o_s0_request(rom_request),
+		.i_s0_ready(rom_ready),
+		.o_s0_address(rom_address),
+		.i_s0_rdata(rom_rdata),
+		.o_s0_wdata(),
 
-		.i_pa_request(cpu_ibus_request),
-		.o_pa_ready(cpu_ibus_ready),
-		.i_pa_address(cpu_ibus_address),
-		.o_pa_rdata(cpu_ibus_rdata),
+		.o_s1_rw(ram_rw),
+		.o_s1_request(ram_request),
+		.i_s1_ready(ram_ready),
+		.o_s1_address(ram_address),
+		.i_s1_rdata(ram_rdata),
+		.o_s1_wdata(ram_wdata),
 
-		.i_pb_rw(cpu_dbus_rw),
-		.i_pb_request(cpu_dbus_request),
-		.o_pb_ready(cpu_dbus_ready),
-		.i_pb_address(cpu_dbus_address),
-		.o_pb_rdata(cpu_dbus_rdata),
-		.i_pb_wdata(cpu_dbus_wdata)
+		.o_s2_rw(uart_rw),
+		.o_s2_request(uart_request),
+		.i_s2_ready(uart_ready),
+		.o_s2_address(uart_address),
+		.i_s2_rdata(uart_rdata),
+		.o_s2_wdata(uart_wdata),
+
+		.i_m0_rw(1'b0),
+		.i_m0_request(cpu_ibus_request),
+		.o_m0_ready(cpu_ibus_ready),
+		.i_m0_address(cpu_ibus_address),
+		.o_m0_rdata(cpu_ibus_rdata),
+		.i_m0_wdata(32'h0),
+
+		.i_m1_rw(cpu_dbus_rw),
+		.i_m1_request(cpu_dbus_request),
+		.o_m1_ready(cpu_dbus_ready),
+		.i_m1_address(cpu_dbus_address),
+		.o_m1_rdata(cpu_dbus_rdata),
+		.i_m1_wdata(cpu_dbus_wdata)
 	);
 
 

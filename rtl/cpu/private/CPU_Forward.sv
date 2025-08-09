@@ -9,6 +9,7 @@
 `include "CPU_Types.sv"
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module CPU_Forward (
 	input decode_data_t i_decode_data,

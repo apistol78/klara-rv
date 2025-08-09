@@ -5,7 +5,7 @@ typedef unsigned int uint32_t;
 
 void _start()
 {
-    volatile uint32_t* uart = (uint32_t*)0x30000000;
+    volatile uint32_t* uart = (uint32_t*)0x20000000;
     for (;;)
     {
         *uart = 'H';
@@ -13,5 +13,7 @@ void _start()
         *uart = 'L';
         *uart = 'L';
         *uart = 'O';
+        *uart = '\n';
+        *uart = '\r';
     }
 }

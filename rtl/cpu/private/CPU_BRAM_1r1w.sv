@@ -7,6 +7,7 @@
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 `timescale 1ns/1ns
+`default_nettype none
 
 module CPU_BRAM_1r1w #(
 	parameter WIDTH = 32,

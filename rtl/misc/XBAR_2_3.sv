@@ -2,7 +2,7 @@
 `default_nettype none
 
 // #note master 0 has highest priority.
-module XBAR_2_2(
+module XBAR_2_3(
 	input i_reset,
 	input i_clock,
 
@@ -36,16 +36,27 @@ module XBAR_2_2(
 	input i_s1_ready,
 	output bit [31:0] o_s1_address,
 	input [31:0] i_s1_rdata,
-	output bit [31:0] o_s1_wdata
+	output bit [31:0] o_s1_wdata,
+
+	// Slave 2
+	output bit o_s2_rw,
+	output bit o_s2_request,
+	input i_s2_ready,
+	output bit [31:0] o_s2_address,
+	input [31:0] i_s2_rdata,
+	output bit [31:0] o_s2_wdata
 );
 	bit [3:0] s0_source;
 	bit [3:0] next_s0_source;
 	bit [3:0] s1_source;
 	bit [3:0] next_s1_source;
+	bit [3:0] s2_source;
+	bit [3:0] next_s2_source;
 
 	always_ff @(posedge i_clock) begin
 		s0_source <= next_s0_source;
 		s1_source <= next_s1_source;
+		s2_source <= next_s2_source;
 	end
 
 	always_comb begin
@@ -57,6 +68,10 @@ module XBAR_2_2(
 		o_s1_request = 1'b0;
 		o_s1_address = 32'h0;
 		o_s1_wdata = 32'h0;
+		o_s2_rw = 1'b0;
+		o_s2_request = 1'b0;
+		o_s2_address = 32'h0;
+		o_s2_wdata = 32'h0;
 
 		o_m0_ready = 1'b0;
 		o_m0_rdata = 32'h0;
@@ -96,11 +111,29 @@ module XBAR_2_2(
 			o_m1_rdata = i_s1_rdata;
 			o_s1_wdata = i_m1_wdata;
 		end
+
+		if (next_s2_source == 4'h1) begin
+			o_s2_rw = i_m0_rw;
+			o_s2_request = 1'b1;
+			o_m0_ready = i_s2_ready;
+			o_s2_address = { 4'h0, i_m0_address[27:0] };
+			o_m0_rdata = i_s2_rdata;
+			o_s2_wdata = i_m0_wdata;
+		end
+		else if (next_s2_source == 4'h2) begin
+			o_s2_rw = i_m1_rw;
+			o_s2_request = 1'b1;
+			o_m1_ready = i_s2_ready;
+			o_s2_address = { 4'h0, i_m1_address[27:0] };
+			o_m1_rdata = i_s2_rdata;
+			o_s2_wdata = i_m1_wdata;
+		end
 	end
 
 	always_comb begin
 		next_s0_source = 4'h0;
 		next_s1_source = 4'h0;
+		next_s2_source = 4'h0;
 
 		if (i_m1_request) begin
 			if (
@@ -114,6 +147,12 @@ module XBAR_2_2(
 				(s1_source == 4'h0 || s1_source == 4'h2)
 			) begin
 				next_s1_source = 4'h2;
+			end
+			if (
+				i_m1_address[31:28] == 4'h2 &&
+				(s2_source == 4'h0 || s2_source == 4'h2)
+			) begin
+				next_s2_source = 4'h2;
 			end
 		end
 
@@ -129,6 +168,12 @@ module XBAR_2_2(
 				(s1_source == 4'h0 || s1_source == 4'h1)
 			) begin
 				next_s1_source = 4'h1;
+			end
+			if (
+				i_m0_address[31:28] == 4'h2 &&
+				(s2_source == 4'h0 || s2_source == 4'h1)
+			) begin
+				next_s2_source = 4'h1;
 			end
 		end
 	end

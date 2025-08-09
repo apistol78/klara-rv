@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module AUDIO_controller #(
 	parameter BUFFER_SIZE = 4096

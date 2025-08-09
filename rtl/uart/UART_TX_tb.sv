@@ -1,6 +1,7 @@
 
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module UART_TX_tb();
 

@@ -9,6 +9,7 @@
 `include "CPU_Types.sv"
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module CPU_Memory #(
 	parameter DCACHE_SIZE,
@@ -149,12 +150,12 @@ module CPU_Memory #(
 			.i_reset(i_reset),
 			.i_clock(i_clock),
 
-			.o_bus_rw(o_bus_rw),
-			.o_bus_request(o_bus_request),
-			.i_bus_ready(i_bus_ready),
-			.o_bus_address(o_bus_address),
-			.i_bus_rdata(i_bus_rdata),
-			.o_bus_wdata(o_bus_wdata),
+			.o_bus_rw(wb_rw),
+			.o_bus_request(wb_request),
+			.i_bus_ready(wb_ready),
+			.o_bus_address(wb_address),
+			.i_bus_rdata(wb_rdata),
+			.o_bus_wdata(wb_wdata),
 
 			.i_rw(dcache_rw),
 			.i_request(dcache_request),
@@ -175,12 +176,12 @@ module CPU_Memory #(
 
 	generate if (DCACHE_SIZE == 0) begin
 
-		assign o_bus_rw = dcache_rw;
-		assign o_bus_request = dcache_request;
-		assign dcache_ready = i_bus_ready;
-		assign o_bus_address = dcache_address;
-		assign dcache_rdata = i_bus_rdata;
-		assign o_bus_wdata = dcache_wdata;
+		assign wb_rw = dcache_rw;
+		assign wb_request = dcache_request;
+		assign dcache_ready = wb_ready;
+		assign wb_address = dcache_address;
+		assign dcache_rdata = wb_rdata;
+		assign wb_wdata = dcache_wdata;
 
 		assign dcache_need_flush = 1'b0;
 

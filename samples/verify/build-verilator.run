@@ -19,8 +19,9 @@ local SOURCE < const > =
 {
 	PATH_VERIFY .. "/Verify.sv",
 	PATH_PERIF .. "/block/BRAM.sv",
+	PATH_PERIF .. "/misc/XBAR_2_2.sv",
 	PATH_CPU .. "/CPU.sv",
-	PATH_CPU .. "/CPU_BusMux.sv",
+	-- PATH_CPU .. "/CPU_BusMux.sv",
 	PATH_CPU .. "/CPU_PLIC.sv",
 	PATH_CPU .. "/private/CPU_ALU.sv",
 	PATH_CPU .. "/private/CPU_BRAM.sv",

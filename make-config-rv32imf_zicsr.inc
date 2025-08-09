@@ -1,6 +1,6 @@
 # Configuration file
 
-OPTIMIZE=-O2
+OPTIMIZE=-O3
 #OPTIMIZE=-Os
 #OPTIMIZE=-O0
 #ARCH=rv32imf_zicsr

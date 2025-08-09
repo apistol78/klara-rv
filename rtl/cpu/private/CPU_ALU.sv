@@ -9,6 +9,7 @@
 `include "CPU_Defines.sv"
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module CPU_ALU(
 	input [3:0] i_op,

@@ -1,5 +1,7 @@
 // https://projectf.io/posts/ecp5-fpga-clock/
 
+`default_nettype none
+
 module PLL_ECP5 #(
 	parameter CLKI_DIV  = 1,     // input clock divider
 	parameter CLKFB_DIV = 1,     // feedback divider

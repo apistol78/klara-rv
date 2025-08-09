@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 module UART_RX #(
     parameter PRESCALE = 50000000 / (9600 * 8),

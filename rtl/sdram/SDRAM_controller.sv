@@ -7,6 +7,8 @@
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 
+`default_nettype none
+
 /*
 
 W9825G6KH-6

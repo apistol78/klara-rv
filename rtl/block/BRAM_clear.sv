@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 `ifdef __VERILATOR__
 	`define INSTANT_CLEAR

@@ -17,105 +17,6 @@ module Verify(
 	wire clock = CLOCK_p;
 	wire reset = 1'b0;
 
-
-	//====================================================
-	// ROM
-	wire rom_select;
-	wire [31:0] rom_address;
-	wire [31:0] rom_rdata;
-	wire rom_ready;
-
-	BRAM rom(
-		.i_clock(clock),
-		.i_request(rom_select && bus_request),
-		.i_rw(1'b0),
-		.i_address(rom_address),
-		.i_wdata(0),
-		.o_rdata(rom_rdata),
-		.o_ready(rom_ready),
-		.o_valid()
-	);
-
-
-	//====================================================
-	// RAM
-	wire ram_select;
-	wire [31:0] ram_address;
-	wire [31:0] ram_rdata;
-	wire ram_ready;
-
-	BRAM #(
-		.WIDTH(32),
-		.SIZE(32'h8000),
-		.ADDR_LSH(2)
-	) ram(
-		.i_clock(clock),
-		.i_request(ram_select && bus_request),
-		.i_rw(bus_rw),
-		.i_address(ram_address),
-		.i_wdata(bus_wdata),
-		.o_rdata(ram_rdata),
-		.o_ready(ram_ready),
-		.o_valid()
-	);
-
-
-	//====================================================
-	// Chip select
-
-	assign rom_select = bus_address[31:28] == 4'h0;
-	assign rom_address = { 4'h0, bus_address[27:0] };
-
-	assign ram_select = bus_address[31:28] == 4'h1;
-	assign ram_address = { 4'h0, bus_address[27:0] };
-
-	assign bus_rdata =
-		rom_select		? rom_rdata		:
-		ram_select		? ram_rdata		:
-		32'h00000000;
-
-	assign bus_ready =
-		rom_select		? rom_ready		:
-		ram_select		? ram_ready		:
-		1'b0;
-
-
-	//====================================================
-	// CPU BusMux
-	wire bus_rw;
-	wire bus_request;
-	wire bus_ready;
-	wire [31:0] bus_address;
-	wire [31:0] bus_rdata;
-	wire [31:0] bus_wdata;
-
-	CPU_BusMux #(
-		.REGISTERED(0)
-	) bus(
-		.i_reset(reset),
-		.i_clock(clock),
-
-		.o_bus_rw(bus_rw),
-		.o_bus_request(bus_request),
-		.i_bus_ready(bus_ready),
-		.o_bus_address(bus_address),
-		.i_bus_rdata(bus_rdata),
-		.o_bus_wdata(bus_wdata),
-
-		.i_pa_request(cpu_ibus_request),
-		.o_pa_ready(cpu_ibus_ready),
-		.i_pa_address(cpu_ibus_address),
-		.o_pa_rdata(cpu_ibus_rdata),
-
-		.i_pb_rw(cpu_dbus_rw),
-		.i_pb_request(cpu_dbus_request),
-		.o_pb_ready(cpu_dbus_ready),
-		.i_pb_address(cpu_dbus_address),
-		.o_pb_rdata(cpu_dbus_rdata),
-		.i_pb_wdata(cpu_dbus_wdata)
-	);
-
-
 	//====================================================
 	// CPU
 	wire cpu_ibus_request;
@@ -167,5 +68,88 @@ module Verify(
 		.o_memory_busy(),
 		.o_fault(cpu_fault)
 	);
+
+	//====================================================
+	// ROM
+	wire rom_request;
+	wire [31:0] rom_address;
+	wire [31:0] rom_rdata;
+	wire rom_ready;
+
+	BRAM rom(
+		.i_clock(clock),
+		.i_request(rom_request),
+		.i_rw(1'b0),
+		.i_address(rom_address),
+		.i_wdata(0),
+		.o_rdata(rom_rdata),
+		.o_ready(rom_ready),
+		.o_valid()
+	);
+
+	//====================================================
+	// RAM
+	wire ram_request;
+	wire ram_rw;
+	wire [31:0] ram_address;
+	wire [31:0] ram_wdata;
+	wire [31:0] ram_rdata;
+	wire ram_ready;
+
+	BRAM #(
+		.WIDTH(32),
+		.SIZE(32'h8000),
+		.ADDR_LSH(2)
+	) ram(
+		.i_clock(clock),
+		.i_request(ram_request),
+		.i_rw(ram_rw),
+		.i_address(ram_address),
+		.i_wdata(ram_wdata),
+		.o_rdata(ram_rdata),
+		.o_ready(ram_ready),
+		.o_valid()
+	);
+
+	//====================================================
+	// XBAR
+
+	XBAR_2_2 xbar(
+		.i_reset(1'b0),
+		.i_clock(clock),
+
+		// CPU instruction bus
+		.i_m0_rw(1'b0),
+		.i_m0_request(cpu_ibus_request),
+		.o_m0_ready(cpu_ibus_ready),
+		.i_m0_address(cpu_ibus_address),
+		.o_m0_rdata(cpu_ibus_rdata),
+		.i_m0_wdata(32'h0),
+
+		// CPU data bus
+		.i_m1_rw(cpu_dbus_rw),
+		.i_m1_request(cpu_dbus_request),
+		.o_m1_ready(cpu_dbus_ready),
+		.i_m1_address(cpu_dbus_address),
+		.o_m1_rdata(cpu_dbus_rdata),
+		.i_m1_wdata(cpu_dbus_wdata),
+
+		// 32'h0xxx_xxxx : ROM
+		.o_s0_rw(),
+		.o_s0_request(rom_request),
+		.i_s0_ready(rom_ready),
+		.o_s0_address(rom_address),
+		.i_s0_rdata(rom_rdata),
+		.o_s0_wdata(),
+
+		// 32'h1xxx_xxxx : RAM
+		.o_s1_rw(ram_rw),
+		.o_s1_request(ram_request),
+		.i_s1_ready(ram_ready),
+		.o_s1_address(ram_address),
+		.i_s1_rdata(ram_rdata),
+		.o_s1_wdata(ram_wdata)
+	);
+
 
 endmodule

@@ -8,6 +8,7 @@
 */
 
 `timescale 1ns/1ns
+`default_nettype none
 
 // 800*480
 module VIDEO_LCD_AT070NTN92 #(
