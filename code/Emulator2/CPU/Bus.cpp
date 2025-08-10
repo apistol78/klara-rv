@@ -25,25 +25,6 @@ void Bus::map(uint32_t start, uint32_t end, bool cacheable, bool tick, IDevice* 
 		m_cacheableRanges.push_back({ start, end });
 }
 
-IDevice* Bus::device(uint32_t address) const
-{
-	auto mappedDevice = findMappedDevice(address);
-	if (mappedDevice)
-		return mappedDevice->device;
-	else
-		return nullptr;	
-}
-
-bool Bus::cacheable(uint32_t address) const
-{
-	for (const auto& cacheableRange : m_cacheableRanges)
-	{
-		if (address >= cacheableRange.start && address < cacheableRange.end)
-			return true;
-	}
-	return false;
-}
-
 bool Bus::writeU32(uint32_t address, uint32_t value)
 {
 	auto mappedDevice = findMappedDevice(address);
