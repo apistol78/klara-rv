@@ -25,7 +25,7 @@ module DMA_tb();
 	wire dma_bus_request;
 	wire dma_bus_ready;
 	wire [31:0] dma_bus_address;
-	wire [31:0] dma_bus_rdata;
+	wire [31:0] dma_bus_rdata = (dma_bus_request && !dma_bus_rw) ? { 32'hcafe, dma_bus_address[15:0] } : 32'h0;
 	wire [31:0] dma_bus_wdata;
 
 	BRAM #(
@@ -36,7 +36,7 @@ module DMA_tb();
 		.i_rw(dma_bus_rw),
 		.i_address(dma_bus_address),
 		.i_wdata(dma_bus_wdata),
-		.o_rdata(dma_bus_rdata),
+		.o_rdata(),
 		.o_ready(dma_bus_ready),
 		.o_valid()
 	);
@@ -104,6 +104,36 @@ module DMA_tb();
 		while (!dma_ready) @(posedge clk);
 		dma_request <= 1'b0;
 		repeat (4) @ (posedge clk);
+
+		repeat (100) @ (posedge clk);
+
+		// busy
+		dma_rw = 1'b0;
+		dma_request <= 1'b1;
+		dma_address <= 2'h3;
+		while (!dma_ready) @(posedge clk);
+		dma_request <= 1'b0;
+		assert(dma_rdata != 0);
+
+		repeat (100) @ (posedge clk);
+
+		// busy
+		dma_rw = 1'b0;
+		dma_request <= 1'b1;
+		dma_address <= 2'h3;
+		while (!dma_ready) @(posedge clk);
+		dma_request <= 1'b0;
+		assert(dma_rdata != 0);
+
+		repeat (100) @ (posedge clk);
+
+		// busy
+		dma_rw = 1'b0;
+		dma_request <= 1'b1;
+		dma_address <= 2'h3;
+		while (!dma_ready) @(posedge clk);
+		dma_request <= 1'b0;
+		assert(dma_rdata == 0);
 
 		repeat (10000) @ (posedge clk);
 
