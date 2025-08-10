@@ -177,7 +177,7 @@ module CPU_DCache_Reg #(
 			FLUSH_WRITE: begin
 				if (i_bus_ready) begin
 					cache_rw <= 1'b1;
-					cache_wdata <= { cache_entry_data, cache_entry_address[31:2], 2'b01 };
+					cache_wdata <= 32'hffff_fff0; // { cache_entry_data, cache_entry_address[31:2], 2'b01 };
 					o_bus_request <= 1'b0;
 					state <= FLUSH_NEXT;
 				end

@@ -74,8 +74,9 @@ module DMA(
 	dma_command_t queue_rdata;
 	FIFO #(
 		.DEPTH(8),
-		.WIDTH($bits(dma_command_t))
+		.WIDTH($bits(queue_rdata))
 	) queue(
+		.i_reset(i_reset),
 		.i_clock(i_clock),
 		.o_empty(queue_empty),
 		.o_full(queue_full),
@@ -96,32 +97,32 @@ module DMA(
 
 	// Receive commands and insert into queue.
 	always_ff @(posedge i_clock) begin
-		queue_write <= 0;
+		queue_write <= 1'b0;
 		if (i_request) begin
 			if (!i_rw) begin
-				if (i_address == 2'b11) begin
+				if (i_address == 2'd3) begin
 					o_rdata <= (!queue_empty || state != IDLE) ? 32'hffff_ffff : 32'h0000_0000;
 					o_ready <= 1;
 				end
 			end
 			else begin
 				// Receive commands from CPU.
-				if (i_address == 2'b00) begin
+				if (i_address == 2'd0) begin
 					wr_command.value_or_from <= i_wdata;
 					o_ready <= 1;
 				end
-				else if (i_address == 2'b01) begin
+				else if (i_address == 2'd1) begin
 					wr_command.to <= i_wdata;
 					o_ready <= 1;
 				end
-				else if (i_address == 2'b10) begin
+				else if (i_address == 2'd2) begin
 					wr_command.count <= i_wdata;
 					o_ready <= 1;
 				end
-				else if (i_address == 2'b11) begin
+				else if (i_address == 2'd3) begin
 					wr_command.dt <= dma_type_t'(i_wdata[1:0]);
 					if (!queue_full) begin
-						queue_write <= !o_ready;
+						queue_write <= 1'b1;
 						o_ready <= 1;
 					end
 				end
@@ -134,7 +135,7 @@ module DMA(
 	// Process commands.
 	always_ff @(posedge i_clock) begin
 		queue_read <= 0;
-		case (state)
+		unique case (state)
 			IDLE: begin
 				if (!queue_empty) begin
 					queue_read <= 1;

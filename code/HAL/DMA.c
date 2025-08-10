@@ -9,9 +9,9 @@
 #include "HAL/DMA.h"
 
 #define DMA_FROM    (volatile uint32_t*)(DMA_BASE)
-#define DMA_TO		(volatile uint32_t*)(DMA_BASE + 0x04)
-#define DMA_COUNT	(volatile uint32_t*)(DMA_BASE + 0x08)
-#define DMA_RUN		(volatile uint32_t*)(DMA_BASE + 0x0c)
+#define DMA_TO		(volatile uint32_t*)(DMA_BASE + 4)
+#define DMA_COUNT	(volatile uint32_t*)(DMA_BASE + 8)
+#define DMA_RUN		(volatile uint32_t*)(DMA_BASE + 12)
 
 uint32_t hal_dma_write(void* dst, uint32_t count, uint32_t value)
 {
