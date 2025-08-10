@@ -8,6 +8,8 @@
 */
 #pragma once
 
+#include <Core/Containers/CircularVector.h>
+
 #include "Emulator2/CPU/IDevice.h"
 
 class DMA : public IDevice
@@ -22,8 +24,20 @@ public:
 	virtual bool tick(ICPU* cpu, Bus* bus) override final;
 
 private:
-    uint32_t m_from = 0;
-    uint32_t m_to = 0;
-    uint32_t m_count = 0;
-    uint32_t m_run = 0;
+	struct Task
+	{
+		uint32_t from = 0;
+		uint32_t to = 0;
+		uint32_t count = 0;
+		uint32_t run = 0;
+		uint32_t tag = 0;
+	};
+
+	traktor::CircularVector< Task, 16 > m_tasks;
+	uint32_t m_queued = 0;
+	uint32_t m_retired = 0;
+
+	uint32_t m_from;
+	uint32_t m_to;
+	uint32_t m_count;
 };

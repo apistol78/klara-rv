@@ -25,42 +25,80 @@ bool DMA::writeU32(uint32_t address, uint32_t value)
 	else if (address == 8)
 		m_count = value;
 	else if (address == 12)
-		m_run = value;
+	{
+		if (!m_tasks.full())
+		{
+			m_tasks.push_back({
+				.from = m_from,
+				.to = m_to,
+				.count = m_count,
+				.run = value,
+				.tag = m_queued + 1
+			});
+			m_queued++;
+		}
+		else
+			log::warning << L"[DMA] DMA command fifo full!" << Endl;
+	}
 	return true;
 }
 
 uint32_t DMA::readU32(uint32_t address) const
 {
-	if (address == 12)
-		return m_run ? 1 : 0;
+	if (address == 0)
+		return m_queued;
+	else if (address == 4)
+		return m_retired;
+	else if (address == 12)
+		return (!m_tasks.empty()) ? 1 : 0;
 	else
 		return 0;
 }
 
 bool DMA::tick(ICPU* cpu, Bus* bus)
 {
-	if (m_run == 1)
+	if (m_tasks.empty())
+		return true;
+
+	Task& task = m_tasks.front();
+
+	if (task.run == 1)
 	{
-		if (m_count > 0)
+		if (task.count > 0)
 		{
-			const uint32_t value = m_from;
-			bus->writeU32(m_to, value);
-			m_to += 4;
-			m_count--;
+			const uint32_t value = task.from;
+			bus->writeU32(task.to, value);
+			task.to += 4;
+			task.count--;
 		}
 	}
-	else if (m_run == 2)
+	else if (task.run == 2)
 	{
-		if (m_count > 0)
+		if (task.count > 0)
 		{
-			const uint32_t value = bus->readU32(m_from);
-			bus->writeU32(m_to, value);
-			m_to += 4;
-			m_from += 4;
-			m_count--;
+			const uint32_t value = bus->readU32(task.from);
+			bus->writeU32(task.to, value);
+			task.to += 4;
+			task.from += 4;
+			task.count--;
 		}
 	}
-	if (m_count == 0)
-		m_run = 0;
+	else if (task.run == 3)
+	{
+		if (task.count > 0)
+		{
+			const uint32_t value = bus->readU32(task.from);
+			bus->writeU32(task.to, value);
+			task.from += 4;
+			task.count--;
+		}
+	}
+
+	if (task.count == 0)
+	{
+		m_retired = task.tag;
+		m_tasks.pop_front();
+	}
+	
 	return true;
 }

@@ -19,7 +19,7 @@ uint32_t hal_dma_write(void* dst, uint32_t count, uint32_t value)
 	*DMA_TO = (uint32_t)dst;
 	*DMA_COUNT = count;
 	*DMA_RUN = 1;
-	return 0;
+	return *DMA_FROM;
 }
 
 uint32_t hal_dma_copy(void* dst, const void* src, uint32_t count)
@@ -28,10 +28,24 @@ uint32_t hal_dma_copy(void* dst, const void* src, uint32_t count)
 	*DMA_TO = (uint32_t)dst;
 	*DMA_COUNT = count;
 	*DMA_RUN = 2;
-	return 0;
+	return *DMA_FROM;
+}
+
+uint32_t hal_dma_feed(void* dst, const void* src, uint32_t count)
+{
+	*DMA_FROM = (uint32_t)src;
+	*DMA_TO = (uint32_t)dst;
+	*DMA_COUNT = count;
+	*DMA_RUN = 3;
+	return *DMA_FROM;
 }
 
 uint8_t hal_dma_is_busy()
 {
 	return (*DMA_RUN != 0) ? 1 : 0;
+}
+
+uint32_t hal_dma_retired()
+{
+	return *DMA_TO;
 }

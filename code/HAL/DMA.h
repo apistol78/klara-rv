@@ -14,4 +14,8 @@ EXTERN_C uint32_t hal_dma_write(void* dst, uint32_t count, uint32_t value);
 
 EXTERN_C uint32_t hal_dma_copy(void* dst, const void* src, uint32_t count);
 
+EXTERN_C uint32_t hal_dma_feed(void* dst, const void* src, uint32_t count);
+
 EXTERN_C uint8_t hal_dma_is_busy();
+
+EXTERN_C uint32_t hal_dma_retired();

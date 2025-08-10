@@ -42,14 +42,21 @@ module DMA(
 		C_READ_REQ		= 4'd5,
 		C_WAIT_READ		= 4'd6,
 		C_WRITE_REQ		= 4'd7,
-		C_WAIT_WRITE	= 4'd8
+		C_WAIT_WRITE	= 4'd8,
+
+		// Feed
+		F_READ_REQ		= 4'd9,
+		F_WAIT_READ		= 4'd10,
+		F_WRITE_REQ		= 4'd11,
+		F_WAIT_WRITE	= 4'd12
 	}
 	state_t;
 
 	typedef enum bit [1:0]
 	{
 		WRITE	= 2'd1,
-		COPY	= 2'd2
+		COPY	= 2'd2,
+		FEED	= 2'd3
 	}
 	dma_type_t;
 
@@ -59,6 +66,7 @@ module DMA(
 		bit [31:0] value_or_from;
 		bit [31:0] to;
 		bit [31:0] count;
+		bit [31:0] tag;
 	}
 	dma_command_t;
 
@@ -66,6 +74,9 @@ module DMA(
 	dma_command_t rd_command;
 	bit [31:0] data;
 	state_t state = IDLE;
+
+	bit [31:0] queued_counter = 32'h0;
+	bit [31:0] retired_counter = 32'h0;
 
 	wire queue_empty;
 	wire queue_full;
@@ -100,36 +111,46 @@ module DMA(
 		queue_write <= 1'b0;
 		if (i_request) begin
 			if (!i_rw) begin
-				if (i_address == 2'd3) begin
+				if (i_address == 2'd0) begin
+					o_rdata <= queued_counter;
+					o_ready <= 1'b1;
+				end
+				else if (i_address == 2'd1) begin
+					o_rdata <= retired_counter;
+					o_ready <= 1'b1;
+				end
+				else if (i_address == 2'd3) begin
 					o_rdata <= (!queue_empty || state != IDLE) ? 32'hffff_ffff : 32'h0000_0000;
-					o_ready <= 1;
+					o_ready <= 1'b1;
 				end
 			end
 			else begin
 				// Receive commands from CPU.
 				if (i_address == 2'd0) begin
 					wr_command.value_or_from <= i_wdata;
-					o_ready <= 1;
+					o_ready <= 1'b1;
 				end
 				else if (i_address == 2'd1) begin
 					wr_command.to <= i_wdata;
-					o_ready <= 1;
+					o_ready <= 1'b1;
 				end
 				else if (i_address == 2'd2) begin
 					wr_command.count <= i_wdata;
-					o_ready <= 1;
+					o_ready <= 1'b1;
 				end
 				else if (i_address == 2'd3) begin
 					wr_command.dt <= dma_type_t'(i_wdata[1:0]);
+					wr_command.tag <= queued_counter + 1;
 					if (!queue_full) begin
 						queue_write <= 1'b1;
-						o_ready <= 1;
+						queued_counter <= queued_counter + 1;
+						o_ready <= 1'b1;
 					end
 				end
 			end
 		end
 		else
-			o_ready <= 0;
+			o_ready <= 1'b0;
 	end
 
 	// Process commands.
@@ -154,8 +175,12 @@ module DMA(
 					state <= W_WRITE_REQ;
 				else if (queue_rdata.dt == COPY)
 					state <= C_READ_REQ;
-				else
+				else if (queue_rdata.dt == FEED)
+					state <= C_FEED_REQ;
+				else begin
+					retired_counter <= queue_rdata.tag;
 					state <= IDLE;
+				end
 			end
 
 			// Write
@@ -177,6 +202,7 @@ module DMA(
 						state <= W_WRITE_REQ;
 					end
 					else begin
+						retired_counter <= rd_command.tag;
 						state <= IDLE;
 					end
 				end
@@ -217,6 +243,47 @@ module DMA(
 						state <= C_READ_REQ;
 					end
 					else begin
+						retired_counter <= rd_command.tag;
+						state <= IDLE;
+					end
+				end
+			end
+
+			// Feed
+
+			F_READ_REQ: begin
+				o_bus_request <= 1;
+				o_bus_rw <= 0;
+				o_bus_address <= rd_command.value_or_from;
+				state <= F_WAIT_READ;
+			end
+
+			F_WAIT_READ: begin
+				if (i_bus_ready) begin
+					o_bus_request <= 0;
+					data <= i_bus_rdata;
+					rd_command.value_or_from <= rd_command.value_or_from + 4;
+					state <= F_WRITE_REQ;
+				end
+			end
+
+			F_WRITE_REQ: begin
+				o_bus_request <= 1;
+				o_bus_rw <= 1;
+				o_bus_address <= rd_command.to;
+				o_bus_wdata <= data;
+				state <= F_WAIT_WRITE;
+			end
+
+			F_WAIT_WRITE: begin
+				if (i_bus_ready) begin
+					o_bus_request <= 0;
+					if (rd_command.count > 0) begin
+						rd_command.count <= rd_command.count - 1;
+						state <= F_READ_REQ;
+					end
+					else begin
+						retired_counter <= rd_command.tag;
 						state <= IDLE;
 					end
 				end
