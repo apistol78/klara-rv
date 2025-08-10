@@ -45,15 +45,15 @@ void VCPU_top___024root__traceDeclTypesSub0(VerilatedFst* tracep) {
     {
         const char* __VenumItemNames[]
         = {"IDLE", "FLUSH_SETUP", "FLUSH_CHECK", "FLUSH_WRITE", 
-                                "FLUSH_NEXT", "PASS_THROUGH", 
-                                "WRITE_SETUP", "WRITE_WAIT", 
-                                "READ_SETUP", "READ_WB_WAIT", 
-                                "READ_BUS_WAIT", "INITIALIZE"};
+                                "PASS_THROUGH", "WRITE_SETUP", 
+                                "WRITE_WAIT", "READ_SETUP", 
+                                "READ_WB_WAIT", "READ_BUS_WAIT", 
+                                "INITIALIZE"};
         const char* __VenumItemValues[]
         = {"0", "1", "10", "11", "100", "101", "110", 
                                 "111", "1000", "1001", 
-                                "1010", "1011"};
-        tracep->declDTypeEnum(4, "CPU_DCache_Reg.state_t", 12, 4, __VenumItemNames, __VenumItemValues);
+                                "1010"};
+        tracep->declDTypeEnum(4, "CPU_DCache_Reg.state_t", 11, 4, __VenumItemNames, __VenumItemValues);
     }
 }
 

@@ -48,7 +48,6 @@ module CPU_DCache_Reg #(
 		FLUSH_SETUP,
 		FLUSH_CHECK,
 		FLUSH_WRITE,
-		FLUSH_NEXT,
 		PASS_THROUGH,
 		WRITE_SETUP,
 		WRITE_WAIT,
@@ -91,7 +90,7 @@ module CPU_DCache_Reg #(
 
 	always_comb begin
 		if (state == FLUSH_SETUP || state == FLUSH_CHECK || state == FLUSH_WRITE || state == INITIALIZE)
-			cache_address = flush_address;
+			cache_address = flush_address[SIZE - 1:0];
 		else
 			cache_address = i_address[(SIZE - 1) + 2:2];
 	end
@@ -151,7 +150,7 @@ module CPU_DCache_Reg #(
 			// ================
 			FLUSH_SETUP: begin
 				if (!i_bus_ready) begin
-					if (flush_address < RANGE)
+					if (flush_address <= RANGE - 1)
 						state <= FLUSH_CHECK;
 					else begin
 						o_ready <= 1'b1;
@@ -166,6 +165,8 @@ module CPU_DCache_Reg #(
 					o_bus_address <= cache_entry_address;
 					o_bus_request <= 1'b1;
 					o_bus_wdata <= cache_entry_data;
+					cache_rw <= 1'b1;
+					cache_wdata <= 32'hffff_fff0; // { cache_entry_data, cache_entry_address[31:2], 2'b01 };
 					state <= FLUSH_WRITE;
 				end
 				else begin
@@ -176,16 +177,10 @@ module CPU_DCache_Reg #(
 
 			FLUSH_WRITE: begin
 				if (i_bus_ready) begin
-					cache_rw <= 1'b1;
-					cache_wdata <= 32'hffff_fff0; // { cache_entry_data, cache_entry_address[31:2], 2'b01 };
 					o_bus_request <= 1'b0;
-					state <= FLUSH_NEXT;
+					flush_address <= flush_address + 1;
+					state <= FLUSH_SETUP;
 				end
-			end
-
-			FLUSH_NEXT: begin
-				flush_address <= flush_address + 1;
-				state <= FLUSH_SETUP;
 			end
 
 			// ================

@@ -100,6 +100,7 @@ void DCache::flush()
 		if (line.valid && line.dirty)
 		{
 			m_wb->writeU32(line.address, line.word);
+			line.valid = false;
 			line.dirty = false;
 		}
 	}
