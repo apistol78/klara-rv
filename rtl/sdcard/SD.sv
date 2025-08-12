@@ -27,7 +27,8 @@ module SD (
 	output SD_CMD_out,
 	output SD_DAT_dir,
 	input [3:0] SD_DAT_in,
-	output [3:0] SD_DAT_out
+	output [3:0] SD_DAT_out,
+	input SD_CARD
 );
 	localparam DIR_IN = 1'b0;
 	localparam DIR_OUT = 1'b1;
@@ -102,7 +103,8 @@ module SD (
 						if (!i_rw) begin
 							if (i_address == 2'd0) begin
 								o_rdata <= {
-									24'b0,
+									23'b0,
+									SD_CARD,
 									(ddir == DIR_IN) ? dat_in : dat,
 									(cdir == DIR_IN) ? cmd_in : cmd,
 									ddir,

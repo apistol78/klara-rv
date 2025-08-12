@@ -10,6 +10,10 @@
 
 #include "HAL/Common.h"
 
+#define SD_RESULT_OK            0
+#define SD_RESULT_NO_CARD       1
+#define SD_RESULT_INVALID_CARD  2
+
 #define SD_MODE_SW  0
 #define SD_MODE_HW  1
 

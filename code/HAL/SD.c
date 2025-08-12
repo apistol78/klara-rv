@@ -36,7 +36,7 @@
 #define SD_HW_RDW4	(volatile uint32_t*)(SD_BASE + 12)
 
 /*
-|x|x|x|x|x|x|x|x|dat|dat|dat|dat|cmd|dat dir|cmd dir|clk|
+|x|x|x|x|x|x|x|card|dat|dat|dat|dat|cmd|dat dir|cmd dir|clk|
 */
 #define SD_WR_CLK_LOW() \
 	{ *SD_CTRL = 0x00000100; }
@@ -67,6 +67,9 @@
 	SD_WR_DAT(0x00)
 #define SD_RD_DAT() \
 	( (*SD_CTRL & 0x000000f0) >> 4 )
+
+#define SD_RD_CARD() \
+	( (*SD_CTRL & 0x00000100) == 0x00000100 )
 
 #define SD_VHS_2V7_3V6				0x01
 #define CMD8_DEFAULT_TEST_PATTERN	0xaa
@@ -883,6 +886,9 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 
 int32_t hal_sd_init(int32_t mode)
 {
+	if (!SD_RD_CARD())
+		return SD_RESULT_NO_CARD;
+
 	// Use SW mode for initialization since HW uses a higher frequency
 	// and the card might not be ready for it yet.
 	s_mode = SD_MODE_SW;
@@ -918,7 +924,7 @@ int32_t hal_sd_init(int32_t mode)
 		if (!hal_sd_acmd41(hostOCR32, &OCR))
 		{
 			if (count > 100)
-				return 1;
+				return SD_RESULT_INVALID_CARD;
 			hal_timer_wait_ms(2);
 		}
 		else
@@ -956,8 +962,6 @@ int32_t hal_sd_init(int32_t mode)
 	// Finally set desired acceleration mode;
 	// not applicable for emulator.
 
-	// #fixme uncomment this for HW
 	s_mode = mode;
-
-	return 0;
+	return SD_RESULT_OK;
 }

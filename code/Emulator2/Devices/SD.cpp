@@ -65,6 +65,7 @@ uint32_t SD::readU32(uint32_t address) const
 		v |= (m_r_ddir ? 0x04 : 0x00);
 		v |= (m_r_cmd ? 0x08 : 0x00);
 		v |= m_r_dat << 4;
+		v |= 0x00000100;
 	}
 	else if (address == 0x08)
 	{
