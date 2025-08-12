@@ -176,7 +176,7 @@ module DMA(
 				else if (queue_rdata.dt == COPY)
 					state <= C_READ_REQ;
 				else if (queue_rdata.dt == FEED)
-					state <= C_FEED_REQ;
+					state <= F_READ_REQ;
 				else begin
 					retired_counter <= queue_rdata.tag;
 					state <= IDLE;

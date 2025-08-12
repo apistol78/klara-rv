@@ -100,7 +100,8 @@ module DMA_tb();
 		// transfer type
 		dma_request <= 1'b1;
 		dma_address <= 2'h3;
-		dma_wdata <= 2'd2;		// copy
+		//dma_wdata <= 2'd2;		// copy
+		dma_wdata <= 2'd3;		// feed
 		while (!dma_ready) @(posedge clk);
 		dma_request <= 1'b0;
 		repeat (4) @ (posedge clk);
