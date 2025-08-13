@@ -57,17 +57,20 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__is_S;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__is_JUMP_CONDITIONAL;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__is_FPU;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__RD_bank;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__RS1_bank;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__RS2_bank;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__have_RS3;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__irq_pending_r;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_8;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_9;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_12;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_14;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_15;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_17;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_18;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_19;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_20;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_21;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_22;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT__initialized;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT__cache_invalid;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT__cache_wr_request;
@@ -77,26 +80,29 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_I;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_R;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_S;
+    };
+    struct {
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_U;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_CSR;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__is_FPU;
-    };
-    struct {
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__RD_bank;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__RS1_bank;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__RS2_bank;
         CData/*3:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__alu_operation;
         CData/*4:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__alu_operand2;
         CData/*1:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__memory_width;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT__have_RS3;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_9;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_18;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_14;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_15;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_16;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_17;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_19;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_20;
-        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_23;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_22;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_24;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_25;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_26;
+        CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_27;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__alu_compare_result;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__mul_request;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__mul_signed;
@@ -140,14 +146,14 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__25__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__26__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__27__KET____DOT__q;
+    };
+    struct {
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__28__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__29__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__30__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__31__KET____DOT__q;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__wb_rw;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__wb_request;
-    };
-    struct {
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rw;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_request;
         CData/*0:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_flush;
@@ -206,14 +212,14 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_result;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__div_remainder;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_uop1;
+    };
+    struct {
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_uop2;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__execute__DOT__divide__DOT__df__DOT__gen_div__BRA__31__KET____DOT__t;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__wb_address;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__wb_wdata;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rdata;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__dcache_wdata;
-    };
-    struct {
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__rmw_rdata;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__writeback__DOT__last_pc;

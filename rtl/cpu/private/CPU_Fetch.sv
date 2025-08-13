@@ -148,6 +148,9 @@ module CPU_Fetch #(
 	`define INSTRUCTION icache_rdata
 	`include "private/generated/Instructions_decode.sv"
 
+	wire [31:0] inst_B_imm = { { 20{ `INSTRUCTION[31] } }, `INSTRUCTION[7], `INSTRUCTION[30:25], `INSTRUCTION[11:8], 1'b0 };
+	wire [31:0] inst_J_imm = { { 12{ `INSTRUCTION[31] } }, `INSTRUCTION[19:12], `INSTRUCTION[20], `INSTRUCTION[30:21], 1'b0 };
+
 	wire have_RS1 = is_B | is_I | is_R | is_S | is_CSR | is_R4;
 	wire have_RS2 = is_B | is_R | is_S | is_R4;
 	wire have_RS3 = is_R4;
@@ -201,6 +204,12 @@ module CPU_Fetch #(
 							// Branch instruction, need to wait
 							// for an explicit "goto" signal before
 							// we can continue feeding the pipeline.
+							if (is_JAL) begin
+								pc <= pc + inst_J_imm;
+							end
+							else if (is_JUMP_CONDITIONAL) begin
+								pc <= pc + inst_B_imm;
+							end
 							state <= WAIT_JUMP;
 						end
 						else if (is_ECALL || is_WFI) begin
