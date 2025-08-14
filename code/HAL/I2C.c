@@ -27,7 +27,7 @@
 
 static void NO_OPTIMIZE hal_i2c_dly()
 {
-	for (uint32_t i = 0; i < 160; ++i)
+	for (uint32_t i = 0; i < 120; ++i)
 		__asm__ volatile ("nop");
 }
 
