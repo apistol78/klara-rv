@@ -3039,8 +3039,7 @@ VL_ATTR_COLD void VCPU_top___024root__trace_full_0_sub_0(VCPU_top___024root* vlS
     bufp->fullBit(oldp+459,(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT__cache__DOT__o_pb_ready));
     bufp->fullWData(oldp+460,(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__data),117);
     bufp->fullWData(oldp+464,(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_skid__DOT__r_data),117);
-    bufp->fullBit(oldp+468,(((0U == vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address) 
-                             | (1U == vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address))));
+    bufp->fullBit(oldp+468,((1U == vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__wb_address)));
     bufp->fullBit(oldp+469,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rw));
     bufp->fullBit(oldp+470,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_request));
     bufp->fullBit(oldp+471,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_flush));
@@ -3052,14 +3051,12 @@ VL_ATTR_COLD void VCPU_top___024root__trace_full_0_sub_0(VCPU_top___024root* vlS
                                                     >> 5U))))),32);
     bufp->fullIData(oldp+474,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rdata),32);
     bufp->fullIData(oldp+475,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_wdata),32);
-    bufp->fullBit(oldp+476,(((0U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
-                                             >> 1U))) 
-                             | (1U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
-                                               >> 1U))))));
+    bufp->fullBit(oldp+476,((1U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
+                                            >> 1U)))));
     bufp->fullCData(oldp+477,((3U & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
                                      >> 5U))),2);
-    bufp->fullCData(oldp+478,((0xffU & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1)),8);
-    bufp->fullSData(oldp+479,((0xffffU & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1)),16);
+    bufp->fullCData(oldp+478,((0xffU & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0)),8);
+    bufp->fullSData(oldp+479,((0xffffU & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0)),16);
     bufp->fullCData(oldp+480,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__state),3);
     bufp->fullIData(oldp+481,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__rmw_rdata),32);
     bufp->fullBit(oldp+482,(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__last_strobe));

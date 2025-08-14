@@ -393,7 +393,7 @@ VL_ATTR_COLD void VCPU_top___024root___stl_sequent__TOP__0(VCPU_top___024root* v
         = (1U & (~ (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__div_request)));
     vlSelfRef.cpu_fault = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode_fault) 
                            | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute_fault));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0 
         = VL_SHIFTR_III(32,32,32, vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rdata, 
                         VL_SHIFTL_III(32,32,32, (3U 
                                                  & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
@@ -3699,7 +3699,7 @@ VL_ATTR_COLD void VCPU_top___024root___ctor_var_reset(VCPU_top___024root* vlSelf
     vlSelf->CPU_top__DOT__cpu__DOT__memory__DOT__state = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__memory__DOT__rmw_rdata = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__memory__DOT__last_strobe = 0;
-    vlSelf->CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1 = VL_RAND_RESET_I(32);
+    vlSelf->CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0 = VL_RAND_RESET_I(32);
     vlSelf->CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__state = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__flush_address = 0;
     vlSelf->CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__cache_rw = 0;

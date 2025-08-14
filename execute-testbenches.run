@@ -10,6 +10,7 @@ local TESTBENCHES =
 	{ "rtl/flash/SPI_Flash_tb.sv", "rtl/flash/SPI_Flash.sv" },
 	{ "rtl/misc/Timer_tb.sv", "rtl/misc/Timer.sv" },
 	-- { "rtl/sdram/SDRAM_controller_tb.sv", "rtl/sdram/SDRAM_controller.sv" },
+	{ "rtl/uart/UART_RX_tb.sv", "rtl/uart/UART_RX.sv", "rtl/fifo/FIFO.sv" },
 	{ "rtl/uart/UART_TX_tb.sv", "rtl/uart/UART_TX.sv", "rtl/fifo/FIFO.sv" },
 	{ "rtl/video/VIDEO_VGA_tb.sv", "rtl/video/VIDEO_VGA.sv" },
 	{ "rtl/video/VIDEO_controller_tb.sv", "rtl/video/VIDEO_controller.sv", "rtl/video/VIDEO_VGA.sv", "rtl/misc/DualPort.sv", "rtl/misc/WriteBuffer.sv", "rtl/fifo/FIFO_BRAM.sv", "rtl/block/BRAM_1r1w.sv", "rtl/block/BRAM.sv" },

@@ -215,7 +215,7 @@ class alignas(VL_CACHE_LINE_BYTES) VCPU_top___024root final : public VerilatedMo
     };
     struct {
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT__rmw_rdata;
-        IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1;
+        IData/*31:0*/ CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0;
         IData/*31:0*/ CPU_top__DOT__cpu__DOT__writeback__DOT__last_pc;
         IData/*31:0*/ __VactIterCount;
         VlWide<4>/*116:0*/ CPU_top__DOT__cpu__DOT__fetch_data;

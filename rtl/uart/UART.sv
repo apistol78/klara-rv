@@ -32,12 +32,11 @@ module UART #(
     output UART_TX
 );
 
-	localparam PRESCALE = FREQUENCY / (BAUDRATE * 8);
-
 	bit rx_request;
 	wire rx_ready;
 	UART_RX #(
-		.PRESCALE(PRESCALE),
+		.FREQUENCY(FREQUENCY),
+		.BAUDRATE(BAUDRATE),
 		.FIFO_DEPTH(RX_FIFO_DEPTH)
 	) rx(
 		.i_reset(i_reset),

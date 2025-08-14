@@ -11,7 +11,8 @@
 `default_nettype none
 
 module UART_RX #(
-    parameter PRESCALE = 50000000 / (9600 * 8),
+	parameter FREQUENCY,
+	parameter BAUDRATE = 9600,
 	parameter FIFO_DEPTH = 256
 )(
 	input i_reset,
@@ -27,6 +28,7 @@ module UART_RX #(
 	
     input UART_RX
 );
+    localparam PRESCALE = FREQUENCY / (BAUDRATE * 8);
 	localparam MAX_PRESCALE_VALUE = (PRESCALE << 3);
 
 	bit [$clog2(MAX_PRESCALE_VALUE)-1:0] prescale = 0;

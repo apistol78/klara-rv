@@ -1934,12 +1934,8 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
         if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_flush) {
             __Vdly__CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__flush_address = 0U;
             __Vdly__CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__state = 1U;
-        } else if (((0U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
-                                    >> 1U))) | (1U 
-                                                == 
-                                                (0xfU 
-                                                 & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
-                                                    >> 1U))))) {
+        } else if ((1U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
+                                   >> 1U)))) {
             if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rw) {
                 if (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__cache_rdata) 
                      & (((IData)((vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__cache_rdata 
@@ -3696,18 +3692,18 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                              (1U 
                                                               & ((vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
                                                                   >> 5U) 
-                                                                 & (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1 
+                                                                 & (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0 
                                                                     >> 0xfU))))) 
                                                   << 0x10U) 
                                                  | (0xffffU 
-                                                    & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1))
+                                                    & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0))
                         : ((0U == (3U & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
                                          >> 6U))) ? 
                            (((- (IData)((1U & ((vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
                                                 >> 5U) 
-                                               & (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1 
+                                               & (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0 
                                                   >> 7U))))) 
-                             << 8U) | (0xffU & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1))
+                             << 8U) | (0xffU & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0))
                             : 0U)));
             __Vdly__CPU_top__DOT__cpu__DOT__memory__DOT__last_strobe 
                 = (1U & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[3U] 
@@ -3989,7 +3985,7 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                            | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute_fault));
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_request 
         = vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_request;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0 
         = VL_SHIFTR_III(32,32,32, vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rdata, 
                         VL_SHIFTL_III(32,32,32, (3U 
                                                  & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
