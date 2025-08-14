@@ -63,13 +63,15 @@ module AUDIO_controller #(
 	end
 
 	always_ff @(posedge i_clock) begin
-		output_fifo_wr <= 0;
+		
+		output_fifo_wr <= 1'b0;
+
 		if (i_request && !o_ready) begin
 			if (!i_rw) begin
 				case (i_address)
 					4'h0: begin
 						o_rdata <= output_fifo_queued;
-						o_ready <= 1;
+						o_ready <= 1'b1;
 					end
 					4'h1: begin
 						o_rdata <= o_output_reload;
@@ -99,6 +101,7 @@ module AUDIO_controller #(
 		else if (!i_request) begin
 			o_ready <= 1'b0;
 		end
+		
 	end
 
 	always_comb begin

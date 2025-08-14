@@ -1364,8 +1364,14 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
     VCPU_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     auto& vlSelfRef = std::ref(*vlSelf).get();
     // Init
-    CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_13;
-    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_13 = 0;
+    CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_9;
+    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_9 = 0;
+    CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_10;
+    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_10 = 0;
+    CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11;
+    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11 = 0;
+    CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_12;
+    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_12 = 0;
     CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_16;
     CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_16 = 0;
     CData/*0:0*/ CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____VdfgExtracted_h350f2d95__0;
@@ -1928,8 +1934,12 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
         if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_flush) {
             __Vdly__CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__flush_address = 0U;
             __Vdly__CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__state = 1U;
-        } else if ((1U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
-                                   >> 1U)))) {
+        } else if (((0U == (0xfU & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
+                                    >> 1U))) | (1U 
+                                                == 
+                                                (0xfU 
+                                                 & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
+                                                    >> 1U))))) {
             if (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rw) {
                 if (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__cache_rdata) 
                      & (((IData)((vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__genblk3__DOT__dcache__DOT__cache_rdata 
@@ -2089,7 +2099,7 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                             | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_I) 
                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_R) 
                                   | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_S) 
-                                     | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11)))))
+                                     | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_15)))))
                             ? (0x1fU & (IData)((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata 
                                                 >> 0xfU)))
                             : 0U) << 0xfU));
@@ -2117,7 +2127,7 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
                                      | (0x37U == (0x7fU 
                                                   & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))) 
-                                    | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11)))))
+                                    | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_15)))))
                            ? (0x1fU & (IData)((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata 
                                                >> 7U)))
                            : 0U));
@@ -3213,9 +3223,9 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                                        << 0xcU) 
                                                                       | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                                          >> 0x14U)))))))))))))) 
-                                   << 0x1dU) | (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10) 
-                                                 | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_26) 
-                                                    | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_25))) 
+                                   << 0x1dU) | (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_9) 
+                                                 | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_25) 
+                                                    | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_24))) 
                                                 << 0x1cU)) 
                                  | ((((0x2033U == (0xfe00707fU 
                                                    & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
@@ -3240,8 +3250,8 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                        << 0xcU) 
                                                       | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                          >> 0x14U))))))) 
-                                     << 0x1bU) | (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_27) 
-                                                   | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_24) 
+                                     << 0x1bU) | (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_26) 
+                                                   | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_23) 
                                                       | ((0x100073U 
                                                           == 
                                                           ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
@@ -3362,8 +3372,8 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                          << 0xcU) 
                                                         | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                            >> 0x14U)))) 
-                                                   | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_16) 
-                                                      | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_15)))) 
+                                                   | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_20) 
+                                                      | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_19)))) 
                                                << 9U) 
                                               | (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__is_S) 
                                                   << 8U) 
@@ -3686,18 +3696,18 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                              (1U 
                                                               & ((vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
                                                                   >> 5U) 
-                                                                 & (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0 
+                                                                 & (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1 
                                                                     >> 0xfU))))) 
                                                   << 0x10U) 
                                                  | (0xffffU 
-                                                    & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0))
+                                                    & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1))
                         : ((0U == (3U & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
                                          >> 6U))) ? 
                            (((- (IData)((1U & ((vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[1U] 
                                                 >> 5U) 
-                                               & (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0 
+                                               & (vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1 
                                                   >> 7U))))) 
-                             << 8U) | (0xffU & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0))
+                             << 8U) | (0xffU & vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1))
                             : 0U)));
             __Vdly__CPU_top__DOT__cpu__DOT__memory__DOT__last_strobe 
                 = (1U & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[3U] 
@@ -3883,6 +3893,49 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                   == 
                                                   (0x707fU 
                                                    & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))))))))))))))));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__RS2_bank 
+        = ((0x53U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+           | ((0x18000053U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+              | ((0xa0002053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                 | ((0xa0000053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                    | ((0xa0001053U == (0xfe00707fU 
+                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                       | ((0x43U == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                          | ((0x47U == (0x600007fU 
+                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                             | ((0x4fU == (0x600007fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                | ((0x4bU == (0x600007fU 
+                                              & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                   | ((0x28000053U 
+                                       == (0xfe00707fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                      | ((0x28001053U 
+                                          == (0xfe00707fU 
+                                              & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                         | ((0x10000053U 
+                                             == (0xfe00007fU 
+                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                            | ((0x20000053U 
+                                                == 
+                                                (0xfe00707fU 
+                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                               | ((0x20001053U 
+                                                   == 
+                                                   (0xfe00707fU 
+                                                    & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                  | ((0x20002053U 
+                                                      == 
+                                                      (0xfe00707fU 
+                                                       & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                     | ((0x8000053U 
+                                                         == 
+                                                         (0xfe00007fU 
+                                                          & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                        | (0x2027U 
+                                                           == 
+                                                           (0x707fU 
+                                                            & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))))))))))))))))));
     vlSelfRef.__VdfgRegularize_hd87f99a1_9_0 = ((0x23U 
                                                  == 
                                                  (0x707fU 
@@ -3895,35 +3948,33 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                       == 
                                                       (0x707fU 
                                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_22 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__have_RS3 
+        = ((0x43U == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+           | ((0x47U == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+              | ((0x4fU == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                 | (0x4bU == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))))));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_21 
         = ((0x3073U == (0x707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | ((0x2073U == (0x707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
               | (0x1073U == (0x707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_12 
-        = ((0x18000053U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-           | (0xa0002053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_17 
-        = ((0x53U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-           | ((0xc0000053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-              | (0xc0100053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_19 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_18 
         = ((0x2004033U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | (0x2005033U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_9 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_8 
         = ((0x1033U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | (0x1013U == (0xfc00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_21 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_20 
         = ((0x40005033U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | (0x40005013U == (0xfc00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_20 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_19 
         = ((0x5033U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | (0x5013U == (0xfc00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_8 
-        = ((0x43U == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-           | (0x47U == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
+    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_9 
+        = ((0x53U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+           | (0xc0000053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
     CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_16 
-        = ((0xd0100053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-           | (0x18000053U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
+        = ((0xc0100053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+           | (0xd0000053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
     CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____VdfgExtracted_h350f2d95__0 
         = ((IData)((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata 
                     >> 0x32U)) & ((0x3ffffU & (IData)(
@@ -3931,14 +3982,14 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                        >> 0x20U))) 
                                   == (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__pc 
                                       >> 0xeU)));
-    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_13 
+    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_10 
         = ((0x20002053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | (0x8000053U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))));
     vlSelfRef.cpu_fault = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode_fault) 
                            | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute_fault));
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r2_request 
         = vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_request;
-    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_0 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT____VdfgRegularize_h6f8eb4f6_1_1 
         = VL_SHIFTR_III(32,32,32, vlSelfRef.CPU_top__DOT__cpu__DOT__memory__DOT__dcache_rdata, 
                         VL_SHIFTL_III(32,32,32, (3U 
                                                  & (vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__data[0U] 
@@ -3964,44 +4015,10 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_S 
         = ((0x2027U == (0x707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | (IData)(vlSelfRef.__VdfgRegularize_hd87f99a1_9_0));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__RS2_bank 
-        = ((0x53U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-           | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_12) 
-              | ((0xa0000053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                 | ((0xa0001053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                    | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_8) 
-                       | ((0x4fU == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                          | ((0x4bU == (0x600007fU 
-                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                             | ((0x28000053U == (0xfe00707fU 
-                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                | ((0x28001053U == 
-                                    (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                   | ((0x10000053U 
-                                       == (0xfe00007fU 
-                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                      | ((0x20000053U 
-                                          == (0xfe00707fU 
-                                              & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                         | ((0x20001053U 
-                                             == (0xfe00707fU 
-                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                            | ((0x20002053U 
-                                                == 
-                                                (0xfe00707fU 
-                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                               | ((0x8000053U 
-                                                   == 
-                                                   (0xfe00007fU 
-                                                    & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                  | (0x2027U 
-                                                     == 
-                                                     (0x707fU 
-                                                      & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))))))))))))))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__have_RS3 
-        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_8) 
-           | ((0x4fU == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-              | (0x4bU == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_15 
+        = (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_21) 
+            | (0x30200073U == (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+           | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__have_RS3));
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__icache_ready = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT__cache_rd_set = 0U;
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT__cache_invalid = 0U;
@@ -4026,23 +4043,114 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
     vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_R 
         = ((0x33U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | ((0x7033U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-              | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_19) 
-                 | ((0x53U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                    | ((0xc0000053U == (0xfff0007fU 
-                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                       | ((0xc0100053U == (0xfff0007fU 
+              | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_18) 
+                 | ((IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_9) 
+                    | ((IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_16) 
+                       | ((0xd0100053U == (0xfff0007fU 
                                            & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                          | ((0xd0000053U == (0xfff0007fU 
+                          | ((0x18000053U == (0xfe00007fU 
                                               & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                             | ((IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_16) 
-                                | ((0xa0002053U == 
+                             | ((0xa0002053U == (0xfe00707fU 
+                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                | ((0xa0000053U == 
                                     (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                   | ((0xa0000053U 
+                                   | ((0xa0001053U 
                                        == (0xfe00707fU 
                                            & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                      | ((0xa0001053U 
+                                      | ((0x28000053U 
                                           == (0xfe00707fU 
                                               & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                         | ((0x28001053U 
+                                             == (0xfe00707fU 
+                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                            | ((0x10000053U 
+                                                == 
+                                                (0xfe00007fU 
+                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                               | ((0xe0000053U 
+                                                   == 
+                                                   (0xfff0707fU 
+                                                    & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                  | ((0xf0000053U 
+                                                      == 
+                                                      (0xfff0707fU 
+                                                       & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                     | ((0x20000053U 
+                                                         == 
+                                                         (0xfe00707fU 
+                                                          & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                        | ((0x20001053U 
+                                                            == 
+                                                            (0xfe00707fU 
+                                                             & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                           | ((IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_10) 
+                                                              | ((0x2000033U 
+                                                                  == 
+                                                                  (0xfe00707fU 
+                                                                   & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                 | ((0x2001033U 
+                                                                     == 
+                                                                     (0xfe00707fU 
+                                                                      & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                    | ((0x2003033U 
+                                                                        == 
+                                                                        (0xfe00707fU 
+                                                                         & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                       | ((0x6033U 
+                                                                           == 
+                                                                           (0xfe00707fU 
+                                                                            & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                          | ((0x2006033U 
+                                                                              == 
+                                                                              (0xfe00707fU 
+                                                                               & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                             | ((0x2007033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_8) 
+                                                                                | ((0x2033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                                | ((0x3033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_20) 
+                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_19) 
+                                                                                | ((0x40000033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                                                | (0x4033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata)))))))))))))))))))))))))))))))));
+    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11 
+        = ((0x20000053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+           | ((0x20001053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+              | (IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_10)));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__RS1_bank 
+        = ((0x53U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+           | ((0xc0000053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+              | ((0xc0100053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                 | ((0x18000053U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                    | ((0xa0002053U == (0xfe00707fU 
+                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                       | ((0xa0000053U == (0xfe00707fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                          | ((0xa0001053U == (0xfe00707fU 
+                                              & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                             | ((0x43U == (0x600007fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                | ((0x47U == (0x600007fU 
+                                              & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                   | ((0x4fU == (0x600007fU 
+                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                      | ((0x4bU == 
+                                          (0x600007fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
                                          | ((0x28000053U 
                                              == (0xfe00707fU 
                                                  & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
@@ -4058,73 +4166,10 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                                                       == 
                                                       (0xfff0707fU 
                                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                     | ((0xf0000053U 
-                                                         == 
-                                                         (0xfff0707fU 
-                                                          & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                        | ((0x20000053U 
-                                                            == 
-                                                            (0xfe00707fU 
-                                                             & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                           | ((0x20001053U 
-                                                               == 
-                                                               (0xfe00707fU 
-                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                              | ((IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_13) 
-                                                                 | ((0x2000033U 
-                                                                     == 
-                                                                     (0xfe00707fU 
-                                                                      & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                    | ((0x2001033U 
-                                                                        == 
-                                                                        (0xfe00707fU 
-                                                                         & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                       | ((0x2003033U 
-                                                                           == 
-                                                                           (0xfe00707fU 
-                                                                            & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                          | ((0x6033U 
-                                                                              == 
-                                                                              (0xfe00707fU 
-                                                                               & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                             | ((0x2006033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                                | ((0x2007033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_9) 
-                                                                                | ((0x2033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                                | ((0x3033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_21) 
-                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_20) 
-                                                                                | ((0x40000033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                                                | (0x4033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))))))))))))))))))))))))))))))))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_14 
-        = ((0x20000053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-           | ((0x20001053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-              | (IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_13)));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11 
-        = (((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_22) 
-            | (0x30200073U == (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-           | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__have_RS3));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_15 
+                                                     | (IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11))))))))))))))));
+    CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_12 
         = ((0xf0000053U == (0xfff0707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-           | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_14));
+           | (IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_11));
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_request 
         = vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_request;
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r1_s 
@@ -4231,38 +4276,65 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__0(VCPU_top___024root* 
                     >> 0x15U)) != (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__last_strobe)) 
             & (vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__data[0U] 
                >> 0x1aU)) | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__memory_busy));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_FPU 
-        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_17) 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__RD_bank 
+        = ((0x53U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
            | ((0xd0000053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-              | ((IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_16) 
-                 | ((0xa0002053U == (0xfe00707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                    | ((0xa0000053U == (0xfe00707fU 
+              | ((0xd0100053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                 | ((0x18000053U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                    | ((0x2007U == (0x707fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                       | ((0x43U == (0x600007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                          | ((0x47U == (0x600007fU 
                                         & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                       | ((0xa0001053U == (0xfe00707fU 
+                             | ((0x4fU == (0x600007fU 
                                            & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                          | ((0x43U == (0x600007fU 
-                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                             | ((0x47U == (0x600007fU 
-                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                | ((0x4fU == (0x600007fU 
+                                | ((0x4bU == (0x600007fU 
                                               & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                   | ((0x4bU == (0x600007fU 
-                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                      | ((0x28000053U 
+                                   | ((0x28000053U 
+                                       == (0xfe00707fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                      | ((0x28001053U 
                                           == (0xfe00707fU 
                                               & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                         | ((0x28001053U 
+                                         | ((0x10000053U 
+                                             == (0xfe00007fU 
+                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                            | (IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_12)))))))))))));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__is_FPU 
+        = ((IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_9) 
+           | ((IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_16) 
+              | ((0xd0100053U == (0xfff0007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                 | ((0x18000053U == (0xfe00007fU & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                    | ((0xa0002053U == (0xfe00707fU 
+                                        & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                       | ((0xa0000053U == (0xfe00707fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                          | ((0xa0001053U == (0xfe00707fU 
+                                              & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                             | ((0x43U == (0x600007fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                | ((0x47U == (0x600007fU 
+                                              & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                   | ((0x4fU == (0x600007fU 
+                                                 & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                      | ((0x4bU == 
+                                          (0x600007fU 
+                                           & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                         | ((0x28000053U 
                                              == (0xfe00707fU 
                                                  & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                            | ((0x10000053U 
+                                            | ((0x28001053U 
                                                 == 
-                                                (0xfe00007fU 
+                                                (0xfe00707fU 
                                                  & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                               | ((0xe0000053U 
+                                               | ((0x10000053U 
                                                    == 
-                                                   (0xfff0707fU 
+                                                   (0xfe00007fU 
                                                     & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
-                                                  | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_15)))))))))))))));
+                                                  | ((0xe0000053U 
+                                                      == 
+                                                      (0xfff0707fU 
+                                                       & (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__fetch__DOT__genblk1__DOT__icache__DOT____Vcellout__cache__o_pa_rdata))) 
+                                                     | (IData)(CPU_top__DOT__cpu__DOT__fetch__DOT____VdfgRegularize_hef2daed4_0_12))))))))))))))));
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_request 
         = (1U == (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__latch));
     vlSelfRef.CPU_top__DOT__cpu__DOT__execute__DOT__multiply__DOT__r0_s 
@@ -4706,8 +4778,14 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
     VCPU_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     auto& vlSelfRef = std::ref(*vlSelf).get();
     // Init
-    CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_18;
-    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_18 = 0;
+    CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10;
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10 = 0;
+    CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_11;
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_11 = 0;
+    CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_12;
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_12 = 0;
+    CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_13;
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_13 = 0;
     CData/*0:0*/ CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21;
     CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21 = 0;
     // Body
@@ -5355,6 +5433,117 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                                                >> 0x14U))))
                                                         ? 2U
                                                         : 0U))))))))));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__RS2_bank 
+        = ((0x53U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                      << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                  >> 0x14U)))) 
+           | ((0x18000053U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+              | ((0xa0002053U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                 | ((0xa0000053U == (0xfe00707fU & 
+                                     ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                       << 0xcU) | (
+                                                   vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                   >> 0x14U)))) 
+                    | ((0xa0001053U == (0xfe00707fU 
+                                        & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                            << 0xcU) 
+                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                              >> 0x14U)))) 
+                       | ((0x43U == (0x600007fU & (
+                                                   (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                    << 0xcU) 
+                                                   | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                      >> 0x14U)))) 
+                          | ((0x47U == (0x600007fU 
+                                        & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                            << 0xcU) 
+                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                              >> 0x14U)))) 
+                             | ((0x4fU == (0x600007fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+                                | ((0x4bU == (0x600007fU 
+                                              & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                                   | ((0x28000053U 
+                                       == (0xfe00707fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+                                      | ((0x28001053U 
+                                          == (0xfe00707fU 
+                                              & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                                         | ((0x10000053U 
+                                             == (0xfe00007fU 
+                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                     << 0xcU) 
+                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                       >> 0x14U)))) 
+                                            | ((0x20000053U 
+                                                == 
+                                                (0xfe00707fU 
+                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                     << 0xcU) 
+                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                       >> 0x14U)))) 
+                                               | ((0x20001053U 
+                                                   == 
+                                                   (0xfe00707fU 
+                                                    & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                        << 0xcU) 
+                                                       | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                          >> 0x14U)))) 
+                                                  | ((0x20002053U 
+                                                      == 
+                                                      (0xfe00707fU 
+                                                       & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                           << 0xcU) 
+                                                          | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                             >> 0x14U)))) 
+                                                     | ((0x8000053U 
+                                                         == 
+                                                         (0xfe00007fU 
+                                                          & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                              << 0xcU) 
+                                                             | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                >> 0x14U)))) 
+                                                        | (0x2027U 
+                                                           == 
+                                                           (0x707fU 
+                                                            & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                << 0xcU) 
+                                                               | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                  >> 0x14U))))))))))))))))))));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__have_RS3 
+        = ((0x43U == (0x600007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                     << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+           | ((0x47U == (0x600007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                        << 0xcU) | 
+                                       (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                        >> 0x14U)))) 
+              | ((0x4fU == (0x600007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                           << 0xcU) 
+                                          | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                             >> 0x14U)))) 
+                 | (0x4bU == (0x600007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                             << 0xcU) 
+                                            | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                               >> 0x14U)))))));
     vlSelfRef.__VdfgRegularize_hd87f99a1_4_0 = ((0x23U 
                                                  == 
                                                  (0x707fU 
@@ -5376,42 +5565,21 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                                            << 0xcU) 
                                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                              >> 0x14U))))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_16 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_20 
         = ((0x4003U == (0x707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                     << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                 >> 0x14U)))) 
            | (0x1003U == (0x707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                       << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                   >> 0x14U)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_15 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_19 
         = ((0x5003U == (0x707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                     << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                 >> 0x14U)))) 
            | (0x2003U == (0x707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                       << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                   >> 0x14U)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_17 
-        = ((0x18000053U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                            << 0xcU) 
-                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                              >> 0x14U)))) 
-           | (0xa0002053U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                              << 0xcU) 
-                                             | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                >> 0x14U)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_22 
-        = ((0x53U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                      << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                  >> 0x14U)))) 
-           | ((0xc0000053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                               << 0xcU) 
-                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                 >> 0x14U)))) 
-              | (0xc0100053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                 << 0xcU) 
-                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                   >> 0x14U))))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_27 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_26 
         = ((0x3073U == (0x707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                     << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                 >> 0x14U)))) 
@@ -5423,7 +5591,7 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                          << 0xcU) | 
                                         (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                          >> 0x14U))))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_24 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_23 
         = ((0x2004033U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                            << 0xcU) 
                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
@@ -5432,7 +5600,7 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                              << 0xcU) 
                                             | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                >> 0x14U)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_9 
         = ((0x1033U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                         << 0xcU) | 
                                        (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
@@ -5441,7 +5609,7 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                           << 0xcU) 
                                          | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                             >> 0x14U)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_26 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_25 
         = ((0x40005033U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                             << 0xcU) 
                                            | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
@@ -5450,7 +5618,7 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                               << 0xcU) 
                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                 >> 0x14U)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_25 
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_24 
         = ((0x5033U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                         << 0xcU) | 
                                        (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
@@ -5459,24 +5627,24 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                           << 0xcU) 
                                          | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                             >> 0x14U)))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_9 
-        = ((0x43U == (0x600007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                     << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                 >> 0x14U)))) 
-           | (0x47U == (0x600007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                       << 0xcU) | (
-                                                   vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                   >> 0x14U)))));
-    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21 
-        = ((0xd0100053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                            << 0xcU) 
-                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                              >> 0x14U)))) 
-           | (0x18000053U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10 
+        = ((0x53U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                      << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                  >> 0x14U)))) 
+           | (0xc0000053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                               << 0xcU) 
                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                 >> 0x14U)))));
-    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_18 
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21 
+        = ((0xc0100053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                            << 0xcU) 
+                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                              >> 0x14U)))) 
+           | (0xd0000053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                              << 0xcU) 
+                                             | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                >> 0x14U)))));
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_11 
         = ((0x20002053U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                             << 0xcU) 
                                            | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
@@ -5514,8 +5682,8 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                               << 0xcU) 
                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                 >> 0x14U)))) 
-                          | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_16) 
-                             | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_15) 
+                          | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_20) 
+                             | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_19) 
                                 | ((0x6013U == (0x707fU 
                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                     << 0xcU) 
@@ -5539,95 +5707,10 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                       >> 0x14U)))))))))))))));
     vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__is_CSR 
-        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_27) 
+        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_26) 
            | (0x30200073U == ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                            >> 0x14U))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__RS2_bank 
-        = ((0x53U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                      << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                  >> 0x14U)))) 
-           | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_17) 
-              | ((0xa0000053U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                  << 0xcU) 
-                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                    >> 0x14U)))) 
-                 | ((0xa0001053U == (0xfe00707fU & 
-                                     ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                       << 0xcU) | (
-                                                   vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                   >> 0x14U)))) 
-                    | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_9) 
-                       | ((0x4fU == (0x600007fU & (
-                                                   (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                    << 0xcU) 
-                                                   | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                      >> 0x14U)))) 
-                          | ((0x4bU == (0x600007fU 
-                                        & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                            << 0xcU) 
-                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                              >> 0x14U)))) 
-                             | ((0x28000053U == (0xfe00707fU 
-                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                     << 0xcU) 
-                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                       >> 0x14U)))) 
-                                | ((0x28001053U == 
-                                    (0xfe00707fU & 
-                                     ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                       << 0xcU) | (
-                                                   vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                   >> 0x14U)))) 
-                                   | ((0x10000053U 
-                                       == (0xfe00007fU 
-                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                               << 0xcU) 
-                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                 >> 0x14U)))) 
-                                      | ((0x20000053U 
-                                          == (0xfe00707fU 
-                                              & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                  << 0xcU) 
-                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                    >> 0x14U)))) 
-                                         | ((0x20001053U 
-                                             == (0xfe00707fU 
-                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                     << 0xcU) 
-                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                       >> 0x14U)))) 
-                                            | ((0x20002053U 
-                                                == 
-                                                (0xfe00707fU 
-                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                     << 0xcU) 
-                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                       >> 0x14U)))) 
-                                               | ((0x8000053U 
-                                                   == 
-                                                   (0xfe00007fU 
-                                                    & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                        << 0xcU) 
-                                                       | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                          >> 0x14U)))) 
-                                                  | (0x2027U 
-                                                     == 
-                                                     (0x707fU 
-                                                      & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                          << 0xcU) 
-                                                         | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                            >> 0x14U))))))))))))))))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__have_RS3 
-        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_9) 
-           | ((0x4fU == (0x600007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                        << 0xcU) | 
-                                       (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                        >> 0x14U)))) 
-              | (0x4bU == (0x600007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                          << 0xcU) 
-                                         | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                            >> 0x14U))))));
     vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__is_R 
         = ((0x33U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                       << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
@@ -5636,45 +5719,223 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                            << 0xcU) 
                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                              >> 0x14U)))) 
-              | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_24) 
-                 | ((0x53U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                               << 0xcU) 
-                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                 >> 0x14U)))) 
-                    | ((0xc0000053U == (0xfff0007fU 
-                                        & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                            << 0xcU) 
-                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                              >> 0x14U)))) 
-                       | ((0xc0100053U == (0xfff0007fU 
+              | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_23) 
+                 | ((IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10) 
+                    | ((IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21) 
+                       | ((0xd0100053U == (0xfff0007fU 
                                            & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                << 0xcU) 
                                               | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                  >> 0x14U)))) 
-                          | ((0xd0000053U == (0xfff0007fU 
+                          | ((0x18000053U == (0xfe00007fU 
                                               & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                   << 0xcU) 
                                                  | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                     >> 0x14U)))) 
-                             | ((IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21) 
-                                | ((0xa0002053U == 
+                             | ((0xa0002053U == (0xfe00707fU 
+                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                     << 0xcU) 
+                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                       >> 0x14U)))) 
+                                | ((0xa0000053U == 
                                     (0xfe00707fU & 
                                      ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                        << 0xcU) | (
                                                    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                    >> 0x14U)))) 
-                                   | ((0xa0000053U 
+                                   | ((0xa0001053U 
                                        == (0xfe00707fU 
                                            & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                << 0xcU) 
                                               | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                  >> 0x14U)))) 
-                                      | ((0xa0001053U 
+                                      | ((0x28000053U 
                                           == (0xfe00707fU 
                                               & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                   << 0xcU) 
                                                  | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                     >> 0x14U)))) 
+                                         | ((0x28001053U 
+                                             == (0xfe00707fU 
+                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                     << 0xcU) 
+                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                       >> 0x14U)))) 
+                                            | ((0x10000053U 
+                                                == 
+                                                (0xfe00007fU 
+                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                     << 0xcU) 
+                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                       >> 0x14U)))) 
+                                               | ((0xe0000053U 
+                                                   == 
+                                                   (0xfff0707fU 
+                                                    & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                        << 0xcU) 
+                                                       | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                          >> 0x14U)))) 
+                                                  | ((0xf0000053U 
+                                                      == 
+                                                      (0xfff0707fU 
+                                                       & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                           << 0xcU) 
+                                                          | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                             >> 0x14U)))) 
+                                                     | ((0x20000053U 
+                                                         == 
+                                                         (0xfe00707fU 
+                                                          & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                              << 0xcU) 
+                                                             | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                >> 0x14U)))) 
+                                                        | ((0x20001053U 
+                                                            == 
+                                                            (0xfe00707fU 
+                                                             & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                 << 0xcU) 
+                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                   >> 0x14U)))) 
+                                                           | ((IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_11) 
+                                                              | ((0x2000033U 
+                                                                  == 
+                                                                  (0xfe00707fU 
+                                                                   & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                       << 0xcU) 
+                                                                      | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                         >> 0x14U)))) 
+                                                                 | ((0x2001033U 
+                                                                     == 
+                                                                     (0xfe00707fU 
+                                                                      & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                          << 0xcU) 
+                                                                         | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                            >> 0x14U)))) 
+                                                                    | ((0x2003033U 
+                                                                        == 
+                                                                        (0xfe00707fU 
+                                                                         & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                             << 0xcU) 
+                                                                            | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                               >> 0x14U)))) 
+                                                                       | ((0x6033U 
+                                                                           == 
+                                                                           (0xfe00707fU 
+                                                                            & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                                << 0xcU) 
+                                                                               | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                                >> 0x14U)))) 
+                                                                          | ((0x2006033U 
+                                                                              == 
+                                                                              (0xfe00707fU 
+                                                                               & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                                << 0xcU) 
+                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                                >> 0x14U)))) 
+                                                                             | ((0x2007033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                                << 0xcU) 
+                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                                >> 0x14U)))) 
+                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_9) 
+                                                                                | ((0x2033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                                << 0xcU) 
+                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                                >> 0x14U)))) 
+                                                                                | ((0x3033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                                << 0xcU) 
+                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                                >> 0x14U)))) 
+                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_25) 
+                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_24) 
+                                                                                | ((0x40000033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                                << 0xcU) 
+                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                                >> 0x14U)))) 
+                                                                                | (0x4033U 
+                                                                                == 
+                                                                                (0xfe00707fU 
+                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                                                << 0xcU) 
+                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                                                >> 0x14U))))))))))))))))))))))))))))))))));
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_12 
+        = ((0x20000053U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                            << 0xcU) 
+                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                              >> 0x14U)))) 
+           | ((0x20001053U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+              | (IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_11)));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_18 
+        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__is_CSR) 
+           | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__have_RS3));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__RS1_bank 
+        = ((0x53U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                      << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                  >> 0x14U)))) 
+           | ((0xc0000053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+              | ((0xc0100053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                 | ((0x18000053U == (0xfe00007fU & 
+                                     ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                       << 0xcU) | (
+                                                   vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                   >> 0x14U)))) 
+                    | ((0xa0002053U == (0xfe00707fU 
+                                        & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                            << 0xcU) 
+                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                              >> 0x14U)))) 
+                       | ((0xa0000053U == (0xfe00707fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+                          | ((0xa0001053U == (0xfe00707fU 
+                                              & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                             | ((0x43U == (0x600007fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+                                | ((0x47U == (0x600007fU 
+                                              & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                                   | ((0x4fU == (0x600007fU 
+                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                     << 0xcU) 
+                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                       >> 0x14U)))) 
+                                      | ((0x4bU == 
+                                          (0x600007fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
                                          | ((0x28000053U 
                                              == (0xfe00707fU 
                                                  & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
@@ -5702,189 +5963,149 @@ VL_INLINE_OPT void VCPU_top___024root___nba_sequent__TOP__3(VCPU_top___024root* 
                                                            << 0xcU) 
                                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                              >> 0x14U)))) 
-                                                     | ((0xf0000053U 
-                                                         == 
-                                                         (0xfff0707fU 
-                                                          & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                              << 0xcU) 
-                                                             | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                >> 0x14U)))) 
-                                                        | ((0x20000053U 
-                                                            == 
-                                                            (0xfe00707fU 
-                                                             & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                 << 0xcU) 
-                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                   >> 0x14U)))) 
-                                                           | ((0x20001053U 
-                                                               == 
-                                                               (0xfe00707fU 
-                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                    << 0xcU) 
-                                                                   | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                      >> 0x14U)))) 
-                                                              | ((IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_18) 
-                                                                 | ((0x2000033U 
-                                                                     == 
-                                                                     (0xfe00707fU 
-                                                                      & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                          << 0xcU) 
-                                                                         | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                            >> 0x14U)))) 
-                                                                    | ((0x2001033U 
-                                                                        == 
-                                                                        (0xfe00707fU 
-                                                                         & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                             << 0xcU) 
-                                                                            | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                               >> 0x14U)))) 
-                                                                       | ((0x2003033U 
-                                                                           == 
-                                                                           (0xfe00707fU 
-                                                                            & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                                << 0xcU) 
-                                                                               | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                                >> 0x14U)))) 
-                                                                          | ((0x6033U 
-                                                                              == 
-                                                                              (0xfe00707fU 
-                                                                               & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                                << 0xcU) 
-                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                                >> 0x14U)))) 
-                                                                             | ((0x2006033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                                << 0xcU) 
-                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                                >> 0x14U)))) 
-                                                                                | ((0x2007033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                                << 0xcU) 
-                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                                >> 0x14U)))) 
-                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10) 
-                                                                                | ((0x2033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                                << 0xcU) 
-                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                                >> 0x14U)))) 
-                                                                                | ((0x3033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                                << 0xcU) 
-                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                                >> 0x14U)))) 
-                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_26) 
-                                                                                | ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_25) 
-                                                                                | ((0x40000033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                                << 0xcU) 
-                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                                >> 0x14U)))) 
-                                                                                | (0x4033U 
-                                                                                == 
-                                                                                (0xfe00707fU 
-                                                                                & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                                                << 0xcU) 
-                                                                                | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                                                >> 0x14U)))))))))))))))))))))))))))))))))));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_19 
-        = ((0x20000053U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                            << 0xcU) 
-                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                              >> 0x14U)))) 
-           | ((0x20001053U == (0xfe00707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                               << 0xcU) 
-                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                 >> 0x14U)))) 
-              | (IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_18)));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_14 
-        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__is_CSR) 
-           | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__have_RS3));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_20 
+                                                     | (IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_12))))))))))))))));
+    CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_13 
         = ((0xf0000053U == (0xfff0707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                             << 0xcU) 
                                            | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                               >> 0x14U)))) 
-           | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_19));
-    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__is_FPU 
-        = ((IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_22) 
+           | (IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_12));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__RD_bank 
+        = ((0x53U == (0xfe00007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                      << 0xcU) | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                  >> 0x14U)))) 
            | ((0xd0000053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                << 0xcU) 
                                               | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                  >> 0x14U)))) 
-              | ((IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21) 
-                 | ((0xa0002053U == (0xfe00707fU & 
+              | ((0xd0100053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                 | ((0x18000053U == (0xfe00007fU & 
                                      ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                        << 0xcU) | (
                                                    vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                    >> 0x14U)))) 
-                    | ((0xa0000053U == (0xfe00707fU 
+                    | ((0x2007U == (0x707fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                << 0xcU) 
+                                               | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                  >> 0x14U)))) 
+                       | ((0x43U == (0x600007fU & (
+                                                   (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                    << 0xcU) 
+                                                   | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                      >> 0x14U)))) 
+                          | ((0x47U == (0x600007fU 
                                         & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                             << 0xcU) 
                                            | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                               >> 0x14U)))) 
-                       | ((0xa0001053U == (0xfe00707fU 
+                             | ((0x4fU == (0x600007fU 
                                            & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                << 0xcU) 
                                               | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                  >> 0x14U)))) 
-                          | ((0x43U == (0x600007fU 
-                                        & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                            << 0xcU) 
-                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                              >> 0x14U)))) 
-                             | ((0x47U == (0x600007fU 
-                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                               << 0xcU) 
-                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                 >> 0x14U)))) 
-                                | ((0x4fU == (0x600007fU 
+                                | ((0x4bU == (0x600007fU 
                                               & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                   << 0xcU) 
                                                  | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                     >> 0x14U)))) 
-                                   | ((0x4bU == (0x600007fU 
-                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
-                                                     << 0xcU) 
-                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
-                                                       >> 0x14U)))) 
-                                      | ((0x28000053U 
+                                   | ((0x28000053U 
+                                       == (0xfe00707fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+                                      | ((0x28001053U 
                                           == (0xfe00707fU 
                                               & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                   << 0xcU) 
                                                  | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                     >> 0x14U)))) 
-                                         | ((0x28001053U 
+                                         | ((0x10000053U 
+                                             == (0xfe00007fU 
+                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                     << 0xcU) 
+                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                       >> 0x14U)))) 
+                                            | (IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_13)))))))))))));
+    vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT__is_FPU 
+        = ((IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_10) 
+           | ((IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_21) 
+              | ((0xd0100053U == (0xfff0007fU & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                 | ((0x18000053U == (0xfe00007fU & 
+                                     ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                       << 0xcU) | (
+                                                   vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                   >> 0x14U)))) 
+                    | ((0xa0002053U == (0xfe00707fU 
+                                        & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                            << 0xcU) 
+                                           | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                              >> 0x14U)))) 
+                       | ((0xa0000053U == (0xfe00707fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+                          | ((0xa0001053U == (0xfe00707fU 
+                                              & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                             | ((0x43U == (0x600007fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+                                | ((0x47U == (0x600007fU 
+                                              & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                  << 0xcU) 
+                                                 | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                    >> 0x14U)))) 
+                                   | ((0x4fU == (0x600007fU 
+                                                 & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                     << 0xcU) 
+                                                    | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                       >> 0x14U)))) 
+                                      | ((0x4bU == 
+                                          (0x600007fU 
+                                           & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                               << 0xcU) 
+                                              | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                 >> 0x14U)))) 
+                                         | ((0x28000053U 
                                              == (0xfe00707fU 
                                                  & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                      << 0xcU) 
                                                     | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                        >> 0x14U)))) 
-                                            | ((0x10000053U 
+                                            | ((0x28001053U 
                                                 == 
-                                                (0xfe00007fU 
+                                                (0xfe00707fU 
                                                  & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                      << 0xcU) 
                                                     | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                        >> 0x14U)))) 
-                                               | ((0xe0000053U 
+                                               | ((0x10000053U 
                                                    == 
-                                                   (0xfff0707fU 
+                                                   (0xfe00007fU 
                                                     & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
                                                         << 0xcU) 
                                                        | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
                                                           >> 0x14U)))) 
-                                                  | (IData)(vlSelfRef.CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_20)))))))))))))));
+                                                  | ((0xe0000053U 
+                                                      == 
+                                                      (0xfff0707fU 
+                                                       & ((vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[3U] 
+                                                           << 0xcU) 
+                                                          | (vlSelfRef.CPU_top__DOT__cpu__DOT__fetch_data[2U] 
+                                                             >> 0x14U)))) 
+                                                     | (IData)(CPU_top__DOT__cpu__DOT__decode__DOT____VdfgRegularize_h2cfc3394_0_13))))))))))))))));
 }
 
 VL_INLINE_OPT void VCPU_top___024root___nba_comb__TOP__0(VCPU_top___024root* vlSelf) {

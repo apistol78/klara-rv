@@ -84,7 +84,7 @@ module DMA(
 	bit queue_read = 0;
 	dma_command_t queue_rdata;
 	FIFO #(
-		.DEPTH(8),
+		.DEPTH(16),
 		.WIDTH($bits(queue_rdata))
 	) queue(
 		.i_reset(i_reset),
@@ -108,8 +108,10 @@ module DMA(
 
 	// Receive commands and insert into queue.
 	always_ff @(posedge i_clock) begin
+
 		queue_write <= 1'b0;
-		if (i_request) begin
+
+		if (i_request && !o_ready) begin
 			if (!i_rw) begin
 				if (i_address == 2'd0) begin
 					o_rdata <= queued_counter;
@@ -149,23 +151,25 @@ module DMA(
 				end
 			end
 		end
-		else
+		else if (!i_request) begin
 			o_ready <= 1'b0;
+		end
+
 	end
 
 	// Process commands.
 	always_ff @(posedge i_clock) begin
-		queue_read <= 0;
+		queue_read <= 1'b0;
 		unique case (state)
 			IDLE: begin
 				if (!queue_empty) begin
-					queue_read <= 1;
+					queue_read <= 1'b1;
 					state <= READ_CMD_0;
 				end
 			end
 
 			READ_CMD_0: begin
-				queue_read <= 0;
+				queue_read <= 1'b0;
 				state <= READ_CMD;
 			end
 
@@ -186,8 +190,8 @@ module DMA(
 			// Write
 
 			W_WRITE_REQ: begin
-				o_bus_request <= 1;
-				o_bus_rw <= 1;
+				o_bus_request <= 1'b1;
+				o_bus_rw <= 1'b1;
 				o_bus_address <= rd_command.to;
 				o_bus_wdata <= rd_command.value_or_from;
 				state <= W_WAIT_WRITE;
@@ -195,7 +199,7 @@ module DMA(
 
 			W_WAIT_WRITE: begin
 				if (i_bus_ready) begin
-					o_bus_request <= 0;
+					o_bus_request <= 1'b0;
 					rd_command.to <= rd_command.to + 4;
 					if (rd_command.count > 0) begin
 						rd_command.count <= rd_command.count - 1;
@@ -211,15 +215,15 @@ module DMA(
 			// Copy
 
 			C_READ_REQ: begin
-				o_bus_request <= 1;
-				o_bus_rw <= 0;
+				o_bus_request <= 1'b1;
+				o_bus_rw <= 1'b0;
 				o_bus_address <= rd_command.value_or_from;
 				state <= C_WAIT_READ;
 			end
 
 			C_WAIT_READ: begin
 				if (i_bus_ready) begin
-					o_bus_request <= 0;
+					o_bus_request <= 1'b0;
 					data <= i_bus_rdata;
 					rd_command.value_or_from <= rd_command.value_or_from + 4;
 					state <= C_WRITE_REQ;
@@ -227,8 +231,8 @@ module DMA(
 			end
 
 			C_WRITE_REQ: begin
-				o_bus_request <= 1;
-				o_bus_rw <= 1;
+				o_bus_request <= 1'b1;
+				o_bus_rw <= 1'b1;
 				o_bus_address <= rd_command.to;
 				o_bus_wdata <= data;
 				state <= C_WAIT_WRITE;
@@ -236,7 +240,7 @@ module DMA(
 
 			C_WAIT_WRITE: begin
 				if (i_bus_ready) begin
-					o_bus_request <= 0;
+					o_bus_request <= 1'b0;
 					rd_command.to <= rd_command.to + 4;
 					if (rd_command.count > 0) begin
 						rd_command.count <= rd_command.count - 1;
@@ -252,15 +256,15 @@ module DMA(
 			// Feed
 
 			F_READ_REQ: begin
-				o_bus_request <= 1;
-				o_bus_rw <= 0;
+				o_bus_request <= 1'b1;
+				o_bus_rw <= 1'b0;
 				o_bus_address <= rd_command.value_or_from;
 				state <= F_WAIT_READ;
 			end
 
 			F_WAIT_READ: begin
 				if (i_bus_ready) begin
-					o_bus_request <= 0;
+					o_bus_request <= 1'b0;
 					data <= i_bus_rdata;
 					rd_command.value_or_from <= rd_command.value_or_from + 4;
 					state <= F_WRITE_REQ;
@@ -268,8 +272,8 @@ module DMA(
 			end
 
 			F_WRITE_REQ: begin
-				o_bus_request <= 1;
-				o_bus_rw <= 1;
+				o_bus_request <= 1'b1;
+				o_bus_rw <= 1'b1;
 				o_bus_address <= rd_command.to;
 				o_bus_wdata <= data;
 				state <= F_WAIT_WRITE;
@@ -277,7 +281,7 @@ module DMA(
 
 			F_WAIT_WRITE: begin
 				if (i_bus_ready) begin
-					o_bus_request <= 0;
+					o_bus_request <= 1'b0;
 					if (rd_command.count > 0) begin
 						rd_command.count <= rd_command.count - 1;
 						state <= F_READ_REQ;
