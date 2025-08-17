@@ -9,7 +9,7 @@
 #pragma once
 
 #include <Core/Ref.h>
-#include "Emulator/CPU/ICache.h"
+#include "Emulator2/CPU/HL/ICache.h"
 
 class Bus;
 
