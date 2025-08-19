@@ -335,6 +335,11 @@ void CPU_hl::interrupt(uint32_t mask)
 	m_interrupt |= mask;
 }
 
+void CPU_hl::flushCaches()
+{
+	m_dcache->flush();
+}
+
 uint32_t CPU_hl::getPC() const
 {
 	return m_retiredPC;
@@ -406,9 +411,4 @@ void CPU_hl::returnFromInterrupt()
 
 	// Return from interrupt.
 	PC_NEXT = readCSR(CSR::MEPC);
-}
-
-void CPU_hl::flushCaches()
-{
-	m_dcache->flush();
 }

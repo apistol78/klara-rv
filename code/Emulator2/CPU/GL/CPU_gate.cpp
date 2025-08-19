@@ -133,6 +133,10 @@ void CPU_gate::interrupt(uint32_t mask)
 	m_interrupt |= mask;
 }
 
+void CPU_gate::flushCaches()
+{
+}
+
 uint32_t CPU_gate::getPC() const
 {
 	return m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__last_pc;

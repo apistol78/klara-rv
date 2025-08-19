@@ -31,6 +31,8 @@ public:
 
 	virtual void interrupt(uint32_t mask) override final;
 
+	virtual void flushCaches() override final;
+
 	virtual uint32_t getPC() const override final;
 
 	virtual uint32_t getRegister(uint32_t index) const override final;

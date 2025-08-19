@@ -39,6 +39,8 @@ public:
 
 	virtual void interrupt(uint32_t mask) = 0;
 
+	virtual void flushCaches() = 0;
+
 	// void reset();
 
 	virtual uint32_t getPC() const = 0;
