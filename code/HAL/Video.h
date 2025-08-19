@@ -13,6 +13,9 @@
 #define VMODE_720_720_8 0
 #define VMODE_360_360_8 1
 #define VMODE_320_200_8 2
+#define VMODE_720_720_32 3
+#define VMODE_360_360_32 4
+#define VMODE_320_200_32 5
 
 EXTERN_C int32_t hal_video_init();
 
@@ -21,6 +24,8 @@ EXTERN_C int32_t hal_video_set_mode(int32_t mode);
 EXTERN_C int32_t hal_video_get_resolution_width();
 
 EXTERN_C int32_t hal_video_get_resolution_height();
+
+EXTERN_C uint32_t hal_video_get_page_size();
 
 EXTERN_C void hal_video_set_palette(uint8_t index, uint32_t color);
 

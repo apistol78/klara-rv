@@ -26,7 +26,7 @@ Video::Video(uint32_t displayWidth, uint32_t displayHeight)
 :	m_displayWidth(displayWidth)
 ,	m_displayHeight(displayHeight)
 {
-	m_framebuffer.resize(displayWidth * displayHeight * 2);
+	m_framebuffer.resize(displayWidth * displayHeight * sizeof(uint32_t) * 2);
 	m_image = new drawing::Image(
 		drawing::PixelFormat::getX8R8G8B8(),
 		displayWidth,
@@ -58,6 +58,10 @@ bool Video::writeU32(uint32_t address, uint32_t value)
 		else if ((address & 0xff) == 16)
 		{
 			m_skipV = value;
+		}
+		else if ((address & 0xff) == 20)
+		{
+			m_usePalette = value;
 		}
 	}
 	else if ((address & 0x00f00000) == 0x00e00000)
@@ -104,9 +108,17 @@ drawing::Image* Video::getImage()
 					const uint32_t rvx = vx >> ((m_skip & 1) ? 1 : 0);
 					const uint32_t rvy = vy >> ((m_skip & 2) ? 1 : 0);
 
-					const uint8_t value = m_framebuffer[offset + rvx + rvy * m_pitch];
-					*dst++ = m_palette[value];
-				
+					if (!m_usePalette)
+					{
+						const uint32_t value = *(const uint32_t*)&m_framebuffer[offset + (rvx + rvy * m_pitch) * 4];
+						*dst++ = value;
+					}
+					else
+					{
+						const uint8_t value = m_framebuffer[offset + rvx + rvy * m_pitch];
+						*dst++ = m_palette[value];
+					}
+
 					vx++;
 				}
 				else
