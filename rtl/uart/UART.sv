@@ -70,6 +70,8 @@ module UART #(
 		tx_request = i_request && i_rw;
 	end
 	
-	assign o_ready = rx_ready | tx_ready;
+	assign o_ready =
+		(rx_ready) ||
+		(tx_ready);
 
 endmodule

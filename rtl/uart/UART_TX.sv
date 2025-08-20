@@ -19,7 +19,7 @@ module UART_TX #(
 	input i_clock,
 	input i_request,
 	input [31:0] i_wdata,
-	output bit o_ready,
+	output o_ready,
 
 	output bit UART_TX
 );
@@ -31,6 +31,7 @@ module UART_TX #(
 	bit [CNT_WIDTH:0] counter = 0;
 	bit [7:0] data = 0;
 	bit [8:0] bidx = 0;
+	bit ready = 1'b0;
 
 	// FIFO
 	wire tx_fifo_empty;
@@ -55,18 +56,20 @@ module UART_TX #(
 
 	initial begin
 		UART_TX = 1'b1;
-		o_ready = 1'b0;
+		ready = 1'b0;
 	end
+
+	assign o_ready = i_request && ready;
 
 	// Write to FIFO.
 	always_ff @(posedge i_clock) begin
-		tx_fifo_write <= 0;
-		o_ready <= 0;
+		tx_fifo_write <= 1'b0;
+		ready <= 1'b0;
 		if (i_request) begin
 			if (!tx_fifo_full) begin
-				if (!o_ready)
-					tx_fifo_write <= 1;
-				o_ready <= 1;
+				if (!ready)
+					tx_fifo_write <= 1'b1;
+				ready <= 1'b1;
 			end
 		end
 	end
