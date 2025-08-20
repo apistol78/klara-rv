@@ -149,7 +149,7 @@ module VIDEO_controller #(
 	}
 	state_t;
 
-	state_t state = 0;
+	state_t state = IDLE;
 
 	always_ff @(posedge i_clock) begin
 
@@ -219,7 +219,7 @@ module VIDEO_controller #(
 		WAIT_REQUEST_END: begin
 			o_cpu_ready <= i_cpu_request;
 			if (!i_cpu_request) begin
-				state <= 0;
+				state <= IDLE;
 			end
 		end
 
