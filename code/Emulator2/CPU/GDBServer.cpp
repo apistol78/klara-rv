@@ -6,11 +6,15 @@
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
+#include "Emulator2/CPU/Bus.h"
 #include "Emulator2/CPU/GDBServer.h"
+#include "Emulator2/CPU/ICPU.h"
 
 #include <Core/Io/StringReader.h>
+#include <Core/Io/StringOutputStream.h>
 #include <Core/Io/Utf8Encoding.h>
 #include <Core/Log/Log.h>
+#include <Core/Misc/Endian.h>
 #include <Core/Misc/String.h>
 #include <Core/Misc/TString.h>
 #include <Net/SocketAddressIPv4.h>
@@ -29,6 +33,8 @@ namespace
 		const char hex[] = "0123456789ABCDEF";
 		uint8_t cs = 0;
 
+		log::info << L"GDB; sending \"" << mbstows(msg) << L"\"" << Endl;
+
 		socket->send('+');
 		socket->send('$');
 		for (const char ch : msg)
@@ -41,6 +47,60 @@ namespace
 		socket->send(hex[cs & 15]);
 	}
 
+	uint8_t readU8(Bus* bus, uint32_t address)
+	{
+		const uint32_t ra = address & ~3;
+		const uint32_t rb = address & 3;
+		const uint32_t r = bus->readU32(ra);
+		switch(rb)
+		{
+		case 0:
+			return r & 0xff;
+		case 1:
+			return (r >> 8) & 0xff;
+		case 2:
+			return (r >> 16) & 0xff;
+		case 3:
+			return (r >> 24) & 0xff;
+		}
+		return 0;
+	}
+
+	void writeU8(Bus* bus, uint32_t address, uint8_t value)
+	{
+		const uint32_t wa = address & ~3;
+		const uint32_t wb = address & 3;
+		uint32_t w = bus->readU32(wa);
+		switch(wb)
+		{
+		case 0:
+			w = (w & 0xffffff00) | value;
+			break;
+		case 1:
+			w = (w & 0xffff00ff) | (value << 8);
+			break;
+		case 2:
+			w = (w & 0xff00ffff) | (value << 16);
+			break;
+		case 3:
+			w = (w & 0x00ffffff) | (value << 24);
+			break;
+		}
+		bus->writeU32(wa, w);	
+	}
+
+	std::string registerToHex(uint32_t r)
+	{
+		swap8in32(r);
+		return wstombs(str(L"%08x", r));
+	}
+
+}
+
+GDBServer::GDBServer(ICPU* cpu, Bus* bus)
+:	m_cpu(cpu)
+,	m_bus(bus)
+{
 }
 
 bool GDBServer::create()
@@ -54,41 +114,152 @@ bool GDBServer::create()
 	return true;
 }
 
-void GDBServer::process()
+void GDBServer::process(uint32_t& mode)
 {
 	if (m_clientSocket)
 	{
 		// Receive commands from GDB.
-		if (m_clientSocket->select(true, false, false, 0) > 0)
+		while (m_clientSocket->select(true, false, false, 0) > 0)
 		{
 			char ch;
-			m_clientSocket->recv(&ch, 1);
+			if (m_clientSocket->recv(&ch, 1) <= 0)
+			{
+				log::info << L"GDB client disconnected." << Endl;
+				m_clientSocket = nullptr;
+				mode = ModeRun;
+				return;
+			}
 
-			if (ch == '$')
+			if (ch == '\x03')
+			{
+				// Async break.
+				mode = ModeStopped;
+				send(m_clientSocket, "S02");	// sigint
+			}
+
+			else if (ch == '$')
 			{
 				// Receive message until end character.
-				std::string msg;
+				AlignedVector< char > buf;
+				buf.reserve(256);
 				for (;;)
 				{
 					m_clientSocket->recv(&ch, 1);
 					if (ch == '#')
 						break;
-
-					msg += ch;
+					buf.push_back(ch);
 				}
+				const std::string msg(buf.begin(), buf.end());
 
 				// Read checksum.
-				m_clientSocket->recv(&ch, 1);
-				m_clientSocket->recv(&ch, 1);
+				uint8_t cs[2];
+				m_clientSocket->recv(cs, 2);
 
 				log::info << L"GDB, got message \"" << mbstows(msg) << L"\"" << Endl;
 
 				// Process message.
-				if (msg == "?")
+				if (msg[0] == '?')
+				{
+					//if (mode == ModeStopped)
+						send(m_clientSocket, "S05");	// sigtrap
+					//else
+					//	send(m_clientSocket, "");
+				}
+				else if (msg[0] == 'g')
+				{
+					// Return all registers.
+					std::string data = msg.substr(1);
+					for (uint32_t i = 0; i < 32; ++i)
+						data += registerToHex(m_cpu->getRegister(i));
+					data += registerToHex(m_cpu->getPC());
+					send(m_clientSocket, data);
+				}
+				else if (msg[0] == 'G')
+				{
+					// Set all registers.
+					std::string data = msg.substr(1);
+
+					for (uint32_t i = 0; i < 32; ++i)
+					{
+						uint32_t r = parseString< uint32_t >(std::string("0x") + data.substr(i * 8, 8));
+						swap8in32(r);
+						m_cpu->setRegister(i, r);
+					}
+
+					uint32_t r = parseString< uint32_t >(std::string("0x") + data.substr(32 * 8, 8));
+					swap8in32(r);
+					m_cpu->setPC(r);
+
+					send(m_clientSocket, "OK");
+				}
+				else if (msg[0] == 'm')
+				{
+					// Read memory.
+					m_cpu->flushCaches();
+
+					uint32_t addr, len;
+					sscanf(msg.c_str() + 1, "%x,%x", &addr, &len);
+					log::info << L"GDB; read " << len << L" bytes from " << str(L"%08x", addr) << Endl;
+					
+					StringOutputStream ss;
+					for (uint32_t i = 0; i < len; ++i)
+					{
+						const uint8_t b = readU8(m_bus, addr + i);
+						ss << str(L"%02x", b);
+					}
+
+					send(m_clientSocket, wstombs(ss.str()));
+				}
+				else if (msg[0] == 'M')
+				{
+					// Write memory.
+					uint32_t addr, len;
+					sscanf(msg.c_str() + 1, "%x,%x", &addr, &len);
+					log::info << L"GDB; write " << len << L" bytes to " << str(L"%08x", addr) << Endl;
+
+					std::string hexdata = msg.substr(msg.find(':')+1);
+					for (uint32_t i = 0; i < len; i++)
+					{
+						const uint8_t b = parseString< uint8_t >(std::string("0x") + hexdata.substr(i * 2, 2));
+						writeU8(m_bus, addr + i, b);
+					}					
+
+					send(m_clientSocket, "OK");
+				}
+				else if (msg[0] == 'c')
+				{
+					mode = ModeRun;
+					send(m_clientSocket, "OK");
+				}
+				else if (msg[0] == 's')
+				{
+					mode = ModeStep;
 					send(m_clientSocket, "S05");
-				else if (msg == "c")
-					send(m_clientSocket, "S05");
+				}
+				else if (msg[0] == 'k')
+				{
+					mode = ModeKilled;
+					send(m_clientSocket, "OK");
+				}
+				else if (startsWith(msg, "Z0"))
+				{
+					uint32_t addr, len;
+					sscanf(msg.c_str() + 3, "%x,%x", &addr, &len);
+					// m_cpu->addBreakpoint(addr);
+					send(m_clientSocket, "OK");
+				}
+				else if (startsWith(msg, "z0"))
+				{
+					uint32_t addr, len;
+					sscanf(msg.c_str() + 3, "%x,%x", &addr, &len);
+					// m_cpu->removeBreakpoint(addr);
+					send(m_clientSocket, "OK");
+				}
 				else if (startsWith(msg, "qSupported"))
+					send(m_clientSocket, "");
+				else if (startsWith(msg, "vCont?"))
+					send(m_clientSocket, "");
+				else if (startsWith(msg, "vMustReplyEmpty"))
 					send(m_clientSocket, "");
 				else
 					send(m_clientSocket, "");

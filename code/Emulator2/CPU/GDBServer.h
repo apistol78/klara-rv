@@ -12,16 +12,28 @@
 #include <Core/Ref.h>
 #include <Net/TcpSocket.h>
 
+class Bus;
+class ICPU;
+
 class GDBServer : public traktor::Object
 {
 	T_RTTI_CLASS;
 
 public:
+	constexpr static int32_t ModeRun = 0;
+	constexpr static int32_t ModeStep = 1;
+	constexpr static int32_t ModeStopped = 2;
+	constexpr static int32_t ModeKilled = 3;
+
+	explicit GDBServer(ICPU* cpu, Bus* bus);
+
 	bool create();
 
-	void process();
+	void process(uint32_t& mode);
 
 private:
+	traktor::Ref< ICPU > m_cpu;
+	traktor::Ref< Bus > m_bus;
 	traktor::Ref< traktor::net::TcpSocket > m_listenSocket;
 	traktor::Ref< traktor::net::TcpSocket > m_clientSocket;
 };

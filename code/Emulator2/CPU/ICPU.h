@@ -31,10 +31,6 @@ class ICPU : public traktor::Object
 	T_RTTI_CLASS;
 
 public:
-	virtual void jump(uint32_t address) = 0;
-
-	virtual void setSP(uint32_t sp) = 0;
-
 	virtual bool tick(uint32_t count) = 0;
 
 	virtual void interrupt(uint32_t mask) = 0;
@@ -43,7 +39,17 @@ public:
 
 	// void reset();
 
+	virtual void setPC(uint32_t value) = 0;
+
 	virtual uint32_t getPC() const = 0;
 
+	virtual void setRegister(uint32_t index, uint32_t value) = 0;
+
 	virtual uint32_t getRegister(uint32_t index) const = 0;
+
+	// Convenience
+
+	void jump(uint32_t address) { setPC(address); }
+
+	void setSP(uint32_t sp) { setRegister(2, sp); }
 };

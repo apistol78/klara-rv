@@ -53,16 +53,6 @@ CPU_gate::~CPU_gate()
 	delete m_tb;
 }
 
-void CPU_gate::jump(uint32_t address)
-{
-	m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__pc = address;
-}
-
-void CPU_gate::setSP(uint32_t sp)
-{
-	m_tb->rootp->CPU_top__DOT__cpu__DOT__registers__DOT__r[2] = sp;
-}
-
 bool CPU_gate::tick(uint32_t count)
 {
 	for (uint32_t i = 0; i < count; ++i)
@@ -137,9 +127,19 @@ void CPU_gate::flushCaches()
 {
 }
 
+void CPU_gate::setPC(uint32_t value)
+{
+	m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__pc = value;
+}
+
 uint32_t CPU_gate::getPC() const
 {
 	return m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__last_pc;
+}
+
+void CPU_gate::setRegister(uint32_t index, uint32_t value)
+{
+	m_tb->rootp->CPU_top__DOT__cpu__DOT__registers__DOT__r[index] = value;
 }
 
 uint32_t CPU_gate::getRegister(uint32_t index) const

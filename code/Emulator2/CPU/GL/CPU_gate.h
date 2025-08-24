@@ -23,17 +23,17 @@ public:
 
 	virtual ~CPU_gate();
 
-	virtual void jump(uint32_t address) override final;
-
-	virtual void setSP(uint32_t sp) override final;
-
 	virtual bool tick(uint32_t count) override final;
 
 	virtual void interrupt(uint32_t mask) override final;
 
 	virtual void flushCaches() override final;
 
+	virtual void setPC(uint32_t value) override final;
+
 	virtual uint32_t getPC() const override final;
+
+	virtual void setRegister(uint32_t index, uint32_t value) override final;
 
 	virtual uint32_t getRegister(uint32_t index) const override final;
 

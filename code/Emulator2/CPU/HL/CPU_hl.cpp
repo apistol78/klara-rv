@@ -223,16 +223,6 @@ CPU_hl::CPU_hl(Bus* bus, OutputStream* trace, bool twoWayICache)
 		m_csr[i] = 0x00000000;
 }
 
-void CPU_hl::jump(uint32_t address)
-{
-	m_pc = address;
-}
-
-void CPU_hl::setSP(uint32_t sp)
-{
-	m_registers[2] = sp;
-}
-
 bool CPU_hl::tick(uint32_t count)
 {
 	// Check if CPU in low power mode and
@@ -340,9 +330,19 @@ void CPU_hl::flushCaches()
 	m_dcache->flush();
 }
 
+void CPU_hl::setPC(uint32_t value)
+{
+	m_pc = value;
+}
+
 uint32_t CPU_hl::getPC() const
 {
 	return m_retiredPC;
+}
+
+void CPU_hl::setRegister(uint32_t index, uint32_t value)
+{
+	m_registers[index] = value;
 }
 
 uint32_t CPU_hl::getRegister(uint32_t index) const
