@@ -24,7 +24,7 @@
 
 using namespace traktor;
 
-T_IMPLEMENT_RTTI_CLASS(L"GDBServer", GDBServer, Object)
+T_IMPLEMENT_RTTI_CLASS(L"GDBServer", GDBServer, IDevice)
 
 namespace
 {
@@ -121,7 +121,7 @@ bool GDBServer::create()
 	return true;
 }
 
-void GDBServer::process(uint32_t& mode)
+void GDBServer::process()
 {
 	if (m_clientSocket)
 	{
@@ -129,17 +129,6 @@ void GDBServer::process(uint32_t& mode)
 		int32_t timeout = 0;
 
 		buf.reserve(256);
-
-		// Check breakpoints.
-		for (uint32_t bp : m_breakpoints)
-		{
-			if (bp == m_cpu->getPC())
-			{
-				log::info << L"GDB; breakpoint hit." << Endl;
-				send(m_clientSocket, "S02");	// sigint
-				mode = ModeStopped;
-			}
-		}
 
 		// Receive commands from GDB.
 		while (m_clientSocket != nullptr && m_clientSocket->select(true, false, false, timeout) > 0)
@@ -151,15 +140,14 @@ void GDBServer::process(uint32_t& mode)
 			{
 				log::info << L"GDB client disconnected." << Endl;
 				safeClose(m_clientSocket);
-				mode = ModeRun;
+				m_mode = ModeRun;
 				continue;
 			}
 
 			if (ch == '\x03')
 			{
 				// Async break.
-				send(m_clientSocket, "S02");	// sigint
-				mode = ModeStopped;
+				setMode(ModeStopped);
 			}
 
 			else if (ch == '$')
@@ -257,17 +245,17 @@ void GDBServer::process(uint32_t& mode)
 				else if (msg[0] == 'c')
 				{
 					send(m_clientSocket, "OK");
-					mode = ModeRun;
+					m_mode = ModeRun;
 				}
 				else if (msg[0] == 's')
 				{
 					send(m_clientSocket, "S05");
-					mode = ModeStep;
+					m_mode = ModeStep;
 				}
 				else if (msg[0] == 'k')
 				{
 					safeClose(m_clientSocket);
-					mode = ModeKilled;
+					m_mode = ModeKilled;
 				}
 				else if (startsWith(msg, "Z0"))
 				{
@@ -311,4 +299,28 @@ void GDBServer::process(uint32_t& mode)
 			log::info << L"GDB client connected." << Endl;
 		}
 	}
+}
+
+bool GDBServer::tick(ICPU* cpu, Bus* bus)
+{
+	if (m_mode == ModeRun)
+	{
+		for (uint32_t bp : m_breakpoints)
+		{
+			if (bp == m_cpu->getPC())
+			{
+				log::info << L"GDB; breakpoint hit." << Endl;
+				setMode(ModeStopped);
+			}
+		}
+	}
+	return true;
+}
+
+void GDBServer::setMode(int32_t mode)
+{
+	if (mode != m_mode && mode == ModeStopped)
+		send(m_clientSocket, "S02");	// sigint
+
+	m_mode = mode;
 }

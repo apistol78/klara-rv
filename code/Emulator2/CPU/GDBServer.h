@@ -8,15 +8,16 @@
 */
 #pragma once
 
-#include <Core/Object.h>
 #include <Core/Ref.h>
 #include <Core/Containers/StaticSet.h>
 #include <Net/TcpSocket.h>
 
+#include "Emulator2/CPU/IDevice.h"
+
 class Bus;
 class ICPU;
 
-class GDBServer : public traktor::Object
+class GDBServer : public IDevice
 {
 	T_RTTI_CLASS;
 
@@ -32,7 +33,17 @@ public:
 
 	bool create();
 
-	void process(uint32_t& mode);
+	void process();
+
+	virtual bool writeU32(uint32_t address, uint32_t value) override final { return false; }
+
+	virtual uint32_t readU32(uint32_t address) const override final { return 0; }
+
+	virtual bool tick(ICPU* cpu, Bus* bus) override final;
+
+	void setMode(int32_t mode);
+
+	int32_t getMode() const { return m_mode; }
 
 private:
 	traktor::Ref< ICPU > m_cpu;
@@ -40,4 +51,5 @@ private:
 	traktor::Ref< traktor::net::TcpSocket > m_listenSocket;
 	traktor::Ref< traktor::net::TcpSocket > m_clientSocket;
 	traktor::StaticSet< uint32_t, 16 > m_breakpoints;
+	int32_t m_mode = ModeStopped;
 };

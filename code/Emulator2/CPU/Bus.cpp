@@ -18,7 +18,8 @@ T_IMPLEMENT_RTTI_CLASS(L"Bus", Bus, Object)
 
 void Bus::map(uint32_t start, uint32_t end, bool cacheable, bool tick, IDevice* device)
 {
-	m_mappedDevices.push_back({ start, end, device });
+	if (start < end)
+		m_mappedDevices.push_back({ start, end, device });
 	if (tick)
 		m_tickDevices.push_back(device);
 	if (cacheable)
