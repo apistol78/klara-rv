@@ -49,3 +49,9 @@ uint32_t ICache1W::readU32(uint32_t address)
 	m_misses++;
 	return word;
 }
+
+void ICache1W::flush()
+{
+	for (int32_t i = 0; i < sizeof_array(m_data); ++i)
+		m_data[i].valid = false;
+}

@@ -328,11 +328,16 @@ void CPU_hl::interrupt(uint32_t mask)
 void CPU_hl::flushCaches()
 {
 	m_dcache->flush();
+	m_icache->flush();
+	m_bus->reset();
 }
 
 void CPU_hl::setPC(uint32_t value)
 {
 	m_pc = value;
+	m_interrupt = 0;
+	m_waitForInterrupt = false;
+	m_bus->reset();
 }
 
 uint32_t CPU_hl::getPC() const

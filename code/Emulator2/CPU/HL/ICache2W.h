@@ -24,6 +24,8 @@ public:
 
 	virtual uint32_t readU32(uint32_t address) override final;
 
+    virtual void flush() override final;
+
 private:
     /*
     13 => 8192

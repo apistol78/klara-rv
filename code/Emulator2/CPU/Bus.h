@@ -49,6 +49,8 @@ public:
 
 	bool error() const { return m_error; }
 
+	void reset() { m_error = false; }
+
 private:
 	struct MappedDevice
 	{

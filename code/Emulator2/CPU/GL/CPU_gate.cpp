@@ -125,11 +125,13 @@ void CPU_gate::interrupt(uint32_t mask)
 
 void CPU_gate::flushCaches()
 {
+	m_bus->reset();
 }
 
 void CPU_gate::setPC(uint32_t value)
 {
 	m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__pc = value;
+	m_bus->reset();
 }
 
 uint32_t CPU_gate::getPC() const

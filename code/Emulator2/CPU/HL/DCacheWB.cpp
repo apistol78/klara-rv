@@ -21,7 +21,7 @@ DCacheWB::DCacheWB(Bus* bus)
 
 DCacheWB::~DCacheWB()
 {
-	log::info << L"DCacheWB transactions/stalls " << m_transactions << L"/" << m_stalls << Endl;
+	//log::info << L"DCacheWB transactions/stalls " << m_transactions << L"/" << m_stalls << Endl;
 }
 
 void DCacheWB::writeU32(uint32_t address, uint32_t value)
@@ -69,4 +69,16 @@ void DCacheWB::process()
 			break;
 		}
 	}
+}
+
+void DCacheWB::flush()
+{
+	for (int32_t i = 0; i < 4; ++i)
+	{
+		if (m_dirty[i])
+		{
+			m_bus->writeU32(m_address[i], m_word[i]);
+			m_dirty[i] = false;
+		}
+	}	
 }

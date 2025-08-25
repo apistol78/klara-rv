@@ -70,6 +70,7 @@ local function buildHostLinux()
 	)
 
 	run:pushd("build/rv")
+	if run:execute("make -f KlaraRV.mak DebugStatic") ~= 0 then return false end
 	if run:execute("make -f KlaraRV.mak ReleaseStatic") ~= 0 then return false end
 	run:popd()
 

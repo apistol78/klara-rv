@@ -10,6 +10,7 @@
 
 #include <Core/Object.h>
 #include <Core/Ref.h>
+#include <Core/Containers/StaticSet.h>
 #include <Net/TcpSocket.h>
 
 class Bus;
@@ -27,6 +28,8 @@ public:
 
 	explicit GDBServer(ICPU* cpu, Bus* bus);
 
+	virtual ~GDBServer();
+
 	bool create();
 
 	void process(uint32_t& mode);
@@ -36,4 +39,5 @@ private:
 	traktor::Ref< Bus > m_bus;
 	traktor::Ref< traktor::net::TcpSocket > m_listenSocket;
 	traktor::Ref< traktor::net::TcpSocket > m_clientSocket;
+	traktor::StaticSet< uint32_t, 16 > m_breakpoints;
 };

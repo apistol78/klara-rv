@@ -37,8 +37,6 @@ public:
 
 	virtual void flushCaches() = 0;
 
-	// void reset();
-
 	virtual void setPC(uint32_t value) = 0;
 
 	virtual uint32_t getPC() const = 0;

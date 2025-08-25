@@ -28,6 +28,8 @@ public:
 
 	void process();
 
+	void flush();	
+
 private:
 	traktor::Ref< Bus > m_bus;
 	

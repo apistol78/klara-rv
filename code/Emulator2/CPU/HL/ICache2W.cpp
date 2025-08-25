@@ -95,3 +95,13 @@ tttttttttttttttttsssssssssssss..
 	m_misses++;
 	return word;
 }
+
+void ICache2W::flush()
+{
+	for (int32_t i = 0; i < sizeof_array(m_data); ++i)
+	{
+		m_data[i].valid[0] = false;
+		m_data[i].valid[1] = false;
+		m_data[i].last = 0;
+	}
+}

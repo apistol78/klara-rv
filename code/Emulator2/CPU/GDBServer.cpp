@@ -15,6 +15,7 @@
 #include <Core/Io/Utf8Encoding.h>
 #include <Core/Log/Log.h>
 #include <Core/Misc/Endian.h>
+#include <Core/Misc/SafeDestroy.h>
 #include <Core/Misc/String.h>
 #include <Core/Misc/TString.h>
 #include <Net/SocketAddressIPv4.h>
@@ -27,25 +28,6 @@ T_IMPLEMENT_RTTI_CLASS(L"GDBServer", GDBServer, Object)
 
 namespace
 {
-
-	void send(net::TcpSocket* socket, const std::string& msg)
-	{
-		const char hex[] = "0123456789ABCDEF";
-		uint8_t cs = 0;
-
-		log::info << L"GDB; sending \"" << mbstows(msg) << L"\"" << Endl;
-
-		socket->send('+');
-		socket->send('$');
-		for (const char ch : msg)
-		{
-			socket->send(ch);
-			cs += (uint8_t)ch;
-		}
-		socket->send('#');
-		socket->send(hex[cs >> 4]);
-		socket->send(hex[cs & 15]);
-	}
 
 	uint8_t readU8(Bus* bus, uint32_t address)
 	{
@@ -89,6 +71,25 @@ namespace
 		bus->writeU32(wa, w);	
 	}
 
+	void send(net::TcpSocket* socket, const std::string& msg)
+	{
+		const char hex[] = "0123456789ABCDEF";
+		uint8_t cs = 0;
+
+		log::info << L"GDB; sending \"" << mbstows(msg) << L"\"" << Endl;
+
+		socket->send('+');
+		socket->send('$');
+		for (const char ch : msg)
+		{
+			socket->send(ch);
+			cs += (uint8_t)ch;
+		}
+		socket->send('#');
+		socket->send(hex[cs >> 4]);
+		socket->send(hex[cs & 15]);
+	}
+
 	std::string registerToHex(uint32_t r)
 	{
 		swap8in32(r);
@@ -103,10 +104,16 @@ GDBServer::GDBServer(ICPU* cpu, Bus* bus)
 {
 }
 
+GDBServer::~GDBServer()
+{
+	safeClose(m_clientSocket);
+	safeClose(m_listenSocket);
+}
+
 bool GDBServer::create()
 {
 	m_listenSocket = new net::TcpSocket();
-	if (!m_listenSocket->bind(net::SocketAddressIPv4(12345)))
+	if (!m_listenSocket->bind(net::SocketAddressIPv4(12345), true))
 		return false;
 	if (!m_listenSocket->listen())
 		return false;
@@ -118,30 +125,47 @@ void GDBServer::process(uint32_t& mode)
 {
 	if (m_clientSocket)
 	{
-		// Receive commands from GDB.
-		while (m_clientSocket->select(true, false, false, 0) > 0)
+		AlignedVector< char > buf;
+		int32_t timeout = 0;
+
+		buf.reserve(256);
+
+		// Check breakpoints.
+		for (uint32_t bp : m_breakpoints)
 		{
+			if (bp == m_cpu->getPC())
+			{
+				log::info << L"GDB; breakpoint hit." << Endl;
+				send(m_clientSocket, "S02");	// sigint
+				mode = ModeStopped;
+			}
+		}
+
+		// Receive commands from GDB.
+		while (m_clientSocket != nullptr && m_clientSocket->select(true, false, false, timeout) > 0)
+		{
+			timeout = 100;
+
 			char ch;
 			if (m_clientSocket->recv(&ch, 1) <= 0)
 			{
 				log::info << L"GDB client disconnected." << Endl;
-				m_clientSocket = nullptr;
+				safeClose(m_clientSocket);
 				mode = ModeRun;
-				return;
+				continue;
 			}
 
 			if (ch == '\x03')
 			{
 				// Async break.
-				mode = ModeStopped;
 				send(m_clientSocket, "S02");	// sigint
+				mode = ModeStopped;
 			}
 
 			else if (ch == '$')
 			{
 				// Receive message until end character.
-				AlignedVector< char > buf;
-				buf.reserve(256);
+				buf.resize(0);
 				for (;;)
 				{
 					m_clientSocket->recv(&ch, 1);
@@ -177,6 +201,8 @@ void GDBServer::process(uint32_t& mode)
 				else if (msg[0] == 'G')
 				{
 					// Set all registers.
+					m_cpu->flushCaches();
+					
 					std::string data = msg.substr(1);
 
 					for (uint32_t i = 0; i < 32; ++i)
@@ -213,6 +239,8 @@ void GDBServer::process(uint32_t& mode)
 				else if (msg[0] == 'M')
 				{
 					// Write memory.
+					m_cpu->flushCaches();
+
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 1, "%x,%x", &addr, &len);
 					log::info << L"GDB; write " << len << L" bytes to " << str(L"%08x", addr) << Endl;
@@ -222,37 +250,37 @@ void GDBServer::process(uint32_t& mode)
 					{
 						const uint8_t b = parseString< uint8_t >(std::string("0x") + hexdata.substr(i * 2, 2));
 						writeU8(m_bus, addr + i, b);
-					}					
+					}
 
 					send(m_clientSocket, "OK");
 				}
 				else if (msg[0] == 'c')
 				{
-					mode = ModeRun;
 					send(m_clientSocket, "OK");
+					mode = ModeRun;
 				}
 				else if (msg[0] == 's')
 				{
-					mode = ModeStep;
 					send(m_clientSocket, "S05");
+					mode = ModeStep;
 				}
 				else if (msg[0] == 'k')
 				{
+					safeClose(m_clientSocket);
 					mode = ModeKilled;
-					send(m_clientSocket, "OK");
 				}
 				else if (startsWith(msg, "Z0"))
 				{
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 3, "%x,%x", &addr, &len);
-					// m_cpu->addBreakpoint(addr);
+					m_breakpoints.insert(addr);
 					send(m_clientSocket, "OK");
 				}
 				else if (startsWith(msg, "z0"))
 				{
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 3, "%x,%x", &addr, &len);
-					// m_cpu->removeBreakpoint(addr);
+					m_breakpoints.erase(addr);
 					send(m_clientSocket, "OK");
 				}
 				else if (startsWith(msg, "qSupported"))
@@ -264,10 +292,7 @@ void GDBServer::process(uint32_t& mode)
 				else
 					send(m_clientSocket, "");
 			}
-
-			
 		}
-
 	}
 	else
 	{
@@ -275,10 +300,15 @@ void GDBServer::process(uint32_t& mode)
 		ss.add(m_listenSocket);
 
 		net::SocketSet result;
-		if (ss.select(true, false, false, 100, result) <= 0)
+		if (ss.select(true, false, false, 0, result) <= 0)
 			return;
 
 		m_clientSocket = m_listenSocket->accept();
-		log::info << L"GDB client connected." << Endl;
+		if (m_clientSocket != nullptr)
+		{
+			m_clientSocket->setNoDelay(true);
+			m_clientSocket->setQuickAck(true);
+			log::info << L"GDB client connected." << Endl;
+		}
 	}
 }

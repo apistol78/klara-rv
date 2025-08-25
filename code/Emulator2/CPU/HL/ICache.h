@@ -16,4 +16,6 @@ class ICache : public traktor::Object
 
 public:
 	virtual uint32_t readU32(uint32_t address) = 0;
+
+	virtual void flush() =  0;
 };

@@ -12,6 +12,8 @@
 #include "Emulator2/CPU/HL/DCache.h"
 #include "Emulator2/CPU/HL/DCacheWB.h"
 
+//#define DCACHE_LOG_STAT
+
 using namespace traktor;
 
 T_IMPLEMENT_RTTI_CLASS(L"DCache", DCache, Object)
@@ -29,7 +31,9 @@ DCache::DCache(Bus* bus)
 
 DCache::~DCache()
 {
+#if defined(DCACHE_LOG_STAT)
 	log::info << L"DCache " << m_hits << L"/" << m_misses << L" (" << str(L"%.2f%%", (m_hits * 100.0) / (m_hits + m_misses)) << L")" << Endl;
+#endif
 }
 
 void DCache::writeU32(uint32_t address, uint32_t value)
@@ -94,6 +98,7 @@ void DCache::processWriteQueue()
 
 void DCache::flush()
 {
+	m_wb->flush();
     for (uint32_t i = 0; i < c_nlines; ++i)
 	{
 		Line& line = m_data[i];
