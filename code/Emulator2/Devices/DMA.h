@@ -28,7 +28,10 @@ private:
 	{
 		uint32_t from = 0;
 		uint32_t to = 0;
+		uint32_t pitch = 0;
+		uint32_t width = 0;
 		uint32_t count = 0;
+		uint32_t offset = 0;
 		uint32_t run = 0;
 		uint32_t tag = 0;
 	};
@@ -39,5 +42,7 @@ private:
 
 	uint32_t m_from;
 	uint32_t m_to;
+	uint32_t m_pitch;
+	uint32_t m_width;
 	uint32_t m_count;
 };
