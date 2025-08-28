@@ -6,5 +6,6 @@
 /samples/verify/code/verilator
 /samples/verify/verify
 /samples/verify/*.fst*
+/code/Emulator2/CPU/GL/verilator
 /a.out
 /*.vcd
