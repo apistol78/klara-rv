@@ -95,17 +95,17 @@ module CPU_ICache_Reg #(
 		cache_rd_set = 0;
 		cache_invalid = 1'b0;
 
-		if (initialized) begin
+		//if (initialized) begin
 			cache_rd_set = i_set;
 			if (set_r == i_set) begin
 				if (cache_rd_rdata.valid && cache_rd_rdata.tag == i_tag) begin
-					o_ready = 1;
+					o_ready = initialized; //1;
 					cache_rd_set = i_set + 1;
 				end
 				else
 					cache_invalid = 1'b1;
 			end
-		end
+		//end
 	end
 
 	// Update cache if current line is invalid.

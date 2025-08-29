@@ -42,19 +42,19 @@ module CPU_DCache_Reg #(
 
 	localparam RANGE = 1 << SIZE;
 
-	typedef enum bit [3:0]
+	typedef enum bit [10:0]
 	{
-		IDLE,
-		FLUSH_SETUP,
-		FLUSH_CHECK,
-		FLUSH_WRITE,
-		PASS_THROUGH,
-		WRITE_SETUP,
-		WRITE_WAIT,
-		READ_SETUP,
-		READ_WB_WAIT,
-		READ_BUS_WAIT,
-		INITIALIZE
+		IDLE			= 11'b00000000001,
+		PASS_THROUGH	= 11'b00000000010,
+		WRITE_SETUP		= 11'b00000000100,
+		WRITE_WAIT		= 11'b00000001000,
+		READ_SETUP		= 11'b00000010000,
+		READ_WB_WAIT	= 11'b00000100000,
+		READ_BUS_WAIT	= 11'b00001000000,
+		FLUSH_SETUP		= 11'b00010000000,
+		FLUSH_CHECK		= 11'b00100000000,
+		FLUSH_WRITE		= 11'b01000000000,
+		INITIALIZE		= 11'b10000000000
 	} state_t;
 
 	state_t state = INITIALIZE;
@@ -89,7 +89,7 @@ module CPU_DCache_Reg #(
 	wire [31:0] cache_entry_data = cache_rdata[63:32];
 
 	always_comb begin
-		if (state == FLUSH_SETUP || state == FLUSH_CHECK || state == FLUSH_WRITE || state == INITIALIZE)
+		if (|state[10:7])
 			cache_address = flush_address[SIZE - 1:0];
 		else
 			cache_address = i_address[(SIZE - 1) + 2:2];
@@ -100,8 +100,8 @@ module CPU_DCache_Reg #(
 		o_ready <= 1'b0;
 		cache_rw <= 1'b0;
 
-		case (state)
-			IDLE: begin
+		unique case (1'b1)
+			state[0]: begin
 				if (i_request && !o_ready) begin
 					if (i_flush) begin
 						flush_address <= 0;
@@ -146,49 +146,11 @@ module CPU_DCache_Reg #(
 			end
 
 			// ================
-			// FLUSH
-			// ================
-			FLUSH_SETUP: begin
-				if (!i_bus_ready) begin
-					if (flush_address <= RANGE - 1)
-						state <= FLUSH_CHECK;
-					else begin
-						o_ready <= 1'b1;
-						state <= IDLE;
-					end
-				end
-			end
-
-			FLUSH_CHECK: begin
-				if (cache_entry_dirty) begin
-					o_bus_rw <= 1'b1;
-					o_bus_address <= cache_entry_address;
-					o_bus_request <= 1'b1;
-					o_bus_wdata <= cache_entry_data;
-					cache_rw <= 1'b1;
-					cache_wdata <= 32'hffff_fff0; // { cache_entry_data, cache_entry_address[31:2], 2'b01 };
-					state <= FLUSH_WRITE;
-				end
-				else begin
-					flush_address <= flush_address + 1;
-					state <= FLUSH_SETUP;
-				end
-			end
-
-			FLUSH_WRITE: begin
-				if (i_bus_ready) begin
-					o_bus_request <= 1'b0;
-					flush_address <= flush_address + 1;
-					state <= FLUSH_SETUP;
-				end
-			end
-
-			// ================
 			// NOT INITIALIZED
 			// ================
 
 			// Cache not initialized, pass through to bus.
-			PASS_THROUGH: begin
+			state[1]: begin
 				if (i_bus_ready) begin
 					o_bus_request <= 1'b0;
 					o_rdata <= i_bus_rdata;
@@ -202,7 +164,7 @@ module CPU_DCache_Reg #(
 			// ================
 
 			// Write, write back if necessary.
-			WRITE_SETUP: begin
+			state[2]: begin
 				if (cache_entry_dirty && cache_entry_address != i_address) begin
 					o_bus_rw <= 1'b1;
 					o_bus_address <= cache_entry_address;
@@ -219,7 +181,7 @@ module CPU_DCache_Reg #(
 			end
 
 			// Wait until write back finish.
-			WRITE_WAIT: begin
+			state[3]: begin
 				if (i_bus_ready) begin
 					cache_rw <= 1'b1;
 					cache_wdata <= { i_wdata, i_address[31:2], 2'b11 };
@@ -234,7 +196,7 @@ module CPU_DCache_Reg #(
 			// ================
 
 			// Check if cache entry valid, if not then read from bus.
-			READ_SETUP: begin
+			state[4]: begin
 				if (cache_entry_valid && cache_entry_address == i_address) begin
 					o_rdata <= cache_entry_data;
 					o_ready <= 1'b1;
@@ -258,7 +220,7 @@ module CPU_DCache_Reg #(
 			end
 
 			// Write previous entry back to bus.
-			READ_WB_WAIT: begin
+			state[5]: begin
 				if (i_bus_ready) begin
 					o_bus_request <= 1'b0;
 					state <= READ_BUS_WAIT;
@@ -266,7 +228,7 @@ module CPU_DCache_Reg #(
 			end
 
 			// Wait until new data read from bus.
-			READ_BUS_WAIT: begin
+			state[6]: begin
 				o_bus_rw <= 1'b0;
 				o_bus_address <= i_address;
 				o_bus_request <= 1'b1;
@@ -281,10 +243,48 @@ module CPU_DCache_Reg #(
 			end
 
 			// ================
+			// FLUSH
+			// ================
+			state[7]: begin
+				if (!i_bus_ready) begin
+					if (flush_address <= RANGE - 1)
+						state <= FLUSH_CHECK;
+					else begin
+						o_ready <= 1'b1;
+						state <= IDLE;
+					end
+				end
+			end
+
+			state[8]: begin
+				if (cache_entry_dirty) begin
+					o_bus_rw <= 1'b1;
+					o_bus_address <= cache_entry_address;
+					o_bus_request <= 1'b1;
+					o_bus_wdata <= cache_entry_data;
+					cache_rw <= 1'b1;
+					cache_wdata <= 32'hffff_fff0; // { cache_entry_data, cache_entry_address[31:2], 2'b01 };
+					state <= FLUSH_WRITE;
+				end
+				else begin
+					flush_address <= flush_address + 1;
+					state <= FLUSH_SETUP;
+				end
+			end
+
+			state[9]: begin
+				if (i_bus_ready) begin
+					o_bus_request <= 1'b0;
+					flush_address <= flush_address + 1;
+					state <= FLUSH_SETUP;
+				end
+			end
+
+			// ================
 			// INITIALIZE
 			// ================
 
-			INITIALIZE: begin
+			state[10]: begin
 				if (flush_address < RANGE) begin
 					cache_rw <= 1'b1;
 					cache_wdata <= 32'hffff_fff0;
