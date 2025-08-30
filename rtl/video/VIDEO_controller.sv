@@ -143,8 +143,9 @@ module VIDEO_controller #(
 	typedef enum bit [3:0]
 	{
 		IDLE,
-		WAIT_PALETTE_WRITE,
-		WAIT_VRAM_WRITE,
+		END_PALETTE_WRITE,
+		END_VRAM_WRITE,
+		ACCESS_CONTROL,
 		WAIT_REQUEST_END
 	}
 	state_t;
@@ -162,57 +163,62 @@ module VIDEO_controller #(
 					palette_cpu_request <= 1'b1;
 					palette_cpu_address <= i_cpu_address[9:2];
 					palette_cpu_wdata <= i_cpu_wdata;
-					state <= WAIT_PALETTE_WRITE;	// access palette
+					state <= END_PALETTE_WRITE;	// access palette
 				end
 				else if (i_cpu_address[23:20] == 4'hf) begin
-					if (i_cpu_rw) begin
-						if (i_cpu_address[4:2] == 3'd0) begin
-							vram_read_offset <= i_cpu_wdata;
-						end
-						else if (i_cpu_address[4:2] == 3'd1) begin
-							vram_pitch <= i_cpu_wdata;
-						end
-						else if (i_cpu_address[4:2] == 3'd2) begin
-							vram_skip <= i_cpu_wdata[1:0];
-						end
-						else if (i_cpu_address[4:2] == 3'd3) begin
-							vram_skip_x <= i_cpu_wdata;
-						end
-						else if (i_cpu_address[4:2] == 3'd4) begin
-							vram_skip_y <= i_cpu_wdata;
-						end
-						else if (i_cpu_address[4:2] == 3'd5) begin
-							vram_use_palette <= i_cpu_wdata[0];
-						end
-					end
-					o_cpu_ready <= 1'b1;
-					state <= WAIT_REQUEST_END;
+					state <= ACCESS_CONTROL;
 				end
 				else begin
 					wb_address <= { 8'b0, i_cpu_address[23:0] };
 					wb_rw <= i_cpu_rw;
 					wb_wdata <= i_cpu_wdata;
 					wb_request <= 1'b1;
-					state <= WAIT_VRAM_WRITE;
+					state <= END_VRAM_WRITE;
 				end
 			end
 		end
 
 		// access palette.
-		WAIT_PALETTE_WRITE: begin
+		END_PALETTE_WRITE: begin
 			palette_cpu_request <= 1'b0;
 			o_cpu_ready <= 1'b1;
 			state <= WAIT_REQUEST_END;
 		end
 
 		// wait on vram.
-		WAIT_VRAM_WRITE: begin
+		END_VRAM_WRITE: begin
 			if (wb_ready) begin
 				o_cpu_ready <= 1'b1;
 				o_cpu_rdata <= wb_rdata;
 				wb_request <= 1'b0;
 				state <= WAIT_REQUEST_END;
 			end
+		end
+
+		// access control registers.
+		ACCESS_CONTROL: begin
+			if (i_cpu_rw) begin
+				if (i_cpu_address[4:2] == 3'd0) begin
+					vram_read_offset <= i_cpu_wdata;
+				end
+				else if (i_cpu_address[4:2] == 3'd1) begin
+					vram_pitch <= i_cpu_wdata;
+				end
+				else if (i_cpu_address[4:2] == 3'd2) begin
+					vram_skip <= i_cpu_wdata[1:0];
+				end
+				else if (i_cpu_address[4:2] == 3'd3) begin
+					vram_skip_x <= i_cpu_wdata;
+				end
+				else if (i_cpu_address[4:2] == 3'd4) begin
+					vram_skip_y <= i_cpu_wdata;
+				end
+				else if (i_cpu_address[4:2] == 3'd5) begin
+					vram_use_palette <= |i_cpu_wdata;
+				end
+			end
+			o_cpu_ready <= 1'b1;
+			state <= WAIT_REQUEST_END;
 		end
 
 		// wait until request finishes.
@@ -310,8 +316,8 @@ module VIDEO_controller #(
 	// Stream out to video "DAC".
 
 	bit valid;
-	bit [8:0] pixel_x;
-	bit [1:0] switch_x;
+	bit [9:0] pixel_word_offset;	// 0 - 1023
+	bit [1:0] pixel_word_switch;
 
 	always_comb begin
 		valid =
@@ -324,32 +330,32 @@ module VIDEO_controller #(
 	always_comb begin
 		if (!vram_use_palette) begin
 			if (vram_skip[0] == 1'b0) begin
-				pixel_x = i_video_pos_x[10:2] - vram_skip_x[10:3];
-				switch_x = i_video_pos_x[1:0];
+				pixel_word_offset = i_video_pos_x[9:0] - vram_skip_x[9:0];
+				pixel_word_switch = 4;
 			end
 			else begin
-				pixel_x = i_video_pos_x[11:3] - vram_skip_x[10:3];
-				switch_x = i_video_pos_x[2:1];
+				pixel_word_offset = { 1'b0, i_video_pos_x[9:1] - vram_skip_x[9:1] };
+				pixel_word_switch = 4;
 			end
 		end
 		else begin
 			if (vram_skip[0] == 1'b0) begin
-				pixel_x = i_video_pos_x[8:0] - vram_skip_x[10:3];
-				switch_x = 4;
+				pixel_word_offset = { 1'b0, i_video_pos_x[10:2] - vram_skip_x[10:2] };
+				pixel_word_switch = i_video_pos_x[1:0];
 			end
 			else begin
-				pixel_x = i_video_pos_x[9:1] - vram_skip_x[10:3];
-				switch_x = 4;
+				pixel_word_offset = { 2'b00, i_video_pos_x[10:3] - vram_skip_x[10:3] };
+				pixel_word_switch = i_video_pos_x[2:1];
 			end
 		end
 	end
 
 	always_comb begin
-		line_r_address = pixel_x;
+		line_r_address = pixel_word_offset;
 	end
 
 	always_comb begin
-		unique case (switch_x)
+		unique case (pixel_word_switch)
 			0: palette_video_address = line_r_rdata[7:0];
 			1: palette_video_address = line_r_rdata[15:8];
 			2: palette_video_address = line_r_rdata[23:16];
@@ -362,13 +368,13 @@ module VIDEO_controller #(
 		if (!vram_use_palette) begin
 			o_video_rdata <=
 				valid ?
-				{ 8'h00, palette_video_rdata } :
+				line_r_rdata :
 				32'h0;
 		end
 		else begin
 			o_video_rdata <=
 				valid ?
-				line_r_rdata :
+				{ 8'h00, palette_video_rdata } :
 				32'h0;
 		end
 	end
