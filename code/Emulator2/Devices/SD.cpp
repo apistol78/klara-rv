@@ -75,6 +75,11 @@ uint32_t SD::readU32(uint32_t address) const
 	{
 		// Read data dword.
 	}
+	else
+	{
+		log::error << L"[SD] attempt read from unknown address " << str(L"0x%08x", address) << L"." << Endl;
+		return 0;
+	}
 
 	return v;
 }

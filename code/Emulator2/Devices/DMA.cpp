@@ -47,6 +47,12 @@ bool DMA::writeU32(uint32_t address, uint32_t value)
 		else
 			log::warning << L"[DMA] DMA command fifo full!" << Endl;
 	}
+	else
+	{
+		log::error << L"[DMA] attempt write to unknown address " << str(L"0x%08x", address) << L"." << Endl;
+		return false;
+	}
+
 	return true;
 }
 

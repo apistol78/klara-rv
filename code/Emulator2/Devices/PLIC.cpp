@@ -43,6 +43,12 @@ bool PLIC::writeU32(uint32_t address, uint32_t value)
 			//log::info << L"[PLIC] Complete context " << value << L" : " << fmt(m_raised) << L" / " << fmt(m_issued) << Endl;
 		}
 	}	
+	else
+	{
+		log::error << L"[PLIC] attempt write to unknown address " << str(L"0x%08x", address) << L"." << Endl;
+		return false;
+	}
+
 	return true;
 }
 
@@ -60,6 +66,12 @@ uint32_t PLIC::readU32(uint32_t address) const
 		}
 		//log::info << L"[PLIC] Claim context none" << Endl;
 	}
+	else
+	{
+		log::error << L"[PLIC] attempt read from unknown address " << str(L"0x%08x", address) << L"." << Endl;
+		return 0;
+	}
+
 	return 0;
 }
 

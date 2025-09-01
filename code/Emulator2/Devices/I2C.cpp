@@ -42,6 +42,11 @@ bool I2C::writeU32(uint32_t address, uint32_t value)
 		for (uint8_t i = 0; i < controlDataOrCount; ++i)
 			m_data.push_back(data[i]);
 	}
+	else
+	{
+		log::error << L"[I2C] attempt write to unknown address " << str(L"0x%08x", address) << L"." << Endl;
+		return false;
+	}
 
 	return true;
 }

@@ -34,7 +34,8 @@ bool Timer::writeU32(uint32_t address, uint32_t value)
 		m_countdown = value;
 		break;
 	default:
-		tk::log::info << L"Invalid timer address " << tk::str(L"%08x", address) << L", write" << tk::Endl;
+		tk::log::error << L"[Timer] attempt write to unknown address " << tk::str(L"0x%08x", address) << L"." << tk::Endl;
+		return false;
 	}
 	return true;
 }
@@ -56,7 +57,8 @@ uint32_t Timer::readU32(uint32_t address) const
 	case 0x5:
 		return m_countdown;
 	default:
-		tk::log::info << L"Invalid timer address " << tk::str(L"%08x", address) << L", read" << tk::Endl;
+		tk::log::error << L"[Timer] attempt read from unknown address " << tk::str(L"0x%08x", address) << L"." << tk::Endl;
+		return 0;
 	}
 	return 0;
 }

@@ -69,11 +69,16 @@ bool Video::writeU32(uint32_t address, uint32_t value)
 		const uint32_t idx = (address >> 2) & 255;
 		m_palette[idx] = value;
 	}
+	else if (address < m_framebuffer.size())
+	{
+		*(uint32_t*)&m_framebuffer[address] = value;
+	}
 	else
 	{
-		if (address < m_framebuffer.size())
-			*(uint32_t*)&m_framebuffer[address] = value;
+		log::error << L"[VIDEO] attempt write to unknown address " << str(L"0x%08x", address) << L"." << Endl;
+		return false;
 	}
+
 	return true;
 }
 
@@ -82,7 +87,10 @@ uint32_t Video::readU32(uint32_t address) const
 	if (address < m_framebuffer.size())
 		return *(uint32_t*)&m_framebuffer[address];
 	else
+	{
+		log::error << L"[VIDEO] attempt read from unknown address " << str(L"0x%08x", address) << L"." << Endl;
 		return 0;
+	}
 }
 
 bool Video::tick(ICPU* cpu, Bus* bus)

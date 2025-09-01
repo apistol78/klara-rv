@@ -11,6 +11,7 @@
 #include <Core/Io/FileSystem.h>
 #include <Core/Log/Log.h>
 #include <Core/Memory/Alloc.h>
+#include <Core/Misc/String.h>
 #include <Core/Thread/ThreadManager.h>
 #include <Sound/AudioChannel.h>
 #include <Sound/AudioSystem.h>
@@ -143,6 +144,11 @@ bool Audio::writeU32(uint32_t address, uint32_t value)
 		const uint32_t rate = 100000000 / value;
 		log::info << L"[AUDIO] play back rate " << rate << Endl;
 		wab->setRate(rate);
+	}
+	else
+	{
+		log::error << L"[AUDIO] attempt write to unknown address " << str(L"0x%08x", address) << L"." << Endl;
+		return false;
 	}
 
 	return true;
