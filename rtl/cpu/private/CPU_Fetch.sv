@@ -60,88 +60,88 @@ module CPU_Fetch #(
 	wire [31:0] icache_rdata;
 	wire icache_ready;
 
-	generate if (ICACHE_SIZE > 0 && ICACHE_REGISTERED != 0) begin
+	generate
+		if (ICACHE_SIZE > 0 && ICACHE_REGISTERED != 0) begin : icache_registered
+			CPU_ICache_Reg #(
+				.SIZE(ICACHE_SIZE)
+			) icache(
+				.i_reset(i_reset),
+				.i_clock(i_clock),
 
-		CPU_ICache_Reg #(
-			.SIZE(ICACHE_SIZE)
-		) icache(
-			.i_reset(i_reset),
-			.i_clock(i_clock),
+				// Input
+				.i_input_pc(pc),
 
-			// Input
-			.i_input_pc(pc),
+				// Output
+				.o_rdata(icache_rdata),
+				.o_ready(icache_ready),
 
-			// Output
-			.o_rdata(icache_rdata),
-			.o_ready(icache_ready),
+				// Bus
+				.o_bus_request(o_bus_request),
+				.i_bus_ready(i_bus_ready),
+				.o_bus_address(o_bus_address),
+				.i_bus_rdata(i_bus_rdata),
 
-			// Bus
-			.o_bus_request(o_bus_request),
-			.i_bus_ready(i_bus_ready),
-			.o_bus_address(o_bus_address),
-			.i_bus_rdata(i_bus_rdata),
+				// Debug
+				.o_hit(o_icache_hit),
+				.o_miss(o_icache_miss)
+			);
+		end
+	endgenerate
 
-			// Debug
-			.o_hit(o_icache_hit),
-			.o_miss(o_icache_miss)
-		);
+	generate
+		if (ICACHE_SIZE > 0 && ICACHE_REGISTERED == 0) begin : icache_combinatorial
+			CPU_ICache_Comb #(
+				.SIZE(ICACHE_SIZE)
+			) icache(
+				.i_reset(i_reset),
+				.i_clock(i_clock),
 
-	end endgenerate
+				// Input
+				.i_input_pc(pc),
 
-	generate if (ICACHE_SIZE > 0 && ICACHE_REGISTERED == 0) begin
+				// Output
+				.o_rdata(icache_rdata),
+				.o_ready(icache_ready),
 
-		CPU_ICache_Comb #(
-			.SIZE(ICACHE_SIZE)
-		) icache(
-			.i_reset(i_reset),
-			.i_clock(i_clock),
+				// Bus
+				.o_bus_request(o_bus_request),
+				.i_bus_ready(i_bus_ready),
+				.o_bus_address(o_bus_address),
+				.i_bus_rdata(i_bus_rdata),
 
-			// Input
-			.i_input_pc(pc),
+				// Debug
+				.o_hit(o_icache_hit),
+				.o_miss(o_icache_miss)
+			);
+		end
+	endgenerate
 
-			// Output
-			.o_rdata(icache_rdata),
-			.o_ready(icache_ready),
+	generate
+		if (ICACHE_SIZE == 0) begin : icache_none
+			CPU_ICache_None icache(
+				.i_reset(i_reset),
+				.i_clock(i_clock),
 
-			// Bus
-			.o_bus_request(o_bus_request),
-			.i_bus_ready(i_bus_ready),
-			.o_bus_address(o_bus_address),
-			.i_bus_rdata(i_bus_rdata),
+				// Input
+				.i_input_pc(pc),
 
-			// Debug
-			.o_hit(o_icache_hit),
-			.o_miss(o_icache_miss)
-		);
+				// Output
+				.o_rdata(icache_rdata),
+				.o_ready(icache_ready),
+				.i_stall(),
 
-	end endgenerate
+				// Bus
+				.o_bus_request(o_bus_request),
+				.i_bus_ready(i_bus_ready),
+				.o_bus_address(o_bus_address),
+				.i_bus_rdata(i_bus_rdata),
 
-	generate if (ICACHE_SIZE == 0) begin
-
-		CPU_ICache_None icache(
-			.i_reset(i_reset),
-			.i_clock(i_clock),
-
-			// Input
-			.i_input_pc(pc),
-
-			// Output
-			.o_rdata(icache_rdata),
-			.o_ready(icache_ready),
-			.i_stall(),
-
-			// Bus
-			.o_bus_request(o_bus_request),
-			.i_bus_ready(i_bus_ready),
-			.o_bus_address(o_bus_address),
-			.i_bus_rdata(i_bus_rdata),
-
-			// Debug
-			.o_hit(o_icache_hit),
-			.o_miss(o_icache_miss)
-		);
-
-	end endgenerate
+				// Debug
+				.o_hit(o_icache_hit),
+				.o_miss(o_icache_miss)
+			);
+		end
+	endgenerate
 
 	// 
 	`undef INSTRUCTION
