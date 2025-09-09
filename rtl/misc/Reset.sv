@@ -17,12 +17,17 @@ module Reset (
 );
 	initial o_reset = 1'b0;
 
+	bit ff_reset = 0;
 	bit [2:0] counter = 0;
 
 	assign o_reset = !counter[2];
 
 	always_ff @(posedge i_clock) begin
-		if (i_reset) begin
+		ff_reset <= i_reset;
+	end
+
+	always_ff @(posedge i_clock) begin
+		if (ff_reset) begin
 			counter <= 0;
 		end
 		else if (counter != 3'b100) begin
