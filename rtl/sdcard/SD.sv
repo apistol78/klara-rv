@@ -11,24 +11,24 @@
 `default_nettype none
 
 module SD (
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 	
-	input i_request,
-	input i_rw,
-	input [1:0] i_address,
-	input [31:0] i_wdata,
+	input wire i_request,
+	input wire i_rw,
+	input wire [1:0] i_address,
+	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 
-	output SD_CLK,
-	output SD_CMD_dir,
-	input SD_CMD_in,
-	output SD_CMD_out,
-	output SD_DAT_dir,
-	input [3:0] SD_DAT_in,
-	output [3:0] SD_DAT_out,
-	input SD_CARD
+	output wire SD_CLK,
+	output wire SD_CMD_dir,
+	input wire SD_CMD_in,
+	output wire SD_CMD_out,
+	output wire SD_DAT_dir,
+	input wire [3:0] SD_DAT_in,
+	output wire [3:0] SD_DAT_out,
+	input wire SD_CARD
 );
 	localparam DIR_IN = 1'b0;
 	localparam DIR_OUT = 1'b1;

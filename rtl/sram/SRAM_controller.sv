@@ -14,26 +14,26 @@ module SRAM_controller #(
 	parameter FREQUENCY = 100_000_000,
 	parameter SRAM_ADDRESS_WIDTH = 18
 )(
-	input i_reset,
-	input i_clock,
-	input i_request,
-	input i_rw,
-	input [31:0] i_address,
-	input [31:0] i_wdata,
+	input wire i_reset,
+	input wire i_clock,
+	input wire i_request,
+	input wire i_rw,
+	input wire [31:0] i_address,
+	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 
 	output bit [SRAM_ADDRESS_WIDTH-1:0] SRAM_A,
 	
 	output bit [15:0] SRAM_D_w,
-	input [15:0] SRAM_D_r,
+	input wire [15:0] SRAM_D_r,
 	output bit SRAM_D_rw,
 
-	output SRAM_CE_n,
+	output wire SRAM_CE_n,
 	output bit SRAM_OE_n,
 	output bit SRAM_WE_n,
-	output SRAM_LB_n,
-	output SRAM_UB_n
+	output wire SRAM_LB_n,
+	output wire SRAM_UB_n
 );
 
 	// Number of cycles for entire transaction.

@@ -15,18 +15,18 @@ module UART_RX #(
 	parameter BAUDRATE = 9600,
 	parameter FIFO_DEPTH = 256
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
-	input i_request,
-	input [1:0] i_address,
+	input wire i_request,
+	input wire [1:0] i_address,
 	output bit [31:0] o_rdata,
-    output o_ready,
+    output wire o_ready,
 
 	output bit o_interrupt,
 	output bit o_soft_reset,
 	
-    input UART_RX
+    input wire UART_RX
 );
     localparam PRESCALE = FREQUENCY / (BAUDRATE * 8);
 	localparam MAX_PRESCALE_VALUE = (PRESCALE << 3);

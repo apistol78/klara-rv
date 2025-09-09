@@ -12,16 +12,16 @@
 `default_nettype none
 
 module CPU_Execute (
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 	output bit o_fault,
 
 	// CSR
-	output [11:0] o_csr_index,
-	input [31:0] i_csr_rdata,
+	output wire [11:0] o_csr_index,
+	input wire [31:0] i_csr_rdata,
 	output bit o_csr_wdata_wr,
 	output bit [31:0] o_csr_wdata,
-	input [31:0] i_epc,
+	input wire [31:0] i_epc,
 
 	// Control
 	output bit o_jump,
@@ -32,12 +32,12 @@ module CPU_Execute (
 	// Input
 	output bit o_busy,
 	input decode_data_t i_data,
-	input [31:0] i_rs1,
-	input [31:0] i_rs2,
-	input [31:0] i_rs3,
+	input wire [31:0] i_rs1,
+	input wire [31:0] i_rs2,
+	input wire [31:0] i_rs3,
 
 	// Output
-	input i_memory_busy,
+	input wire i_memory_busy,
 	output execute_data_t o_data
 );
 

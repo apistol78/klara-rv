@@ -13,12 +13,12 @@
 module Timer#(
     parameter FREQUENCY
 )(
-	input i_reset,
-	input i_clock,
-	input i_request,
-	input i_rw,
-	input [3:0] i_address,
-	input [31:0] i_wdata,
+	input wire i_reset,
+	input wire i_clock,
+	input wire i_request,
+	input wire i_rw,
+	input wire [3:0] i_address,
+	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 

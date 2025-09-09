@@ -12,20 +12,20 @@
 `default_nettype none
 
 module CPU_Memory #(
-	parameter DCACHE_SIZE,
-	parameter DCACHE_REGISTERED,
-	parameter DCACHE_WB_QUEUE
+	parameter DCACHE_SIZE = 10,
+	parameter DCACHE_REGISTERED = 1,
+	parameter DCACHE_WB_QUEUE = 0
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Bus
-	output o_bus_rw,
-	output o_bus_request,
-	input i_bus_ready,
-	output [31:0] o_bus_address,
-	input [31:0] i_bus_rdata,
-	output [31:0] o_bus_wdata,
+	output wire o_bus_rw,
+	output wire o_bus_request,
+	input wire i_bus_ready,
+	output wire [31:0] o_bus_address,
+	input wire [31:0] i_bus_rdata,
+	output wire [31:0] o_bus_wdata,
 
 	// Input
 	output bit o_busy,
@@ -35,8 +35,8 @@ module CPU_Memory #(
 	output memory_data_t o_data,
 
 	// Debug
-	output [31:0] o_dcache_hit,
-	output [31:0] o_dcache_miss
+	output wire [31:0] o_dcache_hit,
+	output wire [31:0] o_dcache_miss
 );
 
 	typedef enum bit [2:0]

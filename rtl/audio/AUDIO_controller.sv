@@ -13,22 +13,22 @@
 module AUDIO_controller #(
 	parameter BUFFER_SIZE = 4096
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// CPU interface.
-	input i_request,
-	input i_rw,
-	input [3:0] i_address,
-	input [31:0] i_wdata,
+	input wire i_request,
+	input wire i_rw,
+	input wire [3:0] i_address,
+	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 	output bit o_interrupt,
 
 	// Audio output
-	input i_output_busy,
-	output [15:0] o_output_sample_left,
-	output [15:0] o_output_sample_right,
+	input wire i_output_busy,
+	output wire [15:0] o_output_sample_left,
+	output wire [15:0] o_output_sample_right,
 	output bit [31:0] o_output_reload
 );
 	// Sample FIFO.

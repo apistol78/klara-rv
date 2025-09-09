@@ -11,17 +11,17 @@
 `default_nettype none
 
 module I2C (
-	input i_clock,
-	input i_request,
-	input i_rw,
-	input [31:0] i_wdata,
+	input wire i_clock,
+	input wire i_request,
+	input wire i_rw,
+	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 
-	output I2C_SCL,
-	output I2C_SDA_direction,
-	input I2C_SDA_r,
-	output I2C_SDA_w
+	output wire I2C_SCL,
+	output wire I2C_SDA_direction,
+	input wire I2C_SDA_r,
+	output wire I2C_SDA_w
 );
 	bit scl = 1;
 	bit sda = 1;

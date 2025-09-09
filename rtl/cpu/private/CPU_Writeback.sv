@@ -12,15 +12,15 @@
 `default_nettype none
 
 module CPU_Writeback(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Input
 	input memory_data_t i_data,
 
 	// Output
 	output writeback_data_t o_data,
-	output [63:0] o_retired
+	output wire [63:0] o_retired
 );
 	assign o_data = data;
 	assign o_retired = retired;

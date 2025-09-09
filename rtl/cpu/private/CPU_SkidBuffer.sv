@@ -14,11 +14,11 @@
 module CPU_SkidBuffer #(
 	parameter DW
 ) (
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 	
-	input i_busy,
-	input [DW-1:0] i_data,
+	input wire i_busy,
+	input wire [DW-1:0] i_data,
 	output bit [DW-1:0] o_data
 );
 

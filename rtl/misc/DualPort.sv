@@ -11,40 +11,40 @@
 `default_nettype none
 
 module DualPort(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Bus
 	output bit o_bus_rw,				// Data read/write
 	output bit o_bus_request,			// IO request.
-	input i_bus_ready,					// IO request ready.
+	input wire i_bus_ready,					// IO request ready.
 	output bit [31:0] o_bus_address,	// Address
-	input [31:0] i_bus_rdata,			// Read data
+	input wire [31:0] i_bus_rdata,			// Read data
 	output bit [31:0] o_bus_wdata,		// Write data,
 
 	// Port A
-	input i_pa_rw,
-	input i_pa_request,
+	input wire i_pa_rw,
+	input wire i_pa_request,
 	output bit o_pa_ready,
-	input [31:0] i_pa_address,
+	input wire [31:0] i_pa_address,
 	output bit [31:0] o_pa_rdata,
-	input [31:0] i_pa_wdata,
+	input wire [31:0] i_pa_wdata,
 
 	// Port B
-	input i_pb_rw,
-	input i_pb_request,
+	input wire i_pb_rw,
+	input wire i_pb_request,
 	output bit o_pb_ready,
-	input [31:0] i_pb_address,
+	input wire [31:0] i_pb_address,
 	output bit [31:0] o_pb_rdata,
-	input [31:0] i_pb_wdata,
+	input wire [31:0] i_pb_wdata,
 
 	// Port C
-	input i_pc_rw,
-	input i_pc_request,
+	input wire i_pc_rw,
+	input wire i_pc_request,
 	output bit o_pc_ready,
-	input [31:0] i_pc_address,
+	input wire [31:0] i_pc_address,
 	output bit [31:0] o_pc_rdata,
-	input [31:0] i_pc_wdata
+	input wire [31:0] i_pc_wdata
 );
 
 	bit [2:0] state = 0;

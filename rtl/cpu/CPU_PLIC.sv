@@ -11,24 +11,24 @@
 `default_nettype none
 
 module CPU_PLIC(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Input
-	input i_interrupt_0,
-	input i_interrupt_1,
-	input i_interrupt_2,
-	input i_interrupt_3,
+	input wire i_interrupt_0,
+	input wire i_interrupt_1,
+	input wire i_interrupt_2,
+	input wire i_interrupt_3,
 
 	// Output
-	input i_interrupt_enable,
+	input wire i_interrupt_enable,
 	output bit o_interrupt,
 
 	// CPU interface
-	input i_request,
-	input i_rw,
-	input [23:0] i_address,
-	input [31:0] i_wdata,
+	input wire i_request,
+	input wire i_rw,
+	input wire [23:0] i_address,
+	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready
 );

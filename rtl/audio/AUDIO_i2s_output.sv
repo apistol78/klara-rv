@@ -13,11 +13,11 @@
 module AUDIO_i2s_output #(
 	parameter FREQUENCY = 100_000_000
 )(
-	input i_clock,
+	input wire i_clock,
 
 	output bit o_busy,
-	input [15:0] i_sample_left,
-	input [15:0] i_sample_right,
+	input wire [15:0] i_sample_left,
+	input wire [15:0] i_sample_right,
 
 	output bit o_i2s_sdout,
 	output bit o_i2s_sclk,

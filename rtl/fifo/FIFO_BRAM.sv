@@ -14,19 +14,19 @@ module FIFO_BRAM #(
 	parameter DEPTH = 128,
 	parameter WIDTH = 8
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
-	output o_empty,
-	output o_full,
+	output wire o_empty,
+	output wire o_full,
 
-	input i_write,
-	input [WIDTH-1:0] i_wdata,
+	input wire i_write,
+	input wire [WIDTH-1:0] i_wdata,
 
-	input i_read,
-	output [WIDTH-1:0] o_rdata,
+	input wire i_read,
+	output wire [WIDTH-1:0] o_rdata,
 
-	output [$clog2(DEPTH) - 1:0] o_queued
+	output wire [$clog2(DEPTH) - 1:0] o_queued
 );
 	localparam DB = $clog2(DEPTH) - 1;
 

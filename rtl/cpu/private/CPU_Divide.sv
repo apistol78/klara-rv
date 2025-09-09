@@ -32,7 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////////////
 
 `define N(n) [(n)-1:0]
-`define FFx(signal,bits) always @ ( posedge clk or posedge  rst ) if (rst) signal <= bits; else
+`define FFx(signal,bits) always @ ( posedge clk /* or posedge rst */) if (rst) signal <= bits; else
 
 module divfunc
 #(
@@ -40,14 +40,14 @@ module divfunc
     parameter `N(XLEN) STAGE_LIST = 0
 )
 (
-    input              clk,
-    input              rst,
-    input  `N(XLEN)    a,
-    input  `N(XLEN)    b,
-    input              vld,
-    output `N(XLEN)    quo,
-    output `N(XLEN)    rem,
-    output             ack
+    input wire clk,
+    input wire rst,
+    input wire `N(XLEN) a,
+    input wire `N(XLEN) b,
+    input wire vld,
+    output wire `N(XLEN) quo,
+    output wire `N(XLEN) rem,
+    output wire ack
 );
     reg               ready    `N(XLEN+1);
     reg `N(XLEN)      dividend `N(XLEN+1);  
@@ -103,11 +103,11 @@ module divfunc
 endmodule
 
 module CPU_Divide(
-	input i_clock,
-	input i_latch,
-	input i_signed,
-	input [31:0] i_numerator,
-	input [31:0] i_denominator,
+	input wire i_clock,
+	input wire i_latch,
+	input wire i_signed,
+	input wire [31:0] i_numerator,
+	input wire [31:0] i_denominator,
 	output bit o_ready,
 	output bit [31:0] o_result,
 	output bit [31:0] o_remainder

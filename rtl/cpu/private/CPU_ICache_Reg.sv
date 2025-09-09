@@ -12,22 +12,22 @@
 module CPU_ICache_Reg #(
 	parameter SIZE = 13
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 	
-	input [31:0] i_input_pc,
+	input wire [31:0] i_input_pc,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 
 	// Bus
 	output bit o_bus_request,
-	input i_bus_ready,
+	input wire i_bus_ready,
 	output bit [31:0] o_bus_address,
-	input [31:0] i_bus_rdata,
+	input wire [31:0] i_bus_rdata,
 
 	// Debug
-	output [31:0] o_hit,
-	output [31:0] o_miss
+	output wire [31:0] o_hit,
+	output wire [31:0] o_miss
 );
 	localparam RANGE = 1 << SIZE;
 	localparam SET_BITS = SIZE;

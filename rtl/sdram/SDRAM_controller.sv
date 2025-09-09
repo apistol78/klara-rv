@@ -43,15 +43,15 @@ module SDRAM_controller #(
 	parameter SDRAM_ADDRESS_WIDTH = 13,
 	parameter SDRAM_DATA_WIDTH = 16
 )(
-	input i_reset,
-	input i_clock,
-	input i_clock_sdram,			// Offset from i_clock to help with timing.
+	input wire i_reset,
+	input wire i_clock,
+	input wire i_clock_sdram,			// Offset from i_clock to help with timing.
 
-	input i_request,
-	input i_rw,
-	input [31:0] i_address,			// Must be 4 byte aligned.
-	input [USER_DATA_WIDTH-1:0] i_wdata,
-	output logic [USER_DATA_WIDTH-1:0] o_rdata,
+	input wire i_request,
+	input wire i_rw,
+	input wire [31:0] i_address,			// Must be 4 byte aligned.
+	input wire [USER_DATA_WIDTH-1:0] i_wdata,
+	output bit [USER_DATA_WIDTH-1:0] o_rdata,
 	output bit o_ready,
 
 	output bit sdram_clk,
@@ -63,7 +63,7 @@ module SDRAM_controller #(
 	output bit [1:0] sdram_dqm,
 	output bit [1:0] sdram_bs,		// Also commonly called BA.
 	output bit [SDRAM_ADDRESS_WIDTH-1:0] sdram_addr,
-	input [SDRAM_DATA_WIDTH-1:0] sdram_rdata,
+	input wire [SDRAM_DATA_WIDTH-1:0] sdram_rdata,
 	output bit [SDRAM_DATA_WIDTH-1:0] sdram_wdata,
 	output bit sdram_data_rw
 );

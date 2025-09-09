@@ -3,47 +3,47 @@
 
 // #note master 0 has highest priority.
 module XBAR_2_3(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Master 0
-	input i_m0_rw,
-	input i_m0_request,
+	input wire i_m0_rw,
+	input wire i_m0_request,
 	output bit o_m0_ready,
-	input [31:0] i_m0_address,
+	input wire [31:0] i_m0_address,
 	output bit [31:0] o_m0_rdata,
-	input [31:0] i_m0_wdata,
+	input wire [31:0] i_m0_wdata,
 
 	// Master 1
-	input i_m1_rw,
-	input i_m1_request,
+	input wire i_m1_rw,
+	input wire i_m1_request,
 	output bit o_m1_ready,
-	input [31:0] i_m1_address,
+	input wire [31:0] i_m1_address,
 	output bit [31:0] o_m1_rdata,
-	input [31:0] i_m1_wdata,
+	input wire [31:0] i_m1_wdata,
 
 	// Slave 0
 	output bit o_s0_rw,
 	output bit o_s0_request,
-	input i_s0_ready,
+	input wire i_s0_ready,
 	output bit [31:0] o_s0_address,
-	input [31:0] i_s0_rdata,
+	input wire [31:0] i_s0_rdata,
 	output bit [31:0] o_s0_wdata,
 
 	// Slave 1
 	output bit o_s1_rw,
 	output bit o_s1_request,
-	input i_s1_ready,
+	input wire i_s1_ready,
 	output bit [31:0] o_s1_address,
-	input [31:0] i_s1_rdata,
+	input wire [31:0] i_s1_rdata,
 	output bit [31:0] o_s1_wdata,
 
 	// Slave 2
 	output bit o_s2_rw,
 	output bit o_s2_request,
-	input i_s2_ready,
+	input wire i_s2_ready,
 	output bit [31:0] o_s2_address,
-	input [31:0] i_s2_rdata,
+	input wire [31:0] i_s2_rdata,
 	output bit [31:0] o_s2_wdata
 );
 	bit [3:0] s0_source;

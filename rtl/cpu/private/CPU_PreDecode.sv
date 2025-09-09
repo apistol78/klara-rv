@@ -12,8 +12,8 @@
 `default_nettype none
 
 module CPU_PreDecode(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Input
 	input fetch_data_t i_data,

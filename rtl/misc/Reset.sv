@@ -11,8 +11,8 @@
 `default_nettype none
 
 module Reset (
-	input i_clock,
-	input i_reset,
+	input wire i_clock,
+	input wire i_reset,
 	output bit o_reset
 );
 	initial o_reset = 1'b0;

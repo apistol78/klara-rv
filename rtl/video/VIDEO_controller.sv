@@ -13,37 +13,37 @@
 module VIDEO_controller #(
 	parameter MAX_PITCH = 640
 )(
-	input i_clock,
+	input wire i_clock,
 
 	// CPU
-	input i_cpu_request,
-	input i_cpu_rw,
-	input [31:0] i_cpu_address,
-	input [31:0] i_cpu_wdata,
+	input wire i_cpu_request,
+	input wire i_cpu_rw,
+	input wire [31:0] i_cpu_address,
+	input wire [31:0] i_cpu_wdata,
 	output bit [31:0] o_cpu_rdata,
 	output bit o_cpu_ready,
 
 	// Video
-	input i_video_hblank,
-	input i_video_vblank,
-	input [10:0] i_video_pos_x,
-	input [10:0] i_video_pos_y,
+	input wire i_video_hblank,
+	input wire i_video_vblank,
+	input wire [10:0] i_video_pos_x,
+	input wire [10:0] i_video_pos_y,
 	output bit [31:0] o_video_rdata,
 
 	// Memory
-	output o_vram_pa_request,
-	output o_vram_pa_rw,
-	output [31:0] o_vram_pa_address,
-	output [31:0] o_vram_pa_wdata,
-	input [31:0] i_vram_pa_rdata,
-	input i_vram_pa_ready,
+	output wire o_vram_pa_request,
+	output wire o_vram_pa_rw,
+	output wire [31:0] o_vram_pa_address,
+	output wire [31:0] o_vram_pa_wdata,
+	input wire [31:0] i_vram_pa_rdata,
+	input wire i_vram_pa_ready,
 
 	output bit o_vram_pb_request,
 	output bit o_vram_pb_rw,
 	output bit [31:0] o_vram_pb_address,
 	output bit [31:0] o_vram_pb_wdata,
-	input [31:0] i_vram_pb_rdata,
-	input i_vram_pb_ready
+	input wire [31:0] i_vram_pb_rdata,
+	input wire i_vram_pb_ready
 );
 
 	bit [31:0] vram_read_offset = 0;

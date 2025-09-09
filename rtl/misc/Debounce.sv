@@ -11,8 +11,8 @@
 `default_nettype none
 
 module Debounce (
-	input i_clock,
-	input i_data,
+	input wire i_clock,
+	input wire i_data,
 	output bit o_stable
 );
 	initial o_stable = 1'b0;

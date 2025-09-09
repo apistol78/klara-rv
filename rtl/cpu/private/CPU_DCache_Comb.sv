@@ -14,30 +14,30 @@
 module CPU_DCache_Comb #(
 	parameter SIZE = 14
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Bus
 	output bit o_bus_rw,
 	output bit o_bus_request,
-	input i_bus_ready,
+	input wire i_bus_ready,
 	output bit [31:0] o_bus_address,
-	input [31:0] i_bus_rdata,
+	input wire [31:0] i_bus_rdata,
 	output bit [31:0] o_bus_wdata,
 
 	// Input
-	input i_rw,
-	input i_request,
-	input i_flush,
+	input wire i_rw,
+	input wire i_request,
+	input wire i_flush,
 	output bit o_ready,
-	input [31:0] i_address,
+	input wire [31:0] i_address,
 	output bit [31:0] o_rdata,
-	input [31:0] i_wdata,
-	input i_cacheable,
+	input wire [31:0] i_wdata,
+	input wire i_cacheable,
 
 	// Debug
-	output [31:0] o_hit,
-	output [31:0] o_miss
+	output wire [31:0] o_hit,
+	output wire [31:0] o_miss
 );
 
 	localparam RANGE = 1 << SIZE;

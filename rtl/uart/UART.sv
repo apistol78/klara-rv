@@ -16,20 +16,20 @@ module UART #(
 	parameter RX_FIFO_DEPTH = 16,
 	parameter TX_FIFO_DEPTH = 16
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
-	input i_request,
-	input i_rw,
-	input [1:0] i_address,
-	input [31:0] i_wdata,
-	output [31:0] o_rdata,
-    output o_ready,
-	output o_interrupt,
-	output o_soft_reset,
+	input wire i_request,
+	input wire i_rw,
+	input wire [1:0] i_address,
+	input wire [31:0] i_wdata,
+	output wire [31:0] o_rdata,
+    output wire o_ready,
+	output wire o_interrupt,
+	output wire o_soft_reset,
 	
-    input UART_RX,
-    output UART_TX
+    input wire UART_RX,
+    output wire UART_TX
 );
 
 	bit rx_request;

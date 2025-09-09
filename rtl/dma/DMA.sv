@@ -11,21 +11,21 @@
 `default_nettype none
 
 module DMA(
-	input i_reset,
-	input i_clock,
-	input i_request,
-	input i_rw,
-	input [1:0] i_address,
-	input [31:0] i_wdata,
+	input wire i_reset,
+	input wire i_clock,
+	input wire i_request,
+	input wire i_rw,
+	input wire [1:0] i_address,
+	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
 
 	// Bus
 	output bit o_bus_rw,				// Data read/write
 	output bit o_bus_request,			// IO request.
-	input i_bus_ready,					// IO request ready.
+	input wire i_bus_ready,			// IO request ready.
 	output bit [31:0] o_bus_address,	// Address
-	input [31:0] i_bus_rdata,			// Read data
+	input wire [31:0] i_bus_rdata,	// Read data
 	output bit [31:0] o_bus_wdata		// Write data,
 );
 	typedef enum bit [3:0]

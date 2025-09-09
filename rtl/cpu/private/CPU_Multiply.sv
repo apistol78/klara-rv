@@ -11,13 +11,13 @@
 `default_nettype none
 
 module CPU_Multiply(
-	input i_clock,
-	input i_latch,
-	input i_signed,
-	input [31:0] i_op1,
-	input [31:0] i_op2,
-	output o_ready,
-	output [63:0] o_result
+	input wire i_clock,
+	input wire i_latch,
+	input wire i_signed,
+	input wire [31:0] i_op1,
+	input wire [31:0] i_op2,
+	output wire o_ready,
+	output wire [63:0] o_result
 );
 
 	wire s1 = i_op1[31];

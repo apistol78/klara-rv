@@ -12,8 +12,8 @@
 `default_nettype none
 
 module CPU_Decode(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 	output bit o_fault,
 
 	// Input

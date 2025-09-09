@@ -14,8 +14,8 @@ module ClockDivider #(
     parameter CLOCK_RATE = 50000000,
     parameter BAUD_RATE = 9600
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 	output bit o_clock
 );
 

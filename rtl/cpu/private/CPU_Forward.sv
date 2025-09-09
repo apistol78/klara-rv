@@ -17,13 +17,13 @@ module CPU_Forward (
 	input memory_data_t i_memory_data,
 	input writeback_data_t i_writeback_data,
 
-	input [31:0] i_rs1,
-	input [31:0] i_rs2,
-	input [31:0] i_rs3,
+	input wire [31:0] i_rs1,
+	input wire [31:0] i_rs2,
+	input wire [31:0] i_rs3,
 
-	output [31:0] o_rs1,
-	output [31:0] o_rs2,
-	output [31:0] o_rs3
+	output wire [31:0] o_rs1,
+	output wire [31:0] o_rs2,
+	output wire [31:0] o_rs3
 );
 	assign o_rs1 = rs1;
 	assign o_rs2 = rs2;

@@ -18,9 +18,9 @@ interface CPU_XCPI;
 endinterface
 
 module CPU #(
+	parameter FREQUENCY,
 	parameter RESET_VECTOR = 32'h00000000,
 	parameter STACK_POINTER = 32'h10000400,
-	parameter FREQUENCY,
 	parameter VENDORID = 32'h0,
 	parameter ARCHID = 32'h0,
 	parameter IMPID = 32'h0,
@@ -31,36 +31,53 @@ module CPU #(
 	parameter DCACHE_REGISTERED = 1,
 	parameter DCACHE_WB_QUEUE = 0
 )(
-	input i_reset,
-	input i_clock,					// CPU clock
+	input wire i_reset,
+	input wire i_clock,			// CPU clock
 
 	// Control
-	input i_timer_interrupt,
-	input i_external_interrupt,
+	input wire i_timer_interrupt,
+	input wire i_external_interrupt,
 	
 	// Instruction bus
-	output o_ibus_request,			// IO request.
-	input i_ibus_ready,				// IO request ready.
-	output [31:0] o_ibus_address,	// Address
-	input [31:0] i_ibus_rdata,		// Read data
+	output wire o_ibus_request,			// IO request.
+	input wire i_ibus_ready,				// IO request ready.
+	output wire [31:0] o_ibus_address,	// Address
+	input wire [31:0] i_ibus_rdata,		// Read data
 	
 	// Data bus
-	output o_dbus_rw,				// Data read/write
-	output o_dbus_request,			// IO request.
-	input i_dbus_ready,				// IO request ready.
-	output [31:0] o_dbus_address,	// Address
-	input [31:0] i_dbus_rdata,		// Read data
-	output [31:0] o_dbus_wdata,		// Write data
+	output wire o_dbus_rw,					// Data read/write
+	output wire o_dbus_request,			// IO request.
+	input wire i_dbus_ready,				// IO request ready.
+	output wire [31:0] o_dbus_address,	// Address
+	input wire [31:0] i_dbus_rdata,		// Read data
+	output wire [31:0] o_dbus_wdata,		// Write data
 	
 	// Debug
-	output [31:0] o_icache_hit,
-	output [31:0] o_icache_miss,
-	output [31:0] o_dcache_hit,
-	output [31:0] o_dcache_miss,
-	output o_execute_busy,
-	output o_memory_busy,
-	output o_fault
+	output wire [31:0] o_icache_hit,
+	output wire [31:0] o_icache_miss,
+	output wire [31:0] o_dcache_hit,
+	output wire [31:0] o_dcache_miss,
+	output wire o_execute_busy,
+	output wire o_memory_busy,
+	output wire o_fault
 );
+
+	//====================================================
+	// "Forward declarations"
+
+	fetch_data_t fetch_data;
+
+	wire execute_ecall;
+	wire execute_mret;
+	wire execute_jump;
+	wire [31:0] execute_jump_pc;
+	wire execute_busy;
+	execute_data_t execute_data;
+
+	wire memory_busy;
+	memory_data_t memory_data;
+
+	writeback_data_t writeback_data;
 
 	//====================================================
 	// CSR
@@ -165,8 +182,6 @@ module CPU #(
 		.o_icache_miss(o_icache_miss)
 	);
 
-	fetch_data_t fetch_data;
-
 	CPU_SkidBuffer #(
 		.DW($bits(fetch_data))
 	) fetch_skid(
@@ -222,12 +237,6 @@ module CPU #(
 	// EXECUTE
 
 	wire execute_fault;
-	wire execute_jump;
-	wire [31:0] execute_jump_pc;
-	wire execute_ecall;
-	wire execute_mret;
-	wire execute_busy;
-	execute_data_t execute_data;
 	
 	CPU_Execute execute(
 		.i_reset(i_reset),
@@ -262,9 +271,6 @@ module CPU #(
 	//====================================================
 	// MEMORY
 
-	wire memory_busy;
-	memory_data_t memory_data;
-
 	CPU_Memory #(
 		.DCACHE_SIZE(DCACHE_SIZE),
 		.DCACHE_REGISTERED(DCACHE_REGISTERED),
@@ -296,8 +302,6 @@ module CPU #(
 	//====================================================
 	// WRITEBACK
 
-	writeback_data_t writeback_data;
-	
 	CPU_Writeback writeback(
 		.i_reset(i_reset),
 		.i_clock(i_clock),

@@ -13,17 +13,17 @@
 module SPI_Flash #(
 	parameter FREQUENCY = 100_000_000
 )(
-	input i_reset,
-	input i_clock,
-	input i_request,
-	input [31:0] i_address,
-	output [31:0] o_rdata,
+	input wire i_reset,
+	input wire i_clock,
+	input wire i_request,
+	input wire [31:0] i_address,
+	output wire [31:0] o_rdata,
 	output bit o_ready,
 
     output bit SPI_nCS,
-    output SPI_CLK,
-    output SPI_MOSI,
-    input SPI_MISO
+    output wire SPI_CLK,
+    output wire SPI_MOSI,
+    input wire SPI_MISO
 );
 	typedef enum bit [7:0]
 	{

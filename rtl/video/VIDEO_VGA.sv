@@ -23,8 +23,8 @@ module VIDEO_VGA #(
 	parameter VSPOL,			// Polarity (0 = negative, 1 = positive)
 	parameter HSPOL
 )(
-	input i_clock,				//!< VGA timing clock.
-	input i_clock_out,			//!< Signal output clock domain.
+	input wire i_clock,				//!< VGA timing clock.
+	input wire i_clock_out,			//!< Signal output clock domain.
 
 	output bit o_clock,
 	output bit o_hsync,			//!< 1 when sync.

@@ -3,95 +3,95 @@
 
 // #note master 0 has highest priority.
 module XBAR_2_9(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Master 0
-	input i_m0_rw,
-	input i_m0_request,
+	input wire i_m0_rw,
+	input wire i_m0_request,
 	output bit o_m0_ready,
-	input [31:0] i_m0_address,
+	input wire [31:0] i_m0_address,
 	output bit [31:0] o_m0_rdata,
-	input [31:0] i_m0_wdata,
+	input wire [31:0] i_m0_wdata,
 
 	// Master 1
-	input i_m1_rw,
-	input i_m1_request,
+	input wire i_m1_rw,
+	input wire i_m1_request,
 	output bit o_m1_ready,
-	input [31:0] i_m1_address,
+	input wire [31:0] i_m1_address,
 	output bit [31:0] o_m1_rdata,
-	input [31:0] i_m1_wdata,
+	input wire [31:0] i_m1_wdata,
 
 	// Slave 0
 	output bit o_s0_rw,
 	output bit o_s0_request,
-	input i_s0_ready,
+	input wire i_s0_ready,
 	output bit [31:0] o_s0_address,
-	input [31:0] i_s0_rdata,
+	input wire [31:0] i_s0_rdata,
 	output bit [31:0] o_s0_wdata,
 
 	// Slave 1
 	output bit o_s1_rw,
 	output bit o_s1_request,
-	input i_s1_ready,
+	input wire i_s1_ready,
 	output bit [31:0] o_s1_address,
-	input [31:0] i_s1_rdata,
+	input wire [31:0] i_s1_rdata,
 	output bit [31:0] o_s1_wdata,
 
 	// Slave 2
 	output bit o_s2_rw,
 	output bit o_s2_request,
-	input i_s2_ready,
+	input wire i_s2_ready,
 	output bit [31:0] o_s2_address,
-	input [31:0] i_s2_rdata,
+	input wire [31:0] i_s2_rdata,
 	output bit [31:0] o_s2_wdata,
 
 	// Slave 3
 	output bit o_s3_rw,
 	output bit o_s3_request,
-	input i_s3_ready,
+	input wire i_s3_ready,
 	output bit [31:0] o_s3_address,
-	input [31:0] i_s3_rdata,
+	input wire [31:0] i_s3_rdata,
 	output bit [31:0] o_s3_wdata,
 
 	// Slave 4
 	output bit o_s4_rw,
 	output bit o_s4_request,
-	input i_s4_ready,
+	input wire i_s4_ready,
 	output bit [31:0] o_s4_address,
-	input [31:0] i_s4_rdata,
+	input wire [31:0] i_s4_rdata,
 	output bit [31:0] o_s4_wdata,
 
 	// Slave 5
 	output bit o_s5_rw,
 	output bit o_s5_request,
-	input i_s5_ready,
+	input wire i_s5_ready,
 	output bit [31:0] o_s5_address,
-	input [31:0] i_s5_rdata,
+	input wire [31:0] i_s5_rdata,
 	output bit [31:0] o_s5_wdata,
 
 	// Slave 6
 	output bit o_s6_rw,
 	output bit o_s6_request,
-	input i_s6_ready,
+	input wire i_s6_ready,
 	output bit [31:0] o_s6_address,
-	input [31:0] i_s6_rdata,
+	input wire [31:0] i_s6_rdata,
 	output bit [31:0] o_s6_wdata,
 
 	// Slave 7
 	output bit o_s7_rw,
 	output bit o_s7_request,
-	input i_s7_ready,
+	input wire i_s7_ready,
 	output bit [31:0] o_s7_address,
-	input [31:0] i_s7_rdata,
+	input wire [31:0] i_s7_rdata,
 	output bit [31:0] o_s7_wdata,
 
 	// Slave 8
 	output bit o_s8_rw,
 	output bit o_s8_request,
-	input i_s8_ready,
+	input wire i_s8_ready,
 	output bit [31:0] o_s8_address,
-	input [31:0] i_s8_rdata,
+	input wire [31:0] i_s8_rdata,
 	output bit [31:0] o_s8_wdata
 );
 	bit [3:0] s0_source;

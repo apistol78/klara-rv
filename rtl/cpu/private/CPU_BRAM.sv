@@ -16,17 +16,17 @@ module CPU_BRAM #(
 	parameter SIZE = 32'h400,
 	parameter ADDR_LSH = 2
 )(
-	input i_clock,
-	input i_request,
-	input i_rw,
-	input [31:0] i_address,
-	input [WIDTH - 1:0] i_wdata,
-	output logic [WIDTH - 1:0] o_rdata,
+	input wire i_clock,
+	input wire i_request,
+	input wire i_rw,
+	input wire [31:0] i_address,
+	input wire [WIDTH - 1:0] i_wdata,
+	output bit [WIDTH - 1:0] o_rdata,
 	output bit o_ready,
 	output bit o_valid
 );
     (* ram_style = "block" *)
-	logic [WIDTH - 1:0] data [0:SIZE - 1];
+	bit [WIDTH - 1:0] data [0:SIZE - 1];
 
 	initial begin
 		o_ready = 0;

@@ -13,30 +13,30 @@
 module CPU_BusMux #(
 	parameter REGISTERED
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Bus
 	output bit o_bus_rw,				// Data read/write
 	output bit o_bus_request,			// IO request.
-	input i_bus_ready,					// IO request ready.
+	input wire i_bus_ready,					// IO request ready.
 	output bit [31:0] o_bus_address,	// Address
-	input [31:0] i_bus_rdata,			// Read data
+	input wire [31:0] i_bus_rdata,			// Read data
 	output bit [31:0] o_bus_wdata,		// Write data,
 
 	// Port A (Read only)
-	input i_pa_request,
-	output o_pa_ready,
-	input [31:0] i_pa_address,
-	output [31:0] o_pa_rdata,
+	input wire i_pa_request,
+	output wire o_pa_ready,
+	input wire [31:0] i_pa_address,
+	output wire [31:0] o_pa_rdata,
 
 	// Port B
-	input i_pb_rw,
-	input i_pb_request,
-	output o_pb_ready,
-	input [31:0] i_pb_address,
-	output [31:0] o_pb_rdata,
-	input [31:0] i_pb_wdata
+	input wire i_pb_rw,
+	input wire i_pb_request,
+	output wire o_pb_ready,
+	input wire [31:0] i_pb_address,
+	output wire [31:0] o_pb_rdata,
+	input wire [31:0] i_pb_wdata
 );
 
 	bit [1:0] state = 0;

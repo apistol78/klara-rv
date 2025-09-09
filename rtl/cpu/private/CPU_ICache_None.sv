@@ -12,23 +12,23 @@
 `default_nettype none
 
 module CPU_ICache_None(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 	
-	input [31:0] i_input_pc,
+	input wire [31:0] i_input_pc,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
-	input i_stall,
+	input wire i_stall,
 
 	// Bus
 	output bit o_bus_request,
-	input i_bus_ready,
-	output [31:0] o_bus_address,
-	input [31:0] i_bus_rdata,
+	input wire i_bus_ready,
+	output wire [31:0] o_bus_address,
+	input wire [31:0] i_bus_rdata,
 
 	// Debug
-	output [31:0] o_hit,
-	output [31:0] o_miss
+	output wire [31:0] o_hit,
+	output wire [31:0] o_miss
 );
 
 	typedef enum bit [1:0]

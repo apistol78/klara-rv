@@ -15,11 +15,11 @@ module UART_TX #(
 	parameter BAUDRATE = 9600,
 	parameter FIFO_DEPTH = 16
 )(
-	input i_reset,
-	input i_clock,
-	input i_request,
-	input [31:0] i_wdata,
-	output o_ready,
+	input wire i_reset,
+	input wire i_clock,
+	input wire i_request,
+	input wire [31:0] i_wdata,
+	output wire o_ready,
 
 	output bit UART_TX
 );

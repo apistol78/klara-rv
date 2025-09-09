@@ -16,32 +16,32 @@ module CPU_Fetch #(
 	parameter ICACHE_SIZE,
 	parameter ICACHE_REGISTERED
 )(
-	input				i_reset,
-	input				i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// Control
-	input				i_jump,
-	input [31:0]		i_jump_pc,
+	input wire i_jump,
+	input wire [31:0] i_jump_pc,
 
 	// Interrupt
-	input				i_irq_pending,		//!< Interrupt pending.
-	input [31:0]		i_irq_pc,			//!< Interrupt handler vector.
-	output bit			o_irq_dispatched,	//!< Interrupt dispatched signal.
-	output bit [31:0]	o_irq_epc,			//!< Interrupt return vector.
+	input wire i_irq_pending,		//!< Interrupt pending.
+	input wire [31:0] i_irq_pc,	//!< Interrupt handler vector.
+	output bit o_irq_dispatched,	//!< Interrupt dispatched signal.
+	output bit [31:0] o_irq_epc,	//!< Interrupt return vector.
 
 	// Bus
-	output				o_bus_request,
-	input				i_bus_ready,
-	output [31:0]		o_bus_address,
-	input [31:0]		i_bus_rdata,
+	output wire o_bus_request,
+	input wire i_bus_ready,
+	output wire [31:0] o_bus_address,
+	input wire [31:0] i_bus_rdata,
 
 	// Output
-	input				i_busy,
-	output fetch_data_t	o_data,
+	input wire i_busy,
+	output fetch_data_t o_data,
 
 	// Debug
-	output [31:0]		o_icache_hit,
-	output [31:0]		o_icache_miss
+	output wire [31:0] o_icache_hit,
+	output wire [31:0] o_icache_miss
 );
 
 	typedef enum bit [1:0]

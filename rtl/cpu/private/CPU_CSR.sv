@@ -18,34 +18,34 @@ module CPU_CSR #(
 	parameter IMPID,
 	parameter HARTID
 )(
-	input i_reset,
-	input i_clock,
+	input wire i_reset,
+	input wire i_clock,
 
 	// External interrupt input.
-	input i_timer_interrupt,
-	input i_external_interrupt,
+	input wire i_timer_interrupt,
+	input wire i_external_interrupt,
 
 	// Software interrupt input.
-	input i_ecall,
-	input i_mret,
+	input wire i_ecall,
+	input wire i_mret,
 
 	// Instruction I/O access.
-	input [11:0] i_index,
+	input wire [11:0] i_index,
 	output bit [31:0] o_rdata,
-	input i_wdata_wr,
-	input [31:0] i_wdata,
+	input wire i_wdata_wr,
+	input wire [31:0] i_wdata,
 
 	// Direct read access.
-	output [31:0] o_epc,
+	output wire [31:0] o_epc,
 
 	// Pending interrupt output.
 	output bit o_irq_pending,
 	output bit [31:0] o_irq_pc,
-	input i_irq_dispatched,
-	input [31:0] i_irq_epc,
+	input wire i_irq_dispatched,
+	input wire [31:0] i_irq_epc,
 
 	// Retired instructions.
-	input [63:0] i_retired
+	input wire [63:0] i_retired
 );
 	localparam PRESCALE = FREQUENCY / 1000;
 	localparam PRESCALE_WIDTH = $clog2(PRESCALE);
