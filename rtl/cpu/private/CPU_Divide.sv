@@ -76,14 +76,11 @@ module divfunc
                 `FFx(ready[i+1], 0)
                 ready[i+1] <= ready[i];
 
-                `FFx(dividend[i + 1], 0)
-                dividend[i+1] <= d;
-
-                `FFx(divisor[i + 1], 0)
-                divisor[i+1] <= divisor[i];
-
-                `FFx(quotient[i + 1], 0)
-                quotient[i+1] <= quotient[i] | (q << (XLEN-i-1));
+				always @(posedge clk) begin
+					dividend[i+1] <= d;
+					divisor[i+1] <= divisor[i];
+					quotient[i+1] <= quotient[i] | (q << (XLEN-i-1));
+				end
                
             end else begin:gen_comb
                 always @* begin
@@ -130,7 +127,7 @@ module CPU_Divide(
 
 	divfunc #(
 		.XLEN(32),
-		.STAGE_LIST(32'b10100010001000100010001000100101)
+		.STAGE_LIST(32'b10101010101010101010101010100101)
 	) df(
 		.clk(i_clock),
 		.rst(~i_latch),
