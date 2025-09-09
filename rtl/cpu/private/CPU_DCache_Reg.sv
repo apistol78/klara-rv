@@ -69,7 +69,8 @@ module CPU_DCache_Reg #(
 	// One cycle latency, important since
 	// we rely on address only.
 	CPU_BRAM #(
-		.WIDTH(64),
+		.ADDRESS_WIDTH(SIZE),
+		.DATA_WIDTH(64),
 		.SIZE(RANGE),
 		.ADDR_LSH(0)
 	) cache(

@@ -10,7 +10,8 @@
 `default_nettype none
 
 module CPU_BRAM_1r1w #(
-	parameter WIDTH = 32,
+	parameter ADDRESS_WIDTH = 32,
+	parameter DATA_WIDTH = 32,
 	parameter SIZE = 32'h400,
 	parameter ADDR_LSH = 2
 )(
@@ -18,18 +19,18 @@ module CPU_BRAM_1r1w #(
 
     // Port A (read)
 	input wire i_pa_request,
-	input wire [31:0] i_pa_address,
-	output bit [WIDTH - 1:0] o_pa_rdata,
+	input wire [ADDRESS_WIDTH - 1:0] i_pa_address,
+	output bit [DATA_WIDTH - 1:0] o_pa_rdata,
 	output bit o_pa_ready,
 
     // Port B (write)
 	input wire i_pb_request,
-	input wire [31:0] i_pb_address,
-	input wire [WIDTH - 1:0] i_pb_wdata,
+	input wire [ADDRESS_WIDTH - 1:0] i_pb_address,
+	input wire [DATA_WIDTH - 1:0] i_pb_wdata,
 	output bit o_pb_ready
 );
     (* ram_style = "block" *)
-	bit [WIDTH - 1:0] data [0:SIZE - 1];
+	bit [DATA_WIDTH - 1:0] data [0:SIZE - 1];
 
 	initial begin
         o_pa_ready = 0;
