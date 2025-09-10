@@ -9,11 +9,17 @@
 #include "HAL/UART.h"
 
 volatile uint32_t* const c_base = (volatile uint32_t*)UART_BASE;
-volatile uint32_t* const c_status = (volatile uint32_t*)(UART_BASE + 0x04);
+volatile uint32_t* const c_status = (volatile uint32_t*)(UART_BASE + 4);
+volatile uint32_t* const c_reset = (volatile uint32_t*)(UART_BASE + 8);
 
 void hal_uart_tx_u8(uint8_t data)
 {
 	*c_base = (uint32_t)data;
+}
+
+void hal_uart_reset()
+{
+	*c_reset = *c_reset;
 }
 
 uint32_t hal_uart_rx_full()

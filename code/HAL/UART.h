@@ -12,6 +12,8 @@
 
 EXTERN_C void hal_uart_tx_u8(uint8_t data);
 
+EXTERN_C void hal_uart_reset();
+
 EXTERN_C uint32_t hal_uart_rx_full();
 
 EXTERN_C uint32_t hal_uart_rx_empty();

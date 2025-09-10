@@ -38,15 +38,16 @@ module UART_RX #(
 	bit rx = 0;
 	
 	// FIFO
+	bit rx_fifo_reset = 1'b0;
 	wire rx_fifo_empty;
-	bit rx_fifo_write = 0;
-	bit rx_fifo_read = 0;
+	bit rx_fifo_write = 1'b0;
+	bit rx_fifo_read = 1'b0;
 	wire [7:0] rx_fifo_rdata;
 	FIFO #(
 		.DEPTH(FIFO_DEPTH),
 		.WIDTH(8)
 	) rx_fifo(
-		.i_reset(i_reset),
+		.i_reset(i_reset || rx_fifo_reset),
 		.i_clock(i_clock),
 		.o_empty(rx_fifo_empty),
 		.o_full(),
@@ -72,7 +73,9 @@ module UART_RX #(
 			o_rdata <= 32'h0;
 		end
 		else begin
-			rx_fifo_read <= 0;
+			rx_fifo_reset <= 1'b0;
+			rx_fifo_read <= 1'b0;
+
 			if (i_request) begin
 				if (i_address == 2'h0) begin	// Read byte from fifo.
 					case (rds)
@@ -97,8 +100,14 @@ module UART_RX #(
 					o_rdata <= { 30'b0, rx_fifo_empty, 1'b0 };
 					rds <= 5;
 				end
+				else if (i_address == 2'h2) begin	// Reset
+					rx_fifo_reset <= 1'b1;
+					o_rdata <= 32'hcafe_babe;
+					rds <= 5;
+				end
 			end
 			else begin
+				// No request; ensure FSM return to idle.
 				rds <= 0;
 			end
 		end

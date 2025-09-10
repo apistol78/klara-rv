@@ -18,6 +18,7 @@ module UART_TX #(
 	input wire i_reset,
 	input wire i_clock,
 	input wire i_request,
+	input wire [1:0] i_address,
 	input wire [31:0] i_wdata,
 	output wire o_ready,
 
@@ -34,16 +35,17 @@ module UART_TX #(
 	bit ready = 1'b0;
 
 	// FIFO
+	bit tx_fifo_reset = 1'b0;
 	wire tx_fifo_empty;
 	wire tx_fifo_full;
-	bit tx_fifo_write = 0;
-	bit tx_fifo_read = 0;
+	bit tx_fifo_write = 1'b0;
+	bit tx_fifo_read = 1'b0;
 	wire [7:0] tx_fifo_rdata;
 	FIFO #(
 		.DEPTH(FIFO_DEPTH),
 		.WIDTH(8)
 	) tx_fifo(
-		.i_reset(i_reset),
+		.i_reset(i_reset || tx_fifo_reset),
 		.i_clock(i_clock),
 		.o_empty(tx_fifo_empty),
 		.o_full(tx_fifo_full),
@@ -63,12 +65,24 @@ module UART_TX #(
 
 	// Write to FIFO.
 	always_ff @(posedge i_clock) begin
+		
+		tx_fifo_reset <= 1'b0;
 		tx_fifo_write <= 1'b0;
+
 		ready <= 1'b0;
 		if (i_request) begin
-			if (!tx_fifo_full) begin
-				if (!ready)
-					tx_fifo_write <= 1'b1;
+			if (i_address == 2'h0) begin
+				if (!tx_fifo_full) begin
+					if (!ready)
+						tx_fifo_write <= 1'b1;
+					ready <= 1'b1;
+				end
+			end
+			else if (i_address == 2'h2) begin	// Reset
+				tx_fifo_reset <= 1'b1;
+				ready <= 1'b1;
+			end
+			else begin
 				ready <= 1'b1;
 			end
 		end

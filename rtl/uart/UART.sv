@@ -60,6 +60,7 @@ module UART #(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 		.i_request(tx_request),
+		.i_address(i_address),
 		.i_wdata(i_wdata),
 		.o_ready(tx_ready),
 		.UART_TX(UART_TX)
