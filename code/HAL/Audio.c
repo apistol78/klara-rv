@@ -10,12 +10,13 @@
 
 void hal_audio_init()
 {
+	hal_audio_set_playback_rate(22050);
 }
 
 void hal_audio_set_playback_rate(uint32_t rate)
 {
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
-	audio[1] = CPU_FREQUENCY / rate;
+	audio[1] = rate;
 }
 
 uint32_t hal_audio_get_queued()

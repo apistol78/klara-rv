@@ -27,9 +27,9 @@ module AUDIO_controller #(
 
 	// Audio output
 	input wire i_output_busy,
+	output bit [31:0] o_output_sample_rate,
 	output wire [15:0] o_output_sample_left,
 	output wire [15:0] o_output_sample_right,
-	output bit [31:0] o_output_reload
 );
 	// Sample FIFO.
     wire output_fifo_empty;
@@ -59,7 +59,7 @@ module AUDIO_controller #(
     initial begin
 		o_ready = 0;
 		o_interrupt = 0;
-		o_output_reload = 4536;
+		o_output_sample_rate = 22050;
 	end
 
 	always_ff @(posedge i_clock) begin
@@ -74,7 +74,7 @@ module AUDIO_controller #(
 						o_ready <= 1'b1;
 					end
 					4'h1: begin
-						o_rdata <= o_output_reload;
+						o_rdata <= o_output_sample_rate;
 						o_ready <= 1'b1;
 					end
 					default:
@@ -90,7 +90,7 @@ module AUDIO_controller #(
 						end
 					end
 					4'h1: begin
-						o_output_reload <= i_wdata;
+						o_output_sample_rate <= i_wdata;
 						o_ready <= 1'b1;
 					end
 					default:

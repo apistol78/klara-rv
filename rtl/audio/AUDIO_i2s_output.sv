@@ -16,6 +16,7 @@ module AUDIO_i2s_output #(
 	input wire i_clock,
 
 	output bit o_busy,
+	input wire [31:0] i_sample_rate,
 	input wire [15:0] i_sample_left,
 	input wire [15:0] i_sample_right,
 
@@ -27,12 +28,10 @@ module AUDIO_i2s_output #(
 
 	wire mclk;
 
-	ClockDivider #(
-		.CLOCK_RATE(FREQUENCY),
-		.BAUD_RATE(256 * 22050 /*44100*/)
-	) mclk_div(
+	ClockDividerV mclk_div(
 		.i_reset(1'b0),
 		.i_clock(i_clock),
+		.i_rate(i_sample_rate << 8),
 		.o_clock(mclk)
 	);
 
