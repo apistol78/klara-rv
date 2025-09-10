@@ -31,7 +31,7 @@ module AUDIO_i2s_output #(
 	ClockDividerV mclk_div(
 		.i_reset(1'b0),
 		.i_clock(i_clock),
-		.i_rate(i_sample_rate << 8),
+		.i_rate(i_sample_rate),
 		.o_clock(mclk)
 	);
 

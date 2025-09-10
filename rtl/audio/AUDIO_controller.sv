@@ -59,7 +59,7 @@ module AUDIO_controller #(
     initial begin
 		o_ready = 0;
 		o_interrupt = 0;
-		o_output_sample_rate = 22050;
+		o_output_sample_rate = 100_000_000 / (2 * 256 * 22050);
 	end
 
 	always_ff @(posedge i_clock) begin

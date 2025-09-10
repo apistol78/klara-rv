@@ -16,17 +16,20 @@ module ClockDividerV (
     input wire [31:0] i_rate,
 	output bit o_clock
 );
+	bit [31:0] rate = ~0;
 	bit [31:0] counter = 0;
 
 	initial o_clock = 0;
 
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
+			rate <= ~0;
 			counter <= 0;
 			o_clock <= 0;
 		end
 		else begin
-			if (counter == i_rate) begin
+			rate <= i_rate;
+			if (counter >= rate) begin
 				counter <= 0;
 				o_clock <= ~o_clock;
 			end else begin
