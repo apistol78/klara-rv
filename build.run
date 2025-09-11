@@ -120,6 +120,7 @@ function main()
 	run:run("generate-xbar.run 2 9", "rtl/misc/XBAR_2_9.sv")
 	run:run("generate-xbar.run 3 9", "rtl/misc/XBAR_3_9.sv")
 	run:run("generate-xbar.run 3 10", "rtl/misc/XBAR_3_10.sv")
+	run:run("generate-xbar.run 3 11", "rtl/misc/XBAR_3_11.sv")
 	run:run("build-verilator.run")
 
 	if os.identifier == "windows" then

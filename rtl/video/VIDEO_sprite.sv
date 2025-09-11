@@ -12,7 +12,12 @@
 
 module VIDEO_sprite(
 	input wire i_clock,
-	
+
+	input wire i_request,
+	input wire [3:0] i_address,
+	input wire [31:0] i_wdata,
+	output bit o_ready,
+
 	input wire i_video_hblank,
 	input wire i_video_vblank,
 	input wire [10:0] i_overlay_x,
@@ -20,79 +25,65 @@ module VIDEO_sprite(
 	output bit [7:0] o_overlay_data,
 	output bit o_overlay_mask
 );
-	typedef enum bit [4:0]
-	{
-		IDLE,
-		WAIT_X,
-		OUT_LINE
-	}
-	state_t;
 
-	initial begin
+	bit [10:0] sprite_0_pos_x = 11'h0;
+	bit [10:0] sprite_0_pos_y = 11'h0;
+	wire [7:0] sprite_0_overlay_data;
+	wire sprite_0_overlay_mask;
+
+	VIDEO_sprite_x sprite_0(
+		.i_clock(i_clock),
+		.i_pos_x(sprite_0_pos_x),
+		.i_pos_y(sprite_0_pos_y),
+		.i_video_hblank(i_video_hblank),
+		.i_video_vblank(i_video_vblank),
+		.i_overlay_x(i_overlay_x),
+		.i_overlay_y(i_overlay_y),
+		.o_overlay_data(sprite_0_overlay_data),
+		.o_overlay_mask(sprite_0_overlay_mask)
+	);
+
+	bit [10:0] sprite_1_pos_x = 11'h0;
+	bit [10:0] sprite_1_pos_y = 11'h0;
+	wire [7:0] sprite_1_overlay_data;
+	wire sprite_1_overlay_mask;
+
+	VIDEO_sprite_x sprite_1(
+		.i_clock(i_clock),
+		.i_pos_x(sprite_1_pos_x),
+		.i_pos_y(sprite_1_pos_y),
+		.i_video_hblank(i_video_hblank),
+		.i_video_vblank(i_video_vblank),
+		.i_overlay_x(i_overlay_x),
+		.i_overlay_y(i_overlay_y),
+		.o_overlay_data(sprite_1_overlay_data),
+		.o_overlay_mask(sprite_1_overlay_mask)
+	);
+
+	always_comb begin
 		o_overlay_data = 8'h00;
 		o_overlay_mask = 1'b0;
-	end
 
-	bit r_video_hblank = 1'b0;
-	always_ff @(posedge i_clock) begin
-		r_video_hblank <= i_video_hblank;
-	end
-
-	bit line_start;
-	always_comb begin
-		line_start =
-			!i_video_vblank &&
-			({ r_video_hblank, i_video_hblank } == 2'b10);
-	end
-
-	state_t state = IDLE;
-	state_t next_state;
-
-	bit signed [10:0] pos_x = 20;
-	bit signed [10:0] pos_y = 20;
-	bit [7:0] width = 16;
-	bit [7:0] height = 16;
-
-	always_ff @(posedge i_clock) begin
-		state <= next_state;
-	end
-
-	always_comb begin
-
-		next_state = state;
-
-		o_overlay_data = 32'h0;
-		o_overlay_mask = 1'b0;
-
-		if (line_start) begin
-			if (
-				$signed(i_overlay_y) >= pos_y &&
-				$signed(i_overlay_y) < pos_y + height
-			) begin
-				next_state = WAIT_X;
-			end
+		if (sprite_0_overlay_mask) begin
+			o_overlay_data = sprite_0_overlay_data;
+			o_overlay_mask = 1'b1;
 		end
-		else begin
-			case (state)
-			WAIT_X: begin
-				if ($signed(i_overlay_x) >= pos_x - 1) begin
-					next_state = OUT_LINE;
-				end
-			end
-			
-			OUT_LINE: begin
-				if ($signed(i_overlay_x) < pos_x + width) begin
-					o_overlay_data = 8'h02;
-					o_overlay_mask = 1'b1;
-				end
-				else begin
-					next_state = IDLE;
-				end
-			end
+		else if (sprite_1_overlay_mask) begin
+			o_overlay_data = sprite_1_overlay_data;
+			o_overlay_mask = 1'b1;
+		end
+	end
 
-			default:
-				next_state = IDLE;
+	always_ff @(posedge i_clock) begin
+		o_ready <= 1'b0;
+		if (i_request) begin
+			case (i_address)
+				4'h0: sprite_0_pos_x <= i_wdata[10:0];
+				4'h1: sprite_0_pos_y <= i_wdata[10:0];
+				4'h2: sprite_1_pos_x <= i_wdata[10:0];
+				4'h3: sprite_1_pos_y <= i_wdata[10:0];
 			endcase
+			o_ready <= 1'b1;
 		end
 	end
 
