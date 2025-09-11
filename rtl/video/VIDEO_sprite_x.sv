@@ -36,16 +36,16 @@ module VIDEO_sprite_x(
 		o_overlay_mask = 1'b0;
 	end
 
-	bit r_video_hblank = 1'b0;
+	bit [1:0] r_overlay_zero = 2'b00;
 	always_ff @(posedge i_clock) begin
-		r_video_hblank <= i_video_hblank;
+		r_overlay_zero <= { r_overlay_zero[0], i_overlay_x == 0 };
 	end
 
 	bit line_start;
 	always_comb begin
 		line_start =
 			!i_video_vblank &&
-			({ r_video_hblank, i_video_hblank } == 2'b10);
+			(r_overlay_zero == 2'b01);
 	end
 
 	state_t state = IDLE;
@@ -55,6 +55,8 @@ module VIDEO_sprite_x(
 	bit signed [10:0] pos_y;
 	bit [7:0] width = 16;
 	bit [7:0] height = 16;
+
+	bit [10:0] data_address;
 
 	always_comb begin
 		pos_x = i_pos_x;
