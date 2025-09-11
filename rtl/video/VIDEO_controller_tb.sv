@@ -112,6 +112,21 @@ module VIDEO_controller_tb();
 		.i_pc_wdata(vram_pa_wdata)
 	);
 
+	wire [10:0] video_overlay_x;
+	wire [10:0] video_overlay_y;
+	wire [31:0] video_overlay_data;
+	wire video_overlay_mask;
+
+	VIDEO_sprite video_sprite(
+		.i_clock(clk),
+		.i_video_hblank(vga_hblank),
+		.i_video_vblank(vga_vblank),
+		.i_overlay_x(video_overlay_x),
+		.i_overlay_y(video_overlay_y),
+		.o_overlay_data(video_overlay_data),
+		.o_overlay_mask(video_overlay_mask)
+	);
+
 	VIDEO_controller #(
 		.MAX_PITCH(720)
 	) vc(
@@ -142,7 +157,12 @@ module VIDEO_controller_tb();
 		.o_vram_pb_address(vram_pb_address),
 		.o_vram_pb_wdata(vram_pb_wdata),
 		.i_vram_pb_rdata(vram_pb_rdata),
-		.i_vram_pb_ready(vram_pb_ready)
+		.i_vram_pb_ready(vram_pb_ready),
+
+		.o_overlay_x(video_overlay_x),
+		.o_overlay_y(video_overlay_y),
+		.i_overlay_data(video_overlay_data),
+		.i_overlay_mask(video_overlay_mask)		
 	);
 
 /*

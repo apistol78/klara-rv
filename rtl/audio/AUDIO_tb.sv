@@ -23,15 +23,16 @@ module AUDIO_tb();
     wire ac_interrupt;
 
     wire ac_output_busy;
+    wire [31:0] ac_output_sample_rate;
     wire [15:0] ac_output_sample_left;
     wire [15:0] ac_output_sample_right;
-    wire [31:0] ac_output_reload;
 
     AUDIO_i2s_output #(
         .FREQUENCY(100_000_000)
     ) ao(
         .i_clock(clk),
         .o_busy(ac_output_busy),
+        .i_sample_rate(ac_output_sample_rate),
         .i_sample_left(ac_output_sample_left),
         .i_sample_right(ac_output_sample_right)
     );
@@ -51,9 +52,9 @@ module AUDIO_tb();
         .o_interrupt(ac_interrupt),
 
         .i_output_busy(ac_output_busy),
+        .o_output_sample_rate(ac_output_sample_rate),
         .o_output_sample_left(ac_output_sample_left),
-        .o_output_sample_right(ac_output_sample_right),
-        .o_output_reload(ac_output_reload)
+        .o_output_sample_right(ac_output_sample_right)
     );
 
 	initial begin

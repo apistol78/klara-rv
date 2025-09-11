@@ -29,7 +29,7 @@ module AUDIO_controller #(
 	input wire i_output_busy,
 	output bit [31:0] o_output_sample_rate,
 	output wire [15:0] o_output_sample_left,
-	output wire [15:0] o_output_sample_right,
+	output wire [15:0] o_output_sample_right
 );
 	// Sample FIFO.
     wire output_fifo_empty;
