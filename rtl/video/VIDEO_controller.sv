@@ -376,12 +376,15 @@ module VIDEO_controller #(
 	end
 
 	always_comb begin
+		// Calculate overlay X position.
 		if (vram_skip[0] == 1'b0) begin
 			o_overlay_x = (i_video_pos_x - vram_skip_x);
 		end
 		else begin
 			o_overlay_x = (i_video_pos_x - vram_skip_x) >> 1;
 		end
+
+		// Calculate overlay Y position.
 		if (vram_skip[1] == 1'b0) begin
 			o_overlay_y = (i_video_pos_y - vram_skip_y);
 		end

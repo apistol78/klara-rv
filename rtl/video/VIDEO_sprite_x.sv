@@ -69,7 +69,7 @@ module VIDEO_sprite_x(
 
 		next_state = state;
 
-		o_overlay_data = 32'h0;
+		o_overlay_data = 8'h00;
 		o_overlay_mask = 1'b0;
 
 		if (line_start) begin
@@ -78,6 +78,9 @@ module VIDEO_sprite_x(
 				$signed(i_overlay_y) < pos_y + height
 			) begin
 				next_state = WAIT_X;
+			end
+			else begin
+				next_state = IDLE;
 			end
 		end
 		else begin
