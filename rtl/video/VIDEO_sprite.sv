@@ -17,7 +17,7 @@ module VIDEO_sprite(
 	input wire i_video_vblank,
 	input wire [10:0] i_overlay_x,
 	input wire [10:0] i_overlay_y,
-	output bit [31:0] o_overlay_data,
+	output bit [7:0] o_overlay_data,
 	output bit o_overlay_mask
 );
 	typedef enum bit [4:0]
@@ -48,8 +48,8 @@ module VIDEO_sprite(
 	state_t state = IDLE;
 	state_t next_state;
 
-	bit signed [10:0] pos_x = 1;
-	bit signed [10:0] pos_y = 0;
+	bit signed [10:0] pos_x = 20;
+	bit signed [10:0] pos_y = 20;
 	bit [7:0] width = 16;
 	bit [7:0] height = 16;
 
@@ -82,7 +82,7 @@ module VIDEO_sprite(
 			
 			OUT_LINE: begin
 				if ($signed(i_overlay_x) < pos_x + width) begin
-					o_overlay_data = 32'hff00ff00;
+					o_overlay_data = 8'h02;
 					o_overlay_mask = 1'b1;
 				end
 				else begin

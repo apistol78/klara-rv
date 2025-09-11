@@ -48,7 +48,7 @@ module VIDEO_controller #(
 	// Overlay
 	output bit [10:0] o_overlay_x,
 	output bit [10:0] o_overlay_y,
-	input wire [31:0] i_overlay_data,
+	input wire [7:0] i_overlay_data,
 	input wire i_overlay_mask
 );
 
@@ -361,13 +361,18 @@ module VIDEO_controller #(
 	end
 
 	always_comb begin
-		unique case (pixel_word_switch)
-			0: palette_video_address = line_r_rdata[7:0];
-			1: palette_video_address = line_r_rdata[15:8];
-			2: palette_video_address = line_r_rdata[23:16];
-			3: palette_video_address = line_r_rdata[31:24];
-			4: palette_video_address = 0;
-		endcase
+		if (!i_overlay_mask) begin
+			unique case (pixel_word_switch)
+				0: palette_video_address = line_r_rdata[7:0];
+				1: palette_video_address = line_r_rdata[15:8];
+				2: palette_video_address = line_r_rdata[23:16];
+				3: palette_video_address = line_r_rdata[31:24];
+				4: palette_video_address = 0;
+			endcase
+		end
+		else begin
+			palette_video_address = i_overlay_data;
+		end
 	end
 
 	always_comb begin
@@ -386,22 +391,17 @@ module VIDEO_controller #(
 	end
 
 	always_ff @(posedge i_clock) begin
-		if (!i_overlay_mask) begin
-			if (!vram_use_palette) begin
-				o_video_rdata <=
-					valid ?
-					line_r_rdata :
-					32'h0;
-			end
-			else begin
-				o_video_rdata <=
-					valid ?
-					{ 8'h00, palette_video_rdata } :
-					32'h0;
-			end
+		if (!vram_use_palette) begin
+			o_video_rdata <=
+				valid ?
+				line_r_rdata :
+				32'h0;
 		end
 		else begin
-			o_video_rdata <= i_overlay_data;
+			o_video_rdata <=
+				valid ?
+				{ 8'h00, palette_video_rdata } :
+				32'h0;
 		end
 	end
 
