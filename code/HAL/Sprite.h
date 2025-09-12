@@ -10,6 +10,8 @@
 
 #include "HAL/Common.h"
 
+EXTERN_C void hal_sprite_set_visible(int32_t index, int8_t visible);
+
 EXTERN_C void hal_sprite_set_position(int32_t index, int32_t x, int32_t y);
 
 EXTERN_C void hal_sprite_set_bits(int32_t index, const void* bits);

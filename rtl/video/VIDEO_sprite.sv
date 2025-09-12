@@ -29,6 +29,9 @@ module VIDEO_sprite #(
 	output bit o_overlay_mask
 );
 
+	bit sprite_0_visible = 1'b0;
+	bit sprite_1_visible = 1'b0;
+
 	bit [10:0] sprite_0_pos_x = 11'h0;
 	bit [10:0] sprite_0_pos_y = 11'h0;
 	wire [7:0] sprite_0_overlay_data;
@@ -81,17 +84,24 @@ module VIDEO_sprite #(
 		.i_wd_wdata(sprite_1_wd_wdata)
 	);
 
+	bit sprite_0_mask;
+	bit sprite_1_mask;
+	always_comb begin
+		sprite_0_mask = (sprite_0_overlay_data != 8'hff);
+		sprite_1_mask = (sprite_1_overlay_data != 8'hff);
+	end
+
 	always_comb begin
 		o_overlay_data = 8'h00;
 		o_overlay_mask = 1'b0;
 
 		if (sprite_0_overlay_mask) begin
 			o_overlay_data = sprite_0_overlay_data;
-			o_overlay_mask = 1'b1;
+			o_overlay_mask = sprite_0_mask & sprite_0_visible;
 		end
 		else if (sprite_1_overlay_mask) begin
 			o_overlay_data = sprite_1_overlay_data;
-			o_overlay_mask = 1'b1;
+			o_overlay_mask = sprite_1_mask & sprite_1_visible;
 		end
 	end
 
@@ -104,14 +114,19 @@ module VIDEO_sprite #(
 
 		if (i_request) begin
 
-			// pppp xxxx xxxx xxxx
+			// pppp xxxx xxxx xx00
 
 			if (i_address[15:12] == 4'h0) begin	// Registers
-				case (i_address[3:0])
-					4'h0: sprite_0_pos_x <= i_wdata[10:0];
-					4'h4: sprite_0_pos_y <= i_wdata[10:0];
-					4'h8: sprite_1_pos_x <= i_wdata[10:0];
-					4'hc: sprite_1_pos_y <= i_wdata[10:0];
+				case (i_address[4:0])
+					5'h00: sprite_0_pos_x <= i_wdata[10:0];
+					5'h04: sprite_0_pos_y <= i_wdata[10:0];
+					5'h08: sprite_0_visible <= |i_wdata;
+					// 5'h0c:
+
+					5'h10: sprite_1_pos_x <= i_wdata[10:0];
+					5'h14: sprite_1_pos_y <= i_wdata[10:0];
+					5'h18: sprite_1_visible <= |i_wdata;
+					// 5'h1c:
 				endcase
 			end
 			else if (i_address[15:12] == 4'h1) begin	// Sprite 0 data

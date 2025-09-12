@@ -12,8 +12,14 @@
 #define SPRITE_HEIGHT			32
 #define SPRITE_REGISTERS_BASE	(SPRITE_BASE)
 #define SPRITE_BITS_BASE		(SPRITE_BASE + 0x1000)
-#define SPRITE_REGISTERS(N)		((volatile uint32_t*)SPRITE_REGISTERS_BASE + N * 2)
+#define SPRITE_REGISTERS(N)		((volatile uint32_t*)SPRITE_REGISTERS_BASE + N * 4)
 #define SPRITE_BITS(N)			((volatile uint32_t*)SPRITE_BITS_BASE + N * 0x1000)
+
+void hal_sprite_set_visible(int32_t index, int8_t visible)
+{
+	volatile uint32_t* s = SPRITE_REGISTERS(index);
+	s[2] = visible;
+}
 
 void hal_sprite_set_position(int32_t index, int32_t x, int32_t y)
 {
