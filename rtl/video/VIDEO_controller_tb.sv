@@ -114,10 +114,13 @@ module VIDEO_controller_tb();
 
 	wire [10:0] video_overlay_x;
 	wire [10:0] video_overlay_y;
-	wire [31:0] video_overlay_data;
+	wire [7:0] video_overlay_data;
 	wire video_overlay_mask;
 
-	VIDEO_sprite video_sprite(
+	VIDEO_sprite #(
+		.WIDTH(16),
+		.HEIGHT(16)
+	) video_sprite (
 		.i_clock(clk),
 		.i_video_hblank(vga_hblank),
 		.i_video_vblank(vga_vblank),

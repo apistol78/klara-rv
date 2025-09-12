@@ -17,7 +17,7 @@ module VIDEO_sprite #(
 	input wire i_clock,
 
 	input wire i_request,
-	input wire [3:0] i_address,
+	input wire [15:0] i_address,
 	input wire [31:0] i_wdata,
 	output bit o_ready,
 
@@ -33,6 +33,9 @@ module VIDEO_sprite #(
 	bit [10:0] sprite_0_pos_y = 11'h0;
 	wire [7:0] sprite_0_overlay_data;
 	wire sprite_0_overlay_mask;
+	bit sprite_0_wd_request = 1'b0;
+	bit [9:0] sprite_0_wd_address;
+	bit [7:0] sprite_0_wd_wdata;
 
 	VIDEO_sprite_x #(
 		.WIDTH(WIDTH),
@@ -46,13 +49,19 @@ module VIDEO_sprite #(
 		.i_overlay_x(i_overlay_x),
 		.i_overlay_y(i_overlay_y),
 		.o_overlay_data(sprite_0_overlay_data),
-		.o_overlay_mask(sprite_0_overlay_mask)
+		.o_overlay_mask(sprite_0_overlay_mask),
+		.i_wd_request(sprite_0_wd_request),
+		.i_wd_address(sprite_0_wd_address),
+		.i_wd_wdata(sprite_0_wd_wdata)
 	);
 
 	bit [10:0] sprite_1_pos_x = 11'h0;
 	bit [10:0] sprite_1_pos_y = 11'h0;
 	wire [7:0] sprite_1_overlay_data;
 	wire sprite_1_overlay_mask;
+	bit sprite_1_wd_request = 1'b0;
+	bit [9:0] sprite_1_wd_address;
+	bit [7:0] sprite_1_wd_wdata;
 
 	VIDEO_sprite_x #(
 		.WIDTH(WIDTH),
@@ -66,7 +75,10 @@ module VIDEO_sprite #(
 		.i_overlay_x(i_overlay_x),
 		.i_overlay_y(i_overlay_y),
 		.o_overlay_data(sprite_1_overlay_data),
-		.o_overlay_mask(sprite_1_overlay_mask)
+		.o_overlay_mask(sprite_1_overlay_mask),
+		.i_wd_request(sprite_1_wd_request),
+		.i_wd_address(sprite_1_wd_address),
+		.i_wd_wdata(sprite_1_wd_wdata)
 	);
 
 	always_comb begin
@@ -84,14 +96,35 @@ module VIDEO_sprite #(
 	end
 
 	always_ff @(posedge i_clock) begin
+
 		o_ready <= 1'b0;
+
+		sprite_0_wd_request <= 1'b0;
+		sprite_1_wd_request <= 1'b0;
+
 		if (i_request) begin
-			case (i_address)
-				4'h0: sprite_0_pos_x <= i_wdata[10:0];
-				4'h1: sprite_0_pos_y <= i_wdata[10:0];
-				4'h2: sprite_1_pos_x <= i_wdata[10:0];
-				4'h3: sprite_1_pos_y <= i_wdata[10:0];
-			endcase
+
+			// pppp xxxx xxxx xxxx
+
+			if (i_address[15:12] == 4'h0) begin	// Registers
+				case (i_address[3:0])
+					4'h0: sprite_0_pos_x <= i_wdata[10:0];
+					4'h4: sprite_0_pos_y <= i_wdata[10:0];
+					4'h8: sprite_1_pos_x <= i_wdata[10:0];
+					4'hc: sprite_1_pos_y <= i_wdata[10:0];
+				endcase
+			end
+			else if (i_address[15:12] == 4'h1) begin	// Sprite 0 data
+				sprite_0_wd_request <= 1'b1;
+				sprite_0_wd_address <= i_address[11:2];
+				sprite_0_wd_wdata <= i_wdata[7:0];
+			end
+			else if (i_address[15:12] == 4'h2) begin	// Sprite 1 data
+				sprite_1_wd_request <= 1'b1;
+				sprite_1_wd_address <= i_address[11:2];
+				sprite_1_wd_wdata <= i_wdata[7:0];
+			end
+
 			o_ready <= 1'b1;
 		end
 	end

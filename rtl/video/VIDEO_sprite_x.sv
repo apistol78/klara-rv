@@ -24,7 +24,11 @@ module VIDEO_sprite_x #(
 	input wire [10:0] i_overlay_x,
 	input wire [10:0] i_overlay_y,
 	output bit [7:0] o_overlay_data,
-	output bit o_overlay_mask
+	output bit o_overlay_mask,
+
+	input wire i_wd_request,
+	input wire [9:0] i_wd_address,
+	input wire [7:0] i_wd_wdata
 );
 	typedef enum bit [4:0]
 	{
@@ -39,11 +43,13 @@ module VIDEO_sprite_x #(
 		o_overlay_mask = 1'b0;
 	end
 
+	// Signal when overlay X becomes zero.
 	bit [1:0] r_overlay_zero = 2'b00;
 	always_ff @(posedge i_clock) begin
 		r_overlay_zero <= { r_overlay_zero[0], i_overlay_x == 0 };
 	end
 
+	// Signal when line starts.
 	bit line_start;
 	always_comb begin
 		line_start =
@@ -51,18 +57,44 @@ module VIDEO_sprite_x #(
 			(r_overlay_zero == 2'b01);
 	end
 
-	state_t state = IDLE;
-	state_t next_state;
-
+	// Cast position to be signed.
 	bit signed [10:0] pos_x;
 	bit signed [10:0] pos_y;
-
-	bit [10:0] data_address;
 
 	always_comb begin
 		pos_x = i_pos_x;
 		pos_y = i_pos_y;
 	end
+
+	// Sprite pixel data.
+	bit data_request;
+	bit [9:0] data_address;
+	bit [7:0] data_rdata;
+
+	BRAM_1r1w #(
+		.WIDTH(8),
+		.SIZE(WIDTH * HEIGHT),
+		.ADDR_LSH(0)
+	) data (
+		.i_clock(i_clock),
+		.i_pa_request(data_request),
+		.i_pa_address({ 22'b0, data_address }),
+		.o_pa_rdata(data_rdata),
+		.o_pa_ready(),
+		.i_pb_request(i_wd_request),
+		.i_pb_address({ 22'b0, i_wd_address }),
+		.i_pb_wdata(i_wd_wdata),
+		.o_pb_ready()
+	);
+
+	// Calculate sprite pixel address.
+	always_comb begin
+		data_address = (i_overlay_x - i_pos_x) + (i_overlay_y - i_pos_y) * WIDTH;
+	end
+
+	// State machine.
+	state_t state = IDLE;
+	state_t next_state;
 
 	always_ff @(posedge i_clock) begin
 		state <= next_state;
@@ -71,8 +103,9 @@ module VIDEO_sprite_x #(
 	always_comb begin
 
 		next_state = state;
+		data_request = (next_state == OUT_LINE);
 
-		o_overlay_data = 8'h00;
+		o_overlay_data = data_rdata;
 		o_overlay_mask = 1'b0;
 
 		if (line_start) begin
@@ -96,7 +129,6 @@ module VIDEO_sprite_x #(
 			
 			OUT_LINE: begin
 				if ($signed(i_overlay_x) < pos_x + WIDTH) begin
-					o_overlay_data = 8'h02;
 					o_overlay_mask = 1'b1;
 				end
 				else begin

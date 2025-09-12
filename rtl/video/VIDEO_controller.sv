@@ -90,7 +90,7 @@ module VIDEO_controller #(
 
 		// Video read port.
 		.i_pa_request(1'b1),
-		.i_pa_address(palette_video_address),
+		.i_pa_address({ 24'h0, palette_video_address }),
 		.o_pa_rdata(palette_video_rdata),
 		.o_pa_ready(),
 
