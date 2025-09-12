@@ -16,3 +16,7 @@ void hal_sprite_set_position(int32_t index, int32_t x, int32_t y)
 	s[0] = x;
 	s[1] = y;
 }
+
+void hal_sprite_set_bits(int32_t index, const void* bits)
+{
+}

@@ -10,7 +10,10 @@
 `timescale 1ns/1ns
 `default_nettype none
 
-module VIDEO_sprite(
+module VIDEO_sprite #(
+	parameter WIDTH,
+	parameter HEIGHT
+) (
 	input wire i_clock,
 
 	input wire i_request,
@@ -31,7 +34,10 @@ module VIDEO_sprite(
 	wire [7:0] sprite_0_overlay_data;
 	wire sprite_0_overlay_mask;
 
-	VIDEO_sprite_x sprite_0(
+	VIDEO_sprite_x #(
+		.WIDTH(WIDTH),
+		.HEIGHT(HEIGHT)
+	) sprite_0 (
 		.i_clock(i_clock),
 		.i_pos_x(sprite_0_pos_x),
 		.i_pos_y(sprite_0_pos_y),
@@ -48,7 +54,10 @@ module VIDEO_sprite(
 	wire [7:0] sprite_1_overlay_data;
 	wire sprite_1_overlay_mask;
 
-	VIDEO_sprite_x sprite_1(
+	VIDEO_sprite_x #(
+		.WIDTH(WIDTH),
+		.HEIGHT(HEIGHT)
+	) sprite_1 (
 		.i_clock(i_clock),
 		.i_pos_x(sprite_1_pos_x),
 		.i_pos_y(sprite_1_pos_y),

@@ -134,14 +134,13 @@ Audio::Audio()
 bool Audio::writeU32(uint32_t address, uint32_t value)
 {
 	WrappedAudioBuffer* wab = (WrappedAudioBuffer*)m_audioBuffer.ptr();
-
 	if (address == 0x0)
 	{
 		wab->write(value);
 	}
 	else if (address == 0x4)
 	{
-		const uint32_t rate = 100000000 / value;
+		const uint32_t rate = 100000000 / (2ULL * 256ULL * (uint64_t)value);
 		log::info << L"[AUDIO] play back rate " << rate << Endl;
 		wab->setRate(rate);
 	}
@@ -157,7 +156,13 @@ bool Audio::writeU32(uint32_t address, uint32_t value)
 uint32_t Audio::readU32(uint32_t address) const
 {
 	WrappedAudioBuffer* wab = (WrappedAudioBuffer*)m_audioBuffer.ptr();
-	return wab->queued();
+	if (address == 0x0)
+		return wab->queued();
+	else
+	{
+		log::error << L"[AUDIO] attempt read from unknown address " << str(L"0x%08x", address) << L"." << Endl;
+		return 0;
+	}
 }
 
 bool Audio::tick(ICPU* cpu, Bus* bus)

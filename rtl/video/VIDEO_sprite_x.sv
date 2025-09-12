@@ -10,7 +10,10 @@
 `timescale 1ns/1ns
 `default_nettype none
 
-module VIDEO_sprite_x(
+module VIDEO_sprite_x #(
+	parameter WIDTH,
+	parameter HEIGHT
+) (
 	input wire i_clock,
 
 	input wire [10:0] i_pos_x,
@@ -53,8 +56,6 @@ module VIDEO_sprite_x(
 
 	bit signed [10:0] pos_x;
 	bit signed [10:0] pos_y;
-	bit [7:0] width = 16;
-	bit [7:0] height = 16;
 
 	bit [10:0] data_address;
 
@@ -77,7 +78,7 @@ module VIDEO_sprite_x(
 		if (line_start) begin
 			if (
 				$signed(i_overlay_y) >= pos_y &&
-				$signed(i_overlay_y) < pos_y + height
+				$signed(i_overlay_y) < pos_y + HEIGHT
 			) begin
 				next_state = WAIT_X;
 			end
@@ -94,7 +95,7 @@ module VIDEO_sprite_x(
 			end
 			
 			OUT_LINE: begin
-				if ($signed(i_overlay_x) < pos_x + width) begin
+				if ($signed(i_overlay_x) < pos_x + WIDTH) begin
 					o_overlay_data = 8'h02;
 					o_overlay_mask = 1'b1;
 				end

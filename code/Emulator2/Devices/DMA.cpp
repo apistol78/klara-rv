@@ -65,7 +65,10 @@ uint32_t DMA::readU32(uint32_t address) const
 	else if (address == 12)
 		return (!m_tasks.empty()) ? 1 : 0;
 	else
+	{
+		log::error << L"[DMA] attempt read from unknown address " << str(L"0x%08x", address) << L"." << Endl;
 		return 0;
+	}
 }
 
 bool DMA::tick(ICPU* cpu, Bus* bus)
