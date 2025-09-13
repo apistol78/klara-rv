@@ -171,7 +171,7 @@ module WriteBuffer #(
 			PROCESS_REQUEST: begin
 				o_bus_request = 1'b1;
 				o_bus_rw = 1'b1;
-				o_bus_address = wq_rdata[ADDRESS_WIDTH - 1:32];
+				o_bus_address = wq_rdata[(32 + ADDRESS_WIDTH) - 1:32];
 				o_bus_wdata = wq_rdata[31:0];
 
 				// We need to terminate request, ie no bus request for
