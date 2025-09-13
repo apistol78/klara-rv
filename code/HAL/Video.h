@@ -34,3 +34,5 @@ EXTERN_C void* hal_video_get_primary_target();
 EXTERN_C void* hal_video_get_secondary_target();
 
 EXTERN_C void hal_video_present();
+
+EXTERN_C uint32_t hal_video_get_frame_counter();

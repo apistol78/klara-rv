@@ -227,6 +227,11 @@ module VIDEO_controller #(
 					vram_use_palette <= |i_cpu_wdata;
 				end
 			end
+			else begin
+				if (i_cpu_address[4:2] == 3'd6) begin
+					o_cpu_rdata <= frame_counter;
+				end
+			end
 			o_cpu_ready <= 1'b1;
 			state <= WAIT_REQUEST_END;
 		end

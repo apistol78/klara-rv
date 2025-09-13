@@ -111,3 +111,9 @@ void hal_video_present()
 	volatile uint32_t* control = (volatile uint32_t*)VIDEO_CONTROL_BASE;
 	control[0] = s_visible_offset;
 }
+
+uint32_t hal_video_get_frame_counter()
+{
+	volatile uint32_t* control = (volatile uint32_t*)VIDEO_CONTROL_BASE;
+	return control[6];
+}
