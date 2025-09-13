@@ -107,12 +107,16 @@ module VIDEO_controller #(
 	bit wb_rw;
 	bit wb_request;
 	wire wb_ready;
-	bit [31:0] wb_address;
+	bit [24:0] wb_address;
 	wire [31:0] wb_rdata;
 	bit [31:0] wb_wdata;
 
+	wire [24:0] vram_pa_address;
+	assign o_vram_pa_address = { 8'h0, vram_pa_address };
+
 	WriteBuffer #(
-		.DEPTH(4096),
+		.DEPTH(1024),
+		.ADDRESS_WIDTH(24),
 		.STALL_READ(0)
 	) wb(
 		.i_reset(1'b0),
@@ -124,7 +128,7 @@ module VIDEO_controller #(
 		.o_bus_rw(o_vram_pa_rw),
 		.o_bus_request(o_vram_pa_request),
 		.i_bus_ready(i_vram_pa_ready),
-		.o_bus_address(o_vram_pa_address),
+		.o_bus_address(vram_pa_address),
 		.i_bus_rdata(i_vram_pa_rdata),
 		.o_bus_wdata(o_vram_pa_wdata),
 
@@ -139,7 +143,7 @@ module VIDEO_controller #(
 	initial begin
 		wb_rw = 1'b0;
 		wb_request = 1'b0;
-		wb_address = 32'h0;
+		wb_address = 24'h0;
 		wb_wdata = 32'h0;
 	end
 
@@ -175,7 +179,7 @@ module VIDEO_controller #(
 					state <= ACCESS_CONTROL;
 				end
 				else begin
-					wb_address <= { 8'b0, i_cpu_address[23:0] };
+					wb_address <= i_cpu_address[23:0];
 					wb_rw <= i_cpu_rw;
 					wb_wdata <= i_cpu_wdata;
 					wb_request <= 1'b1;

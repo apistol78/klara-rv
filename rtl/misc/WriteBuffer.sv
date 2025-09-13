@@ -12,6 +12,7 @@
 
 module WriteBuffer #(
 	parameter DEPTH,
+	parameter ADDRESS_WIDTH,
 	parameter STALL_READ	//!< If set then any read request will stall until fifo is empty.
 )(
 	input wire i_reset,
@@ -25,7 +26,7 @@ module WriteBuffer #(
 	output bit o_bus_rw,
 	output bit o_bus_request,
 	input wire i_bus_ready,
-	output bit [31:0] o_bus_address,
+	output bit [ADDRESS_WIDTH - 1:0] o_bus_address,
 	input wire [31:0] i_bus_rdata,
 	output bit [31:0] o_bus_wdata,
 
@@ -33,7 +34,7 @@ module WriteBuffer #(
 	input wire i_rw,
 	input wire i_request,
 	output bit o_ready,
-	input wire [31:0] i_address,
+	input wire [ADDRESS_WIDTH - 1:0] i_address,
 	output bit [31:0] o_rdata,
 	input wire [31:0] i_wdata
 );
@@ -50,14 +51,14 @@ module WriteBuffer #(
 	wire wq_empty;
 	wire wq_full;
 	bit wq_write = 1'b0;
-	bit [63:0] wq_wdata;
+	bit [(32 + ADDRESS_WIDTH) - 1:0] wq_wdata;
 	bit wq_read = 1'b0;
-	wire [63:0] wq_rdata;
+	wire [(32 + ADDRESS_WIDTH) - 1:0] wq_rdata;
 
 	generate if (DEPTH > 16) begin
 		FIFO_BRAM #(
 			.DEPTH(DEPTH),
-			.WIDTH(64)
+			.WIDTH(32 + ADDRESS_WIDTH)
 		) wq(
 			.i_reset(i_reset),
 			.i_clock(i_clock),
@@ -74,7 +75,7 @@ module WriteBuffer #(
 	generate if (DEPTH <= 16) begin
 		FIFO #(
 			.DEPTH(DEPTH),
-			.WIDTH(64)
+			.WIDTH(32 + ADDRESS_WIDTH)
 		) wq(
 			.i_clock(i_clock),
 			.o_empty(wq_empty),
@@ -114,13 +115,13 @@ module WriteBuffer #(
 		
 		next_state = state;
 
-		wq_wdata = 32'h0;
+		wq_wdata = 0;
 		wq_write = 1'b0;
 		wq_read = 1'b0;
 
 		o_bus_request = 1'b0;
 		o_bus_rw = 1'b0;
-		o_bus_address = 32'h0;
+		o_bus_address = 0;
 		o_bus_wdata = 32'h0;
 
 		o_rdata = i_bus_rdata;
@@ -170,7 +171,7 @@ module WriteBuffer #(
 			PROCESS_REQUEST: begin
 				o_bus_request = 1'b1;
 				o_bus_rw = 1'b1;
-				o_bus_address = wq_rdata[63:32];
+				o_bus_address = wq_rdata[ADDRESS_WIDTH - 1:32];
 				o_bus_wdata = wq_rdata[31:0];
 
 				// We need to terminate request, ie no bus request for
