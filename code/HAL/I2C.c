@@ -9,7 +9,7 @@
 #include "HAL/I2C.h"
 #include "HAL/Timer.h"
 
-// #define I2C_USE_V2
+#define I2C_USE_V2
 
 #define I2C_CTRL (volatile uint32_t*)(I2C_BASE)
 #define I2C_DATA (volatile uint32_t*)(I2C_BASE + 4)
