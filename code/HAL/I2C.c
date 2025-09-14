@@ -9,6 +9,8 @@
 #include "HAL/I2C.h"
 #include "HAL/Timer.h"
 
+#include <stdio.h>
+
 #define I2C_USE_V2
 
 #define I2C_CTRL (volatile uint32_t*)(I2C_BASE)
@@ -205,11 +207,15 @@ int32_t hal_i2c_write(uint8_t deviceAddr, uint8_t controlAddr, uint8_t controlDa
 	hal_i2c_stop();
 #else
 
+	hal_i2c_wait_until_idle();
+
 	*I2C_CTRL = 
 		((uint32_t)controlData << 24) |
 		((uint32_t)controlAddr << 16) |
 		((uint32_t)deviceAddr << 8) |
 		0x02;
+
+	hal_i2c_wait_until_idle();
 
 #endif
 	return 0;
@@ -228,6 +234,8 @@ int32_t hal_i2c_read(uint8_t deviceAddr, uint8_t controlAddr, uint8_t* outContro
 		outControlData[i] = hal_i2c_rx((i < nbytes - 1) ? 1 : 0);  // read
 	hal_i2c_stop();
 #else
+
+	hal_i2c_wait_until_idle();
 
 	*I2C_CTRL = 
 		((uint32_t)nbytes << 24) |

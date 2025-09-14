@@ -89,6 +89,7 @@ module I2C_v2 #(
 		S_I2C_RX_1,
 		S_I2C_RX_2,
 		S_I2C_RX_3,
+		S_I2C_RX_3_1,
 		S_I2C_RX_4,
 		S_I2C_RX_5,
 		S_I2C_RX_6,
@@ -102,6 +103,7 @@ module I2C_v2 #(
 		S_I2C_TX_ADDR_7,
 		S_I2C_TX_ADDR_8,
 		S_I2C_TX_ADDR_9,
+		S_I2C_TX_ADDR_9_1,
 		S_I2C_TX_DATA_0,	// 40
 		S_I2C_TX_DATA_1,
 		S_I2C_TX_DATA_2,
@@ -109,6 +111,7 @@ module I2C_v2 #(
 		S_I2C_TX_DATA_4,
 		S_I2C_TX_DATA_5,
 		S_I2C_TX_DATA_6,
+		S_I2C_TX_DATA_6_1,
 		WAIT_DELAY,			// 47
 		WAIT_DELAY_I
 	}
@@ -177,23 +180,25 @@ module I2C_v2 #(
 	state_t i2c_rx_rs;
 	bit i2c_rx_ack;							//!< Input
 	bit [7:0] i2c_rx_data;					//!< Output
-	bit [3:0] i2c_rx_counter;
+	bit [4:0] i2c_rx_counter;
 
 	state_t i2c_tx_addr_rs;
 	bit [6:0] i2c_tx_addr_device_address;	//!< Input
 	bit i2c_tx_addr_device_read;			//!< Input
 	bit i2c_tx_addr_ack;					//!< Output
-	bit [3:0] i2c_tx_addr_counter;
+	bit [4:0] i2c_tx_addr_counter;
 
 	state_t i2c_tx_data_rs;
 	bit [7:0] i2c_tx_data_data;				//!< Input
 	bit i2c_tx_data_ack;					//!< Output
-	bit [3:0] i2c_tx_data_counter;
+	bit [4:0] i2c_tx_data_counter;
 
 	state_t dly_next_state;
 	bit [23:0] dly_count;
 
 	state_t state = IDLE;
+
+	bit [2:0] read_state = 0;
 
 	// CPU interface
 	// Receive commands and insert into queue.
@@ -217,14 +222,24 @@ module I2C_v2 #(
 					o_ready <= 1'b1;
 				end
 				else if (i_address == 2'd1) begin
-					if (!rx_queue_empty) begin
-						if (!rx_queue_read)
-							rx_queue_read <= 1'b1;
-						else begin
+
+					case (read_state)
+						0: begin
+							if (!rx_queue_empty) begin
+								rx_queue_read <= 1'b1;
+								read_state <= 1;
+							end
+						end
+						1: begin
+							rx_queue_read <= 1'b0;
+							read_state <= 2;
+						end
+						2: begin
 							o_rdata <= rx_queue_rdata;
 							o_ready <= 1'b1;
 						end
-					end
+
+					endcase
 				end
 			end
 			else begin
@@ -242,6 +257,7 @@ module I2C_v2 #(
 		end
 		else if (!i_request) begin
 			o_ready <= 1'b0;
+			read_state <= 0;
 		end
 	end
 
@@ -392,7 +408,8 @@ module I2C_v2 #(
 				$display("S_I2C_RX_0, ack %d", i2c_rx_ack);
 				sda_rw <= 1'b1;
 				sda_w <= 1'b1;
-				i2c_rx_counter <= 0;
+				i2c_rx_data <= 8'h0;
+				i2c_rx_counter <= 5'h0;
 				state <= S_I2C_RX_1;
 			end
 			S_I2C_RX_1: begin
@@ -400,25 +417,31 @@ module I2C_v2 #(
 				state <= S_I2C_RX_2;
 			end
 			S_I2C_RX_2: begin
-				if (scl <= 0)
-					state <= S_I2C_RX_1;
-				else begin
-					i2c_rx_counter <= i2c_rx_counter + 1;
-					`DLY_NEXT(S_I2C_RX_3);
-				end
+				// if (scl == 0)
+				// 	state <= S_I2C_RX_1;
+				// else begin
+				//	i2c_rx_counter <= i2c_rx_counter + 1;
+				// 	`DLY_NEXT(S_I2C_RX_3);
+				// end
+				i2c_rx_counter <= i2c_rx_counter + 5'h1;
+				`DLY_NEXT(S_I2C_RX_3);
 			end
 			S_I2C_RX_3: begin
 				sda_rw <= 1'b0;
+				state <= S_I2C_RX_3_1;
+			end
+			S_I2C_RX_3_1: begin
 				scl <= 1'b0;
 				i2c_rx_data <= { i2c_rx_data[6:0], sda_r };
-				if (i2c_rx_counter < 8)
+				if (i2c_rx_counter < 5'd8)
 					`DLY_NEXT(S_I2C_RX_1)
-				else
+				else begin
 					`DLY_NEXT(S_I2C_RX_4)
+				end
 			end
 			S_I2C_RX_4: begin
 				sda_rw <= 1'b1;
-				sda_w <= i2c_rx_ack;
+				sda_w <= ~i2c_rx_ack;
 				`DLY_NEXT(S_I2C_RX_5);
 			end
 			S_I2C_RX_5: begin
@@ -436,14 +459,14 @@ module I2C_v2 #(
 
 			S_I2C_TX_ADDR_0: begin
 				$display("S_I2C_TX_ADDR_0 device address %02x, read %d", i2c_tx_addr_device_address, i2c_tx_addr_device_read);
-				i2c_tx_addr_counter <= 0;
+				i2c_tx_addr_counter <= 5'h0;
 				state <= S_I2C_TX_ADDR_1;
 			end
 			S_I2C_TX_ADDR_1: begin
 				sda_rw <= 1'b1;
 				sda_w <= i2c_tx_addr_device_address[6];
 				i2c_tx_addr_device_address <= i2c_tx_addr_device_address << 1;
-				i2c_tx_addr_counter <= i2c_tx_addr_counter + 1;
+				i2c_tx_addr_counter <= i2c_tx_addr_counter + 5'h1;
 				`DLY_NEXT(S_I2C_TX_ADDR_2);
 			end
 			S_I2C_TX_ADDR_2: begin
@@ -452,7 +475,7 @@ module I2C_v2 #(
 			end
 			S_I2C_TX_ADDR_3: begin
 				scl <= 1'b0;
-				if (i2c_tx_addr_counter < 7)
+				if (i2c_tx_addr_counter < 5'h7)
 					`DLY_NEXT(S_I2C_TX_ADDR_1)
 				else
 					`DLY_NEXT(S_I2C_TX_ADDR_4)
@@ -481,6 +504,9 @@ module I2C_v2 #(
 			end
 			S_I2C_TX_ADDR_9: begin
 				sda_rw <= 1'b0;
+				state <= S_I2C_TX_ADDR_9_1;
+			end
+			S_I2C_TX_ADDR_9_1: begin
 				i2c_tx_addr_ack <= sda_r;
 				scl <= 1'b0;
 				`DLY_NEXT(i2c_tx_addr_rs);
@@ -489,7 +515,7 @@ module I2C_v2 #(
 			// I2C_TX_DATA
 
 			S_I2C_TX_DATA_0: begin
-				$display("S_I2C_TX_DATA_0 data %02x", i2c_tx_data_data);
+				$display("S_I2C_TX_DAT5'hA_0 data %02x", i2c_tx_data_data);
 				i2c_tx_data_counter <= 0;
 				state <= S_I2C_TX_DATA_1;
 			end
@@ -497,7 +523,7 @@ module I2C_v2 #(
 				sda_rw <= 1'b1;
 				sda_w <= i2c_tx_data_data[7];
 				i2c_tx_data_data <= i2c_tx_data_data << 1;
-				i2c_tx_data_counter <= i2c_tx_data_counter + 1;
+				i2c_tx_data_counter <= i2c_tx_data_counter + 5'h1;
 				`DLY_NEXT(S_I2C_TX_DATA_2);
 			end
 			S_I2C_TX_DATA_2: begin
@@ -506,7 +532,7 @@ module I2C_v2 #(
 			end
 			S_I2C_TX_DATA_3: begin
 				scl <= 1'b0;
-				if (i2c_tx_data_counter < 8)
+				if (i2c_tx_data_counter < 5'h8)
 					`DLY_NEXT(S_I2C_TX_DATA_1)
 				else
 					`DLY_NEXT(S_I2C_TX_DATA_4)
@@ -522,6 +548,9 @@ module I2C_v2 #(
 			end
 			S_I2C_TX_DATA_6: begin
 				sda_rw <= 1'b0;
+				state <= S_I2C_TX_DATA_6_1;
+			end
+			S_I2C_TX_DATA_6_1: begin
 				i2c_tx_data_ack <= sda_r;
 				scl <= 1'b0;
 				`DLY_NEXT(i2c_tx_data_rs);
