@@ -9,7 +9,10 @@
 #include "HAL/I2C.h"
 #include "HAL/Timer.h"
 
+// #define I2C_USE_V2
+
 #define I2C_CTRL (volatile uint32_t*)(I2C_BASE)
+#define I2C_DATA (volatile uint32_t*)(I2C_BASE + 4)
 
 #define I2C_RD_SDA() \
 	((*I2C_CTRL & 1) == 1)
@@ -174,18 +177,47 @@ static uint8_t NO_OPTIMIZE hal_i2c_tx_data(uint8_t d)
 	return b;
 }
 
+#if defined(I2C_USE_V2)
+static void hal_i2c_wait_until_idle()
+{
+	#define I2C_STATUS_RX_QUEUE_FULL	0x00000001
+	#define I2C_STATUS_RX_QUEUE_EMPTY	0x00000002
+	#define I2C_STATUS_CMD_QUEUE_FULL	0x00000004
+	#define I2C_STATUS_CMD_QUEUE_EMPTY	0x00000008
+	#define I2C_STATUS_CMD_QUEUE_BUSY	0x00000010
+
+	for (;;)
+	{
+		const uint32_t status = *I2C_CTRL;
+		if ((status & I2C_STATUS_CMD_QUEUE_BUSY) == 0)
+			break;
+	}
+}
+#endif
+
 int32_t hal_i2c_write(uint8_t deviceAddr, uint8_t controlAddr, uint8_t controlData)
 {
+#if !defined(I2C_USE_V2)
 	hal_i2c_start();
 	hal_i2c_tx_addr(deviceAddr, 7, 0);
 	hal_i2c_tx_data(controlAddr);
 	hal_i2c_tx_data(controlData);
 	hal_i2c_stop();
+#else
+
+	*I2C_CTRL = 
+		((uint32_t)controlData << 24) |
+		((uint32_t)controlAddr << 16) |
+		((uint32_t)deviceAddr << 8) |
+		0x02;
+
+#endif
 	return 0;
 }
 
 int32_t hal_i2c_read(uint8_t deviceAddr, uint8_t controlAddr, uint8_t* outControlData, uint8_t nbytes)
 {
+#if !defined(I2C_USE_V2)
 	hal_i2c_start();
 	hal_i2c_tx_addr(deviceAddr, 7, 0);
 	hal_i2c_tx_data(controlAddr);
@@ -195,6 +227,19 @@ int32_t hal_i2c_read(uint8_t deviceAddr, uint8_t controlAddr, uint8_t* outContro
 	for (uint8_t i = 0; i < nbytes; ++i)
 		outControlData[i] = hal_i2c_rx((i < nbytes - 1) ? 1 : 0);  // read
 	hal_i2c_stop();
+#else
 
+	*I2C_CTRL = 
+		((uint32_t)nbytes << 24) |
+		((uint32_t)controlAddr << 16) |
+		((uint32_t)deviceAddr << 8) |
+		0x01;
+
+	hal_i2c_wait_until_idle();
+
+	for (uint8_t i = 0; i < nbytes; ++i)
+		outControlData[i] = *I2C_DATA;
+
+#endif
 	return 0;
 }

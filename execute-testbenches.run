@@ -14,9 +14,10 @@ local TESTBENCHES =
 	-- { "rtl/uart/UART_TX_tb.sv", "rtl/uart/UART_TX.sv", "rtl/fifo/FIFO.sv" },
 	-- { "rtl/uart/UART_tb.sv", "rtl/uart/UART.sv", "rtl/uart/UART_RX.sv", "rtl/uart/UART_TX.sv", "rtl/fifo/FIFO.sv" },
 	-- { "rtl/video/VIDEO_VGA_tb.sv", "rtl/video/VIDEO_VGA.sv" },
-	{ "rtl/video/VIDEO_controller_tb.sv", "rtl/video/VIDEO_controller.sv", "rtl/video/VIDEO_sprite.sv", "rtl/video/VIDEO_VGA.sv", "rtl/misc/DualPort.sv", "rtl/misc/WriteBuffer.sv", "rtl/fifo/FIFO_BRAM.sv", "rtl/block/BRAM_1r1w.sv", "rtl/block/BRAM.sv" },
+	-- { "rtl/video/VIDEO_controller_tb.sv", "rtl/video/VIDEO_controller.sv", "rtl/video/VIDEO_sprite.sv", "rtl/video/VIDEO_sprite_x.sv", "rtl/video/VIDEO_VGA.sv", "rtl/misc/DualPort.sv", "rtl/misc/WriteBuffer.sv", "rtl/fifo/FIFO_BRAM.sv", "rtl/block/BRAM_1r1w.sv", "rtl/block/BRAM.sv" },
 	-- { "rtl/misc/XBAR_2_2_tb.sv", "rtl/misc/XBAR_2_2.sv", "rtl/block/BRAM.sv" },
 	-- { "rtl/misc/BusX_tb.sv", "rtl/misc/BusX.sv" },
+	{ "rtl/i2c/I2C_v2_tb.sv", "rtl/i2c/I2C_v2.sv", "rtl/fifo/FIFO.sv" },
 }
 
 function main()
