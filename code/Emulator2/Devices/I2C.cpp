@@ -19,10 +19,10 @@ T_IMPLEMENT_RTTI_CLASS(L"I2C.ISlave", I2C::ISlave, Object)
 
 bool I2C::writeU32(uint32_t address, uint32_t value)
 {
-	const uint8_t dir = (value >> 24);
-	const uint8_t deviceAddr = (value >> 16) & 255;
-	const uint8_t controlAddr = (value >> 8) & 255;
-	const uint8_t controlDataOrCount = value & 255;
+	const uint8_t dir = value & 0xff;
+	const uint8_t deviceAddr = (value >> 8) & 0xff;
+	const uint8_t controlAddr = (value >> 16) & 0xff;
+	const uint8_t controlDataOrCount = (value >> 24) & 0xff;
 
 	ISlave* slave = m_slaves[deviceAddr];
 	if (!slave)
@@ -31,11 +31,11 @@ bool I2C::writeU32(uint32_t address, uint32_t value)
 		return true;
 	}
 
-	if (dir == 0x00)	// write
+	if (dir == 0x02)	// write
 	{
 		slave->write(controlAddr, controlDataOrCount);
 	}
-	else if (dir == 0x01 && controlDataOrCount < 16)	// read
+	else if (dir == 0x01)	// read
 	{
 		uint8_t data[16];
 		slave->read(controlAddr, controlDataOrCount, data);
@@ -53,14 +53,21 @@ bool I2C::writeU32(uint32_t address, uint32_t value)
 
 uint32_t I2C::readU32(uint32_t address) const
 {
-	if (!m_data.empty())
+	if (address == 0)	// status
 	{
-		const uint8_t value = m_data.front();
-		m_data.pop_front();
-		return value;
+		return m_data.empty() ? 0x00000002 : 0x00000000;
 	}
-	else
-		return 0;
+	else	// read
+	{
+		if (!m_data.empty())
+		{
+			const uint8_t value = m_data.front();
+			m_data.pop_front();
+			return value;
+		}
+		else
+			return 0;
+	}
 }
 
 bool I2C::tick(ICPU* cpu, Bus* bus)

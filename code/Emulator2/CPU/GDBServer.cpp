@@ -320,7 +320,9 @@ bool GDBServer::tick(ICPU* cpu, Bus* bus)
 void GDBServer::setMode(int32_t mode)
 {
 	if (mode != m_mode && mode == ModeStopped)
+	{
+		log::info << L"[GDB] Mode changed to " << (int32_t)mode << Endl;
 		send(m_clientSocket, "S02");	// sigint
-
+	}
 	m_mode = mode;
 }

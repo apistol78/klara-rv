@@ -46,5 +46,6 @@ private:
 	uint32_t m_skipV = 0;
 	uint32_t m_usePalette = 0;
 	uint32_t m_readOffset = 0;
+	uint32_t m_frameCounter = 0;
 	traktor::Ref< traktor::drawing::Image > m_image;
 };

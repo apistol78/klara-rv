@@ -84,7 +84,11 @@ bool Video::writeU32(uint32_t address, uint32_t value)
 
 uint32_t Video::readU32(uint32_t address) const
 {
-	if (address < m_framebuffer.size())
+	if ((address & 0x00f000ff) == 0x00f00018)
+	{
+		return m_frameCounter;
+	}
+	else if (address < m_framebuffer.size())
 		return *(uint32_t*)&m_framebuffer[address];
 	else
 	{
@@ -137,6 +141,8 @@ drawing::Image* Video::getImage()
 		else
 			dst += m_displayWidth;
 	}
+
+	m_frameCounter++;
 
 	return m_image;
 }
