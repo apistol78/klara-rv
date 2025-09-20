@@ -57,7 +57,7 @@ uint32_t I2C::readU32(uint32_t address) const
 	{
 		return m_data.empty() ? 0x00000002 : 0x00000000;
 	}
-	else	// read
+	else if (address == 4)	// read
 	{
 		if (!m_data.empty())
 		{
@@ -67,6 +67,14 @@ uint32_t I2C::readU32(uint32_t address) const
 		}
 		else
 			return 0;
+	}
+	else if (address == 8)	// queued
+	{
+		return 0;
+	}
+	else if (address == 12)	// retired
+	{
+		return 0;
 	}
 }
 
