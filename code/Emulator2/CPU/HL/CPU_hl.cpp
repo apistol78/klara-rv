@@ -201,7 +201,6 @@ CPU_hl::CPU_hl(Bus* bus, OutputStream* trace, bool twoWayICache)
 ,	m_trace(trace)
 ,   m_pc(0x00000000)
 ,	m_retiredPC(0x00000000)
-,	m_interrupt(0)
 ,	m_waitForInterrupt(false)
 ,	m_cycles(0)
 {
@@ -227,7 +226,7 @@ bool CPU_hl::tick(uint32_t count)
 {
 	// Check if CPU in low power mode and
 	// are waiting for interrupt.
-	if (m_waitForInterrupt && m_interrupt == 0)
+	if (m_waitForInterrupt && readCSR(CSR::MIP) == 0)
 		return true;
 
 	for (uint32_t i = 0; i < count; ++i)
@@ -238,21 +237,16 @@ bool CPU_hl::tick(uint32_t count)
 		if (mie)
 		{
 			const uint32_t mie = readCSR(CSR::MIE);
-			const uint32_t mask =
-				((mie & 0b000000000001000) ? SOFT : 0) |
-				((mie & 0b000000010000000) ? TIMER : 0) |
-				((mie & 0b000100000000000) ? EXTERNAL : 0);
-
-			const uint32_t pending = m_interrupt & mask;
-			if (pending != 0)
+			uint32_t mip = readCSR(CSR::MIP);
+			if ((mip & mie) != 0)
 			{
 				writeCSR(CSR::MEPC, m_pc);
-
-				if ((pending & TIMER) != 0)
+			
+				if ((mip & 0x80) != 0)
 					writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 7));	// Timer
-				else if ((pending & EXTERNAL) != 0)
+				else if ((mip & 0x800) != 0)
 					writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 11));	// External
-				else if ((pending & SOFT) != 0)
+				else if ((mip & 0x8) != 0)
 					writeCSR(CSR::MCAUSE, 0x00000000 | (1 << 11));	// Software
 
 				// Push MIE and then disable interrupts.
@@ -268,12 +262,14 @@ bool CPU_hl::tick(uint32_t count)
 				const uint32_t mtvec = readCSR(CSR::MTVEC);
 				m_pc = mtvec;
 
-				if ((pending & TIMER) != 0)
-					m_interrupt &= ~TIMER;
-				else if ((pending & EXTERNAL) != 0)
-					m_interrupt &= ~EXTERNAL;
-				else if ((pending & SOFT) != 0)
-					m_interrupt &= ~SOFT;
+				if ((mip & 0x80) != 0)
+					mip &= ~0x80;
+				else if ((mip & 0x800) != 0)
+					mip &= ~0x800;
+				else if ((mip & 0x8) != 0)
+					mip &= ~0x8;
+
+				writeCSR(CSR::MIP, mip);
 
 				m_waitForInterrupt = false;
 			}
@@ -322,7 +318,12 @@ bool CPU_hl::tick(uint32_t count)
 
 void CPU_hl::interrupt(uint32_t mask)
 {
-	m_interrupt |= mask;
+	if (mask & SOFT)
+		m_csr[CSR::MIP] |= 0x8;
+	if (mask & TIMER)
+		m_csr[CSR::MIP] |= 0x80;
+	if (mask & EXTERNAL)
+		m_csr[CSR::MIP] |= 0x800;
 }
 
 void CPU_hl::flushCaches()
@@ -335,7 +336,6 @@ void CPU_hl::flushCaches()
 void CPU_hl::setPC(uint32_t value)
 {
 	m_pc = value;
-	m_interrupt = 0;
 	m_waitForInterrupt = false;
 	m_bus->reset();
 }

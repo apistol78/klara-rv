@@ -69,7 +69,6 @@ private:
 	uint32_t m_registers[32];
 	float m_flt_registers[32];
 	uint32_t m_csr[4096];
-	uint32_t m_interrupt;
 	uint64_t m_cycles;
 	bool m_waitForInterrupt;
 
