@@ -60,7 +60,6 @@ enum
 #define PLIC_COMPLETE_0	(volatile uint32_t*)(PLIC_BASE + 0x00200004)
 
 static irq_handler_t g_handlers[] = { 0, 0, 0, 0, 0, 0 };
-static uint32_t g_interrupt_enable = 0;
 
 #pragma GCC push_options
 #pragma GCC optimize ("align-functions=4")
@@ -134,12 +133,10 @@ irq_handler_t* hal_interrupt_get_handler(uint32_t source)
 
 void hal_interrupt_enable()
 {
-	if (g_interrupt_enable++ == 0)
-		hal_csr_set_bits_mstatus(MSTATUS_MIE_BIT_MASK);
+	hal_csr_set_bits_mstatus(MSTATUS_MIE_BIT_MASK);
 }
 
 void hal_interrupt_disable()
 {
-	if (--g_interrupt_enable == 0)
-		hal_csr_clr_bits_mstatus(MSTATUS_MIE_BIT_MASK);
+	hal_csr_clr_bits_mstatus(MSTATUS_MIE_BIT_MASK);
 }
