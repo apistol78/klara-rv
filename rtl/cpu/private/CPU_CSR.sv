@@ -52,9 +52,9 @@ module CPU_CSR #(
 
 	bit mstatus_mpie = 0;
 	bit mstatus_mie = 0;
-	bit mie_meie = 0; 
-	bit mie_mtie = 0;
-	bit mie_msie = 0;
+	bit mie_meie = 1'b1; 
+	bit mie_mtie = 1'b1;
+	bit mie_msie = 1'b1;
 	bit [31:0] mtvec = 0;
 	bit [31:0] mepc = 0;
 	bit [31:0] mcause = 0;
@@ -116,9 +116,9 @@ module CPU_CSR #(
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			mstatus_mie <= 0;
-			mie_meie <= 0;
-			mie_mtie <= 0;
-			mie_msie <= 0;
+			mie_meie <= 1'b1;
+			mie_mtie <= 1'b1;
+			mie_msie <= 1'b1;
 			mtvec <= 0;
 			mepc <= 0;
 			mcause <= 0;

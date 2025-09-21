@@ -88,12 +88,6 @@ static void hal_sd_dummy_delay(uint32_t clockCnt)
 			"nop	\n"
 			"nop	\n"
 			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
-			"nop	\n"
 		);		
 	}
 }
