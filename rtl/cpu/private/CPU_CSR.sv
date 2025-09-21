@@ -147,7 +147,7 @@ module CPU_CSR #(
 				else if (i_index == `CSR_MEPC)
 					mepc <= i_wdata;
 				else if (i_index == `CSR_MIP) begin
-					//mip_meip <= i_wdata[11];
+					mip_meip <= i_wdata[11];
 					mip_mtip <= i_wdata[7];
 					mip_msip <= i_wdata[3];
 				end
@@ -168,20 +168,24 @@ module CPU_CSR #(
 			if (!o_irq_pending && mstatus_mie) begin
 
 				// Handle in priority order; external interrupts have higest prio.
-				if (mip_meip) begin
+				if (mip_meip && mie_meie) begin
 					mcause <= 32'h80000000 | (1 << 11);					
 					issued <= 3'b010;
 				end
-				else if (mip_mtip) begin
+				else if (mip_mtip && mie_mtie) begin
 					mcause <= 32'h80000000 | (1 << 7);
 					issued <= 3'b001;
 				end
-				else if (mip_msip) begin
+				else if (mip_msip && mie_msie) begin
 					mcause <= 32'h00000000 | (1 << 11);					
 					issued <= 3'b100;
 				end
 
-				if (mip_mtip || mip_meip || mip_msip) begin
+				if (
+					(mip_meip && mie_meie) ||
+					(mip_mtip && mie_mtie) ||
+					(mip_msip && mie_msie)
+				) begin
 					o_irq_pending <= 1'b1;
 					o_irq_pc <= mtvec;
 
