@@ -20,6 +20,8 @@ class Image;
 
 }
 
+class Sprite;
+
 class Video : public IDevice
 {
 	T_RTTI_CLASS;
@@ -32,6 +34,8 @@ public:
 	virtual uint32_t readU32(uint32_t address) const override final;
 
 	virtual bool tick(ICPU* cpu, Bus* bus) override final;
+
+	void setSprite(Sprite* sprite);
 
 	traktor::drawing::Image* getImage();
 
@@ -47,5 +51,6 @@ private:
 	uint32_t m_usePalette = 0;
 	uint32_t m_readOffset = 0;
 	uint32_t m_frameCounter = 0;
+	traktor::Ref< Sprite > m_sprite;
 	traktor::Ref< traktor::drawing::Image > m_image;
 };

@@ -220,6 +220,8 @@ CPU_hl::CPU_hl(Bus* bus, OutputStream* trace, bool twoWayICache)
 
 	for (uint32_t i = 0; i < sizeof_array(m_csr); ++i)
 		m_csr[i] = 0x00000000;
+
+	writeCSR(CSR::MIP, 0x888);
 }
 
 bool CPU_hl::tick(uint32_t count)

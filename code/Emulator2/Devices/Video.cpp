@@ -16,6 +16,7 @@
 #include <Drawing/Image.h>
 #include <Drawing/PixelFormat.h>
 
+#include "Emulator2/Devices/Sprite.h"
 #include "Emulator2/Devices/Video.h"
 
 using namespace traktor;
@@ -102,6 +103,11 @@ bool Video::tick(ICPU* cpu, Bus* bus)
 	return true;
 }
 
+void Video::setSprite(Sprite* sprite)
+{
+	m_sprite = sprite;
+}
+
 drawing::Image* Video::getImage()
 {
 	uint32_t* dst = (uint32_t*)m_image->getData();
@@ -120,15 +126,23 @@ drawing::Image* Video::getImage()
 					const uint32_t rvx = vx >> ((m_skip & 1) ? 1 : 0);
 					const uint32_t rvy = vy >> ((m_skip & 2) ? 1 : 0);
 
-					if (!m_usePalette)
+					uint8_t overlay = 0;
+					if (m_sprite != nullptr && m_sprite->getOverlay(rvx, rvy, overlay))
 					{
-						const uint32_t value = *(const uint32_t*)&m_framebuffer[offset + (rvx + rvy * m_pitch) * 4];
-						*dst++ = value;
+						*dst++ = m_palette[overlay];
 					}
 					else
 					{
-						const uint8_t value = m_framebuffer[offset + rvx + rvy * m_pitch];
-						*dst++ = m_palette[value];
+						if (!m_usePalette)
+						{
+							const uint32_t value = *(const uint32_t*)&m_framebuffer[offset + (rvx + rvy * m_pitch) * 4];
+							*dst++ = value;
+						}
+						else
+						{
+							const uint8_t value = m_framebuffer[offset + rvx + rvy * m_pitch];
+							*dst++ = m_palette[value];
+						}
 					}
 
 					vx++;
