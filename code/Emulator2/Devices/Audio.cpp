@@ -77,7 +77,6 @@ public:
 	{
 		if (queued() >= 4096)
 		{
-			log::info << L"Stalling audio writing; not enough space in FIFO." << Endl;
 			while (queued() >= 4096)
 				ThreadManager::getInstance().getCurrentThread()->sleep(1);
 		}
@@ -140,8 +139,8 @@ bool Audio::writeU32(uint32_t address, uint32_t value)
 	}
 	else if (address == 0x4)
 	{
-		const uint32_t rate = 100000000 / (2ULL * 256ULL * (uint64_t)value);
-		log::info << L"[AUDIO] play back rate " << rate << Endl;
+		const uint32_t rate = 100000000 / (567ULL * (uint64_t)value);
+		log::info << L"[AUDIO] play back rate " << rate << L" (" << value << L")" << Endl;
 		wab->setRate(rate);
 	}
 	else
@@ -170,7 +169,7 @@ bool Audio::tick(ICPU* cpu, Bus* bus)
 	WrappedAudioBuffer* wab = (WrappedAudioBuffer*)m_audioBuffer.ptr();
 	const uint32_t q = wab->queued();
 
-	if (m_lastQ >= 2048 && q < 2048)
+	if (m_callback && m_lastQ >= 2048 && q < 2048)
 		m_callback();
 
 	m_lastQ = q;

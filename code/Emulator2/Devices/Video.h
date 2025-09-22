@@ -8,6 +8,8 @@
 */
 #pragma once
 
+#include <functional>
+
 #include <Core/Ref.h>
 #include <Core/Misc/AutoPtr.h>
 
@@ -39,6 +41,8 @@ public:
 
 	traktor::drawing::Image* getImage();
 
+	void setCallback(const std::function< void() >& callback);
+
 private:
 	traktor::AlignedVector< uint8_t > m_framebuffer;
 	uint32_t m_palette[256];
@@ -53,4 +57,6 @@ private:
 	uint32_t m_frameCounter = 0;
 	traktor::Ref< Sprite > m_sprite;
 	traktor::Ref< traktor::drawing::Image > m_image;
+	std::function< void() > m_callback;
+	bool m_trig = false;
 };

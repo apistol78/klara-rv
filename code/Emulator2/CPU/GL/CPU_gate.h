@@ -37,6 +37,8 @@ public:
 
 	virtual uint32_t getRegister(uint32_t index) const override final;
 
+	virtual uint32_t getCSR(uint16_t csr) const override final;
+
 private:
 	traktor::Ref< Bus > m_bus;
 	VCPU_top* m_tb = nullptr;

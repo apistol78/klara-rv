@@ -100,6 +100,11 @@ uint32_t Video::readU32(uint32_t address) const
 
 bool Video::tick(ICPU* cpu, Bus* bus)
 {
+	if (m_trig)
+	{
+		m_callback();
+		m_trig = false;
+	}
 	return true;
 }
 
@@ -157,6 +162,12 @@ drawing::Image* Video::getImage()
 	}
 
 	m_frameCounter++;
+	m_trig = true;
 
 	return m_image;
+}
+
+void Video::setCallback(const std::function< void() >& callback)
+{
+	m_callback = callback;
 }

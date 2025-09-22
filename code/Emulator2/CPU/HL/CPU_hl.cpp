@@ -221,7 +221,7 @@ CPU_hl::CPU_hl(Bus* bus, OutputStream* trace, bool twoWayICache)
 	for (uint32_t i = 0; i < sizeof_array(m_csr); ++i)
 		m_csr[i] = 0x00000000;
 
-	writeCSR(CSR::MIP, 0x888);
+	writeCSR(CSR::MSTATUS, 0x8);
 }
 
 bool CPU_hl::tick(uint32_t count)
@@ -234,11 +234,11 @@ bool CPU_hl::tick(uint32_t count)
 	for (uint32_t i = 0; i < count; ++i)
 	{
 		// Handle interrupts.
-		const uint32_t mstatus = readCSR(CSR::MSTATUS);
-		const bool mie = (bool)((mstatus & (1 << 3)) != 0);
-		if (mie)
+		uint32_t mstatus = readCSR(CSR::MSTATUS);
+		bool interruptsEnable = (bool)((mstatus & (1 << 3)) != 0);
+		if (interruptsEnable)
 		{
-			const uint32_t mie = readCSR(CSR::MIE);
+			const uint32_t mie = (readCSR(CSR::MIE) & 0x888);
 			uint32_t mip = readCSR(CSR::MIP);
 			if ((mip & mie) != 0)
 			{
@@ -252,13 +252,8 @@ bool CPU_hl::tick(uint32_t count)
 					writeCSR(CSR::MCAUSE, 0x00000000 | (1 << 11));	// Software
 
 				// Push MIE and then disable interrupts.
-				uint32_t mstatus = readCSR(CSR::MSTATUS);
-				const bool mie = (bool)((mstatus & (1 << 3)) != 0);
 				mstatus &= ~(1 << 3);
-				if (mie)
-					mstatus |= 1 << 4;
-				else
-					mstatus &= ~(1 << 4);
+				mstatus |= 1 << 4;
 				writeCSR(CSR::MSTATUS, mstatus);
 
 				const uint32_t mtvec = readCSR(CSR::MTVEC);
@@ -357,12 +352,23 @@ uint32_t CPU_hl::getRegister(uint32_t index) const
 	return m_registers[index];
 }
 
+uint32_t CPU_hl::getCSR(uint16_t csr) const
+{
+	return readCSR(csr);
+}
+
 void CPU_hl::reset()
 {
 	m_pc = 0x000000000;
+
 	for (uint32_t i = 0; i < sizeof_array(m_registers); ++i)
 		m_registers[i] = i;
-	m_registers[2] = 0x20110000;	
+	m_registers[2] = 0x20110000;
+
+	for (uint32_t i = 0; i < sizeof_array(m_csr); ++i)
+		m_csr[i] = 0x00000000;
+
+	writeCSR(CSR::MSTATUS, 0x8);
 }
 
 void CPU_hl::push(uint32_t value)

@@ -24,6 +24,8 @@
 
 using namespace traktor;
 
+#define T_GDB_LOG(x) // log::info << x << Endl;
+
 T_IMPLEMENT_RTTI_CLASS(L"GDBServer", GDBServer, IDevice)
 
 namespace
@@ -76,7 +78,7 @@ namespace
 		const char hex[] = "0123456789ABCDEF";
 		uint8_t cs = 0;
 
-		log::info << L"GDB; sending \"" << mbstows(msg) << L"\"" << Endl;
+		T_GDB_LOG(L"[GDB] sending \"" << mbstows(msg) << L"\"");
 
 		socket->send('+');
 		socket->send('$');
@@ -138,7 +140,7 @@ void GDBServer::process()
 			char ch;
 			if (m_clientSocket->recv(&ch, 1) <= 0)
 			{
-				log::info << L"GDB client disconnected." << Endl;
+				T_GDB_LOG(L"GDB client disconnected.");
 				safeClose(m_clientSocket);
 				m_mode = ModeRun;
 				continue;
@@ -167,7 +169,7 @@ void GDBServer::process()
 				uint8_t cs[2];
 				m_clientSocket->recv(cs, 2);
 
-				log::info << L"GDB, got message \"" << mbstows(msg) << L"\"" << Endl;
+				T_GDB_LOG(L"GDB, got message \"" << mbstows(msg) << L"\"");
 
 				// Process message.
 				if (msg[0] == '?')
@@ -213,7 +215,7 @@ void GDBServer::process()
 
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 1, "%x,%x", &addr, &len);
-					log::info << L"GDB; read " << len << L" bytes from " << str(L"%08x", addr) << Endl;
+					T_GDB_LOG(L"[GDB] read " << len << L" bytes from " << str(L"%08x", addr));
 					
 					StringOutputStream ss;
 					for (uint32_t i = 0; i < len; ++i)
@@ -231,7 +233,7 @@ void GDBServer::process()
 
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 1, "%x,%x", &addr, &len);
-					log::info << L"GDB; write " << len << L" bytes to " << str(L"%08x", addr) << Endl;
+					T_GDB_LOG(L"[GDB] write " << len << L" bytes to " << str(L"%08x", addr));
 
 					std::string hexdata = msg.substr(msg.find(':')+1);
 					for (uint32_t i = 0; i < len; i++)
@@ -296,7 +298,7 @@ void GDBServer::process()
 		{
 			m_clientSocket->setNoDelay(true);
 			m_clientSocket->setQuickAck(true);
-			log::info << L"GDB client connected." << Endl;
+			T_GDB_LOG(L"GDB client connected.");
 		}
 	}
 }
@@ -309,7 +311,7 @@ bool GDBServer::tick(ICPU* cpu, Bus* bus)
 		{
 			if (bp == m_cpu->getPC())
 			{
-				log::info << L"GDB; breakpoint hit." << Endl;
+				T_GDB_LOG(L"[GDB] breakpoint hit.");
 				setMode(ModeStopped);
 			}
 		}
@@ -321,7 +323,7 @@ void GDBServer::setMode(int32_t mode)
 {
 	if (mode != m_mode && mode == ModeStopped)
 	{
-		log::info << L"[GDB] Mode changed to " << (int32_t)mode << Endl;
+		T_GDB_LOG(L"[GDB] Mode changed to " << (int32_t)mode);
 		send(m_clientSocket, "S02");	// sigint
 	}
 	m_mode = mode;

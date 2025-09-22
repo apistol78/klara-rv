@@ -46,6 +46,8 @@ public:
 
 	virtual uint32_t getRegister(uint32_t index) const = 0;
 
+	virtual uint32_t getCSR(uint16_t csr) const = 0;
+
 	// Convenience
 
 	void jump(uint32_t address) { setPC(address); }

@@ -148,3 +148,8 @@ uint32_t CPU_gate::getRegister(uint32_t index) const
 {
 	return m_tb->rootp->CPU_top__DOT__cpu__DOT__registers__DOT__r[index];
 }
+
+uint32_t CPU_gate::getCSR(uint16_t csr) const
+{
+	return 0;
+}

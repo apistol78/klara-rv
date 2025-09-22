@@ -46,6 +46,8 @@ public:
 
 	virtual uint32_t getRegister(uint32_t index) const override final;
 
+	virtual uint32_t getCSR(uint16_t csr) const override final;
+
 	void reset();
 
 	void push(uint32_t value);
