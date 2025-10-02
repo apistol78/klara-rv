@@ -17,6 +17,8 @@
 #define SD_MODE_SW  0
 #define SD_MODE_HW  1
 
+EXTERN_C int32_t hal_sd_card_inserted();
+
 EXTERN_C int32_t hal_sd_init(int32_t mode);
 
 EXTERN_C int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen);

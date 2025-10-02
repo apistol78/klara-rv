@@ -77,7 +77,7 @@
 static int32_t s_mode = SD_MODE_SW;
 static int32_t s_dataBits = 1;
 
-#define SD_WAIT_SETUP() hal_sd_dummy_delay(1)
+#define SD_WAIT_SETUP() // hal_sd_dummy_delay(1)
 
 static void hal_sd_dummy_delay(uint32_t clockCnt)
 {
@@ -876,6 +876,14 @@ int32_t hal_sd_write_block512(uint32_t block, const uint8_t* buffer, uint32_t bu
 	// kernel_leave_critical();
 	// sysreg_modify(SR_REG_LEDS, 1, 0);
 	return bufferLen;
+}
+
+int32_t hal_sd_card_inserted()
+{
+	if (SD_RD_CARD())
+		return SD_RESULT_OK;
+	else
+		return SD_RESULT_NO_CARD;
 }
 
 int32_t hal_sd_init(int32_t mode)
