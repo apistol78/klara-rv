@@ -20,4 +20,6 @@ EXTERN_C uint32_t hal_dma_blit(uint32_t channel, void* dst, const void* src, uin
 
 EXTERN_C uint8_t hal_dma_is_busy(uint32_t channel);
 
+EXTERN_C uint8_t hal_dma_is_full(uint32_t channel);
+
 EXTERN_C uint32_t hal_dma_retired(uint32_t channel);

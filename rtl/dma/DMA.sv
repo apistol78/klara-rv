@@ -122,7 +122,12 @@ module DMA(
 					o_ready <= 1'b1;
 				end
 				else if (i_address == 2'd3) begin
-					o_rdata <= (!queue_empty || state != IDLE) ? 32'hffff_ffff : 32'h0000_0000;
+					o_rdata <=
+					{
+						30'h0,
+						queue_full,										// DMA full
+						(!queue_empty || state != IDLE) ? 1'b1 : 1'b0	// DMA busy
+					};
 					o_ready <= 1'b1;
 				end
 			end

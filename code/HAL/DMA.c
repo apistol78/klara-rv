@@ -57,7 +57,14 @@ uint32_t hal_dma_blit(uint32_t channel, void* dst, const void* src, uint32_t wid
 
 uint8_t hal_dma_is_busy(uint32_t channel)
 {
-	return (*DMA_RUN(channel) != 0) ? 1 : 0;
+	const uint32_t state = *DMA_RUN(channel);
+	return ((state & 1) != 0) ? 1 : 0;
+}
+
+uint8_t hal_dma_is_full(uint32_t channel)
+{
+	const uint32_t state = *DMA_RUN(channel);
+	return ((state & 2) != 0) ? 1 : 0;
 }
 
 uint32_t hal_dma_retired(uint32_t channel)
