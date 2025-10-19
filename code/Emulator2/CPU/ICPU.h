@@ -15,6 +15,7 @@ enum CSR
 	MSTATUS = 0x300,
 	MIE = 0x304,
 	MTVEC = 0x305,
+	MSCRATCH = 0x340,
 	MEPC = 0x341,
 	MCAUSE = 0x342,
 	MIP = 0x344
