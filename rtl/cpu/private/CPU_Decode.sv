@@ -120,8 +120,8 @@ module CPU_Decode(
 			end
 			else begin
 `endif
-			`define OP data.op
-			`include "private/generated/Instructions_decode_ops.sv"
+				`define OP data.op
+				`include "private/generated/Instructions_decode_ops.sv"
 `ifdef FPU_ENABLE
 			end
 `endif
