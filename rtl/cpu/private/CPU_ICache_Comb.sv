@@ -25,11 +25,7 @@ module CPU_ICache_Comb#(
 	output bit o_bus_request,
 	input wire i_bus_ready,
 	output wire [31:0] o_bus_address,
-	input wire [31:0] i_bus_rdata,
-
-	// Debug
-	output wire [31:0] o_hit,
-	output wire [31:0] o_miss
+	input wire [31:0] i_bus_rdata
 );
 
 	localparam RANGE = 1 << SIZE;
@@ -46,20 +42,6 @@ module CPU_ICache_Comb#(
 
 	bit [SIZE:0] clear_address = 0;
 	bit [SIZE:0] next_clear_address;
-
-	// Debug, only for verilated.
-`ifdef __VERILATOR__
-	bit [31:0] hit = 0;
-	bit [31:0] next_hit = 0;
-	bit [31:0] miss = 0;
-	bit [31:0] next_miss = 0;
-
-	assign o_hit = hit;
-	assign o_miss = miss;
-`else
-	assign o_hit = 0;
-	assign o_miss = 0;
-`endif
 
 	// Cache memory.
 	bit cache_rw;
@@ -91,11 +73,6 @@ module CPU_ICache_Comb#(
 	always_ff @(posedge i_clock) begin
 		state <= next;
 		clear_address <= next_clear_address;
-
-`ifdef __VERILATOR__
-		hit <= next_hit;
-		miss <= next_miss;
-`endif		
 	end
 	
 	always_comb begin
@@ -110,29 +87,16 @@ module CPU_ICache_Comb#(
 		cache_wdata = 0;
 		cache_pc = i_input_pc;
 
-`ifdef __VERILATOR__
-		next_hit = hit;
-		next_miss = miss;
-`endif
-
 		case (state)
 			READ_SETUP: begin
 				if (cache_rdata[31:0] == { i_input_pc[31:2], 2'b01 }) begin
 					o_ready = 1;
 					o_rdata = cache_rdata[63:32];
 					cache_pc = i_input_pc + 4;
-`ifdef __VERILATOR__
-					// \fixme I think this increase after a READ_BUS thus
-					// give false reading about hit rate.
-					next_hit = hit + 1;
-`endif
 				end
 				else begin
 					o_bus_request = 1;
 					next = READ_BUS;
-`ifdef __VERILATOR__
-					next_miss = miss + 1;
-`endif
 				end
 			end
 

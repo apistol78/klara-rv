@@ -37,11 +37,7 @@ module CPU_Fetch #(
 
 	// Output
 	input wire i_busy,
-	output fetch_data_t o_data,
-
-	// Debug
-	output wire [31:0] o_icache_hit,
-	output wire [31:0] o_icache_miss
+	output fetch_data_t o_data
 );
 
 	typedef enum bit [1:0]
@@ -79,11 +75,7 @@ module CPU_Fetch #(
 				.o_bus_request(o_bus_request),
 				.i_bus_ready(i_bus_ready),
 				.o_bus_address(o_bus_address),
-				.i_bus_rdata(i_bus_rdata),
-
-				// Debug
-				.o_hit(o_icache_hit),
-				.o_miss(o_icache_miss)
+				.i_bus_rdata(i_bus_rdata)
 			);
 		end
 	endgenerate
@@ -107,11 +99,7 @@ module CPU_Fetch #(
 				.o_bus_request(o_bus_request),
 				.i_bus_ready(i_bus_ready),
 				.o_bus_address(o_bus_address),
-				.i_bus_rdata(i_bus_rdata),
-
-				// Debug
-				.o_hit(o_icache_hit),
-				.o_miss(o_icache_miss)
+				.i_bus_rdata(i_bus_rdata)
 			);
 		end
 	endgenerate
@@ -134,11 +122,7 @@ module CPU_Fetch #(
 				.o_bus_request(o_bus_request),
 				.i_bus_ready(i_bus_ready),
 				.o_bus_address(o_bus_address),
-				.i_bus_rdata(i_bus_rdata),
-
-				// Debug
-				.o_hit(o_icache_hit),
-				.o_miss(o_icache_miss)
+				.i_bus_rdata(i_bus_rdata)
 			);
 		end
 	endgenerate

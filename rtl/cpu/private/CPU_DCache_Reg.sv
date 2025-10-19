@@ -33,11 +33,7 @@ module CPU_DCache_Reg #(
 	input wire [31:0] i_address,
 	output bit [31:0] o_rdata,
 	input wire [31:0] i_wdata,
-	input wire i_cacheable,
-
-	// Debug
-	output wire [31:0] o_hit,
-	output wire [31:0] o_miss
+	input wire i_cacheable
 );
 
 	localparam RANGE = 1 << SIZE;

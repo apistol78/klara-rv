@@ -60,10 +60,6 @@ module Verify(
 		.o_dbus_wdata(cpu_dbus_wdata),
 
 		// Debug
-		.o_icache_hit(),
-		.o_icache_miss(),
-		.o_dcache_hit(),
-		.o_dcache_miss(),
 		.o_execute_busy(),
 		.o_memory_busy(),
 		.o_fault(cpu_fault)

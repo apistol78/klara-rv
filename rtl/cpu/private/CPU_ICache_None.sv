@@ -24,11 +24,7 @@ module CPU_ICache_None(
 	output bit o_bus_request,
 	input wire i_bus_ready,
 	output wire [31:0] o_bus_address,
-	input wire [31:0] i_bus_rdata,
-
-	// Debug
-	output wire [31:0] o_hit,
-	output wire [31:0] o_miss
+	input wire [31:0] i_bus_rdata
 );
 
 	typedef enum bit [1:0]
@@ -39,10 +35,6 @@ module CPU_ICache_None(
 
 	state_t next = IDLE;
 	state_t state = IDLE;
-
-	// Debug, only for verilated.
-	assign o_hit = 0;
-	assign o_miss = 0;
 
 	assign o_bus_address = i_input_pc;
 	

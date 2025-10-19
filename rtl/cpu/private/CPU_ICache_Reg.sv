@@ -23,11 +23,7 @@ module CPU_ICache_Reg #(
 	output bit o_bus_request,
 	input wire i_bus_ready,
 	output bit [31:0] o_bus_address,
-	input wire [31:0] i_bus_rdata,
-
-	// Debug
-	output wire [31:0] o_hit,
-	output wire [31:0] o_miss
+	input wire [31:0] i_bus_rdata
 );
 	localparam RANGE = 1 << SIZE;
 	localparam SET_BITS = SIZE;
@@ -40,9 +36,6 @@ module CPU_ICache_Reg #(
 		bit [31:0] data;
 	}
 	cache_entry_t;
-
-	assign o_hit = 0;
-	assign o_miss = 0;
 
 	bit initialized = 1'b0;
 	bit [31:0] clear_set = 0;

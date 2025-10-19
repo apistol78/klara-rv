@@ -32,11 +32,7 @@ module CPU_Memory #(
 	input execute_data_t i_data,
 
 	// Output
-	output memory_data_t o_data,
-
-	// Debug
-	output wire [31:0] o_dcache_hit,
-	output wire [31:0] o_dcache_miss
+	output memory_data_t o_data
 );
 
 	typedef enum bit [2:0]
@@ -132,10 +128,7 @@ module CPU_Memory #(
 			.i_address(dcache_address),
 			.o_rdata(dcache_rdata),
 			.i_wdata(dcache_wdata),
-			.i_cacheable(dcache_cacheable),
-
-			.o_hit(o_dcache_hit),
-			.o_miss(o_dcache_miss)
+			.i_cacheable(dcache_cacheable)
 		);
 
 		assign dcache_need_flush = 1'b1;
@@ -164,10 +157,7 @@ module CPU_Memory #(
 			.i_address(dcache_address),
 			.o_rdata(dcache_rdata),
 			.i_wdata(dcache_wdata),
-			.i_cacheable(dcache_cacheable),
-
-			.o_hit(o_dcache_hit),
-			.o_miss(o_dcache_miss)
+			.i_cacheable(dcache_cacheable)
 		);
 
 		assign dcache_need_flush = 1'b1;
@@ -182,11 +172,7 @@ module CPU_Memory #(
 		assign wb_address = dcache_address;
 		assign dcache_rdata = wb_rdata;
 		assign wb_wdata = dcache_wdata;
-
 		assign dcache_need_flush = 1'b0;
-
-		assign o_dcache_hit = 0;
-		assign o_dcache_miss = 0;
 
 	end endgenerate
 

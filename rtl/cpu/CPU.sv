@@ -53,10 +53,6 @@ module CPU #(
 	output wire [31:0] o_dbus_wdata,		// Write data
 	
 	// Debug
-	output wire [31:0] o_icache_hit,
-	output wire [31:0] o_icache_miss,
-	output wire [31:0] o_dcache_hit,
-	output wire [31:0] o_dcache_miss,
 	output wire o_execute_busy,
 	output wire o_memory_busy,
 	output wire o_fault
@@ -175,11 +171,7 @@ module CPU #(
 
 		// Output
 		.i_busy(execute_busy | memory_busy),
-		.o_data(fetch_data_0),
-
-		// Debug
-		.o_icache_hit(o_icache_hit),
-		.o_icache_miss(o_icache_miss)
+		.o_data(fetch_data_0)
 	);
 
 	CPU_SkidBuffer #(
@@ -292,11 +284,7 @@ module CPU #(
 		.i_data(execute_data),
 
 		// Output
-		.o_data(memory_data),
-
-		// Debug
-		.o_dcache_hit(o_dcache_hit),
-		.o_dcache_miss(o_dcache_miss)
+		.o_data(memory_data)
 	);
 
 	//====================================================

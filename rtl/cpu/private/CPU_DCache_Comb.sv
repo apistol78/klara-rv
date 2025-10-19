@@ -33,11 +33,7 @@ module CPU_DCache_Comb #(
 	input wire [31:0] i_address,
 	output bit [31:0] o_rdata,
 	input wire [31:0] i_wdata,
-	input wire i_cacheable,
-
-	// Debug
-	output wire [31:0] o_hit,
-	output wire [31:0] o_miss
+	input wire i_cacheable
 );
 
 	localparam RANGE = 1 << SIZE;
@@ -63,20 +59,6 @@ module CPU_DCache_Comb #(
 
 	bit [SIZE:0] flush_address = 0;
 	bit [SIZE:0] next_flush_address = 0;
-
-	// Debug, only for verilated.
-`ifdef __VERILATOR__
-	bit [31:0] hit = 0;
-	bit [31:0] next_hit = 0;
-	bit [31:0] miss = 0;
-	bit [31:0] next_miss = 0;
-	
-	assign o_hit = hit;
-	assign o_miss = miss;
-`else
-	assign o_hit = 0;
-	assign o_miss = 0;
-`endif
 
 	// Cache memory.
 	bit cache_rw = 0;
@@ -117,12 +99,7 @@ module CPU_DCache_Comb #(
 
 	always_ff @(posedge i_clock) begin
 		state <= next;
-		flush_address <= next_flush_address;
-
-`ifdef __VERILATOR__
-		hit <= next_hit;
-		miss <= next_miss;
-`endif		
+		flush_address <= next_flush_address;	
 	end
 
 	always_comb begin
@@ -140,11 +117,6 @@ module CPU_DCache_Comb #(
 		cache_rw = 0;
 		cache_wdata = 0;
 		cache_address = i_address[(SIZE - 1) + 2:2];
-		
-`ifdef __VERILATOR__
-		next_hit = hit;
-		next_miss = miss;
-`endif
 
 		case (state)
 			IDLE: begin
@@ -246,18 +218,12 @@ module CPU_DCache_Comb #(
 					o_bus_request = 1;
 					o_bus_wdata = cache_entry_data;
 					next = WRITE_WAIT;
-`ifdef __VERILATOR__
-					next_miss = miss + 1;
-`endif
 				end
 				else begin
 					cache_rw = 1;
 					cache_wdata = { i_wdata, i_address[31:2], 2'b11 };
 					o_ready = 1;
 					next = IDLE;
-`ifdef __VERILATOR__
-					next_hit = hit + 1;
-`endif
 				end
 			end
 
@@ -285,9 +251,6 @@ module CPU_DCache_Comb #(
 				if (cache_entry_valid && cache_entry_address == i_address) begin
 					o_ready = 1;
 					next = IDLE;
-`ifdef __VERILATOR__
-					next_hit = hit + 1;
-`endif
 				end
 				else begin
 					if (/* cache_entry_valid && */ cache_entry_dirty) begin
@@ -302,9 +265,6 @@ module CPU_DCache_Comb #(
 						o_bus_request = 1;
 						next = READ_BUS_WAIT;
 					end
-`ifdef __VERILATOR__
-					next_miss = miss + 1;
-`endif
 				end
 			end
 
