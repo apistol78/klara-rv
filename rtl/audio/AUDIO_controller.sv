@@ -11,7 +11,7 @@
 `default_nettype none
 
 module AUDIO_controller #(
-	parameter BUFFER_SIZE = 2048
+	parameter BUFFER_SIZE = 1024
 )(
 	input wire i_reset,
 	input wire i_clock,
@@ -23,10 +23,9 @@ module AUDIO_controller #(
 	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
 	output bit o_ready,
-	output bit o_interrupt,
 
 	// Audio output
-	input wire i_output_busy,
+	input wire i_output_sample_clock,
 	output bit [31:0] o_output_sample_rate,
 	output wire [15:0] o_output_sample_left,
 	output wire [15:0] o_output_sample_right
@@ -58,14 +57,11 @@ module AUDIO_controller #(
 
     initial begin
 		o_ready = 0;
-		o_interrupt = 0;
-		o_output_sample_rate = 100_000_000 / (2 * 256 * 22050);
+		o_output_sample_rate = 100_000_000 / (256 * 22050);
 	end
 
 	always_ff @(posedge i_clock) begin
-		
 		output_fifo_wr <= 1'b0;
-
 		if (i_request && !o_ready) begin
 			if (!i_rw) begin
 				case (i_address)
@@ -101,20 +97,16 @@ module AUDIO_controller #(
 		else if (!i_request) begin
 			o_ready <= 1'b0;
 		end
-		
 	end
 
-	always_comb begin
-		output_fifo_rd = !i_output_busy && !output_fifo_empty;
-	end
-
-	bit [1:0] last_queued = 2'b00;
+	// Read new sample from FIFO whenever sample clock change.
+	bit last_sample_clock = 1'b0;
 	always_ff @(posedge i_clock) begin
-		last_queued <= { last_queued[0], output_fifo_queued > BUFFER_SIZE / 2 };
-	end
-
-	always_comb begin
-		o_interrupt = (last_queued == 2'b10);
+		output_fifo_rd <= 1'b0;
+		last_sample_clock <= i_output_sample_clock;
+		if (i_output_sample_clock != last_sample_clock && !output_fifo_empty) begin
+			output_fifo_rd <= 1'b1;
+		end
 	end
 
 endmodule

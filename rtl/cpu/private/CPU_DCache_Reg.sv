@@ -263,8 +263,10 @@ module CPU_DCache_Reg #(
 					o_bus_address <= cache_entry_address;
 					o_bus_request <= 1'b1;
 					o_bus_wdata <= cache_entry_data;
+					/*
 					cache_rw <= 1'b1;
 					cache_wdata <= 32'hffff_fff0; // { cache_entry_data, cache_entry_address[31:2], 2'b01 };
+					*/
 					state <= FLUSH_WRITE;
 				end
 				else begin

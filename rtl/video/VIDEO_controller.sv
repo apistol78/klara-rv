@@ -285,7 +285,7 @@ module VIDEO_controller #(
 		vs <= { vs[0], i_video_vblank };
 
 		// Check if we have entered vblank.
-		if (vs == 2'b01) begin
+		if ({ vs[0], i_video_vblank } == 2'b01) begin
 			column <= 0;
 			row_num <= 0;
 			row_offset <= 0;
@@ -293,10 +293,10 @@ module VIDEO_controller #(
 		end
 
 		// At hblank we start read next line.
-		if (hs == 2'b01 && vs == 2'b00) begin
+		if (hs == 2'b01 && /*vs == 2'b00*/ i_video_vblank == 1'b0) begin
 			if (
 				(row_num >= vram_skip_y && row_num < 720 - vram_skip_y) &&
-				(vram_skip[1] == 1'b0 || row_num[0])
+				(vram_skip[1] == 1'b0 || ~row_num[0])
 			) begin
 				column <= 0;
 				row_offset <= row_offset + vram_pitch;

@@ -10,7 +10,9 @@
 `timescale 1ns/1ns
 `default_nettype none
 
-module DMA(
+module DMA #(
+	parameter QUEUE_DEPTH = 32
+) (
 	input wire i_reset,
 	input wire i_clock,
 	input wire i_request,
@@ -48,7 +50,8 @@ module DMA(
 		F_READ_REQ		= 4'd9,
 		F_WAIT_READ		= 4'd10,
 		F_WRITE_REQ		= 4'd11,
-		F_WAIT_WRITE	= 4'd12
+		F_WAIT_WRITE	= 4'd12,
+		F_INTERLEAVE	= 4'd13
 	}
 	state_t;
 
@@ -83,8 +86,9 @@ module DMA(
 	bit queue_write = 0;
 	bit queue_read = 0;
 	dma_command_t queue_rdata;
+	wire [15:0] queue_queued;
 	FIFO #(
-		.DEPTH(16),
+		.DEPTH(QUEUE_DEPTH),
 		.WIDTH($bits(queue_rdata))
 	) queue(
 		.i_reset(i_reset),
@@ -95,7 +99,7 @@ module DMA(
 		.i_wdata(wr_command),
 		.i_read(queue_read),
 		.o_rdata(queue_rdata),
-		.o_queued()
+		.o_queued(queue_queued)
 	);
 
 	initial begin
@@ -125,7 +129,7 @@ module DMA(
 					o_rdata <=
 					{
 						30'h0,
-						queue_full,										// DMA full
+						queue_queued >= (QUEUE_DEPTH - 2), // queue_full,										// DMA full
 						(!queue_empty || state != IDLE) ? 1'b1 : 1'b0	// DMA busy
 					};
 					o_ready <= 1'b1;
@@ -174,7 +178,6 @@ module DMA(
 			end
 
 			READ_CMD_0: begin
-				queue_read <= 1'b0;
 				state <= READ_CMD;
 			end
 
@@ -289,13 +292,18 @@ module DMA(
 					o_bus_request <= 1'b0;
 					if (rd_command.count > 0) begin
 						rd_command.count <= rd_command.count - 1;
-						state <= F_READ_REQ;
+						state <= F_INTERLEAVE;
 					end
 					else begin
 						retired_counter <= rd_command.tag;
 						state <= IDLE;
 					end
 				end
+			end
+
+			F_INTERLEAVE: begin
+				// Allow other bus masters to access bus.
+				state <= F_READ_REQ;
 			end
 
 			default:

@@ -121,13 +121,11 @@ module CPU_Divide(
 	bit [31:0] remainder;
 	bit ack = 1'b0;
 
-	// bit llth = 0;
-
-	wire valid = /*llth &&*/ i_latch;
+	wire valid = i_latch;
 
 	divfunc #(
 		.XLEN(32),
-		.STAGE_LIST(32'b10101010101010101010101010100101)
+		.STAGE_LIST(32'b10010010010010010010010010010011)
 	) df(
 		.clk(i_clock),
 		.rst(~i_latch),
@@ -138,15 +136,6 @@ module CPU_Divide(
 		.rem(remainder),
 		.ack(ack)
 	);
-
-	// always_ff @(posedge i_clock) begin
-	// 	llth <= i_latch;
-	// 	if (!llth && i_latch) begin
-	// 		unumerator <= (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
-	// 		udenominator <= (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;		
-	// 		s <= i_signed ? { snumerator, sdenominator } : 2'b00;
-	// 	end
-	// end
 
 	always_comb begin
 		o_ready = i_latch && ack;

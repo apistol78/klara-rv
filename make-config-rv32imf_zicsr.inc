@@ -7,8 +7,7 @@ ARCH=rv32im_zicsr
 ABI=ilp32
 
 C=riscv32-unknown-elf-gcc
-#C_FLAGS_COMMON=-march=$(ARCH) -mabi=$(ABI) -mbranch-cost=8 -Wcast-align -fno-use-cxa-atexit -ffast-math -fdata-sections -ffunction-sections
-C_FLAGS_COMMON=-march=$(ARCH) -mabi=$(ABI) -mbranch-cost=8 -Wcast-align -fno-use-cxa-atexit -fdata-sections -ffunction-sections
+C_FLAGS_COMMON=-march=$(ARCH) -mabi=$(ABI) -mbranch-cost=8 -Wcast-align -ffast-math -fdata-sections -ffunction-sections
 C_FLAGS_DEBUG_SHARED=$(C_FLAGS_COMMON) -g -O0
 C_FLAGS_DEBUG_STATIC=$(C_FLAGS_COMMON) -g -O0
 C_FLAGS_DEBUG_EXECUTABLE=$(C_FLAGS_COMMON) -g -O0
