@@ -55,14 +55,14 @@ module CPU_DCache_Comb #(
 	} state_t;
 
 	state_t state = INITIALIZE;
-	state_t next = INITIALIZE;
+	state_t next;
 
 	bit [SIZE:0] flush_address = 0;
-	bit [SIZE:0] next_flush_address = 0;
+	bit [SIZE:0] next_flush_address;
 
 	// Cache memory.
-	bit cache_rw = 0;
-	bit [SIZE - 1:0] cache_address = 0;
+	bit cache_rw;
+	bit [SIZE - 1:0] cache_address;
 	bit [63:0] cache_wdata;
 	wire [63:0] cache_rdata;
 
@@ -90,11 +90,11 @@ module CPU_DCache_Comb #(
 	wire [31:0] cache_entry_data = cache_rdata[63:32];
 
 	initial begin
-		o_bus_rw = 0;
-		o_bus_request = 0;
-		o_bus_address = 0;
-		o_bus_wdata = 0;
-		o_rdata = 0;
+		// o_bus_rw = 0;
+		// o_bus_request = 0;
+		// o_bus_address = 0;
+		// o_bus_wdata = 0;
+		// o_rdata = 0;
 	end
 
 	always_ff @(posedge i_clock) begin
@@ -275,8 +275,8 @@ module CPU_DCache_Comb #(
 				o_bus_request = 1;
 				o_bus_wdata = cache_entry_data;
 				if (i_bus_ready) begin
-					o_bus_rw = 0;
-					o_bus_address = i_address;
+					//o_bus_rw = 0;
+					//o_bus_address = i_address;
 					next = READ_BUS_WAIT;
 				end
 			end

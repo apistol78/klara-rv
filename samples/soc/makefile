@@ -25,3 +25,5 @@ build/firmware/startup.o : code/startup.c
 
 clean :
 	@rm -Rf build/firmware
+	@rm -Rf firmware.vmem
+	@rm -Rf firmware.vmem-range
