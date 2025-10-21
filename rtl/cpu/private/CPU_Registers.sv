@@ -26,11 +26,11 @@ module CPU_Registers #(
 );
 	bit last_write_strobe = 1'b0;
 
-`ifdef FPU_ENABLE
-	bit [31:0] r[63:0];
-`else
+// `ifdef FPU_ENABLE
+// 	bit [31:0] r[63:0];
+// `else
 	bit [31:0] r[31:0];
-`endif
+// `endif
 
 	bit [31:0] rs1 = 0;
 	bit [31:0] rs2 = 0;
@@ -46,11 +46,11 @@ module CPU_Registers #(
 		for (I = 0; I < 32; ++I)
 			r[I] = 32'h0000_0000;
 
-`ifdef FPU_ENABLE
-		// Float point registers.
-		for (I = 32; I < 64; ++I)
-			r[I] = 32'h0000_0000;
-`endif
+// `ifdef FPU_ENABLE
+// 		// Float point registers.
+// 		for (I = 32; I < 64; ++I)
+// 			r[I] = 32'h0000_0000;
+// `endif
 
 		r[ 2] = STACK_POINTER;
 	end
@@ -68,11 +68,11 @@ module CPU_Registers #(
 			for (I = 0; I < 32; ++I)
 				r[I] <= 32'h0000_0000;
 
-`ifdef FPU_ENABLE
-			// Float point registers.
-			for (I = 32; I < 64; ++I)
-				r[I] <= 32'h0000_0000;
-`endif
+// `ifdef FPU_ENABLE
+// 			// Float point registers.
+// 			for (I = 32; I < 64; ++I)
+// 				r[I] <= 32'h0000_0000;
+// `endif
 
 			r[ 2] <= STACK_POINTER;
 		end

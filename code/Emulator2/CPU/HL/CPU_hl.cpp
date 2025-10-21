@@ -178,8 +178,10 @@ struct FormatR4
 #define R_s(x) (int32_t&)m_registers[x]
 #define R_u(x) (uint32_t&)m_registers[x]
 
-#define FR(x) m_flt_registers[x]
-#define FR_u(x) (uint32_t&)m_flt_registers[x]
+// #define FR(x) m_flt_registers[x]
+// #define FR_u(x) (uint32_t&)m_flt_registers[x]
+#define FR(x) R(x)
+#define FR_u(x) R_u(x)
 
 #define MEM_RD(addr) m_busAccess->readU32(m_pc, addr)
 #define MEM_WR(addr, value) m_busAccess->writeU32(m_pc, addr, value)

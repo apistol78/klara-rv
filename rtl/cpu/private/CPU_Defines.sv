@@ -10,14 +10,14 @@
 `define _CPU_DEFINES_SV
 
 // Configuration
-//`define FPU_ENABLE					1
+`define FPU_ENABLE					1
 
 // Size of register index.
-`ifdef FPU_ENABLE
-	`define REG_ID_SIZE				6
-`else
-	`define REG_ID_SIZE				5
-`endif
+// `ifdef FPU_ENABLE
+// 	`define REG_ID_SIZE				6
+// `else
+ 	`define REG_ID_SIZE				5
+// `endif
 
 // ALU operations
 `define OP_SIGNED_ADD               0

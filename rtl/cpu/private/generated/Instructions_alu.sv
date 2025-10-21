@@ -13,8 +13,6 @@ wire [3:0] alu_operation =
 	is_BLT   ? `OP_SIGNED_LESS_THAN       :
 	is_BLTU  ? `OP_UNSIGNED_LESS_THAN     :
 	is_BNE   ? `OP_NOT_EQUAL              :
-	is_FLW   ? `OP_SIGNED_ADD             :
-	is_FSW   ? `OP_SIGNED_ADD             :
 	is_JAL   ? `OP_SIGNED_ADD             :
 	is_JALR  ? `OP_SIGNED_ADD             :
 	is_LB    ? `OP_SIGNED_ADD             :
@@ -53,8 +51,6 @@ wire [4:0] alu_operand2 =
 	is_ADDI  ? `IMM  :
 	is_ANDI  ? `IMM  :
 	is_AUIPC ? `IMM  :
-	is_FLW   ? `IMM  :
-	is_FSW   ? `IMM  :
 	is_JAL   ? `IMM  :
 	is_JALR  ? `IMM  :
 	is_LB    ? `IMM  :

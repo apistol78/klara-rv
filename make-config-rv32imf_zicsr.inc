@@ -1,7 +1,7 @@
 # Configuration file
 
 #ARCH=rv32imf_zicsr
-ARCH=rv32im_zicsr
+ARCH=rv32im_zfinx_zicsr
 #ARCH=rv32i_zicsr
 
 ABI=ilp32

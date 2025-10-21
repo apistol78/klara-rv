@@ -159,7 +159,7 @@ module CPU_FPU(
 			i_op == `FPU_OP_F2UI		? f2i_ready			:
 			i_op == `FPU_OP_I2F			? i2f_ready			:
 			i_op == `FPU_OP_UI2F		? i2f_ready			:
-			i_op == `FPU_OP_MOV			? 1'b1				:
+			//i_op == `FPU_OP_MOV			? 1'b1				:
 			i_op == `FPU_OP_CMP_EQUAL	? cmp_ready			:
 			i_op == `FPU_OP_CMP_LESS	? cmp_ready			:
 			i_op == `FPU_OP_CMP_LEQUAL	? cmp_ready			:
@@ -184,7 +184,7 @@ module CPU_FPU(
 		i_op == `FPU_OP_F2UI		? f2i_result		:
 		i_op == `FPU_OP_I2F			? i2f_result		:
 		i_op == `FPU_OP_UI2F		? i2f_result		:
-		i_op == `FPU_OP_MOV			? i_op1				:
+		//i_op == `FPU_OP_MOV			? i_op1				:
 		i_op == `FPU_OP_CMP_EQUAL	? fcmp_equal		:
 		i_op == `FPU_OP_CMP_LESS	? fcmp_less			:
 		i_op == `FPU_OP_CMP_LEQUAL	? fcmp_lequal		:

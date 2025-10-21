@@ -172,17 +172,17 @@ module CPU_Fetch #(
 						// Decode register indices here since we
 						// need those for fetching registers while
 						// we are decoding rest of instruction.
-`ifdef FPU_ENABLE
-						data.inst_rs1 <= register_t'(have_RS1 ? { RS1_bank, `INSTRUCTION[19:15] } : 0);
-						data.inst_rs2 <= register_t'(have_RS2 ? { RS2_bank, `INSTRUCTION[24:20] } : 0);
-						data.inst_rs3 <= register_t'(have_RS3 ? { RS3_bank, `INSTRUCTION[31:27] } : 0);
-						data.inst_rd  <= register_t'(have_RD  ? {  RD_bank, `INSTRUCTION[ 11:7] } : 0);
-`else
+// `ifdef FPU_ENABLE
+// 						data.inst_rs1 <= register_t'(have_RS1 ? { RS1_bank, `INSTRUCTION[19:15] } : 0);
+// 						data.inst_rs2 <= register_t'(have_RS2 ? { RS2_bank, `INSTRUCTION[24:20] } : 0);
+// 						data.inst_rs3 <= register_t'(have_RS3 ? { RS3_bank, `INSTRUCTION[31:27] } : 0);
+// 						data.inst_rd  <= register_t'(have_RD  ? {  RD_bank, `INSTRUCTION[ 11:7] } : 0);
+// `else
 						data.inst_rs1 <= register_t'(have_RS1 ? { `INSTRUCTION[19:15] } : 0);
 						data.inst_rs2 <= register_t'(have_RS2 ? { `INSTRUCTION[24:20] } : 0);
 						data.inst_rs3 <= register_t'(have_RS3 ? { `INSTRUCTION[31:27] } : 0);
 						data.inst_rd  <= register_t'(have_RD  ? { `INSTRUCTION[ 11:7] } : 0);
-`endif
+// `endif
 
 						if (is_JUMP || is_JUMP_CONDITIONAL || is_MRET) begin
 							// Branch instruction, need to wait

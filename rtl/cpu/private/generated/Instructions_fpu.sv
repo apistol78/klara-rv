@@ -18,8 +18,6 @@ wire [4:0] fpu_operation =
 	is_FMIN      ? `FPU_OP_MIN        :
 	is_FMAX      ? `FPU_OP_MAX        :
 	is_FMUL      ? `FPU_OP_MUL        :
-	is_FMV_X_W   ? `FPU_OP_MOV        :
-	is_FMV_W_X   ? `FPU_OP_MOV        :
 	is_FSGNJ     ? `FPU_OP_SGNJ       :
 	is_FSGNJN    ? `FPU_OP_SGNJN      :
 	is_FSGNJX    ? `FPU_OP_SGNJX      :
