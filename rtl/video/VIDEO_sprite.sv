@@ -17,7 +17,7 @@ module VIDEO_sprite #(
 	input wire i_clock,
 
 	input wire i_request,
-	input wire [15:0] i_address,
+	input wire [31:0] i_address,
 	input wire [31:0] i_wdata,
 	output bit o_ready,
 
@@ -37,7 +37,7 @@ module VIDEO_sprite #(
 	wire [7:0] sprite_0_overlay_data;
 	wire sprite_0_overlay_mask;
 	bit sprite_0_wd_request = 1'b0;
-	bit [9:0] sprite_0_wd_address;
+	bit [12:0] sprite_0_wd_address;
 	bit [7:0] sprite_0_wd_wdata;
 
 	VIDEO_sprite_x #(
@@ -63,7 +63,7 @@ module VIDEO_sprite #(
 	wire [7:0] sprite_1_overlay_data;
 	wire sprite_1_overlay_mask;
 	bit sprite_1_wd_request = 1'b0;
-	bit [9:0] sprite_1_wd_address;
+	bit [12:0] sprite_1_wd_address;
 	bit [7:0] sprite_1_wd_wdata;
 
 	VIDEO_sprite_x #(
@@ -114,9 +114,9 @@ module VIDEO_sprite #(
 
 		if (i_request) begin
 
-			// pppp xxxx xxxx xx00
+			// pp ppxx xxxx xxxx xx00
 
-			if (i_address[15:12] == 4'h0) begin	// Registers
+			if (i_address[17:14] == 4'h0) begin	// Registers
 				case (i_address[4:0])
 					5'h00: sprite_0_pos_x <= i_wdata[10:0];
 					5'h04: sprite_0_pos_y <= i_wdata[10:0];
@@ -129,14 +129,14 @@ module VIDEO_sprite #(
 					// 5'h1c:
 				endcase
 			end
-			else if (i_address[15:12] == 4'h1) begin	// Sprite 0 data
+			else if (i_address[17:14] == 4'h1) begin	// Sprite 0 data
 				sprite_0_wd_request <= 1'b1;
-				sprite_0_wd_address <= i_address[11:2];
+				sprite_0_wd_address <= i_address[13:2];
 				sprite_0_wd_wdata <= i_wdata[7:0];
 			end
-			else if (i_address[15:12] == 4'h2) begin	// Sprite 1 data
+			else if (i_address[17:14] == 4'h2) begin	// Sprite 1 data
 				sprite_1_wd_request <= 1'b1;
-				sprite_1_wd_address <= i_address[11:2];
+				sprite_1_wd_address <= i_address[13:2];
 				sprite_1_wd_wdata <= i_wdata[7:0];
 			end
 

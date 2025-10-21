@@ -56,7 +56,7 @@ module CPU_Memory #(
 	bit [31:0] wb_wdata;
 	wire wb_cacheable = (wb_address == 4'h1);
 
-	generate if (DCACHE_WB_QUEUE != 0) begin
+	generate if (DCACHE_WB_QUEUE != 0) begin : memory_wb
 
 	// Write queue.
 	CPU_DCache_WB wb(
@@ -81,7 +81,7 @@ module CPU_Memory #(
 
 	end endgenerate
 	
-	generate if (DCACHE_WB_QUEUE == 0) begin
+	generate if (DCACHE_WB_QUEUE == 0) begin : memory_wb_none
 
 	// No write queue.
 	assign o_bus_rw = wb_rw;
@@ -106,7 +106,7 @@ module CPU_Memory #(
 	wire dcache_need_flush;
 	wire dcache_cacheable = (i_data.mem_address[31:28] == 4'h1);
 
-	generate if (DCACHE_SIZE > 0 && DCACHE_REGISTERED != 0) begin
+	generate if (DCACHE_SIZE > 0 && DCACHE_REGISTERED != 0) begin : dcache_registered
 
 		CPU_DCache_Reg #(
 			.SIZE(DCACHE_SIZE)
@@ -135,7 +135,7 @@ module CPU_Memory #(
 
 	end endgenerate
 
-	generate if (DCACHE_SIZE > 0 && DCACHE_REGISTERED == 0) begin
+	generate if (DCACHE_SIZE > 0 && DCACHE_REGISTERED == 0) begin : dcache_combinatorial
 
 		CPU_DCache_Comb #(
 			.SIZE(DCACHE_SIZE)
@@ -164,7 +164,7 @@ module CPU_Memory #(
 
 	end endgenerate	
 
-	generate if (DCACHE_SIZE == 0) begin
+	generate if (DCACHE_SIZE == 0) begin : dcache_none
 
 		assign wb_rw = dcache_rw;
 		assign wb_request = dcache_request;

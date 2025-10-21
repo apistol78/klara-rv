@@ -27,7 +27,7 @@ module VIDEO_sprite_x #(
 	output bit o_overlay_mask,
 
 	input wire i_wd_request,
-	input wire [9:0] i_wd_address,
+	input wire [12:0] i_wd_address,
 	input wire [7:0] i_wd_wdata
 );
 	typedef enum bit [4:0]
@@ -68,7 +68,7 @@ module VIDEO_sprite_x #(
 
 	// Sprite pixel data.
 	bit data_request;
-	bit [9:0] data_address;
+	bit [12:0] data_address;
 	bit [7:0] data_rdata;
 
 	BRAM_1r1w #(
@@ -78,11 +78,11 @@ module VIDEO_sprite_x #(
 	) data (
 		.i_clock(i_clock),
 		.i_pa_request(data_request),
-		.i_pa_address({ 22'b0, data_address }),
+		.i_pa_address({ 19'b0, data_address }),
 		.o_pa_rdata(data_rdata),
 		.o_pa_ready(),
 		.i_pb_request(i_wd_request),
-		.i_pb_address({ 22'b0, i_wd_address }),
+		.i_pb_address({ 19'b0, i_wd_address }),
 		.i_pb_wdata(i_wd_wdata),
 		.o_pb_ready()
 	);

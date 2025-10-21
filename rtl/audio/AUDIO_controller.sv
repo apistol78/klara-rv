@@ -11,7 +11,7 @@
 `default_nettype none
 
 module AUDIO_controller #(
-	parameter BUFFER_SIZE = 1024
+	parameter BUFFER_SIZE = 128
 )(
 	input wire i_reset,
 	input wire i_clock,

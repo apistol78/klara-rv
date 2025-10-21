@@ -55,9 +55,9 @@ module CPU_DCache_Comb #(
 	} state_t;
 
 	state_t state = INITIALIZE;
-	state_t next;
-
 	bit [SIZE:0] flush_address = 0;
+
+	state_t next_state;
 	bit [SIZE:0] next_flush_address;
 
 	// Cache memory.
@@ -89,21 +89,13 @@ module CPU_DCache_Comb #(
 	wire [31:0] cache_entry_address = { cache_rdata[31:2], 2'b00 };
 	wire [31:0] cache_entry_data = cache_rdata[63:32];
 
-	initial begin
-		// o_bus_rw = 0;
-		// o_bus_request = 0;
-		// o_bus_address = 0;
-		// o_bus_wdata = 0;
-		// o_rdata = 0;
-	end
-
 	always_ff @(posedge i_clock) begin
-		state <= next;
+		state <= next_state;
 		flush_address <= next_flush_address;	
 	end
 
 	always_comb begin
-		next = state;
+		next_state = state;
 		next_flush_address = flush_address;
 
 		o_bus_rw = 0;
@@ -123,13 +115,13 @@ module CPU_DCache_Comb #(
 				if (i_request) begin
 					if (i_flush) begin
 						next_flush_address = 0;
-						next = FLUSH_SETUP;
+						next_state = FLUSH_SETUP;
 					end
 					else if (i_cacheable) begin
 						if (!i_rw)
-							next = READ_SETUP;
+							next_state = READ_SETUP;
 						else begin
-							next = WRITE_SETUP;
+							next_state = WRITE_SETUP;
 						end
 					end
 					else begin
@@ -138,7 +130,7 @@ module CPU_DCache_Comb #(
 						o_bus_request = i_request;
 						o_bus_wdata = i_wdata;
 						o_rdata = i_bus_rdata;
-						next = PASS_THROUGH;
+						next_state = PASS_THROUGH;
 					end
 				end
 			end
@@ -149,10 +141,10 @@ module CPU_DCache_Comb #(
 			FLUSH_SETUP: begin
 				cache_address = flush_address;
 				if (flush_address < RANGE)
-					next = FLUSH_CHECK;
+					next_state = FLUSH_CHECK;
 				else begin
 					o_ready = 1;
-					next = IDLE;
+					next_state = IDLE;
 				end
 			end
 
@@ -163,11 +155,11 @@ module CPU_DCache_Comb #(
 					o_bus_address = cache_entry_address;
 					o_bus_request = 1;
 					o_bus_wdata = cache_entry_data;
-					next = FLUSH_WRITE;
+					next_state = FLUSH_WRITE;
 				end
 				else begin
 					next_flush_address = flush_address + 1;
-					next = FLUSH_SETUP;
+					next_state = FLUSH_SETUP;
 				end
 			end
 
@@ -180,13 +172,13 @@ module CPU_DCache_Comb #(
 				if (i_bus_ready) begin
 					cache_rw = 1;
 					cache_wdata = { cache_entry_data, cache_entry_address[31:2], 2'b01 };
-					next = FLUSH_NEXT;
+					next_state = FLUSH_NEXT;
 				end
 			end
 
 			FLUSH_NEXT: begin
 				next_flush_address = flush_address + 1;
-				next = FLUSH_SETUP;
+				next_state = FLUSH_SETUP;
 			end
 
 			// ================
@@ -202,7 +194,7 @@ module CPU_DCache_Comb #(
 				o_rdata = i_bus_rdata;
 				o_ready = i_bus_ready;
 				if (!i_request) begin
-					next = IDLE;
+					next_state = IDLE;
 				end
 			end
 
@@ -217,13 +209,13 @@ module CPU_DCache_Comb #(
 					o_bus_address = cache_entry_address;
 					o_bus_request = 1;
 					o_bus_wdata = cache_entry_data;
-					next = WRITE_WAIT;
+					next_state = WRITE_WAIT;
 				end
 				else begin
 					cache_rw = 1;
 					cache_wdata = { i_wdata, i_address[31:2], 2'b11 };
 					o_ready = 1;
-					next = IDLE;
+					next_state = IDLE;
 				end
 			end
 
@@ -237,7 +229,7 @@ module CPU_DCache_Comb #(
 					cache_rw = 1;
 					cache_wdata = { i_wdata, i_address[31:2], 2'b11 };
 					o_ready = 1;
-					next = IDLE;
+					next_state = IDLE;
 				end
 			end
 
@@ -250,7 +242,7 @@ module CPU_DCache_Comb #(
 				o_rdata = cache_entry_data;
 				if (cache_entry_valid && cache_entry_address == i_address) begin
 					o_ready = 1;
-					next = IDLE;
+					next_state = IDLE;
 				end
 				else begin
 					if (/* cache_entry_valid && */ cache_entry_dirty) begin
@@ -258,12 +250,12 @@ module CPU_DCache_Comb #(
 						o_bus_address = cache_entry_address;
 						o_bus_request = 1;
 						o_bus_wdata = cache_entry_data;
-						next = READ_WB_WAIT;
+						next_state = READ_WB_WAIT;
 					end
 					else begin
 						o_bus_address = i_address;
 						o_bus_request = 1;
-						next = READ_BUS_WAIT;
+						next_state = READ_BUS_WAIT;
 					end
 				end
 			end
@@ -275,9 +267,7 @@ module CPU_DCache_Comb #(
 				o_bus_request = 1;
 				o_bus_wdata = cache_entry_data;
 				if (i_bus_ready) begin
-					//o_bus_rw = 0;
-					//o_bus_address = i_address;
-					next = READ_BUS_WAIT;
+					next_state = READ_BUS_WAIT;
 				end
 			end
 
@@ -291,7 +281,7 @@ module CPU_DCache_Comb #(
 					cache_rw = 1;
 					cache_wdata = { i_bus_rdata, i_address[31:2], 2'b01 };
 					o_ready = 1;
-					next = IDLE;
+					next_state = IDLE;
 				end
 			end
 
@@ -308,18 +298,18 @@ module CPU_DCache_Comb #(
 				end
 				else begin
 					next_flush_address = 0;
-					next = IDLE;
+					next_state = IDLE;
 				end
 			end
 
 			default: begin
-				next = IDLE;
+				next_state = IDLE;
 			end
 		endcase
 
 		// Re-initialize cache at reset.
 		if (i_reset) begin
-			next = INITIALIZE;
+			next_state = INITIALIZE;
 			next_flush_address = 0;
 		end
 	end

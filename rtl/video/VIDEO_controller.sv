@@ -284,7 +284,7 @@ module VIDEO_controller #(
 		hs <= { hs[0], i_video_hblank };
 		vs <= { vs[0], i_video_vblank };
 
-		// Check if we have entered vblank.
+		// Check if we have entered vblank. 
 		if ({ vs[0], i_video_vblank } == 2'b01) begin
 			column <= 0;
 			row_num <= 0;

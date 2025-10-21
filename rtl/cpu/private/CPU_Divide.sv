@@ -125,7 +125,7 @@ module CPU_Divide(
 
 	divfunc #(
 		.XLEN(32),
-		.STAGE_LIST(32'b10010010010010010010010010010011)
+		.STAGE_LIST(32'b10101010101010101010101010100101)
 	) df(
 		.clk(i_clock),
 		.rst(~i_latch),

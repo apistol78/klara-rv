@@ -41,18 +41,22 @@ module CPU_Multiply(
 		latch <= { latch[0], i_latch };
 	end
 
-	always_comb begin
-		r0_request = (latch == 2'b01);
-		r0_s = i_signed ? { s1, s2 } : 2'b00;
-		r0_uop1 = (i_signed && s1) ? -$signed(i_op1) : i_op1;
-		r0_uop2 = (i_signed && s2) ? -$signed(i_op2) : i_op2;
+	initial begin
+		r0_request = 1'b0;
 	end
 
+	// always_comb begin
+	// 	r0_request = (latch == 2'b01);
+	// 	r0_s = i_signed ? { s1, s2 } : 2'b00;
+	// 	r0_uop1 = (i_signed && s1) ? -$signed(i_op1) : i_op1;
+	// 	r0_uop2 = (i_signed && s2) ? -$signed(i_op2) : i_op2;
+	// end
+
 	always_ff @(posedge i_clock) begin
-		// r0_request <= (latch == 2'b01);
-		// r0_s <= i_signed ? { s1, s2 } : 2'b00;
-		// r0_uop1 <= (i_signed && s1) ? -$signed(i_op1) : i_op1;
-		// r0_uop2 <= (i_signed && s2) ? -$signed(i_op2) : i_op2;
+		r0_request <= (latch == 2'b01);
+		r0_s <= i_signed ? { s1, s2 } : 2'b00;
+		r0_uop1 <= (i_signed && s1) ? -$signed(i_op1) : i_op1;
+		r0_uop2 <= (i_signed && s2) ? -$signed(i_op2) : i_op2;
 
 		r1_request <= r0_request;
 		r1_s <= r0_s;
