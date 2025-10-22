@@ -28,7 +28,7 @@ private:
     {
         int32_t x = 0;
         int32_t y = 0;
-        uint8_t bits[32 * 32];
+        uint8_t bits[64 * 64];
         bool visible = false;
     };
 

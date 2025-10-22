@@ -16,7 +16,7 @@ T_IMPLEMENT_RTTI_CLASS(L"Sprite", Sprite, IDevice)
 
 bool Sprite::writeU32(uint32_t address, uint32_t value)
 {
-	if (address < 0x1000)
+	if (address < 0x4000)
 	{
 		// Write to registers.
 		switch (address >> 2)
@@ -47,11 +47,11 @@ bool Sprite::writeU32(uint32_t address, uint32_t value)
 	else
 	{
 		// Write to data.
-		const uint32_t index = (address - 0x1000) / 0x1000;
+		const uint32_t index = (address - 0x4000) / 0x4000;
 		Data& data = m_data[index];
 
-		const uint32_t offset = (address & 0xfff) >> 2;
-		if (offset < 32 * 32)
+		const uint32_t offset = (address & 0x3fff) >> 2;
+		if (offset < 64 * 64)
 			data.bits[offset] = (uint8_t)value;
 	}
 	return true;
@@ -73,13 +73,12 @@ bool Sprite::getOverlay(uint32_t x, uint32_t y, uint8_t& outOverlay) const
 	{
 		const Data& data = m_data[i];
 		if (
-
             data.visible &&
-			x >= data.x && x < data.x + 32 &&
-			y >= data.y && y < data.y + 32
+			x >= data.x && x < data.x + 64 &&
+			y >= data.y && y < data.y + 64
 		)
 		{
-			const uint32_t offset = (x - data.x) + (y - data.y) * 32;
+			const uint32_t offset = (x - data.x) + (y - data.y) * 64;
 			outOverlay = data.bits[offset];
 			return (outOverlay != 0xff);
 		}
