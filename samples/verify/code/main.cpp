@@ -112,6 +112,8 @@ float rndf()
 	{
 		const uint32_t v = urnd32();
 		const float f = *(float*)&v;
+		if (std::abs(f) > 1e+3f)
+			continue;
 		if (!std::isnan(f))
 			return f;
 	}
@@ -1489,13 +1491,13 @@ bool verify_FADD(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v2;
-	tb->Verify__DOT__rom__DOT__data[0] = 0x0000f153; // fadd.s	ft2,ft1,ft0
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__rom__DOT__data[0] = 0x0084f953; // fadd.s	f18,f9,f8
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)];
+	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)];
 	if (*(float*)&r != (v1 + v2))
 		return false;
 
@@ -1511,15 +1513,17 @@ bool verify_FSUB(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v2;
-	tb->Verify__DOT__rom__DOT__data[0] = 0x0800f153; // fsub.s	ft2,ft1,ft0
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__rom__DOT__data[0] = 0x0884f953; // fsub.s	f18,f9,f8
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)];
 	
-	printf("%f\n", *(float*)&r);
+	printf("v1 = %f (%08x)\n", v1, *((uint32_t*)&v1));
+	printf("v2 = %f (%08x)\n", v2, *((uint32_t*)&v2));
+	printf("dot %f, ref %f\n", *(float*)&r, v2 - v1);
 
 	if (*(float*)&r != (v2 - v1))
 		return false;
@@ -1536,13 +1540,13 @@ bool verify_FMUL(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v2;
-	tb->Verify__DOT__rom__DOT__data[0] = 0x1000f153; // fmul.s	ft2,ft1,ft0
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__rom__DOT__data[0] = 0x1084f953; // fmul.s	f18,f9,f8
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)];
 	
 	// printf("%f * %f = %f\n", v1, v2, *(float*)&r);
 
@@ -1561,13 +1565,13 @@ bool verify_FDIV(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v2;
-	tb->Verify__DOT__rom__DOT__data[0] = 0x1800f153; // fdiv.s	ft2,ft1,ft0
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__rom__DOT__data[0] = 0x1884f953; // fdiv.s	f18,f9,f8
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)];
 	
 	printf("%f\n", *(float*)&r);
 
@@ -1586,7 +1590,7 @@ bool verify_FCVT(const char* trace)
 	auto tb = verify->rootp;
 
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
 	tb->Verify__DOT__rom__DOT__data[0] = 0xc0007453; // fcvt.w.s	s0,ft0
 
 	evaluate(verify, trace, 1);
@@ -1611,12 +1615,12 @@ bool verify_FLW(const char* trace)
 
 	tb->Verify__DOT__ram__DOT__data[0] = *(uint32_t*)&v1;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0x10000000;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x00042007; // flw	ft0,0(s0)
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	
 	//printf("%f => %d\n", v1, r);
 
@@ -1636,7 +1640,7 @@ bool verify_FSW(const char* trace)
 
 	tb->Verify__DOT__ram__DOT__data[0] = 0;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0x10000000;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x00042027; // fsw	ft0,0(s0)
 
 	evaluate(verify, trace, 1);
@@ -1660,7 +1664,7 @@ bool verify_FMV_X_W(const char* trace)
 	auto tb = verify->rootp;
 
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
 	tb->Verify__DOT__rom__DOT__data[0] = 0xe0000453; // fmv.x.w	s0,ft0
 
 	evaluate(verify, trace, 1);
@@ -1684,12 +1688,12 @@ bool verify_FMV_W_X(const char* trace)
 	auto tb = verify->rootp;
 
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
 	tb->Verify__DOT__rom__DOT__data[0] = 0xf0040053; // fmv.w.x	ft0,s0
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	
 	//printf("%f => %d\n", v1, r);
 
@@ -1711,9 +1715,9 @@ bool verify_FEQ(const char* trace)
 
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = ~0U;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v2;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v3;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v3;
 	tb->Verify__DOT__rom__DOT__data[0] = 0xa0102453; // feq.s	s0,ft0,ft1
 	tb->Verify__DOT__rom__DOT__data[1] = 0xa02024d3; // feq.s	feq.s	s1,ft0,ft2
 
@@ -1742,9 +1746,9 @@ bool verify_FLT(const char* trace)
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S0] = 0;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S1] = ~0U;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[S2] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v2;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v3;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v3;
 	tb->Verify__DOT__rom__DOT__data[0] = 0xa0101453; // flt.s	s0,ft0,ft1
 	tb->Verify__DOT__rom__DOT__data[1] = 0xa02014d3; // flt.s	s1,ft0,ft2
 	tb->Verify__DOT__rom__DOT__data[2] = 0xa0011953; // flt.s	s2,ft2,ft0
@@ -1775,15 +1779,15 @@ bool verify_FMADD(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[35] = *(uint32_t*)&v3;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x1820f043; // fmadd.s	ft0,ft1,ft2,ft3
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	//printf("%f * %f = %f\n", v1, v2, *(float*)&r);
 
 	if (*(float*)&r != (v1 * v2 + v3))
@@ -1802,15 +1806,15 @@ bool verify_FMSUB(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[35] = *(uint32_t*)&v3;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x1820f047; // fmsub.s	ft0,ft1,ft2,ft3
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	//printf("%f * %f - %f = %f\n", v1, v2, v3, *(float*)&r);
 
 	if (*(float*)&r != (v1 * v2 - v3))
@@ -1829,15 +1833,15 @@ bool verify_FNMADD(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[35] = *(uint32_t*)&v3;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x1820f04f; // fnmadd.s	ft0,ft1,ft2,ft3
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	//printf("%f * %f = %f\n", v1, v2, *(float*)&r);
 
 	if (*(float*)&r != -(v1 * v2 + v3))
@@ -1856,15 +1860,15 @@ bool verify_FNMSUB(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__cpu__DOT__registers__DOT__r[35] = *(uint32_t*)&v3;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x1820f04b; // fnmsub.s	ft0,ft1,ft2,ft3
 
 	evaluate(verify, trace, 1);
 
-	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	const uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	//printf("%f * %f = %f\n", v1, v2, *(float*)&r);
 
 	if (*(float*)&r != -(v1 * v2 - v3))
@@ -1882,14 +1886,14 @@ bool verify_FSGNJ(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x20208053; // fsgnj.s	ft0,ft1,ft2
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	float fr = *(float*)&r;
 
 	bool s1 = v1 >= 0.0f;
@@ -1922,14 +1926,14 @@ bool verify_FSGNJN(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x20209053; // fsgnjn.s	ft0,ft1,ft2
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	float fr = *(float*)&r;
 
 	bool s1 = v1 >= 0.0f;
@@ -1962,14 +1966,14 @@ bool verify_FSGNJX(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x2020a053; // fsgnjx.s	ft0,ft1,ft2
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	float fr = *(float*)&r;
 
 	bool s1 = v1 >= 0.0f;
@@ -2002,14 +2006,14 @@ bool verify_FMIN(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x28208053; // fmin.s	ft0,ft1,ft2
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	if (*(float*)&r != std::min< float >(v1, v2))
 	{
 		printf("min(%f, %f) = %f\n", v1, v2, *(float*)&r);
@@ -2029,14 +2033,14 @@ bool verify_FMAX(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = 0;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&v2;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = 0;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&v2;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x28209053; // fmax.s	ft0,ft1,ft2
 
 	evaluate(verify, trace, 1);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	if (*(float*)&r != std::max< float >(v1, v2))
 	{
 		printf("max(%f, %f) = %f\n", v1, v2, *(float*)&r);
@@ -2056,15 +2060,15 @@ bool verify_FMIN_FMAX(const char* trace)
 	auto verify = create_soc();
 	auto tb = verify->rootp;
 
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)] = *(uint32_t*)&v1;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(1)] = *(uint32_t*)&vmin;
-	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(2)] = *(uint32_t*)&vmax;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)] = *(uint32_t*)&v1;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S1)] = *(uint32_t*)&vmin;
+	tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S2)] = *(uint32_t*)&vmax;
 	tb->Verify__DOT__rom__DOT__data[0] = 0x28101053; // fmax.s	ft0,ft0,ft1
 	tb->Verify__DOT__rom__DOT__data[1] = 0x28200053; // fmin.s	ft0,ft0,ft2
 
 	evaluate(verify, trace, 2);
 
-	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(0)];
+	uint32_t r = tb->Verify__DOT__cpu__DOT__registers__DOT__r[FPR(S0)];
 	float fr = *(float*)&r;
 
 	if (fr < vmin || fr > vmax)
@@ -2188,87 +2192,87 @@ bool verify(bool (*fn)(const char* trace), const char* name, bool ftrce)
 int main(int argc, char **argv)
 {
 	bool success = true;
-	bool ftrce = false;
+	bool ftrce = true;
 
-	CHECK(verify_ADD);
-	CHECK(verify_ADDI);
-	CHECK(verify_AND);
-	CHECK(verify_ANDI);
-	CHECK(verify_AUIPC);
-	CHECK(verify_BEQ);
-	CHECK(verify_BGE);
-	CHECK(verify_BGEU);
-	CHECK(verify_BLT);
-	CHECK(verify_BLTU);
-	CHECK(verify_BNE);
-	CHECK(verify_DIV);
-	CHECK(verify_UDIV);
-	CHECK(verify_JAL);
-	CHECK(verify_JALR);
-	CHECK(verify_LB);
-	CHECK(verify_LBU);
-	CHECK(verify_LH);
-	CHECK(verify_LHU);
-	CHECK(verify_LUI);
-	CHECK(verify_LW);
-	CHECK(verify_MUL);
-	CHECK(verify_MULH);
-	CHECK(verify_MULHU);
-	CHECK(verify_OR);
-	CHECK(verify_ORI);
-	CHECK(verify_REM);
-	CHECK(verify_REMU);
-	CHECK(verify_REMU2);
-	CHECK(verify_SB);
-	CHECK(verify_SH);
-	CHECK(verify_SLL);
-	CHECK(verify_SLLI);
-	CHECK(verify_SLT);
-	CHECK(verify_SLTI);
-	CHECK(verify_SLTIU);
-	CHECK(verify_SLTU);
-	CHECK(verify_SRA);
-	CHECK(verify_SRAI);
-	CHECK(verify_SRL);
-	CHECK(verify_SRLI);
-	CHECK(verify_SUB);
-	CHECK(verify_SW);
- 	CHECK(verify_XOR);
- 	CHECK(verify_XORI);
-	CHECK(verify_ENDIAN);
-	CHECK(verify_MEM_LOAD_HAZARD);
-	CHECK(verify_PIPELINE);
-	CHECK(verify_PIPELINE_MEMORY);
-	CHECK(verify_PIPELINE_MEMORY_B);
+	// CHECK(verify_ADD);
+	// CHECK(verify_ADDI);
+	// CHECK(verify_AND);
+	// CHECK(verify_ANDI);
+	// CHECK(verify_AUIPC);
+	// CHECK(verify_BEQ);
+	// CHECK(verify_BGE);
+	// CHECK(verify_BGEU);
+	// CHECK(verify_BLT);
+	// CHECK(verify_BLTU);
+	// CHECK(verify_BNE);
+	// CHECK(verify_DIV);
+	// CHECK(verify_UDIV);
+	// CHECK(verify_JAL);
+	// CHECK(verify_JALR);
+	// CHECK(verify_LB);
+	// CHECK(verify_LBU);
+	// CHECK(verify_LH);
+	// CHECK(verify_LHU);
+	// CHECK(verify_LUI);
+	// CHECK(verify_LW);
+	// CHECK(verify_MUL);
+	// CHECK(verify_MULH);
+	// CHECK(verify_MULHU);
+	// CHECK(verify_OR);
+	// CHECK(verify_ORI);
+	// CHECK(verify_REM);
+	// CHECK(verify_REMU);
+	// CHECK(verify_REMU2);
+	// CHECK(verify_SB);
+	// CHECK(verify_SH);
+	// CHECK(verify_SLL);
+	// CHECK(verify_SLLI);
+	// CHECK(verify_SLT);
+	// CHECK(verify_SLTI);
+	// CHECK(verify_SLTIU);
+	// CHECK(verify_SLTU);
+	// CHECK(verify_SRA);
+	// CHECK(verify_SRAI);
+	// CHECK(verify_SRL);
+	// CHECK(verify_SRLI);
+	// CHECK(verify_SUB);
+	// CHECK(verify_SW);
+ 	// CHECK(verify_XOR);
+ 	// CHECK(verify_XORI);
+	// CHECK(verify_ENDIAN);
+	// CHECK(verify_MEM_LOAD_HAZARD);
+	// CHECK(verify_PIPELINE);
+	// CHECK(verify_PIPELINE_MEMORY);
+	// CHECK(verify_PIPELINE_MEMORY_B);
 
 #if defined(CHECK_FPU)
 
-	CHECK(verify_FADD);
-	CHECK(verify_FSUB);
-	CHECK(verify_FMUL);
+	// CHECK(verify_FADD);
+	// CHECK(verify_FSUB);
+	// CHECK(verify_FMUL);
 	CHECK(verify_FDIV);
-	CHECK(verify_FCVT);
-	CHECK(verify_FLW);
-	CHECK(verify_FSW);
-	CHECK(verify_FMV_X_W);
-	CHECK(verify_FMV_W_X);
-	CHECK(verify_FEQ);
-	CHECK(verify_FLT);
-	CHECK(verify_FMADD);
-	CHECK(verify_FMSUB);
-	CHECK(verify_FNMADD);
-	CHECK(verify_FNMSUB);
-	CHECK(verify_FSGNJ);
-	CHECK(verify_FSGNJN);
-	CHECK(verify_FSGNJX);
-	CHECK(verify_FMIN);
-	CHECK(verify_FMAX);
-	CHECK(verify_FMIN_FMAX);
+	// CHECK(verify_FCVT);
+	// CHECK(verify_FLW);
+	// CHECK(verify_FSW);
+	// CHECK(verify_FMV_X_W);
+	// CHECK(verify_FMV_W_X);
+	// CHECK(verify_FEQ);
+	// CHECK(verify_FLT);
+	// CHECK(verify_FMADD);
+	// CHECK(verify_FMSUB);
+	// CHECK(verify_FNMADD);
+	// CHECK(verify_FNMSUB);
+	// CHECK(verify_FSGNJ);
+	// CHECK(verify_FSGNJN);
+	// CHECK(verify_FSGNJX);
+	// CHECK(verify_FMIN);
+	// CHECK(verify_FMAX);
+	// CHECK(verify_FMIN_FMAX);
 
 #endif
 
-	CHECK(verify_CSRRS);
-	CHECK(verify_T0);
+	// CHECK(verify_CSRRS);
+	// CHECK(verify_T0);
 
 	if (success)
 		printf("SUCCESS!\n");

@@ -246,11 +246,11 @@ bool CPU_hl::tick(uint32_t count)
 			{
 				writeCSR(CSR::MEPC, m_pc);
 			
-				if ((mip & 0x80) != 0)
+				if ((mie & 0x80) != 0 && (mip & 0x80) != 0)
 					writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 7));	// Timer
-				else if ((mip & 0x800) != 0)
+				else if ((mie & 0x800) != 0 &&(mip & 0x800) != 0)
 					writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 11));	// External
-				else if ((mip & 0x8) != 0)
+				else if ((mie & 0x8) != 0 &&(mip & 0x8) != 0)
 					writeCSR(CSR::MCAUSE, 0x00000000 | (1 << 11));	// Software
 
 				// Push MIE and then disable interrupts.
@@ -261,11 +261,11 @@ bool CPU_hl::tick(uint32_t count)
 				const uint32_t mtvec = readCSR(CSR::MTVEC);
 				m_pc = mtvec;
 
-				if ((mip & 0x80) != 0)
+				if ((mie & 0x80) != 0 && (mip & 0x80) != 0)
 					mip &= ~0x80;
-				else if ((mip & 0x800) != 0)
+				else if ((mie & 0x800) != 0 &&(mip & 0x800) != 0)
 					mip &= ~0x800;
-				else if ((mip & 0x8) != 0)
+				else if ((mie & 0x8) != 0 &&(mip & 0x8) != 0)
 					mip &= ~0x8;
 
 				writeCSR(CSR::MIP, mip);
