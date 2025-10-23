@@ -26,6 +26,19 @@ void Bus::map(uint32_t start, uint32_t end, bool cacheable, bool tick, IDevice* 
 		m_cacheableRanges.push_back({ start, end });
 }
 
+bool Bus::ready(uint32_t address) const
+{
+	auto mappedDevice = findMappedDevice(address);
+	if (mappedDevice)
+		return mappedDevice->device->ready(address - mappedDevice->start);
+	else
+	{
+		log::error << L"No device at 0x" << str(L"%08x", address) << L", trying to check ready." << Endl;
+		m_error = true;
+		return false;
+	}
+}
+
 bool Bus::writeU32(uint32_t address, uint32_t value)
 {
 	auto mappedDevice = findMappedDevice(address);

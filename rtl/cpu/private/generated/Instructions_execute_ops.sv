@@ -71,6 +71,14 @@ case (`EXECUTE_OP)
 			`EXECUTE_DONE;
 		end
 	end
+	OP_MULHSU: begin
+		mul_request <= 1'b1;
+		mul_signed <= 1'b1;
+		if (mul_ready) begin
+			`RD <= mul_result[63:32];
+			`EXECUTE_DONE;
+		end
+	end
 	OP_MRET: begin
 		`GOTO(`MEPC);
 		`MRET <= 1'b1;

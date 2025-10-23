@@ -523,7 +523,7 @@ local instructions = {
 		type = insttype.FPU,
 		cpp = [[
 			const auto f = FormatR::parse(word);
-			R(f.rd) = (int32_t)FR(f.rs1);
+			R_s(f.rd) = (int32_t)FR(f.rs1);
 		]],
 		verilog_fpu = {
 			operation = fpu_operations.F2I
@@ -555,7 +555,8 @@ local instructions = {
 		type = insttype.FPU,
 		cpp = [[
 			const auto f = FormatR::parse(word);
-			FR(f.rd) = (float)R(f.rs1);
+			const float v = (float)R_s(f.rs1);
+			FR(f.rd) = v;
 		]],
 		verilog_fpu = {
 			operation = fpu_operations.I2F
@@ -572,7 +573,7 @@ local instructions = {
 		type = insttype.FPU,
 		cpp = [[
 			const auto f = FormatR::parse(word);
-			FR(f.rd) = (float)R(f.rs1);
+			FR_u(f.rd) = (float)R_u(f.rs1);
 		]],
 		verilog_fpu = {
 			operation = fpu_operations.UI2F
@@ -1215,7 +1216,22 @@ local instructions = {
 		mask = 0xfe00707f,
 		data = 0x02002033,
 		name = "MULHSU",
-		format = "R"
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const int64_t lh = (int64_t)R_s(f.rs1);
+			const uint64_t rh = (uint64_t)R(f.rs2);
+			R_s(f.rd) = (lh * rh) >> 32;
+		]],
+		verilog_text = [[
+			mul_request <= 1'b1;
+			mul_signed <= 1'b1;
+			if (mul_ready) begin
+				`RD <= mul_result[63:32];
+				`EXECUTE_DONE;
+			end
+		]]		
 	},
 	{
 		mask = 0xfe00707f,

@@ -13,6 +13,7 @@
 	is_MUL    ? OP_MUL    : 
 	is_MULH   ? OP_MULH   : 
 	is_MULHU  ? OP_MULHU  : 
+	is_MULHSU ? OP_MULHSU : 
 	is_MRET   ? OP_MRET   : 
 	is_REM    ? OP_REM    : 
 	is_REMU   ? OP_REMU   : 

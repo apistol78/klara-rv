@@ -36,7 +36,7 @@ private:
 		uint32_t tag = 0;
 	};
 
-	traktor::CircularVector< Task, 16 > m_tasks;
+	traktor::CircularVector< Task, 64 > m_tasks;
 	uint32_t m_queued = 0;
 	uint32_t m_retired = 0;
 

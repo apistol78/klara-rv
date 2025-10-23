@@ -63,7 +63,13 @@ uint32_t DMA::readU32(uint32_t address) const
 	else if (address == 4)
 		return m_retired;
 	else if (address == 12)
-		return (!m_tasks.empty()) ? 1 : 0;
+	{
+		const uint32_t full = (m_tasks.full()) ? 1 : 0;
+		const uint32_t busy = (m_tasks.empty()) ? 1 : 0;
+		return 
+			(full << 1) |
+			(busy << 0);
+	}
 	else
 	{
 		log::error << L"[DMA] attempt read from unknown address " << str(L"0x%08x", address) << L"." << Endl;
@@ -82,66 +88,78 @@ bool DMA::tick(ICPU* cpu, Bus* bus)
 	{
 		if (task.run == 1)
 		{
-			const uint32_t value = task.from;
-			bus->writeU32(task.to, value);
-			task.to += 4;
-			task.count--;
+			if (bus->ready(task.to))
+			{
+				const uint32_t value = task.from;
+				bus->writeU32(task.to, value);
+				task.to += 4;
+				task.count--;
+			}
 		}
 		else if (task.run == 2)
 		{
-			const uint32_t value = bus->readU32(task.from);
-			bus->writeU32(task.to, value);
-			task.to += 4;
-			task.from += 4;
-			task.count--;
+			if (bus->ready(task.to))
+			{
+				const uint32_t value = bus->readU32(task.from);
+				bus->writeU32(task.to, value);
+				task.to += 4;
+				task.from += 4;
+				task.count--;
+			}
 		}
 		else if (task.run == 3)
 		{
-			const uint32_t value = bus->readU32(task.from);
-			bus->writeU32(task.to, value);
-			task.from += 4;
-			task.count--;
+			if (bus->ready(task.to))
+			{
+				const uint32_t value = bus->readU32(task.from);
+				bus->writeU32(task.to, value);
+				task.from += 4;
+				task.count--;
+			}
 		}
 		else if (task.run == 4)
 		{
-			const uint32_t value = bus->readU32(task.from);
-			
 			const uint32_t wo = (task.to + task.offset) & ~3U;
-			uint32_t tl = bus->readU32(wo);
-			uint32_t th = bus->readU32(wo + 4);
-
-			switch (task.to & 3U)
+			if (bus->ready(wo) && bus->ready(wo + 4))
 			{
-			case 0:
-				tl = value;
-				break;
+				const uint32_t value = bus->readU32(task.from);
+				
+				uint32_t tl = bus->readU32(wo);
+				uint32_t th = bus->readU32(wo + 4);
 
-			case 3:
-				th = (th & 0xff000000) | (value >> 8);
-				tl = (tl & 0x00ffffff) | ((value & 0x000000ff) << 24);
-				break;
+				switch (task.to & 3U)
+				{
+				case 0:
+					tl = value;
+					break;
 
-			case 2:
-				th = (th & 0xffff0000) | (value >> 16);
-				tl = (tl & 0x0000ffff) | ((value & 0x0000ffff) << 16);
-				break;
+				case 3:
+					th = (th & 0xff000000) | (value >> 8);
+					tl = (tl & 0x00ffffff) | ((value & 0x000000ff) << 24);
+					break;
 
-			case 1:
-				th = (th & 0xffffff00) | (value >> 24);
-				tl = (tl & 0x000000ff) | ((value & 0x00ffffff) << 8);
-				break;
-			}
+				case 2:
+					th = (th & 0xffff0000) | (value >> 16);
+					tl = (tl & 0x0000ffff) | ((value & 0x0000ffff) << 16);
+					break;
 
-			bus->writeU32(wo, tl);
-			bus->writeU32(wo + 4, th);
+				case 1:
+					th = (th & 0xffffff00) | (value >> 24);
+					tl = (tl & 0x000000ff) | ((value & 0x00ffffff) << 8);
+					break;
+				}
 
-			task.from += 4;
-			task.offset += 4;
-			if (task.offset >= task.width)
-			{
-				task.offset = 0;
-				task.to += task.pitch;
-				task.count--;
+				bus->writeU32(wo, tl);
+				bus->writeU32(wo + 4, th);
+
+				task.from += 4;
+				task.offset += 4;
+				if (task.offset >= task.width)
+				{
+					task.offset = 0;
+					task.to += task.pitch;
+					task.count--;
+				}
 			}
 		}
 	}

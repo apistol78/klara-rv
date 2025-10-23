@@ -23,6 +23,10 @@ public:
 
 	void raise(uint32_t channel);
 
+	bool raised(uint32_t channel) const;
+
+	bool issued(uint32_t channel) const;
+
 private:
 	uint32_t m_enable = 0;
 	uint32_t m_raised = 0;

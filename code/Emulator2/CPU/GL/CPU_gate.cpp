@@ -18,6 +18,16 @@
 
 using namespace traktor;
 
+namespace
+{
+
+uint32_t bit(uint32_t value)
+{
+	return value ? 1 : 0;
+}
+
+}
+
 T_IMPLEMENT_RTTI_CLASS(L"CPU_gate", CPU_gate, ICPU)
 
 CPU_gate::CPU_gate(Bus* bus, const char* trace)
@@ -151,5 +161,36 @@ uint32_t CPU_gate::getRegister(uint32_t index) const
 
 uint32_t CPU_gate::getCSR(uint16_t csr) const
 {
+	switch (csr)
+	{
+	case MSTATUS:
+		return (bit(m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mstatus_mpie) << 4) |
+		       (bit(m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mstatus_mie) << 3);
+
+	case MIE:
+		return (bit(m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mie_meie) << 11) |
+		       (bit(m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mie_mtie) << 7)  |
+		       (bit(m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mie_msie) << 3);
+
+	case MTVEC:
+		return m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mtvec;
+
+	case MSCRATCH:
+		return m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mscratch;
+
+	case MEPC:
+		return m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mepc;
+		
+	case MCAUSE:
+		return m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mcause;
+
+	case MIP:
+		return (bit(m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mip_meip) << 11) |
+		       (bit(m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mip_mtip) << 7)  |
+		       (bit(m_tb->rootp->CPU_top__DOT__cpu__DOT__csr__DOT__mip_msip) << 3);
+
+	default:
+		break;
+	}
 	return 0;
 }

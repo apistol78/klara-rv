@@ -131,7 +131,7 @@ else if ((word & 0xfe00007f) == 0x00000053)	// FADD
 else if ((word & 0xfff0007f) == 0xc0000053)	// FCVT_W_S
 {
 	const auto f = FormatR::parse(word);
-	R(f.rd) = (int32_t)FR(f.rs1);
+	R_s(f.rd) = (int32_t)FR(f.rs1);
 }
 else if ((word & 0xfff0007f) == 0xc0100053)	// FCVT_WU_S
 {
@@ -141,12 +141,13 @@ else if ((word & 0xfff0007f) == 0xc0100053)	// FCVT_WU_S
 else if ((word & 0xfff0007f) == 0xd0000053)	// FCVT_S_W
 {
 	const auto f = FormatR::parse(word);
-	FR(f.rd) = (float)R(f.rs1);
+	const float v = (float)R_s(f.rs1);
+	FR(f.rd) = v;
 }
 else if ((word & 0xfff0007f) == 0xd0100053)	// FCVT_S_WU
 {
 	const auto f = FormatR::parse(word);
-	FR(f.rd) = (float)R(f.rs1);
+	FR_u(f.rd) = (float)R_u(f.rs1);
 }
 else if ((word & 0xfe00007f) == 0x18000053)	// FDIV
 {
@@ -171,11 +172,6 @@ else if ((word & 0xfe00707f) == 0xa0001053)	// FLT
 {
 	const auto f = FormatR::parse(word);
 	R(f.rd) = (FR(f.rs1) < FR(f.rs2) ? 1 : 0);
-}
-else if ((word & 0x0000707f) == 0x00002007)	// FLW
-{
-	const auto f = FormatI::parse(word);
-	FR_u(f.rd) = (uint32_t)MEM_RD(R_u(f.rs1) + f.imm);
 }
 else if ((word & 0x0600007f) == 0x00000043)	// FMADD
 {
@@ -212,16 +208,6 @@ else if ((word & 0xfe00007f) == 0x10000053)	// FMUL
 	const auto f = FormatR::parse(word);
 	FR(f.rd) = FR(f.rs1) * FR(f.rs2);
 }
-else if ((word & 0xfff0707f) == 0xe0000053)	// FMV_X_W
-{
-	const auto f = FormatR::parse(word);
-	R(f.rd) = FR_u(f.rs1);
-}
-else if ((word & 0xfff0707f) == 0xf0000053)	// FMV_W_X
-{
-	const auto f = FormatR::parse(word);
-	FR_u(f.rd) = R(f.rs1);
-}
 else if ((word & 0xfe00707f) == 0x20000053)	// FSGNJ
 {
 	const auto f = FormatR::parse(word);
@@ -247,11 +233,6 @@ else if ((word & 0xfe00007f) == 0x08000053)	// FSUB
 {
 	const auto f = FormatR::parse(word);
 	FR(f.rd) = FR(f.rs1) - FR(f.rs2);
-}
-else if ((word & 0x0000707f) == 0x00002027)	// FSW
-{
-	const auto f = FormatS::parse(word);
-	MEM_WR(R_u(f.rs1) + f.imm, FR_u(f.rs2));
 }
 else if ((word & 0x0000007f) == 0x0000006f)	// JAL
 {
@@ -314,6 +295,13 @@ else if ((word & 0xfe00707f) == 0x02003033)	// MULHU
 	const uint64_t lh = (uint64_t)R(f.rs1);
 	const uint64_t rh = (uint64_t)R(f.rs2);
 	R(f.rd) = (lh * rh) >> 32;
+}
+else if ((word & 0xfe00707f) == 0x02002033)	// MULHSU
+{
+	const auto f = FormatR::parse(word);
+	const int64_t lh = (int64_t)R_s(f.rs1);
+	const uint64_t rh = (uint64_t)R(f.rs2);
+	R_s(f.rd) = (lh * rh) >> 32;
 }
 else if ((word & 0xffffffff) == 0x30200073)	// MRET
 {
