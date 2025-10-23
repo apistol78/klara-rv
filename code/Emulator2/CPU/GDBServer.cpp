@@ -24,9 +24,10 @@
 
 using namespace traktor;
 
-#define T_GDB_LOG(x) // log::info << x << Endl;
+#define T_GDB_LOG(x) log::info << x << Endl;
+#define T_GDB_LOG_VERBOSE(x)
 
-T_IMPLEMENT_RTTI_CLASS(L"GDBServer", GDBServer, IDevice)
+T_IMPLEMENT_RTTI_CLASS(L"GDBServer", GDBServer, Object)
 
 namespace
 {
@@ -78,7 +79,7 @@ namespace
 		const char hex[] = "0123456789ABCDEF";
 		uint8_t cs = 0;
 
-		T_GDB_LOG(L"[GDB] sending \"" << mbstows(msg) << L"\"");
+		T_GDB_LOG_VERBOSE(L"[GDB] sending \"" << mbstows(msg) << L"\"");
 
 		socket->send('+');
 		socket->send('$');
@@ -140,15 +141,16 @@ void GDBServer::process()
 			char ch;
 			if (m_clientSocket->recv(&ch, 1) <= 0)
 			{
-				T_GDB_LOG(L"GDB client disconnected.");
+				T_GDB_LOG(L"[GDB] client disconnected.");
 				safeClose(m_clientSocket);
-				m_mode = ModeRun;
+				setMode(ModeRun);
 				continue;
 			}
 
 			if (ch == '\x03')
 			{
 				// Async break.
+				T_GDB_LOG(L"[GDB] async break.");
 				setMode(ModeStopped);
 			}
 
@@ -169,15 +171,15 @@ void GDBServer::process()
 				uint8_t cs[2];
 				m_clientSocket->recv(cs, 2);
 
-				T_GDB_LOG(L"GDB, got message \"" << mbstows(msg) << L"\"");
+				T_GDB_LOG_VERBOSE(L"[GDB] got message \"" << mbstows(msg) << L"\"");
 
 				// Process message.
 				if (msg[0] == '?')
 				{
-					//if (mode == ModeStopped)
+					if (m_mode == ModeStopped)
 						send(m_clientSocket, "S05");	// sigtrap
-					//else
-					//	send(m_clientSocket, "");
+					else
+						send(m_clientSocket, "");
 				}
 				else if (msg[0] == 'g')
 				{
@@ -215,7 +217,7 @@ void GDBServer::process()
 
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 1, "%x,%x", &addr, &len);
-					T_GDB_LOG(L"[GDB] read " << len << L" bytes from " << str(L"%08x", addr));
+					T_GDB_LOG_VERBOSE(L"[GDB] read " << len << L" bytes from " << str(L"%08x", addr));
 					
 					StringOutputStream ss;
 					for (uint32_t i = 0; i < len; ++i)
@@ -233,7 +235,7 @@ void GDBServer::process()
 
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 1, "%x,%x", &addr, &len);
-					T_GDB_LOG(L"[GDB] write " << len << L" bytes to " << str(L"%08x", addr));
+					T_GDB_LOG_VERBOSE(L"[GDB] write " << len << L" bytes to " << str(L"%08x", addr));
 
 					std::string hexdata = msg.substr(msg.find(':')+1);
 					for (uint32_t i = 0; i < len; i++)
@@ -247,17 +249,17 @@ void GDBServer::process()
 				else if (msg[0] == 'c')
 				{
 					send(m_clientSocket, "OK");
-					m_mode = ModeRun;
+					setMode(ModeRun);
 				}
 				else if (msg[0] == 's')
 				{
 					send(m_clientSocket, "S05");
-					m_mode = ModeStep;
+					setMode(ModeStep);
 				}
 				else if (msg[0] == 'k')
 				{
 					safeClose(m_clientSocket);
-					m_mode = ModeKilled;
+					setMode(ModeKilled);
 				}
 				else if (startsWith(msg, "Z0"))
 				{
@@ -298,33 +300,41 @@ void GDBServer::process()
 		{
 			m_clientSocket->setNoDelay(true);
 			m_clientSocket->setQuickAck(true);
-			T_GDB_LOG(L"GDB client connected.");
+			T_GDB_LOG(L"[GDB] client connected.");
 		}
 	}
 }
 
-bool GDBServer::tick(ICPU* cpu, Bus* bus)
+void GDBServer::tick()
 {
-	if (m_mode == ModeRun)
+	if (m_mode != ModeRun && m_mode != ModeStep)
+		return;
+
+	for (uint32_t bp : m_breakpoints)
 	{
-		for (uint32_t bp : m_breakpoints)
+		if (bp == m_cpu->getPC())
 		{
-			if (bp == m_cpu->getPC())
-			{
-				T_GDB_LOG(L"[GDB] breakpoint hit.");
-				setMode(ModeStopped);
-			}
+			T_GDB_LOG(L"[GDB] breakpoint hit.");
+			setMode(ModeStopped);
 		}
 	}
-	return true;
 }
 
 void GDBServer::setMode(int32_t mode)
 {
-	if (mode != m_mode && mode == ModeStopped)
+	const wchar_t* modeNames[] =
 	{
-		T_GDB_LOG(L"[GDB] Mode changed to " << (int32_t)mode);
+		L"Run",
+		L"Step",
+		L"Stopped",
+		L"Killed"
+	};
+
+	if (mode != m_mode)
+		T_GDB_LOG(L"[GDB] mode changed to " << modeNames[mode] << L" (from " << modeNames[m_mode] << L")");
+
+	if (mode == ModeStopped)
 		send(m_clientSocket, "S02");	// sigint
-	}
+
 	m_mode = mode;
 }

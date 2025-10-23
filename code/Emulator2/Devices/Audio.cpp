@@ -11,6 +11,7 @@
 #include <Core/Io/FileSystem.h>
 #include <Core/Log/Log.h>
 #include <Core/Memory/Alloc.h>
+#include <Core/Misc/Align.h>
 #include <Core/Misc/String.h>
 #include <Core/Thread/ThreadManager.h>
 #include <Sound/AudioChannel.h>
@@ -48,7 +49,7 @@ public:
 
 	virtual bool getBlock(sound::IAudioBufferCursor* cursor, const sound::IAudioMixer* mixer, sound::AudioBlock& outBlock) const
 	{
-		uint32_t samplesCount = std::min< uint32_t >(outBlock.samplesCount, queued());
+		uint32_t samplesCount = std::min< uint32_t >(outBlock.samplesCount, alignDown(queued(), 16));
 		samplesCount = std::min< uint32_t >(samplesCount, 1024);
 
 		if (samplesCount > 0)
