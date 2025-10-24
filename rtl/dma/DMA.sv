@@ -11,7 +11,7 @@
 `default_nettype none
 
 module DMA #(
-	parameter QUEUE_DEPTH = 32
+	parameter QUEUE_DEPTH = 4
 ) (
 	input wire i_reset,
 	input wire i_clock,
@@ -129,7 +129,7 @@ module DMA #(
 					o_rdata <=
 					{
 						30'h0,
-						queue_queued >= (QUEUE_DEPTH - 2), // queue_full,										// DMA full
+						queue_queued >= (QUEUE_DEPTH - 1), // queue_full,										// DMA full
 						(!queue_empty || state != IDLE) ? 1'b1 : 1'b0	// DMA busy
 					};
 					o_ready <= 1'b1;
