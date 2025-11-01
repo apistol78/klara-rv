@@ -10,8 +10,15 @@
 `timescale 1ns/1ns
 `default_nettype none
 
+/*!
+AUDIO controller which basically holds the audio
+configuration registers and also a small FIFO to
+queue samples to the output AUDIO device.
+The queue is kept small as the basic idea is to have
+a DMA channel kept busy to feed to the audio stream.
+*/
 module AUDIO_controller #(
-	parameter BUFFER_SIZE = 128
+	parameter BUFFER_SIZE = 16
 )(
 	input wire i_reset,
 	input wire i_clock,
