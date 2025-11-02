@@ -43,6 +43,8 @@ public:
 
 	void setCallback(const std::function< void() >& callback);
 
+	uint32_t getFrameCounter() const { return m_frameCounter; }
+
 private:
 	traktor::AlignedVector< uint8_t > m_framebuffer;
 	uint32_t m_palette[256];

@@ -22,23 +22,6 @@ BusAccess::BusAccess(DCache* dcache)
 
 BusAccess::~BusAccess()
 {
-	const uint64_t wt = m_nw8 + m_nw16 + m_nw32;
-	const uint64_t rt = m_nr8 + m_nr16 + m_nr32;
-
-	// log::info << L"Bus access:" << Endl;
-	// if (wt > 0)
-	// {
-	// 	log::info << str(L"%-12d", m_nw8)  << L" write 8-bit  (" << str(L"%.1f%%", (m_nw8 * 100.0) / wt)  << L")" << Endl;
-	// 	log::info << str(L"%-12d", m_nw16) << L" write 16-bit (" << str(L"%.1f%%", (m_nw16 * 100.0) / wt) << L")" << Endl;
-	// 	log::info << str(L"%-12d", m_nw32) << L" write 32-bit (" << str(L"%.1f%%", (m_nw32 * 100.0) / wt) << L")" << Endl;
-	// }
-	// if (rt > 0)
-	// {
-	// 	log::info << str(L"%-12d", m_nr8)  << L" read 8-bit   (" << str(L"%.1f%%", (m_nr8 * 100.0) / rt)  << L")" << Endl;
-	// 	log::info << str(L"%-12d", m_nr16) << L" read 16-bit  (" << str(L"%.1f%%", (m_nr16 * 100.0) / rt) << L")" << Endl;
-	// 	log::info << str(L"%-12d", m_nr32) << L" read 32-bit  (" << str(L"%.1f%%", (m_nr32 * 100.0) / rt) << L")" << Endl;
-	// }
-
 	if (!m_ua16.empty())
 	{
 		log::warning << L"Unaligned 16-bit reads from following PCs:" << Endl;
@@ -151,8 +134,9 @@ uint16_t BusAccess::readU16(uint32_t pc, uint32_t address) const
 
 	default:
 		{
-			//log::warning << L"Unaligned 16-bit read from " << str(L"%08x", address) << L" (PC " << str(L"%08x", pc) << L")" << Endl;
-			//m_ua16.insert(pc);
+			log::warning << L"Unaligned 16-bit read from " << str(L"%08x", address) << L" (PC " << str(L"%08x", pc) << L")" << Endl;
+			m_ua16.insert(pc);
+
 			const uint8_t lb = readU8(pc, address);
 			const uint8_t hb = readU8(pc, address + 1);
 			return (hb << 8) | lb;
@@ -169,8 +153,9 @@ uint32_t BusAccess::readU32(uint32_t pc, uint32_t address) const
 
 	if ((address & 3) != 0)
 	{
-		//log::warning << L"Unaligned 32-bit read from " << str(L"%08x", address) << L" (PC " << str(L"%08x", pc) << L")" << Endl;
-		//m_ua32.insert(pc);
+		log::warning << L"Unaligned 32-bit read from " << str(L"%08x", address) << L" (PC " << str(L"%08x", pc) << L")" << Endl;
+		m_ua32.insert(pc);
+		
 		const uint16_t lw = readU16(pc, address);
 		const uint16_t hw = readU16(pc, address + 2);
 		return (hw << 16) | lw;

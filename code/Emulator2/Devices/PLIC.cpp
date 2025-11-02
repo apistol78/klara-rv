@@ -14,19 +14,6 @@
 
 using namespace traktor;
 
-namespace
-{
-
-std::wstring fmt(uint32_t bm)
-{
-	std::wstring out;
-	for (uint32_t i = 0; i < 4; ++i)
-		out += (bm & (1 << i)) ? L"1" : L"0";
-	return out;
-}
-
-}
-
 T_IMPLEMENT_RTTI_CLASS(L"PLIC", PLIC, IDevice)
 
 bool PLIC::writeU32(uint32_t address, uint32_t value)

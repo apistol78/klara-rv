@@ -29,6 +29,12 @@ public:
 
 	void setCallback(const std::function< void() >& callback);
 
+	uint64_t getCycles() const { return m_cycles; }
+
+	uint64_t getCompare() const { return m_compare; }
+
+	uint32_t getCountDown() const { return m_countdown; }
+
 private:
 	traktor::Timer m_timer;
 	uint64_t m_cycles = 0;
