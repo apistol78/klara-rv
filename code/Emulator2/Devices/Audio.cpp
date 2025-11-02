@@ -141,7 +141,7 @@ bool Audio::ready(uint32_t address) const
 	 	return true;
 }
 
-bool Audio::writeU32(uint32_t address, uint32_t value)
+bool Audio::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	WrappedAudioBuffer* wab = (WrappedAudioBuffer*)m_audioBuffer.ptr();
 	if (address == 0x0)

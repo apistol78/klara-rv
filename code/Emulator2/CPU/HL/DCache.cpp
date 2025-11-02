@@ -10,7 +10,6 @@
 #include <Core/Misc/String.h>
 #include "Emulator2/CPU/Bus.h"
 #include "Emulator2/CPU/HL/DCache.h"
-#include "Emulator2/CPU/HL/DCacheWB.h"
 
 //#define DCACHE_LOG_STAT
 
@@ -20,11 +19,10 @@ T_IMPLEMENT_RTTI_CLASS(L"DCache", DCache, Object)
 
 DCache::DCache(Bus* bus)
 :	m_bus(bus)
-,	m_wb(new DCacheWB(bus))
 {
     for (uint32_t i = 0; i < c_nlines; ++i)
 	{
-        m_data[i].valid = false;
+        m_data[i].mask = 0;
 		m_data[i].dirty = false;
 	}
 }
@@ -36,26 +34,26 @@ DCache::~DCache()
 #endif
 }
 
-void DCache::writeU32(uint32_t address, uint32_t value)
+void DCache::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	if (m_bus->cacheable(address))
 	{
 		const uint32_t tag = (address >> 2) & (c_nlines - 1);
 		Line& line = m_data[tag];
 
-		if (line.address != address && line.valid && line.dirty)
+		if (line.address != address && line.mask && line.dirty)
 		{
 			// Need to evict line which contain dirty data.
-			m_wb->writeU32(line.address, line.word);
+			m_bus->writeU32(line.address, line.word, line.mask);
 		}
 
 		line.address = address;
-		line.word = value;
-		line.valid = true;
+		line.word = (line.word & ~mask) | (value & mask);
+		line.mask = line.mask | mask;
 		line.dirty = true;
 	}
 	else
-		m_wb->writeU32(address, value);
+		m_bus->writeU32(address, value, mask);
 }
 
 uint32_t DCache::readU32(uint32_t address)
@@ -65,47 +63,41 @@ uint32_t DCache::readU32(uint32_t address)
 		const uint32_t tag = (address >> 2) & (c_nlines - 1);
 		Line& line = m_data[tag];
 
-		if (line.valid && line.address == address)
+		if (line.mask == 0xffffffff && line.address == address)
 		{
 			m_hits++;
 			return line.word;
 		}
 
-		if (/*line.address != address && */ line.valid && line.dirty)
+		if (/*line.address != address && */ line.mask && line.dirty)
 		{
 			// Need to evict line which contain dirty data.
-			m_wb->writeU32(line.address, line.word);
+			m_bus->writeU32(line.address, line.word, line.mask);
 		}
 
-		const uint32_t word = m_wb->readU32(address);
+		const uint32_t word = m_bus->readU32(address);
 
 		line.address = address;
 		line.word = word;
-		line.valid = true;
+		line.mask = 0xffffffff;
 		line.dirty = false;
 
 		m_misses++;
 	    return word;
 	}
 	else
-		return m_wb->readU32(address);
-}
-
-void DCache::processWriteQueue()
-{
-	m_wb->process();
+		return m_bus->readU32(address);
 }
 
 void DCache::flush()
 {
-	m_wb->flush();
     for (uint32_t i = 0; i < c_nlines; ++i)
 	{
 		Line& line = m_data[i];
-		if (line.valid && line.dirty)
+		if (line.mask && line.dirty)
 		{
-			m_wb->writeU32(line.address, line.word);
-			line.valid = false;
+			m_bus->writeU32(line.address, line.word, line.mask);
+			line.mask = 0;
 			line.dirty = false;
 		}
 	}

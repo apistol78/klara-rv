@@ -103,7 +103,7 @@ bool CPU_gate::tick(uint32_t count)
 					}
 					else
 					{
-						m_bus->writeU32(m_tb->bus_address, m_tb->bus_wdata);
+						m_bus->writeU32(m_tb->bus_address, m_tb->bus_wdata, ~0U);
 					}
 				}
 

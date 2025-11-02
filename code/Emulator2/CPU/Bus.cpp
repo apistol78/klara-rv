@@ -39,12 +39,12 @@ bool Bus::ready(uint32_t address) const
 	}
 }
 
-bool Bus::writeU32(uint32_t address, uint32_t value)
+bool Bus::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	auto mappedDevice = findMappedDevice(address);
 	if (mappedDevice)
 	{
-		if (!mappedDevice->device->writeU32(address - mappedDevice->start, value))
+		if (!mappedDevice->device->writeU32(address - mappedDevice->start, value, mask))
 			m_error = true;
 	}
 	else

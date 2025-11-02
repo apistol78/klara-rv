@@ -38,7 +38,7 @@ void Memory::setReadOnly(bool readOnly)
 	m_readOnly = readOnly;
 }
 
-bool Memory::writeU32(uint32_t address, uint32_t value)
+bool Memory::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	if (address >= m_capacity)
 	{
@@ -48,7 +48,8 @@ bool Memory::writeU32(uint32_t address, uint32_t value)
 
 	if (!m_readOnly)
 	{
-		*(uint32_t*)(m_data.c_ptr() + address) = value;
+		uint32_t* p = (uint32_t*)(m_data.ptr() + address);
+		*p = (*p & ~mask) | (value & mask);
 		return true;
 	}
 	else

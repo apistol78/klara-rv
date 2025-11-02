@@ -16,7 +16,7 @@ using namespace traktor;
 
 T_IMPLEMENT_RTTI_CLASS(L"PLIC", PLIC, IDevice)
 
-bool PLIC::writeU32(uint32_t address, uint32_t value)
+bool PLIC::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	if (address == 0x00002000)
 		m_enable = value >> 1;

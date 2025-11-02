@@ -71,7 +71,7 @@ namespace
 			w = (w & 0x00ffffff) | (value << 24);
 			break;
 		}
-		bus->writeU32(wa, w);	
+		bus->writeU32(wa, w, ~0U);	
 	}
 
 	void send(net::TcpSocket* socket, const std::string& msg)

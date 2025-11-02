@@ -35,7 +35,7 @@ SD::SD(void* data, uint32_t size)
 {
 }
 
-bool SD::writeU32(uint32_t address, uint32_t value)
+bool SD::writeU32(uint32_t address, uint32_t value, uint32_t /*mask*/)
 {
 	const uint8_t mask = (uint8_t)(value >> 8);
 	const uint8_t write = (uint8_t)value;

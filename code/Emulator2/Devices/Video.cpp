@@ -36,7 +36,7 @@ Video::Video(uint32_t displayWidth, uint32_t displayHeight)
 	m_image->clear(Color4f(0.0f, 0.0f, 0.0f, 0.0f));
 }
 
-bool Video::writeU32(uint32_t address, uint32_t value)
+bool Video::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	if ((address & 0x00f00000) == 0x00f00000)
 	{
@@ -72,7 +72,8 @@ bool Video::writeU32(uint32_t address, uint32_t value)
 	}
 	else if (address < m_framebuffer.size())
 	{
-		*(uint32_t*)&m_framebuffer[address] = value;
+		uint32_t* p = (uint32_t*)&m_framebuffer[address];
+		*p = (*p & ~mask) | (value & mask);
 	}
 	else
 	{

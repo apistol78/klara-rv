@@ -40,6 +40,7 @@ void BusAccess::writeU8(uint32_t pc, uint32_t address, uint8_t value)
 {
 	const uint32_t wa = address & ~3;
 	const uint32_t wb = address & 3;
+	/*
 	uint32_t w = m_dcache->readU32(wa);
 	switch(wb)
 	{
@@ -57,6 +58,24 @@ void BusAccess::writeU8(uint32_t pc, uint32_t address, uint8_t value)
 		break;
 	}
 	m_dcache->writeU32(wa, w);
+	*/
+
+	switch(wb)
+	{
+	case 0:
+		m_dcache->writeU32(wa, value << 0, 0x000000ff);
+		break;
+	case 1:
+		m_dcache->writeU32(wa, value << 8, 0x0000ff00);
+		break;
+	case 2:
+		m_dcache->writeU32(wa, value << 16, 0x00ff0000);
+		break;
+	case 3:
+		m_dcache->writeU32(wa, value << 24, 0xff000000);
+		break;
+	}
+
 	++m_nw8;
 }
 
@@ -64,6 +83,7 @@ void BusAccess::writeU16(uint32_t pc, uint32_t address, uint16_t value)
 {
 	const uint32_t wa = address & ~3;
 	const uint32_t wb = address & 3;
+	/*
 	uint32_t w = m_dcache->readU32(wa);
 	switch(wb)
 	{
@@ -78,6 +98,18 @@ void BusAccess::writeU16(uint32_t pc, uint32_t address, uint16_t value)
 		break;
 	}
 	m_dcache->writeU32(wa, w);
+	*/
+
+	switch(wb)
+	{
+	case 0:
+		m_dcache->writeU32(wa, value << 0, 0x0000ffff);
+		break;
+	case 2:
+		m_dcache->writeU32(wa, value << 16, 0xffff0000);
+		break;
+	}
+
 	++m_nw16;
 }
 
@@ -85,7 +117,7 @@ void BusAccess::writeU32(uint32_t pc, uint32_t address, uint32_t value)
 {
 	if ((address & 3) != 0)
 		log::error << L"Unaligned 32-bit write to " << str(L"%08x", address) << L" (PC " << str(L"%08x", pc) << L")" << Endl;
-	m_dcache->writeU32(address, value);
+	m_dcache->writeU32(address, value, 0xffffffff);
 	++m_nw32;
 }
 

@@ -16,7 +16,7 @@ using namespace traktor;
 
 T_IMPLEMENT_RTTI_CLASS(L"DMA", DMA, IDevice)
 
-bool DMA::writeU32(uint32_t address, uint32_t value)
+bool DMA::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	if (address == 0)
 		m_from = value;
@@ -91,7 +91,7 @@ bool DMA::tick(ICPU* cpu, Bus* bus)
 			if (bus->ready(task.to))
 			{
 				const uint32_t value = task.from;
-				bus->writeU32(task.to, value);
+				bus->writeU32(task.to, value, ~0U);
 				task.to += 4;
 				task.count--;
 			}
@@ -101,7 +101,7 @@ bool DMA::tick(ICPU* cpu, Bus* bus)
 			if (bus->ready(task.to))
 			{
 				const uint32_t value = bus->readU32(task.from);
-				bus->writeU32(task.to, value);
+				bus->writeU32(task.to, value, ~0U);
 				task.to += 4;
 				task.from += 4;
 				task.count--;
@@ -112,7 +112,7 @@ bool DMA::tick(ICPU* cpu, Bus* bus)
 			if (bus->ready(task.to))
 			{
 				const uint32_t value = bus->readU32(task.from);
-				bus->writeU32(task.to, value);
+				bus->writeU32(task.to, value, ~0U);
 				task.from += 4;
 				task.count--;
 			}
@@ -149,8 +149,8 @@ bool DMA::tick(ICPU* cpu, Bus* bus)
 					break;
 				}
 
-				bus->writeU32(wo, tl);
-				bus->writeU32(wo + 4, th);
+				bus->writeU32(wo, tl, ~0U);
+				bus->writeU32(wo + 4, th, ~0U);
 
 				task.from += 4;
 				task.offset += 4;

@@ -304,8 +304,6 @@ bool CPU_hl::tick(uint32_t count)
 		m_retiredPC = m_pc;
 		m_pc = m_next;
 
-		m_dcache->processWriteQueue();
-
 		if (!m_bus->tick(this))
 			return false;
 

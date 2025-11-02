@@ -10,7 +10,7 @@
 
 T_IMPLEMENT_RTTI_CLASS(L"SPI", SPI, IDevice)
 
-bool SPI::writeU32(uint32_t address, uint32_t value)
+bool SPI::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	return true;
 }

@@ -10,7 +10,7 @@
 
 T_IMPLEMENT_RTTI_CLASS(L"Unknown", Unknown, IDevice)
 
-bool Unknown::writeU32(uint32_t address, uint32_t value)
+bool Unknown::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	return true;
 }

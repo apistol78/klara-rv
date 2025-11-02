@@ -43,7 +43,7 @@ public:
 
 	bool ready(uint32_t address) const;
 
-	bool writeU32(uint32_t address, uint32_t value);
+	bool writeU32(uint32_t address, uint32_t value, uint32_t mask);
 
 	uint32_t readU32(uint32_t address) const;
 

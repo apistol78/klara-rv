@@ -17,7 +17,7 @@ T_IMPLEMENT_RTTI_CLASS(L"I2C", I2C, IDevice)
 
 T_IMPLEMENT_RTTI_CLASS(L"I2C.ISlave", I2C::ISlave, Object)
 
-bool I2C::writeU32(uint32_t address, uint32_t value)
+bool I2C::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	const uint8_t dir = value & 0xff;
 	const uint8_t deviceAddr = (value >> 8) & 0xff;
@@ -73,6 +73,10 @@ uint32_t I2C::readU32(uint32_t address) const
 		return 0;
 	}
 	else if (address == 12)	// retired
+	{
+		return 0;
+	}
+	else
 	{
 		return 0;
 	}

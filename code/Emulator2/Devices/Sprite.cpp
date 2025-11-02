@@ -14,7 +14,7 @@ using namespace traktor;
 
 T_IMPLEMENT_RTTI_CLASS(L"Sprite", Sprite, IDevice)
 
-bool Sprite::writeU32(uint32_t address, uint32_t value)
+bool Sprite::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	if (address < 0x4000)
 	{

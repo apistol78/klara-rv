@@ -21,7 +21,7 @@ void UART::enqueue(uint8_t b)
 	m_data.push_back(b);
 }
 
-bool UART::writeU32(uint32_t address, uint32_t value)
+bool UART::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	log::info << wchar_t(value & 0xff);
 	return true;

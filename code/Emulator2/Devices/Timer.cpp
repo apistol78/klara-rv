@@ -20,7 +20,7 @@ Timer::Timer()
 	m_callback = [](){};
 }
 
-bool Timer::writeU32(uint32_t address, uint32_t value)
+bool Timer::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	switch (address >> 2)
 	{

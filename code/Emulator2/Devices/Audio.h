@@ -31,7 +31,7 @@ public:
 
 	virtual bool ready(uint32_t address) const override final;
 
-	virtual bool writeU32(uint32_t address, uint32_t value) override final;
+	virtual bool writeU32(uint32_t address, uint32_t value, uint32_t mask) override final;
 
 	virtual uint32_t readU32(uint32_t address) const override final;
 
