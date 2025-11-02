@@ -8,7 +8,7 @@
 */
 #include "HAL/DMA.h"
 
-#define DMA_BASE(C)		((uint32_t*)(C))
+#define DMA_BASE(C)		((volatile uint32_t*)(C))
 #define DMA_FROM(C)		(DMA_BASE(C) + 0)
 #define DMA_TO(C)		(DMA_BASE(C) + 1)
 #define DMA_COUNT(C)	(DMA_BASE(C) + 2)
