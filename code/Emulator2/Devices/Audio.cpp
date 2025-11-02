@@ -13,6 +13,8 @@
 #include <Core/Memory/Alloc.h>
 #include <Core/Misc/Align.h>
 #include <Core/Misc/String.h>
+#include <Core/Thread/Acquire.h>
+#include <Core/Thread/Semaphore.h>
 #include <Core/Thread/ThreadManager.h>
 #include <Sound/AudioChannel.h>
 #include <Sound/AudioSystem.h>
@@ -49,9 +51,9 @@ public:
 
 	virtual bool getBlock(sound::IAudioBufferCursor* cursor, const sound::IAudioMixer* mixer, sound::AudioBlock& outBlock) const
 	{
-		uint32_t samplesCount = std::min< uint32_t >(outBlock.samplesCount, alignDown(queued(), 16));
-		samplesCount = std::min< uint32_t >(samplesCount, 1024);
+		T_ANONYMOUS_VAR(Acquire< Semaphore >)(m_lock);
 
+		const uint32_t samplesCount = std::min< uint32_t >(outBlock.samplesCount, alignDown(m_queued[0].size(), 16));
 		if (samplesCount > 0)
 		{
 			for (int32_t i = 0; i < 2; ++i)
@@ -77,6 +79,8 @@ public:
 
 	void write(uint32_t value)
 	{
+		T_ANONYMOUS_VAR(Acquire< Semaphore >)(m_lock);
+
 		const uint16_t lh = (value >> 16);
 		const uint16_t rh = (value & 0xffff);
 		const float flh = (*(int16_t*)&lh) / 32767.0f;
@@ -88,6 +92,7 @@ public:
 
 	uint32_t queued() const
 	{
+		T_ANONYMOUS_VAR(Acquire< Semaphore >)(m_lock);
 		return m_queued[0].size();
 	}
 
@@ -97,6 +102,7 @@ public:
 	}
 
 private:
+	mutable Semaphore m_lock;
 	mutable AlignedVector< float > m_queued[2];
 	float* m_buffer[2];
 	uint32_t m_rate = 22050;
@@ -115,7 +121,7 @@ Audio::Audio()
 	desc.driverDesc.sampleRate = 22050;
 	desc.driverDesc.bitsPerSample = 16;
 	desc.driverDesc.hwChannels = 2;
-	desc.driverDesc.frameSamples = 1024;
+	desc.driverDesc.frameSamples = 256;
 
 	m_audioSystem = new sound::AudioSystem(audioDriver);
 	m_audioSystem->create(desc);
@@ -171,13 +177,6 @@ uint32_t Audio::readU32(uint32_t address) const
 
 bool Audio::tick(ICPU* cpu, Bus* bus)
 {
-	// WrappedAudioBuffer* wab = (WrappedAudioBuffer*)m_audioBuffer.ptr();
-	// const uint32_t q = wab->queued();
-
-	// if (m_callback && m_lastQ >= 2048 && q < 2048)
-	// 	m_callback();
-
-	// m_lastQ = q;
 	return true;
 }
 
