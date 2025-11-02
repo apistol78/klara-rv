@@ -8,14 +8,13 @@
 */
 #include "HAL/DMA.h"
 
-static volatile uint32_t* const c_base[2] = { (volatile uint32_t*)(DMA_0_BASE), (volatile uint32_t*)(DMA_1_BASE) };
-
-#define DMA_FROM(C)		(c_base[C] + 0)
-#define DMA_TO(C)		(c_base[C] + 1)
-#define DMA_COUNT(C)	(c_base[C] + 2)
-#define DMA_RUN(C)		(c_base[C] + 3)
-#define DMA_PITCH(C)	(c_base[C] + 4)
-#define DMA_WIDTH(C)	(c_base[C] + 5)
+#define DMA_BASE(C)		((uint32_t*)(C))
+#define DMA_FROM(C)		(DMA_BASE(C) + 0)
+#define DMA_TO(C)		(DMA_BASE(C) + 1)
+#define DMA_COUNT(C)	(DMA_BASE(C) + 2)
+#define DMA_RUN(C)		(DMA_BASE(C) + 3)
+#define DMA_PITCH(C)	(DMA_BASE(C) + 4)
+#define DMA_WIDTH(C)	(DMA_BASE(C) + 5)
 
 uint32_t hal_dma_write(uint32_t channel, void* dst, uint32_t count, uint32_t value)
 {
