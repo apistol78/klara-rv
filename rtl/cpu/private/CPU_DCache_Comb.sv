@@ -24,6 +24,7 @@ module CPU_DCache_Comb #(
 	output bit [31:0] o_bus_address,
 	input wire [31:0] i_bus_rdata,
 	output bit [31:0] o_bus_wdata,
+	output bit [3:0] o_bus_wmask,
 
 	// Input
 	input wire i_rw,
@@ -33,6 +34,7 @@ module CPU_DCache_Comb #(
 	input wire [31:0] i_address,
 	output bit [31:0] o_rdata,
 	input wire [31:0] i_wdata,
+	input wire [3:0] i_wmask,
 	input wire i_cacheable
 );
 
@@ -102,6 +104,7 @@ module CPU_DCache_Comb #(
 		o_bus_address = 0;
 		o_bus_request = 0;
 		o_bus_wdata = 0;
+		o_bus_wmask = 4'b0000;
 
 		o_rdata = 0;
 		o_ready = 0;

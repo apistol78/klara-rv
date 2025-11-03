@@ -26,6 +26,7 @@ function main(argv)
 		o:printLn("\tinput wire [31:0] i_m" .. i .. "_address,")
 		o:printLn("\toutput bit [31:0] o_m" .. i .. "_rdata,")
 		o:printLn("\tinput wire [31:0] i_m" .. i .. "_wdata,")
+		o:printLn("\tinput wire [3:0] i_m" .. i .. "_wmask,")
 	end
 
 	-- Slaves
@@ -37,7 +38,8 @@ function main(argv)
 		o:printLn("\tinput wire i_s" .. i .. "_ready,")
 		o:printLn("\toutput bit [31:0] o_s" .. i .. "_address,")
 		o:printLn("\tinput wire [31:0] i_s" .. i .. "_rdata,")
-		o:print("\toutput bit [31:0] o_s" .. i .. "_wdata")
+		o:printLn("\toutput bit [31:0] o_s" .. i .. "_wdata,")
+		o:print("\toutput bit [3:0] o_s" .. i .. "_wmask")
 		if i < NSLAVES - 1 then o:printLn(",") else o:printLn() end    
 	end
 
@@ -62,6 +64,7 @@ function main(argv)
 		o:printLn("\t\to_s" .. i .. "_request = 1'b0;")
 		o:printLn("\t\to_s" .. i .. "_address = 32'h0;")
 		o:printLn("\t\to_s" .. i .. "_wdata = 32'h0;")
+		o:printLn("\t\to_s" .. i .. "_wmask = 4'h0;")
 	end
 	o:printLn()
 	for i = 0, NMASTERS - 1 do
@@ -80,6 +83,7 @@ function main(argv)
 			o:printLn("\t\t\to_s" .. i .. "_address = { 4'h0, i_m" .. j .. "_address[27:0] };")
 			o:printLn("\t\t\to_m" .. j .. "_rdata = i_s" .. i .. "_rdata;")
 			o:printLn("\t\t\to_s" .. i .. "_wdata = i_m" .. j .. "_wdata;")
+			o:printLn("\t\t\to_s" .. i .. "_wmask = i_m" .. j .. "_wmask;")
 			o:printLn("\t\tend")
 		end
 		if i < NSLAVES - 1 then o:printLn() end

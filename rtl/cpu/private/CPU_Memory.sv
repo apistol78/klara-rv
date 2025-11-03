@@ -26,6 +26,7 @@ module CPU_Memory #(
 	output wire [31:0] o_bus_address,
 	input wire [31:0] i_bus_rdata,
 	output wire [31:0] o_bus_wdata,
+	output wire [3:0] o_bus_wmask,
 
 	// Input
 	output bit o_busy,
@@ -38,10 +39,6 @@ module CPU_Memory #(
 	typedef enum bit [2:0]
 	{
 		IDLE,
-		READ,
-		WRITE_WORD,
-		WRITE_RMW_0,
-		WRITE_RMW_1,
 		FLUSH
 	} state_t;
 
@@ -54,6 +51,7 @@ module CPU_Memory #(
 	bit [31:0] wb_address;
 	wire [31:0] wb_rdata;
 	bit [31:0] wb_wdata;
+	bit [3:0] wb_wmask;
 	wire wb_cacheable = (wb_address == 4'h1);
 
 	generate if (DCACHE_WB_QUEUE != 0) begin : memory_wb
@@ -69,6 +67,7 @@ module CPU_Memory #(
 		.o_bus_address(o_bus_address),
 		.i_bus_rdata(i_bus_rdata),
 		.o_bus_wdata(o_bus_wdata),
+		.o_bus_wmask(o_bus_wmask),
 
 		.i_rw(wb_rw),
 		.i_request(wb_request),
@@ -76,6 +75,7 @@ module CPU_Memory #(
 		.i_address(wb_address),
 		.o_rdata(wb_rdata),
 		.i_wdata(wb_wdata),
+		.i_wmask(wb_wmask),
 		.i_cached(wb_cacheable)
 	);
 
@@ -90,6 +90,7 @@ module CPU_Memory #(
 	assign o_bus_address = wb_address;
 	assign wb_rdata = i_bus_rdata;
 	assign o_bus_wdata = wb_wdata;
+	assign o_bus_wmask = wb_wmask;
 
 	end endgenerate
 
@@ -103,6 +104,7 @@ module CPU_Memory #(
 	wire [31:0] dcache_address;
 	wire [31:0] dcache_rdata;
 	bit [31:0] dcache_wdata;
+	bit [3:0] dcache_wmask;
 	wire dcache_need_flush;
 	wire dcache_cacheable = (i_data.mem_address[31:28] == 4'h1);
 
@@ -120,6 +122,7 @@ module CPU_Memory #(
 			.o_bus_address(wb_address),
 			.i_bus_rdata(wb_rdata),
 			.o_bus_wdata(wb_wdata),
+			.o_bus_wmask(wb_wmask),
 
 			.i_rw(dcache_rw),
 			.i_request(dcache_request),
@@ -128,6 +131,7 @@ module CPU_Memory #(
 			.i_address(dcache_address),
 			.o_rdata(dcache_rdata),
 			.i_wdata(dcache_wdata),
+			.i_wmask(dcache_wmask),
 			.i_cacheable(dcache_cacheable)
 		);
 
@@ -149,6 +153,7 @@ module CPU_Memory #(
 			.o_bus_address(wb_address),
 			.i_bus_rdata(wb_rdata),
 			.o_bus_wdata(wb_wdata),
+			.o_bus_wmask(wb_wmask),
 
 			.i_rw(dcache_rw),
 			.i_request(dcache_request),
@@ -157,6 +162,7 @@ module CPU_Memory #(
 			.i_address(dcache_address),
 			.o_rdata(dcache_rdata),
 			.i_wdata(dcache_wdata),
+			.i_wmask(dcache_wmask),
 			.i_cacheable(dcache_cacheable)
 		);
 
@@ -172,6 +178,7 @@ module CPU_Memory #(
 		assign wb_address = dcache_address;
 		assign dcache_rdata = wb_rdata;
 		assign wb_wdata = dcache_wdata;
+		assign wb_wmask = dcache_wmask;
 		assign dcache_need_flush = 1'b0;
 
 	end endgenerate
@@ -185,7 +192,6 @@ module CPU_Memory #(
 	
 	memory_data_t data = 0;
 	state_t state = IDLE;
-	bit [31:0] rmw_rdata = 0;
 	bit last_strobe = 0;
 
 	always_comb begin
@@ -203,7 +209,6 @@ module CPU_Memory #(
 	bit [31:0] next_data_pc;
 	bit [31:0] next_data_rd;
 	register_t next_data_inst_rd;
-	bit [31:0] next_rmw_rdata;
 
 	always_ff @(posedge i_clock) begin
 		state <= next_state;
@@ -212,7 +217,6 @@ module CPU_Memory #(
 		data.rd <= next_data_rd;
 		data.inst_rd <= next_data_inst_rd;
 		data.strobe <= next_data_strobe;
-		rmw_rdata <= next_rmw_rdata;
 	end
 
 	always_comb begin
@@ -222,11 +226,11 @@ module CPU_Memory #(
 		next_data_rd = data.rd;
 		next_data_inst_rd = data.inst_rd;
 		next_data_strobe = data.strobe;
-		next_rmw_rdata = rmw_rdata;
 
 		dcache_request = 0;
 		dcache_rw = 0;
 		dcache_wdata = 0;
+		dcache_wmask = 4'b0000;
 		dcache_flush = 0;
 
 		unique case (state)
@@ -234,18 +238,72 @@ module CPU_Memory #(
 				if (i_data.strobe != last_strobe) begin
 					if (i_data.mem_read) begin
 						dcache_request = 1;
-						next_state = READ;
+						if (dcache_ready) begin
+							next_data_pc = i_data.pc;
+							case (i_data.mem_width)
+								`MEMW_4: next_data_rd = dcache_rdata;
+								`MEMW_2: next_data_rd = { { 16{ i_data.mem_signed & bus_rdata_half[15] } }, bus_rdata_half[15:0] };
+								`MEMW_1: next_data_rd = { { 24{ i_data.mem_signed & bus_rdata_byte[ 7] } }, bus_rdata_byte[ 7:0] };
+								default: next_data_rd = 0;
+							endcase
+							next_data_inst_rd = i_data.mem_inst_rd;
+							next_data_strobe = ~data.strobe;
+							next_last_strobe = i_data.strobe;
+						end
 					end
 					else if (i_data.mem_write) begin
 						dcache_request = 1;
+						dcache_rw = 1;
 						if (i_data.mem_width == `MEMW_4) begin
-							dcache_rw = 1;
 							dcache_wdata = i_data.rd;
-							next_state = WRITE_WORD;
+							dcache_wmask = 4'b1111;
 						end
-						else begin
-							// Byte or half write, need to perform read-modify-write.
-							next_state = WRITE_RMW_0;
+						else if (i_data.mem_width == `MEMW_2) begin
+							unique case (address_byte_index)
+								2'd0: begin
+									dcache_wdata = { 8'h00, 8'h00, i_data.rd[15:0] };
+									dcache_wmask = 4'b0011;
+								end
+								2'd2: begin
+									dcache_wdata = { i_data.rd[15:0], 8'h00, 8'h00 };
+									dcache_wmask = 4'b1100;
+								end
+								default: begin
+									dcache_wdata = 32'h0000_0000;
+									dcache_wmask = 4'b0000;
+								end
+							endcase							
+						end
+						else if (i_data.mem_width == `MEMW_1) begin
+							unique case (address_byte_index)
+								2'd0: begin
+									dcache_wdata = { 8'h00, 8'h00, 8'h00, i_data.rd[7:0] };
+									dcache_wmask = 4'b0001;
+								end
+								2'd1: begin
+									dcache_wdata = { 8'h00, 8'h00, i_data.rd[7:0], 8'h00 };
+									dcache_wmask = 4'b0010;
+								end
+								2'd2: begin
+									dcache_wdata = { 8'h00, i_data.rd[7:0], 8'h00, 8'h00 };
+									dcache_wmask = 4'b0100;
+								end
+								2'd3: begin
+									dcache_wdata = { i_data.rd[7:0], 8'h00, 8'h00, 8'h00 };
+									dcache_wmask = 4'b1000;
+								end
+								default: begin
+									dcache_wdata = 32'h0000_0000;
+									dcache_wmask = 4'b0000;
+								end
+							endcase
+						end
+						if (dcache_ready) begin
+							next_data_pc = i_data.pc;
+							next_data_rd = i_data.rd;
+							next_data_inst_rd = i_data.inst_rd;	
+							next_data_strobe = ~data.strobe;
+							next_last_strobe = i_data.strobe;
 						end
 					end
 					else if (i_data.mem_flush && dcache_need_flush) begin
@@ -268,9 +326,6 @@ module CPU_Memory #(
 				dcache_flush = 1;
 
 				if (dcache_ready) begin
-					// dcache_request = 0;
-					// dcache_flush = 0;
-
 					next_data_pc = i_data.pc;
 					next_data_rd = i_data.rd;
 					next_data_inst_rd = i_data.inst_rd;				
@@ -278,92 +333,6 @@ module CPU_Memory #(
 					next_last_strobe = i_data.strobe;
 					next_state = IDLE;
 				end
-			end
-
-			READ: begin
-				dcache_request = 1;
-				dcache_rw = 0;
-
-				if (dcache_ready) begin
-					// dcache_request = 0;
-
-					next_data_pc = i_data.pc;
-					case (i_data.mem_width)
-						`MEMW_4: next_data_rd = dcache_rdata;
-						`MEMW_2: next_data_rd = { { 16{ i_data.mem_signed & bus_rdata_half[15] } }, bus_rdata_half[15:0] };
-						`MEMW_1: next_data_rd = { { 24{ i_data.mem_signed & bus_rdata_byte[ 7] } }, bus_rdata_byte[ 7:0] };
-						default: next_data_rd = 0;
-					endcase
-					next_data_inst_rd = i_data.mem_inst_rd;
-					next_data_strobe = ~data.strobe;
-					next_last_strobe = i_data.strobe;
-					next_state = IDLE;
-				end
-			end
-
-			WRITE_WORD: begin
-				dcache_request = 1;
-				dcache_rw = 1;
-				dcache_wdata = i_data.rd;
-
-				if (dcache_ready) begin
-					// dcache_request = 0;
-					// dcache_rw = 0;
-					
-					next_data_pc = i_data.pc;
-					next_data_rd = i_data.rd;
-					next_data_inst_rd = i_data.inst_rd;	
-					next_data_strobe = ~data.strobe;
-					next_last_strobe = i_data.strobe;
-					next_state = IDLE;
-				end
-			end
-
-			WRITE_RMW_0: begin
-				dcache_request = 1;
-				dcache_rw = 0;
-
-				if (dcache_ready) begin
-					// dcache_request = 0;
-
-					next_rmw_rdata = dcache_rdata;
-					next_state = WRITE_RMW_1;
-				end
-			end
-
-			WRITE_RMW_1: begin
-				dcache_request = 1;
-				dcache_rw = 1;
-				dcache_wdata = 0;
-
-				if (i_data.mem_width == `MEMW_1) begin
-					unique case (address_byte_index)
-						2'd0: dcache_wdata = { rmw_rdata[31:24], rmw_rdata[23:16], rmw_rdata[15:8], i_data.rd[7:0] };
-						2'd1: dcache_wdata = { rmw_rdata[31:24], rmw_rdata[23:16],  i_data.rd[7:0], rmw_rdata[7:0] };
-						2'd2: dcache_wdata = { rmw_rdata[31:24],   i_data.rd[7:0], rmw_rdata[15:8], rmw_rdata[7:0] };
-						2'd3: dcache_wdata = {   i_data.rd[7:0], rmw_rdata[23:16], rmw_rdata[15:8], rmw_rdata[7:0] };
-					endcase
-				end
-				else begin	// width must be 2
-					unique case (address_byte_index)
-						2'd0: dcache_wdata = { rmw_rdata[31:16], i_data.rd[15:0] };
-						2'd2: dcache_wdata = {  i_data.rd[15:0], rmw_rdata[15:0] };
-						default: dcache_wdata = 0;
-					endcase						
-				end
-
-				if (dcache_ready) begin
-					// dcache_request = 0;
-					// dcache_rw = 0;
-					
-					next_data_pc = i_data.pc;
-					next_data_rd = i_data.rd;
-					next_data_inst_rd = i_data.inst_rd;	
-
-					next_data_strobe = ~data.strobe;
-					next_last_strobe = i_data.strobe;
-					next_state = IDLE;
-				end					
 			end
 
 			default:

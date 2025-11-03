@@ -24,6 +24,7 @@ module CPU_DCache_None #(
 	output bit [31:0] o_bus_address,
 	input wire [31:0] i_bus_rdata,
 	output bit [31:0] o_bus_wdata,
+	output bit [3:0] o_bus_wmask,
 
 	// Input
 	input wire i_rw,
@@ -33,6 +34,7 @@ module CPU_DCache_None #(
 	input wire [31:0] i_address,
 	output bit [31:0] o_rdata,
 	input wire [31:0] i_wdata,
+	input wire [3:0] i_wmask,
 	input wire i_cacheable
 );
 
@@ -47,6 +49,7 @@ module CPU_DCache_None #(
         o_bus_rw <= i_rw;
         o_bus_address <= i_address;
         o_bus_wdata <= i_wdata;
+		o_bus_wmask <= i_wmask;
 
         o_rdata <= i_bus_rdata;
         o_ready <= i_bus_ready;

@@ -24,6 +24,7 @@ module CPU_top(
 	output [31:0] bus_address,
 	input [31:0] bus_rdata,
 	output [31:0] bus_wdata,
+	output [3:0] bus_wmask,
 	output cpu_fault
 );
 
@@ -39,6 +40,7 @@ module CPU_top(
 		.o_bus_address(bus_address),
 		.i_bus_rdata(bus_rdata),
 		.o_bus_wdata(bus_wdata),
+		.o_bus_wmask(bus_wmask),
 
 		.i_pa_rw(1'b0),
 		.i_pa_request(cpu_ibus_request),
@@ -46,6 +48,7 @@ module CPU_top(
 		.i_pa_address(cpu_ibus_address),
 		.o_pa_rdata(cpu_ibus_rdata),
 		.i_pa_wdata(32'h0),
+		.i_pa_wmask(4'b0000),
 
 		.i_pb_rw(cpu_dbus_rw),
 		.i_pb_request(cpu_dbus_request),
@@ -53,13 +56,15 @@ module CPU_top(
 		.i_pb_address(cpu_dbus_address),
 		.o_pb_rdata(cpu_dbus_rdata),
 		.i_pb_wdata(cpu_dbus_wdata),
+		.i_pb_wmask(cpu_dbus_wmask),
 
 		.i_pc_rw(1'b0),
 		.i_pc_request(1'b0),
 		.o_pc_ready(),
 		.i_pc_address(32'h0),
 		.o_pc_rdata(),
-		.i_pc_wdata(32'h0)
+		.i_pc_wdata(32'h0),
+		.i_pc_wmask(4'b0000)
 	);
 
 	//====================================================
@@ -74,11 +79,12 @@ module CPU_top(
 	wire [31:0] cpu_dbus_address;
 	wire [31:0] cpu_dbus_rdata;
 	wire [31:0] cpu_dbus_wdata;
+	wire [3:0] cpu_dbus_wmask;
 
 	CPU #(
 		.FREQUENCY(`FREQUENCY),
 		.DCACHE_SIZE(12),
-		.DCACHE_REGISTERED(0),
+		.DCACHE_REGISTERED(1),
 		.DCACHE_WB_QUEUE(1),
 		.ICACHE_SIZE(12),
 		.ICACHE_REGISTERED(1)
@@ -103,6 +109,7 @@ module CPU_top(
 		.o_dbus_address(cpu_dbus_address),
 		.i_dbus_rdata(cpu_dbus_rdata),
 		.o_dbus_wdata(cpu_dbus_wdata),
+		.o_dbus_wmask(cpu_dbus_wmask),
 
 		// Debug
 		.o_execute_busy(),

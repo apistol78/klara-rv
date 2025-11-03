@@ -40,17 +40,18 @@ module CPU #(
 	
 	// Instruction bus
 	output wire o_ibus_request,			// IO request.
-	input wire i_ibus_ready,				// IO request ready.
+	input wire i_ibus_ready,			// IO request ready.
 	output wire [31:0] o_ibus_address,	// Address
 	input wire [31:0] i_ibus_rdata,		// Read data
 	
 	// Data bus
-	output wire o_dbus_rw,					// Data read/write
+	output wire o_dbus_rw,				// Data read/write
 	output wire o_dbus_request,			// IO request.
-	input wire i_dbus_ready,				// IO request ready.
+	input wire i_dbus_ready,			// IO request ready.
 	output wire [31:0] o_dbus_address,	// Address
 	input wire [31:0] i_dbus_rdata,		// Read data
-	output wire [31:0] o_dbus_wdata,		// Write data
+	output wire [31:0] o_dbus_wdata,	// Write data
+	output wire [3:0] o_dbus_wmask,		// Write mask
 	
 	// Debug
 	output wire o_execute_busy,
@@ -278,6 +279,7 @@ module CPU #(
 		.o_bus_address(o_dbus_address),
 		.i_bus_rdata(i_dbus_rdata),
 		.o_bus_wdata(o_dbus_wdata),
+		.o_bus_wmask(o_dbus_wmask),
 
 		// Input
 		.o_busy(memory_busy),

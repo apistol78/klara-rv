@@ -24,6 +24,7 @@ module CPU_DCache_Reg #(
 	output bit [31:0] o_bus_address,
 	input wire [31:0] i_bus_rdata,
 	output bit [31:0] o_bus_wdata,
+	output bit [3:0] o_bus_wmask,
 
 	// Input
 	input wire i_rw,
@@ -33,6 +34,7 @@ module CPU_DCache_Reg #(
 	input wire [31:0] i_address,
 	output bit [31:0] o_rdata,
 	input wire [31:0] i_wdata,
+	input wire [3:0] i_wmask,
 	input wire i_cacheable
 );
 
@@ -53,20 +55,28 @@ module CPU_DCache_Reg #(
 		INITIALIZE		= 11'b10000000000
 	} state_t;
 
+	typedef struct packed
+	{
+		bit dirty;
+		bit [29:0] address;
+		bit [3:0] mask;
+		bit [31:0] data;
+	} cache_entry_t;
+
 	state_t state = INITIALIZE;
 	bit [SIZE:0] flush_address = 0;
 
 	// Cache memory.
 	bit cache_rw = 0;
 	bit [SIZE - 1:0] cache_address;
-	bit [63:0] cache_wdata;
-	wire [63:0] cache_rdata;
+	cache_entry_t cache_wdata;
+	cache_entry_t cache_rdata;
 
 	// One cycle latency, important since
 	// we rely on address only.
 	CPU_BRAM #(
 		.ADDRESS_WIDTH(SIZE),
-		.DATA_WIDTH(64),
+		.DATA_WIDTH($bits(cache_entry_t)),
 		.SIZE(RANGE),
 		.ADDR_LSH(0)
 	) cache(
@@ -80,10 +90,13 @@ module CPU_DCache_Reg #(
 		.o_valid()
 	);
 
-	wire cache_entry_valid = cache_rdata[0];
-	wire cache_entry_dirty = cache_rdata[1];
-	wire [31:0] cache_entry_address = { cache_rdata[31:2], 2'b00 };
-	wire [31:0] cache_entry_data = cache_rdata[63:32];
+	wire [31:0] cache_entry_address = { cache_rdata.address, 2'b00 };
+	wire [31:0] i_wmask_extended = {
+		{ 8{ i_wmask[3] } },
+		{ 8{ i_wmask[2] } },
+		{ 8{ i_wmask[1] } },
+		{ 8{ i_wmask[0] } }
+	};
 
 	always_comb begin
 		if (|state[10:7])
@@ -98,7 +111,7 @@ module CPU_DCache_Reg #(
 		cache_rw <= 1'b0;
 
 		unique case (1'b1)
-			state[0]: begin
+			/* IDLE */ state[0]: begin
 				if (i_request && !o_ready) begin
 					if (i_flush) begin
 						flush_address <= 0;
@@ -110,8 +123,8 @@ module CPU_DCache_Reg #(
 							// Check "super hot" cache line first, since
 							// RMW pattern access same address multiple times
 							// it's a high probability this will be true.
-							if (cache_entry_valid && cache_entry_address == i_address) begin
-								o_rdata <= cache_entry_data;
+							if (&cache_rdata.mask && cache_entry_address == i_address) begin
+								o_rdata <= cache_rdata.data;
 								o_ready <= 1'b1;
 							end
 							else
@@ -122,9 +135,12 @@ module CPU_DCache_Reg #(
 
 							// Check "super hot" cache line here as well,
 							// see comment above.
-							if (cache_entry_valid && cache_entry_address == i_address) begin
+							if (/*|cache_rdata.mask &&*/ cache_entry_address == i_address) begin
 								cache_rw <= 1'b1;
-								cache_wdata <= { i_wdata, i_address[31:2], 2'b11 };
+								cache_wdata.dirty <= 1'b1;
+								cache_wdata.address <= i_address[31:2];
+								cache_wdata.data <= (cache_rdata.data & ~i_wmask_extended) | (i_wdata & i_wmask_extended);
+								cache_wdata.mask <= cache_rdata.mask | i_wmask;
 								o_ready <= 1'b1;
 							end
 							else
@@ -137,6 +153,7 @@ module CPU_DCache_Reg #(
 						o_bus_address <= i_address;
 						o_bus_request <= 1'b1;
 						o_bus_wdata <= i_wdata;
+						o_bus_wmask <= i_wmask;
 						state <= PASS_THROUGH;
 					end
 				end
@@ -147,7 +164,7 @@ module CPU_DCache_Reg #(
 			// ================
 
 			// Cache not initialized, pass through to bus.
-			state[1]: begin
+			/* PASS_THROUGH */ state[1]: begin
 				if (i_bus_ready) begin
 					o_bus_request <= 1'b0;
 					o_rdata <= i_bus_rdata;
@@ -161,27 +178,40 @@ module CPU_DCache_Reg #(
 			// ================
 
 			// Write, write back if necessary.
-			state[2]: begin
-				if (cache_entry_dirty && cache_entry_address != i_address) begin
+			/* WRITE_SETUP */ state[2]: begin
+				if (|cache_rdata.mask && cache_entry_address != i_address) begin
 					o_bus_rw <= 1'b1;
 					o_bus_address <= cache_entry_address;
 					o_bus_request <= 1'b1;
-					o_bus_wdata <= cache_entry_data;
+					o_bus_wdata <= cache_rdata.data;
+					o_bus_wmask <= cache_rdata.mask;
 					state <= WRITE_WAIT;
 				end
 				else begin
 					cache_rw <= 1'b1;
-					cache_wdata <= { i_wdata, i_address[31:2], 2'b11 };
+					cache_wdata.dirty <= 1'b1;
+					cache_wdata.address <= i_address[31:2];
+					if (cache_entry_address == i_address)  begin
+						cache_wdata.data <= (cache_rdata.data & ~i_wmask_extended) | (i_wdata & i_wmask_extended);
+						cache_wdata.mask <= cache_rdata.mask | i_wmask;
+					end
+					else begin
+						cache_wdata.data <= i_wdata;
+						cache_wdata.mask <= i_wmask;
+					end
 					o_ready <= 1'b1;
 					state <= IDLE;
 				end
 			end
 
 			// Wait until write back finish.
-			state[3]: begin
+			/* WRITE_WAIT */ state[3]: begin
 				if (i_bus_ready) begin
 					cache_rw <= 1'b1;
-					cache_wdata <= { i_wdata, i_address[31:2], 2'b11 };
+					cache_wdata.dirty <= 1'b1;
+					cache_wdata.address <= i_address[31:2];
+					cache_wdata.data <= i_wdata;
+					cache_wdata.mask <= i_wmask;
 					o_bus_request <= 1'b0;
 					o_ready <= 1'b1;
 					state <= IDLE;
@@ -193,18 +223,19 @@ module CPU_DCache_Reg #(
 			// ================
 
 			// Check if cache entry valid, if not then read from bus.
-			state[4]: begin
-				if (cache_entry_valid && cache_entry_address == i_address) begin
-					o_rdata <= cache_entry_data;
+			/* READ_SETUP */ state[4]: begin
+				if (&cache_rdata.mask && cache_entry_address == i_address) begin
+					o_rdata <= cache_rdata.data;
 					o_ready <= 1'b1;
 					state <= IDLE;
 				end
 				else begin
-					if (/* cache_entry_valid && */ cache_entry_dirty) begin
+					if (|cache_rdata.mask && cache_rdata.dirty) begin
 						o_bus_rw <= 1'b1;
 						o_bus_address <= cache_entry_address;
 						o_bus_request <= 1'b1;
-						o_bus_wdata <= cache_entry_data;
+						o_bus_wdata <= cache_rdata.data;
+						o_bus_wmask <= cache_rdata.mask;
 						state <= READ_WB_WAIT;
 					end
 					else begin
@@ -217,7 +248,7 @@ module CPU_DCache_Reg #(
 			end
 
 			// Write previous entry back to bus.
-			state[5]: begin
+			/* READ_WB_WAIT */ state[5]: begin
 				if (i_bus_ready) begin
 					o_bus_request <= 1'b0;
 					state <= READ_BUS_WAIT;
@@ -225,13 +256,16 @@ module CPU_DCache_Reg #(
 			end
 
 			// Wait until new data read from bus.
-			state[6]: begin
+			/* READ_BUS_WAIT */ state[6]: begin
 				o_bus_rw <= 1'b0;
 				o_bus_address <= i_address;
 				o_bus_request <= 1'b1;
 				if (i_bus_ready) begin
 					cache_rw <= 1'b1;
-					cache_wdata <= { i_bus_rdata, i_address[31:2], 2'b01 };
+					cache_wdata.dirty <= 1'b0;
+					cache_wdata.address <= i_address[31:2];
+					cache_wdata.data <= i_bus_rdata;
+					cache_wdata.mask <= 4'b1111;
 					o_bus_request <= 1'b0;
 					o_rdata <= i_bus_rdata;
 					o_ready <= 1'b1;
@@ -242,7 +276,7 @@ module CPU_DCache_Reg #(
 			// ================
 			// FLUSH
 			// ================
-			state[7]: begin
+			/* FLUSH_SETUP */ state[7]: begin
 				if (!i_bus_ready) begin
 					if (flush_address <= RANGE - 1)
 						state <= FLUSH_CHECK;
@@ -253,16 +287,13 @@ module CPU_DCache_Reg #(
 				end
 			end
 
-			state[8]: begin
-				if (cache_entry_dirty) begin
+			/* FLUSH_CHECK */ state[8]: begin
+				if (|cache_rdata.mask && cache_rdata.dirty) begin
 					o_bus_rw <= 1'b1;
 					o_bus_address <= cache_entry_address;
 					o_bus_request <= 1'b1;
-					o_bus_wdata <= cache_entry_data;
-					/*
-					cache_rw <= 1'b1;
-					cache_wdata <= 32'hffff_fff0; // { cache_entry_data, cache_entry_address[31:2], 2'b01 };
-					*/
+					o_bus_wdata <= cache_rdata.data;
+					o_bus_wmask <= cache_rdata.mask;
 					state <= FLUSH_WRITE;
 				end
 				else begin
@@ -271,7 +302,7 @@ module CPU_DCache_Reg #(
 				end
 			end
 
-			state[9]: begin
+			/* FLUSH_WRITE */ state[9]: begin
 				if (i_bus_ready) begin
 					o_bus_request <= 1'b0;
 					flush_address <= flush_address + 1;
@@ -283,10 +314,13 @@ module CPU_DCache_Reg #(
 			// INITIALIZE
 			// ================
 
-			state[10]: begin
+			/* INITIALIZE */ state[10]: begin
 				if (flush_address < RANGE) begin
 					cache_rw <= 1'b1;
-					cache_wdata <= 32'hffff_fff0;
+					cache_wdata.dirty <= 1'b0;
+					cache_wdata.address <= 30'h0;
+					cache_wdata.data <= 32'h0;
+					cache_wdata.mask <= 4'b0000;
 					flush_address <= flush_address + 1;
 				end
 				else begin

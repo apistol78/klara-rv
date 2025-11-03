@@ -47,9 +47,17 @@ void DCache::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 			m_bus->writeU32(line.address, line.word, line.mask);
 		}
 
+		if  (address == line.address)
+		{
+			line.word = (line.word & ~mask) | (value & mask);
+			line.mask = line.mask | mask;
+		}
+		else
+		{
+			line.word = value;
+			line.mask = mask;
+		}
 		line.address = address;
-		line.word = (line.word & ~mask) | (value & mask);
-		line.mask = line.mask | mask;
 		line.dirty = true;
 	}
 	else

@@ -51,6 +51,7 @@ module SDRAM_controller #(
 	input wire i_rw,
 	input wire [31:0] i_address,			// Must be 4 byte aligned.
 	input wire [USER_DATA_WIDTH-1:0] i_wdata,
+	input wire [3:0] i_wmask,
 	output bit [USER_DATA_WIDTH-1:0] o_rdata,
 	output bit o_ready,
 
@@ -444,8 +445,10 @@ module SDRAM_controller #(
 						
 						if (BURST_COUNT == 1)
 							sdram_wdata <= wdata;
-						else if (BURST_COUNT == 2)
+						else if (BURST_COUNT == 2) begin
 							sdram_wdata <= wdata[Bc-1:Bb];
+							sdram_dqm <= i_rw ? ~{ i_wmask[3], i_wmask[2] } : 2'b00;
+						end	
 						else if (BURST_COUNT == 4)
 							sdram_wdata <= wdata[Be-1:Bd];
 						else if (BURST_COUNT == 8)
@@ -535,6 +538,7 @@ module SDRAM_controller #(
 
 					if (BURST_COUNT == 2) begin
 						sdram_wdata <= wdata[Bb-1:Ba];
+						sdram_dqm <= ~{ i_wmask[1], i_wmask[0] };
 					end
 					else if (BURST_COUNT == 4) begin
 						if (count == tRCD_COUNT) begin

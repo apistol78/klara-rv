@@ -13,6 +13,7 @@ module XBAR_2_2(
 	input wire [31:0] i_m0_address,
 	output bit [31:0] o_m0_rdata,
 	input wire [31:0] i_m0_wdata,
+	input wire [3:0] i_m0_wmask,
 
 	// Master 1
 	input wire i_m1_rw,
@@ -21,6 +22,7 @@ module XBAR_2_2(
 	input wire [31:0] i_m1_address,
 	output bit [31:0] o_m1_rdata,
 	input wire [31:0] i_m1_wdata,
+	input wire [3:0] i_m1_wmask,
 
 	// Slave 0
 	output bit o_s0_rw,
@@ -29,6 +31,7 @@ module XBAR_2_2(
 	output bit [31:0] o_s0_address,
 	input wire [31:0] i_s0_rdata,
 	output bit [31:0] o_s0_wdata,
+	output bit [3:0] o_s0_wmask,
 
 	// Slave 1
 	output bit o_s1_rw,
@@ -36,7 +39,8 @@ module XBAR_2_2(
 	input wire i_s1_ready,
 	output bit [31:0] o_s1_address,
 	input wire [31:0] i_s1_rdata,
-	output bit [31:0] o_s1_wdata
+	output bit [31:0] o_s1_wdata,
+	output bit [3:0] o_s1_wmask
 );
 	bit [3:0] s0_source;
 	bit [3:0] next_s0_source;
@@ -53,10 +57,12 @@ module XBAR_2_2(
 		o_s0_request = 1'b0;
 		o_s0_address = 32'h0;
 		o_s0_wdata = 32'h0;
+		o_s0_wmask = 4'h0;
 		o_s1_rw = 1'b0;
 		o_s1_request = 1'b0;
 		o_s1_address = 32'h0;
 		o_s1_wdata = 32'h0;
+		o_s1_wmask = 4'h0;
 
 		o_m0_ready = 1'b0;
 		o_m0_rdata = 32'h0;
@@ -70,6 +76,7 @@ module XBAR_2_2(
 			o_s0_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s0_rdata;
 			o_s0_wdata = i_m0_wdata;
+			o_s0_wmask = i_m0_wmask;
 		end
 		else if (next_s0_source == 4'h2) begin
 			o_s0_rw = i_m1_rw;
@@ -78,6 +85,7 @@ module XBAR_2_2(
 			o_s0_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s0_rdata;
 			o_s0_wdata = i_m1_wdata;
+			o_s0_wmask = i_m1_wmask;
 		end
 
 		if (next_s1_source == 4'h1) begin
@@ -87,6 +95,7 @@ module XBAR_2_2(
 			o_s1_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s1_rdata;
 			o_s1_wdata = i_m0_wdata;
+			o_s1_wmask = i_m0_wmask;
 		end
 		else if (next_s1_source == 4'h2) begin
 			o_s1_rw = i_m1_rw;
@@ -95,6 +104,7 @@ module XBAR_2_2(
 			o_s1_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s1_rdata;
 			o_s1_wdata = i_m1_wdata;
+			o_s1_wmask = i_m1_wmask;
 		end
 	end
 

@@ -13,6 +13,7 @@ module XBAR_3_11(
 	input wire [31:0] i_m0_address,
 	output bit [31:0] o_m0_rdata,
 	input wire [31:0] i_m0_wdata,
+	input wire [3:0] i_m0_wmask,
 
 	// Master 1
 	input wire i_m1_rw,
@@ -21,6 +22,7 @@ module XBAR_3_11(
 	input wire [31:0] i_m1_address,
 	output bit [31:0] o_m1_rdata,
 	input wire [31:0] i_m1_wdata,
+	input wire [3:0] i_m1_wmask,
 
 	// Master 2
 	input wire i_m2_rw,
@@ -29,6 +31,7 @@ module XBAR_3_11(
 	input wire [31:0] i_m2_address,
 	output bit [31:0] o_m2_rdata,
 	input wire [31:0] i_m2_wdata,
+	input wire [3:0] i_m2_wmask,
 
 	// Slave 0
 	output bit o_s0_rw,
@@ -37,6 +40,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s0_address,
 	input wire [31:0] i_s0_rdata,
 	output bit [31:0] o_s0_wdata,
+	output bit [3:0] o_s0_wmask,
 
 	// Slave 1
 	output bit o_s1_rw,
@@ -45,6 +49,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s1_address,
 	input wire [31:0] i_s1_rdata,
 	output bit [31:0] o_s1_wdata,
+	output bit [3:0] o_s1_wmask,
 
 	// Slave 2
 	output bit o_s2_rw,
@@ -53,6 +58,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s2_address,
 	input wire [31:0] i_s2_rdata,
 	output bit [31:0] o_s2_wdata,
+	output bit [3:0] o_s2_wmask,
 
 	// Slave 3
 	output bit o_s3_rw,
@@ -61,6 +67,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s3_address,
 	input wire [31:0] i_s3_rdata,
 	output bit [31:0] o_s3_wdata,
+	output bit [3:0] o_s3_wmask,
 
 	// Slave 4
 	output bit o_s4_rw,
@@ -69,6 +76,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s4_address,
 	input wire [31:0] i_s4_rdata,
 	output bit [31:0] o_s4_wdata,
+	output bit [3:0] o_s4_wmask,
 
 	// Slave 5
 	output bit o_s5_rw,
@@ -77,6 +85,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s5_address,
 	input wire [31:0] i_s5_rdata,
 	output bit [31:0] o_s5_wdata,
+	output bit [3:0] o_s5_wmask,
 
 	// Slave 6
 	output bit o_s6_rw,
@@ -85,6 +94,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s6_address,
 	input wire [31:0] i_s6_rdata,
 	output bit [31:0] o_s6_wdata,
+	output bit [3:0] o_s6_wmask,
 
 	// Slave 7
 	output bit o_s7_rw,
@@ -93,6 +103,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s7_address,
 	input wire [31:0] i_s7_rdata,
 	output bit [31:0] o_s7_wdata,
+	output bit [3:0] o_s7_wmask,
 
 	// Slave 8
 	output bit o_s8_rw,
@@ -101,6 +112,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s8_address,
 	input wire [31:0] i_s8_rdata,
 	output bit [31:0] o_s8_wdata,
+	output bit [3:0] o_s8_wmask,
 
 	// Slave 9
 	output bit o_s9_rw,
@@ -109,6 +121,7 @@ module XBAR_3_11(
 	output bit [31:0] o_s9_address,
 	input wire [31:0] i_s9_rdata,
 	output bit [31:0] o_s9_wdata,
+	output bit [3:0] o_s9_wmask,
 
 	// Slave 10
 	output bit o_s10_rw,
@@ -116,7 +129,8 @@ module XBAR_3_11(
 	input wire i_s10_ready,
 	output bit [31:0] o_s10_address,
 	input wire [31:0] i_s10_rdata,
-	output bit [31:0] o_s10_wdata
+	output bit [31:0] o_s10_wdata,
+	output bit [3:0] o_s10_wmask
 );
 	bit [3:0] s0_source;
 	bit [3:0] next_s0_source;
@@ -160,46 +174,57 @@ module XBAR_3_11(
 		o_s0_request = 1'b0;
 		o_s0_address = 32'h0;
 		o_s0_wdata = 32'h0;
+		o_s0_wmask = 4'h0;
 		o_s1_rw = 1'b0;
 		o_s1_request = 1'b0;
 		o_s1_address = 32'h0;
 		o_s1_wdata = 32'h0;
+		o_s1_wmask = 4'h0;
 		o_s2_rw = 1'b0;
 		o_s2_request = 1'b0;
 		o_s2_address = 32'h0;
 		o_s2_wdata = 32'h0;
+		o_s2_wmask = 4'h0;
 		o_s3_rw = 1'b0;
 		o_s3_request = 1'b0;
 		o_s3_address = 32'h0;
 		o_s3_wdata = 32'h0;
+		o_s3_wmask = 4'h0;
 		o_s4_rw = 1'b0;
 		o_s4_request = 1'b0;
 		o_s4_address = 32'h0;
 		o_s4_wdata = 32'h0;
+		o_s4_wmask = 4'h0;
 		o_s5_rw = 1'b0;
 		o_s5_request = 1'b0;
 		o_s5_address = 32'h0;
 		o_s5_wdata = 32'h0;
+		o_s5_wmask = 4'h0;
 		o_s6_rw = 1'b0;
 		o_s6_request = 1'b0;
 		o_s6_address = 32'h0;
 		o_s6_wdata = 32'h0;
+		o_s6_wmask = 4'h0;
 		o_s7_rw = 1'b0;
 		o_s7_request = 1'b0;
 		o_s7_address = 32'h0;
 		o_s7_wdata = 32'h0;
+		o_s7_wmask = 4'h0;
 		o_s8_rw = 1'b0;
 		o_s8_request = 1'b0;
 		o_s8_address = 32'h0;
 		o_s8_wdata = 32'h0;
+		o_s8_wmask = 4'h0;
 		o_s9_rw = 1'b0;
 		o_s9_request = 1'b0;
 		o_s9_address = 32'h0;
 		o_s9_wdata = 32'h0;
+		o_s9_wmask = 4'h0;
 		o_s10_rw = 1'b0;
 		o_s10_request = 1'b0;
 		o_s10_address = 32'h0;
 		o_s10_wdata = 32'h0;
+		o_s10_wmask = 4'h0;
 
 		o_m0_ready = 1'b0;
 		o_m0_rdata = 32'h0;
@@ -215,6 +240,7 @@ module XBAR_3_11(
 			o_s0_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s0_rdata;
 			o_s0_wdata = i_m0_wdata;
+			o_s0_wmask = i_m0_wmask;
 		end
 		else if (next_s0_source == 4'h2) begin
 			o_s0_rw = i_m1_rw;
@@ -223,6 +249,7 @@ module XBAR_3_11(
 			o_s0_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s0_rdata;
 			o_s0_wdata = i_m1_wdata;
+			o_s0_wmask = i_m1_wmask;
 		end
 		else if (next_s0_source == 4'h3) begin
 			o_s0_rw = i_m2_rw;
@@ -231,6 +258,7 @@ module XBAR_3_11(
 			o_s0_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s0_rdata;
 			o_s0_wdata = i_m2_wdata;
+			o_s0_wmask = i_m2_wmask;
 		end
 
 		if (next_s1_source == 4'h1) begin
@@ -240,6 +268,7 @@ module XBAR_3_11(
 			o_s1_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s1_rdata;
 			o_s1_wdata = i_m0_wdata;
+			o_s1_wmask = i_m0_wmask;
 		end
 		else if (next_s1_source == 4'h2) begin
 			o_s1_rw = i_m1_rw;
@@ -248,6 +277,7 @@ module XBAR_3_11(
 			o_s1_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s1_rdata;
 			o_s1_wdata = i_m1_wdata;
+			o_s1_wmask = i_m1_wmask;
 		end
 		else if (next_s1_source == 4'h3) begin
 			o_s1_rw = i_m2_rw;
@@ -256,6 +286,7 @@ module XBAR_3_11(
 			o_s1_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s1_rdata;
 			o_s1_wdata = i_m2_wdata;
+			o_s1_wmask = i_m2_wmask;
 		end
 
 		if (next_s2_source == 4'h1) begin
@@ -265,6 +296,7 @@ module XBAR_3_11(
 			o_s2_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s2_rdata;
 			o_s2_wdata = i_m0_wdata;
+			o_s2_wmask = i_m0_wmask;
 		end
 		else if (next_s2_source == 4'h2) begin
 			o_s2_rw = i_m1_rw;
@@ -273,6 +305,7 @@ module XBAR_3_11(
 			o_s2_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s2_rdata;
 			o_s2_wdata = i_m1_wdata;
+			o_s2_wmask = i_m1_wmask;
 		end
 		else if (next_s2_source == 4'h3) begin
 			o_s2_rw = i_m2_rw;
@@ -281,6 +314,7 @@ module XBAR_3_11(
 			o_s2_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s2_rdata;
 			o_s2_wdata = i_m2_wdata;
+			o_s2_wmask = i_m2_wmask;
 		end
 
 		if (next_s3_source == 4'h1) begin
@@ -290,6 +324,7 @@ module XBAR_3_11(
 			o_s3_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s3_rdata;
 			o_s3_wdata = i_m0_wdata;
+			o_s3_wmask = i_m0_wmask;
 		end
 		else if (next_s3_source == 4'h2) begin
 			o_s3_rw = i_m1_rw;
@@ -298,6 +333,7 @@ module XBAR_3_11(
 			o_s3_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s3_rdata;
 			o_s3_wdata = i_m1_wdata;
+			o_s3_wmask = i_m1_wmask;
 		end
 		else if (next_s3_source == 4'h3) begin
 			o_s3_rw = i_m2_rw;
@@ -306,6 +342,7 @@ module XBAR_3_11(
 			o_s3_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s3_rdata;
 			o_s3_wdata = i_m2_wdata;
+			o_s3_wmask = i_m2_wmask;
 		end
 
 		if (next_s4_source == 4'h1) begin
@@ -315,6 +352,7 @@ module XBAR_3_11(
 			o_s4_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s4_rdata;
 			o_s4_wdata = i_m0_wdata;
+			o_s4_wmask = i_m0_wmask;
 		end
 		else if (next_s4_source == 4'h2) begin
 			o_s4_rw = i_m1_rw;
@@ -323,6 +361,7 @@ module XBAR_3_11(
 			o_s4_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s4_rdata;
 			o_s4_wdata = i_m1_wdata;
+			o_s4_wmask = i_m1_wmask;
 		end
 		else if (next_s4_source == 4'h3) begin
 			o_s4_rw = i_m2_rw;
@@ -331,6 +370,7 @@ module XBAR_3_11(
 			o_s4_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s4_rdata;
 			o_s4_wdata = i_m2_wdata;
+			o_s4_wmask = i_m2_wmask;
 		end
 
 		if (next_s5_source == 4'h1) begin
@@ -340,6 +380,7 @@ module XBAR_3_11(
 			o_s5_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s5_rdata;
 			o_s5_wdata = i_m0_wdata;
+			o_s5_wmask = i_m0_wmask;
 		end
 		else if (next_s5_source == 4'h2) begin
 			o_s5_rw = i_m1_rw;
@@ -348,6 +389,7 @@ module XBAR_3_11(
 			o_s5_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s5_rdata;
 			o_s5_wdata = i_m1_wdata;
+			o_s5_wmask = i_m1_wmask;
 		end
 		else if (next_s5_source == 4'h3) begin
 			o_s5_rw = i_m2_rw;
@@ -356,6 +398,7 @@ module XBAR_3_11(
 			o_s5_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s5_rdata;
 			o_s5_wdata = i_m2_wdata;
+			o_s5_wmask = i_m2_wmask;
 		end
 
 		if (next_s6_source == 4'h1) begin
@@ -365,6 +408,7 @@ module XBAR_3_11(
 			o_s6_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s6_rdata;
 			o_s6_wdata = i_m0_wdata;
+			o_s6_wmask = i_m0_wmask;
 		end
 		else if (next_s6_source == 4'h2) begin
 			o_s6_rw = i_m1_rw;
@@ -373,6 +417,7 @@ module XBAR_3_11(
 			o_s6_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s6_rdata;
 			o_s6_wdata = i_m1_wdata;
+			o_s6_wmask = i_m1_wmask;
 		end
 		else if (next_s6_source == 4'h3) begin
 			o_s6_rw = i_m2_rw;
@@ -381,6 +426,7 @@ module XBAR_3_11(
 			o_s6_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s6_rdata;
 			o_s6_wdata = i_m2_wdata;
+			o_s6_wmask = i_m2_wmask;
 		end
 
 		if (next_s7_source == 4'h1) begin
@@ -390,6 +436,7 @@ module XBAR_3_11(
 			o_s7_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s7_rdata;
 			o_s7_wdata = i_m0_wdata;
+			o_s7_wmask = i_m0_wmask;
 		end
 		else if (next_s7_source == 4'h2) begin
 			o_s7_rw = i_m1_rw;
@@ -398,6 +445,7 @@ module XBAR_3_11(
 			o_s7_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s7_rdata;
 			o_s7_wdata = i_m1_wdata;
+			o_s7_wmask = i_m1_wmask;
 		end
 		else if (next_s7_source == 4'h3) begin
 			o_s7_rw = i_m2_rw;
@@ -406,6 +454,7 @@ module XBAR_3_11(
 			o_s7_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s7_rdata;
 			o_s7_wdata = i_m2_wdata;
+			o_s7_wmask = i_m2_wmask;
 		end
 
 		if (next_s8_source == 4'h1) begin
@@ -415,6 +464,7 @@ module XBAR_3_11(
 			o_s8_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s8_rdata;
 			o_s8_wdata = i_m0_wdata;
+			o_s8_wmask = i_m0_wmask;
 		end
 		else if (next_s8_source == 4'h2) begin
 			o_s8_rw = i_m1_rw;
@@ -423,6 +473,7 @@ module XBAR_3_11(
 			o_s8_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s8_rdata;
 			o_s8_wdata = i_m1_wdata;
+			o_s8_wmask = i_m1_wmask;
 		end
 		else if (next_s8_source == 4'h3) begin
 			o_s8_rw = i_m2_rw;
@@ -431,6 +482,7 @@ module XBAR_3_11(
 			o_s8_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s8_rdata;
 			o_s8_wdata = i_m2_wdata;
+			o_s8_wmask = i_m2_wmask;
 		end
 
 		if (next_s9_source == 4'h1) begin
@@ -440,6 +492,7 @@ module XBAR_3_11(
 			o_s9_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s9_rdata;
 			o_s9_wdata = i_m0_wdata;
+			o_s9_wmask = i_m0_wmask;
 		end
 		else if (next_s9_source == 4'h2) begin
 			o_s9_rw = i_m1_rw;
@@ -448,6 +501,7 @@ module XBAR_3_11(
 			o_s9_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s9_rdata;
 			o_s9_wdata = i_m1_wdata;
+			o_s9_wmask = i_m1_wmask;
 		end
 		else if (next_s9_source == 4'h3) begin
 			o_s9_rw = i_m2_rw;
@@ -456,6 +510,7 @@ module XBAR_3_11(
 			o_s9_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s9_rdata;
 			o_s9_wdata = i_m2_wdata;
+			o_s9_wmask = i_m2_wmask;
 		end
 
 		if (next_s10_source == 4'h1) begin
@@ -465,6 +520,7 @@ module XBAR_3_11(
 			o_s10_address = { 4'h0, i_m0_address[27:0] };
 			o_m0_rdata = i_s10_rdata;
 			o_s10_wdata = i_m0_wdata;
+			o_s10_wmask = i_m0_wmask;
 		end
 		else if (next_s10_source == 4'h2) begin
 			o_s10_rw = i_m1_rw;
@@ -473,6 +529,7 @@ module XBAR_3_11(
 			o_s10_address = { 4'h0, i_m1_address[27:0] };
 			o_m1_rdata = i_s10_rdata;
 			o_s10_wdata = i_m1_wdata;
+			o_s10_wmask = i_m1_wmask;
 		end
 		else if (next_s10_source == 4'h3) begin
 			o_s10_rw = i_m2_rw;
@@ -481,6 +538,7 @@ module XBAR_3_11(
 			o_s10_address = { 4'h0, i_m2_address[27:0] };
 			o_m2_rdata = i_s10_rdata;
 			o_s10_wdata = i_m2_wdata;
+			o_s10_wmask = i_m2_wmask;
 		end
 	end
 

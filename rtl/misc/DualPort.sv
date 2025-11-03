@@ -17,10 +17,11 @@ module DualPort(
 	// Bus
 	output bit o_bus_rw,				// Data read/write
 	output bit o_bus_request,			// IO request.
-	input wire i_bus_ready,					// IO request ready.
+	input wire i_bus_ready,				// IO request ready.
 	output bit [31:0] o_bus_address,	// Address
-	input wire [31:0] i_bus_rdata,			// Read data
-	output bit [31:0] o_bus_wdata,		// Write data,
+	input wire [31:0] i_bus_rdata,		// Read data
+	output bit [31:0] o_bus_wdata,		// Write data
+	output bit [3:0] o_bus_wmask,		// Write mask
 
 	// Port A
 	input wire i_pa_rw,
@@ -29,6 +30,7 @@ module DualPort(
 	input wire [31:0] i_pa_address,
 	output bit [31:0] o_pa_rdata,
 	input wire [31:0] i_pa_wdata,
+	input wire [3:0] i_pa_wmask,
 
 	// Port B
 	input wire i_pb_rw,
@@ -37,6 +39,7 @@ module DualPort(
 	input wire [31:0] i_pb_address,
 	output bit [31:0] o_pb_rdata,
 	input wire [31:0] i_pb_wdata,
+	input wire [3:0] i_pb_wmask,
 
 	// Port C
 	input wire i_pc_rw,
@@ -44,7 +47,8 @@ module DualPort(
 	output bit o_pc_ready,
 	input wire [31:0] i_pc_address,
 	output bit [31:0] o_pc_rdata,
-	input wire [31:0] i_pc_wdata
+	input wire [31:0] i_pc_wdata,
+	input wire [3:0] i_pc_wmask
 );
 
 	bit [2:0] state = 0;
@@ -70,6 +74,7 @@ module DualPort(
 		o_bus_rw = 1'b0;
 		o_bus_address = 0;
 		o_bus_wdata = 0;
+		o_bus_wmask = 4'b0000;
 		
 		unique case (state)
 
@@ -79,18 +84,21 @@ module DualPort(
 					o_bus_rw = i_pa_rw;
 					o_bus_address = i_pa_address;
 					o_bus_wdata = i_pa_wdata;
+					o_bus_wmask = i_pa_wmask;
 					next_state = 3'd1;
 				end
 				else if (i_pb_request) begin
 					o_bus_rw = i_pb_rw;
 					o_bus_address = i_pb_address;
 					o_bus_wdata = i_pb_wdata;
+					o_bus_wmask = i_pb_wmask;
 					next_state = 3'd2;
 				end
 				else if (i_pc_request) begin
 					o_bus_rw = i_pc_rw;
 					o_bus_address = i_pc_address;
 					o_bus_wdata = i_pc_wdata;
+					o_bus_wmask = i_pc_wmask;
 					next_state = 3'd3;
 				end					
 			end
@@ -101,6 +109,7 @@ module DualPort(
 				o_bus_rw = i_pa_rw;
 				o_bus_address = i_pa_address;
 				o_bus_wdata = i_pa_wdata;
+				o_bus_wmask = i_pa_wmask;
 				if (i_bus_ready) begin
 					next_state = 3'd0;
 				end
@@ -110,6 +119,7 @@ module DualPort(
 				o_bus_rw = i_pb_rw;
 				o_bus_address = i_pb_address;
 				o_bus_wdata = i_pb_wdata;
+				o_bus_wmask = i_pb_wmask;
 				if (i_bus_ready) begin
 					next_state = 3'd0;
 				end
@@ -119,6 +129,7 @@ module DualPort(
 				o_bus_rw = i_pc_rw;
 				o_bus_address = i_pc_address;
 				o_bus_wdata = i_pc_wdata;
+				o_bus_wmask = i_pc_wmask;
 				if (i_bus_ready) begin
 					next_state = 3'd0;
 				end

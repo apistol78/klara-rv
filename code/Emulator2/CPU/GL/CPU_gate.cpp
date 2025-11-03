@@ -7,6 +7,7 @@
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include <Core/Log/Log.h>
+#include <Core/Misc/String.h>
 
 #include "verilated.h"
 #include "verilated_fst_c.h"
@@ -103,7 +104,13 @@ bool CPU_gate::tick(uint32_t count)
 					}
 					else
 					{
-						m_bus->writeU32(m_tb->bus_address, m_tb->bus_wdata, ~0U);
+						uint32_t wmask = 0;
+						for (int b = 0; b < 4; ++b)
+						{
+							if (m_tb->bus_wmask & (1 << b))
+								wmask |= (0xff << (b * 8));
+						}
+						m_bus->writeU32(m_tb->bus_address, m_tb->bus_wdata, wmask);
 					}
 				}
 
