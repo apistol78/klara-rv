@@ -447,7 +447,7 @@ module SDRAM_controller #(
 							sdram_wdata <= wdata;
 						else if (BURST_COUNT == 2) begin
 							sdram_wdata <= wdata[Bc-1:Bb];
-							sdram_dqm <= i_rw ? ~{ i_wmask[3], i_wmask[2] } : 2'b00;
+							sdram_dqm <= i_rw ? ~{ i_wmask[2], i_wmask[3] } : 2'b00;
 						end	
 						else if (BURST_COUNT == 4)
 							sdram_wdata <= wdata[Be-1:Bd];
@@ -538,7 +538,7 @@ module SDRAM_controller #(
 
 					if (BURST_COUNT == 2) begin
 						sdram_wdata <= wdata[Bb-1:Ba];
-						sdram_dqm <= ~{ i_wmask[1], i_wmask[0] };
+						sdram_dqm <= ~{ i_wmask[0], i_wmask[1] };
 					end
 					else if (BURST_COUNT == 4) begin
 						if (count == tRCD_COUNT) begin
@@ -576,6 +576,7 @@ module SDRAM_controller #(
 					end
 
 					if (count == 0) begin
+						sdram_dqm <= 2'b00;
 						o_ready <= 1'b1;
 						state <= STATE_END_REQUEST;
 					end			
