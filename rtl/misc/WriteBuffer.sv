@@ -29,6 +29,7 @@ module WriteBuffer #(
 	output bit [ADDRESS_WIDTH - 1:0] o_bus_address,
 	input wire [31:0] i_bus_rdata,
 	output bit [31:0] o_bus_wdata,
+	output bit [3:0] o_bus_wmask,
 
 	// Input
 	input wire i_rw,
@@ -36,7 +37,8 @@ module WriteBuffer #(
 	output bit o_ready,
 	input wire [ADDRESS_WIDTH - 1:0] i_address,
 	output bit [31:0] o_rdata,
-	input wire [31:0] i_wdata
+	input wire [31:0] i_wdata,
+	input wire [3:0] i_wmask
 );
 	typedef enum bit [2:0]
 	{
@@ -48,17 +50,25 @@ module WriteBuffer #(
 	}
 	state_t;
 
+	typedef struct packed
+	{
+		bit [ADDRESS_WIDTH - 1:0] address;
+		bit [31:0] wdata;
+		bit [3:0] wmask;
+	}
+	entry_t;
+
 	wire wq_empty;
 	wire wq_full;
 	bit wq_write = 1'b0;
-	bit [(32 + ADDRESS_WIDTH) - 1:0] wq_wdata;
+	entry_t wq_wdata;
 	bit wq_read = 1'b0;
-	wire [(32 + ADDRESS_WIDTH) - 1:0] wq_rdata;
+	entry_t wq_rdata;
 
 	generate if (DEPTH > 16) begin
 		FIFO_BRAM #(
 			.DEPTH(DEPTH),
-			.WIDTH(32 + ADDRESS_WIDTH)
+			.WIDTH($bits(entry_t))
 		) wq(
 			.i_reset(i_reset),
 			.i_clock(i_clock),
@@ -75,7 +85,7 @@ module WriteBuffer #(
 	generate if (DEPTH <= 16) begin
 		FIFO #(
 			.DEPTH(DEPTH),
-			.WIDTH(32 + ADDRESS_WIDTH)
+			.WIDTH($bits(entry_t))
 		) wq(
 			.i_clock(i_clock),
 			.o_empty(wq_empty),
@@ -132,7 +142,9 @@ module WriteBuffer #(
 				if (i_request) begin
 					// Write to fifo; only when not full.
 					if (i_rw && !wq_full) begin
-						wq_wdata = { i_address, i_wdata };
+						wq_wdata.address = i_address;
+						wq_wdata.wdata = i_wdata;
+						wq_wdata.wmask = i_wmask;
 						wq_write = 1'b1;
 						next_state = WRITE_TO_FIFO;
 					end
@@ -171,8 +183,9 @@ module WriteBuffer #(
 			PROCESS_REQUEST: begin
 				o_bus_request = 1'b1;
 				o_bus_rw = 1'b1;
-				o_bus_address = wq_rdata[(32 + ADDRESS_WIDTH) - 1:32];
-				o_bus_wdata = wq_rdata[31:0];
+				o_bus_address = wq_rdata.address;
+				o_bus_wdata = wq_rdata.wdata;
+				o_bus_wmask = wq_rdata.wmask;
 
 				// We need to terminate request, ie no bus request for
 				// at least one cycle so it won't collide with a pending read

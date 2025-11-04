@@ -19,8 +19,8 @@ module SRAM_controller #(
 	input wire i_request,
 	input wire i_rw,
 	input wire [31:0] i_address,
-	input wire [31:0] i_wdata,
 	output bit [31:0] o_rdata,
+	input wire [31:0] i_wdata,
 	output bit o_ready,
 
 	output bit [SRAM_ADDRESS_WIDTH-1:0] SRAM_A,

@@ -19,8 +19,9 @@ module VIDEO_controller #(
 	input wire i_cpu_request,
 	input wire i_cpu_rw,
 	input wire [31:0] i_cpu_address,
-	input wire [31:0] i_cpu_wdata,
 	output bit [31:0] o_cpu_rdata,
+	input wire [31:0] i_cpu_wdata,
+	input wire [3:0] i_cpu_wmask,
 	output bit o_cpu_ready,
 
 	// Video
@@ -30,18 +31,18 @@ module VIDEO_controller #(
 	input wire [10:0] i_video_pos_y,
 	output bit [31:0] o_video_rdata,
 
-	// Memory
+	// Memory read/write port for CPU.
 	output wire o_vram_pa_request,
 	output wire o_vram_pa_rw,
 	output wire [31:0] o_vram_pa_address,
 	output wire [31:0] o_vram_pa_wdata,
+	output wire [3:0] o_vram_pa_wmask,
 	input wire [31:0] i_vram_pa_rdata,
 	input wire i_vram_pa_ready,
 
+	// Memory read port for video.
 	output bit o_vram_pb_request,
-	output bit o_vram_pb_rw,
 	output bit [31:0] o_vram_pb_address,
-	output bit [31:0] o_vram_pb_wdata,
 	input wire [31:0] i_vram_pb_rdata,
 	input wire i_vram_pb_ready,
 
@@ -67,9 +68,7 @@ module VIDEO_controller #(
 		o_video_rdata = 1'b0;
 
 		o_vram_pb_request = 1'b0;
-		o_vram_pb_rw = 1'b0;
 		o_vram_pb_address = 0;
-		o_vram_pb_wdata = 0;
 	end
 
 	//===============================
@@ -110,6 +109,7 @@ module VIDEO_controller #(
 	bit [24:0] wb_address;
 	wire [31:0] wb_rdata;
 	bit [31:0] wb_wdata;
+	bit [3:0] wb_wmask;
 
 	wire [24:0] vram_pa_address;
 	assign o_vram_pa_address = { 8'h0, vram_pa_address };
@@ -131,13 +131,15 @@ module VIDEO_controller #(
 		.o_bus_address(vram_pa_address),
 		.i_bus_rdata(i_vram_pa_rdata),
 		.o_bus_wdata(o_vram_pa_wdata),
+		.o_bus_wmask(o_vram_pa_wmask),
 
 		.i_rw(wb_rw),
 		.i_request(wb_request),
 		.o_ready(wb_ready),
 		.i_address(wb_address),
 		.o_rdata(wb_rdata),
-		.i_wdata(wb_wdata)
+		.i_wdata(wb_wdata),
+		.i_wmask(wb_wmask)
 	);
 
 	initial begin
@@ -145,6 +147,7 @@ module VIDEO_controller #(
 		wb_request = 1'b0;
 		wb_address = 24'h0;
 		wb_wdata = 32'h0;
+		wb_wmask = 4'h0;
 	end
 
 	//===============================
@@ -182,6 +185,7 @@ module VIDEO_controller #(
 					wb_address <= i_cpu_address[23:0];
 					wb_rw <= i_cpu_rw;
 					wb_wdata <= i_cpu_wdata;
+					wb_wmask <= i_cpu_wmask;
 					wb_request <= 1'b1;
 					state <= END_VRAM_WRITE;
 				end
