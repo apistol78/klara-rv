@@ -47,4 +47,5 @@ private:
 	traktor::Ref< traktor::net::TcpSocket > m_clientSocket;
 	traktor::StaticSet< uint32_t, 16 > m_breakpoints;
 	int32_t m_mode = ModeStopped;
+	uint32_t m_lastPC = ~0U;
 };

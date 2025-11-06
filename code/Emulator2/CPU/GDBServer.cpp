@@ -79,7 +79,7 @@ namespace
 		const char hex[] = "0123456789ABCDEF";
 		uint8_t cs = 0;
 
-		T_GDB_LOG_VERBOSE(L"[GDB] sending \"" << mbstows(msg) << L"\"");
+		T_GDB_LOG(L"[GDB] sending \"" << mbstows(msg) << L"\"");
 
 		socket->send('+');
 		socket->send('$');
@@ -214,7 +214,7 @@ void GDBServer::process()
 				else if (msg[0] == 'm')
 				{
 					// Read memory.
-					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (read memory)");
+					T_GDB_LOG_VERBOSE(L"[GDB] got message \"" << mbstows(msg) << L"\" (read memory)");
 
 					m_cpu->flushCaches();
 
@@ -234,7 +234,7 @@ void GDBServer::process()
 				else if (msg[0] == 'M')
 				{
 					// Write memory.
-					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (write memory)");
+					T_GDB_LOG_VERBOSE(L"[GDB] got message \"" << mbstows(msg) << L"\" (write memory)");
 
 					m_cpu->flushCaches();
 
@@ -274,7 +274,7 @@ void GDBServer::process()
 					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (set thread)");
 					send(m_clientSocket, "OK");
 				}
-				else if (startsWith(msg, "Z0"))
+				else if (startsWith(msg, "Z0") || startsWith(msg, "Z1"))
 				{
 					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (set breakpoint)");
 					uint32_t addr, len;
@@ -282,7 +282,7 @@ void GDBServer::process()
 					m_breakpoints.insert(addr);
 					send(m_clientSocket, "OK");
 				}
-				else if (startsWith(msg, "z0"))
+				else if (startsWith(msg, "z0") || startsWith(msg, "z1"))
 				{
 					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (remove breakpoint)");
 					uint32_t addr, len;
@@ -293,7 +293,7 @@ void GDBServer::process()
 				else if (startsWith(msg, "qSupported"))
 				{
 					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (qSupported)");
-					send(m_clientSocket, "");
+					send(m_clientSocket, "swbreak+;hwbreak+");
 				}
 				else if (startsWith(msg, "vCont?"))
 				{
@@ -337,13 +337,18 @@ void GDBServer::tick()
 	if (m_mode != ModeRun)
 		return;
 
-	for (uint32_t bp : m_breakpoints)
+	const uint32_t pc = m_cpu->getPC();
+	if (pc != m_lastPC)
 	{
-		if (bp == m_cpu->getPC())
+		for (uint32_t bp : m_breakpoints)
 		{
-			T_GDB_LOG(L"[GDB] breakpoint hit.");
-			setMode(ModeStopped);
+			if (bp == pc)
+			{
+				T_GDB_LOG(L"[GDB] breakpoint hit " << str(L"%08x", bp) << L".");
+				setMode(ModeStopped);
+			}
 		}
+		m_lastPC = pc;
 	}
 }
 
@@ -361,7 +366,7 @@ void GDBServer::setMode(int32_t mode)
 		T_GDB_LOG(L"[GDB] mode changed to " << modeNames[mode] << L" (from " << modeNames[m_mode] << L")");
 
 	if (mode == ModeStopped)
-		send(m_clientSocket, "S02");	// sigint
+		send(m_clientSocket, "S05");
 
 	m_mode = mode;
 }
