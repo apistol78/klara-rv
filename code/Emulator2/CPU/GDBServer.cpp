@@ -171,11 +171,10 @@ void GDBServer::process()
 				uint8_t cs[2];
 				m_clientSocket->recv(cs, 2);
 
-				T_GDB_LOG_VERBOSE(L"[GDB] got message \"" << mbstows(msg) << L"\"");
-
 				// Process message.
 				if (msg[0] == '?')
 				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (query)");
 					if (m_mode == ModeStopped)
 						send(m_clientSocket, "S05");	// sigtrap
 					else
@@ -184,6 +183,7 @@ void GDBServer::process()
 				else if (msg[0] == 'g')
 				{
 					// Return all registers.
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (return all registers)");
 					std::string data = msg.substr(1);
 					for (uint32_t i = 0; i < 32; ++i)
 						data += registerToHex(m_cpu->getRegister(i));
@@ -193,10 +193,11 @@ void GDBServer::process()
 				else if (msg[0] == 'G')
 				{
 					// Set all registers.
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (set all registers)");
+
 					m_cpu->flushCaches();
 					
 					std::string data = msg.substr(1);
-
 					for (uint32_t i = 0; i < 32; ++i)
 					{
 						uint32_t r = parseString< uint32_t >(std::string("0x") + data.substr(i * 8, 8));
@@ -213,6 +214,8 @@ void GDBServer::process()
 				else if (msg[0] == 'm')
 				{
 					// Read memory.
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (read memory)");
+
 					m_cpu->flushCaches();
 
 					uint32_t addr, len;
@@ -231,6 +234,8 @@ void GDBServer::process()
 				else if (msg[0] == 'M')
 				{
 					// Write memory.
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (write memory)");
+
 					m_cpu->flushCaches();
 
 					uint32_t addr, len;
@@ -248,21 +253,30 @@ void GDBServer::process()
 				}
 				else if (msg[0] == 'c')
 				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (continue)");
 					send(m_clientSocket, "OK");
 					setMode(ModeRun);
 				}
 				else if (msg[0] == 's')
 				{
-					send(m_clientSocket, "S05");
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (step)");
+					send(m_clientSocket, "OK");
 					setMode(ModeStep);
 				}
 				else if (msg[0] == 'k')
 				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (kill)");
 					safeClose(m_clientSocket);
 					setMode(ModeKilled);
 				}
+				else if (msg[0] == 'H')
+				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (set thread)");
+					send(m_clientSocket, "OK");
+				}
 				else if (startsWith(msg, "Z0"))
 				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (set breakpoint)");
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 3, "%x,%x", &addr, &len);
 					m_breakpoints.insert(addr);
@@ -270,19 +284,32 @@ void GDBServer::process()
 				}
 				else if (startsWith(msg, "z0"))
 				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (remove breakpoint)");
 					uint32_t addr, len;
 					sscanf(msg.c_str() + 3, "%x,%x", &addr, &len);
 					m_breakpoints.erase(addr);
 					send(m_clientSocket, "OK");
 				}
 				else if (startsWith(msg, "qSupported"))
+				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (qSupported)");
 					send(m_clientSocket, "");
+				}
 				else if (startsWith(msg, "vCont?"))
+				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (vCont?)");
 					send(m_clientSocket, "");
+				}
 				else if (startsWith(msg, "vMustReplyEmpty"))
+				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (vMustReplyEmpty)");
 					send(m_clientSocket, "");
+				}
 				else
+				{
+					T_GDB_LOG(L"[GDB] got message \"" << mbstows(msg) << L"\" (**unknown**)");
 					send(m_clientSocket, "");
+				}
 			}
 		}
 	}
@@ -307,7 +334,7 @@ void GDBServer::process()
 
 void GDBServer::tick()
 {
-	if (m_mode != ModeRun && m_mode != ModeStep)
+	if (m_mode != ModeRun)
 		return;
 
 	for (uint32_t bp : m_breakpoints)
