@@ -115,7 +115,7 @@ module VIDEO_controller #(
 	assign o_vram_pa_address = { 8'h0, vram_pa_address };
 
 	WriteBuffer #(
-		.DEPTH(1024),
+		.DEPTH(32),
 		.ADDRESS_WIDTH(24),
 		.STALL_READ(0)
 	) wb(
