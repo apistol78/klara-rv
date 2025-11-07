@@ -62,8 +62,8 @@ module VIDEO_sprite_x #(
 	bit signed [10:0] pos_y;
 
 	always_comb begin
-		pos_x = i_pos_x;
-		pos_y = i_pos_y;
+		pos_x = $signed(i_pos_x);
+		pos_y = $signed(i_pos_y);
 	end
 
 	// Sprite pixel data.
@@ -89,7 +89,7 @@ module VIDEO_sprite_x #(
 
 	// Calculate sprite pixel address.
 	always_comb begin
-		data_address = (i_overlay_x - i_pos_x) + (i_overlay_y - i_pos_y) * WIDTH;
+		data_address = ($signed(i_overlay_x) - pos_x) + ($signed(i_overlay_y) - pos_y) * WIDTH;
 	end
 
 	// State machine.

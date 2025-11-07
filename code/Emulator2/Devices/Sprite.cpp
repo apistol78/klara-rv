@@ -64,21 +64,29 @@ uint32_t Sprite::readU32(uint32_t address) const
 
 bool Sprite::tick(ICPU* cpu, Bus* bus)
 {
+	// for (int32_t i = 0; i < sizeof_array(m_data); ++i)
+	// {
+	// 	const Data& data = m_data[i];
+	// 	log::info << i << L". " << data.x << L", " << data.y << Endl;
+	// }
 	return true;
 }
 
 bool Sprite::getOverlay(uint32_t x, uint32_t y, uint8_t& outOverlay) const
 {
+	const int32_t ix = (int32_t)x;
+	const int32_t iy = (int32_t)y;
+
 	for (int32_t i = 0; i < sizeof_array(m_data); ++i)
 	{
 		const Data& data = m_data[i];
 		if (
-            data.visible &&
-			x >= data.x && x < data.x + 64 &&
-			y >= data.y && y < data.y + 64
+			data.visible &&
+			ix >= data.x && ix < data.x + 64 &&
+			iy >= data.y && iy < data.y + 64
 		)
 		{
-			const uint32_t offset = (x - data.x) + (y - data.y) * 64;
+			const uint32_t offset = (ix - data.x) + (iy - data.y) * 64;
 			outOverlay = data.bits[offset];
 			return (outOverlay != 0xff);
 		}
