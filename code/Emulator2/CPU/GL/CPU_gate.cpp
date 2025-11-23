@@ -66,6 +66,22 @@ CPU_gate::~CPU_gate()
 
 bool CPU_gate::tick(uint32_t count)
 {
+	// static int s_cnt = 0;
+	// if (++s_cnt > 1000)
+	// {
+	// 	const float p = float(m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__bp__DOT__dbg_bp_miss) /
+	// 		(m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__bp__DOT__dbg_bp_hit + m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__bp__DOT__dbg_bp_miss);
+
+	// 	log::info <<
+	// 		str(L"%.2f%% : ", p * 100.0f) <<
+	// 		m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__bp__DOT__dbg_bp_hit <<
+	// 		L" / " <<
+	// 		m_tb->rootp->CPU_top__DOT__cpu__DOT__fetch__DOT__bp__DOT__dbg_bp_miss <<
+	// 		Endl;
+
+	// 	s_cnt = 0;
+	// }
+
 	for (uint32_t i = 0; i < count; ++i)
 	{
 		const uint32_t from = m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__retired;

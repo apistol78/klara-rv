@@ -144,6 +144,22 @@ module CPU_Fetch #(
 
 	bit irq_pending_r = 1'b0;
 
+	// Branch prediction unit.
+	bit [31:0] bp_pc_launch;
+	wire [31:0] bp_pc_hint;
+	CPU_BranchPrediction bp(
+		.i_clock(i_clock),
+		.i_pc(pc),
+		.i_is_jal(is_JAL),
+		.i_is_jump_conditional(is_JUMP_CONDITIONAL),
+		.i_inst_B_imm(inst_B_imm),
+		.i_inst_J_imm(inst_J_imm),
+		.i_pc_launch(bp_pc_launch),
+		.o_pc_hint(bp_pc_hint),
+		.i_jump(i_jump),
+		.i_jump_pc(i_jump_pc)
+	);
+
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			state <= WAIT_ICACHE;
@@ -188,12 +204,8 @@ module CPU_Fetch #(
 							// Branch instruction, need to wait
 							// for an explicit "goto" signal before
 							// we can continue feeding the pipeline.
-							if (is_JAL) begin
-								pc <= pc + inst_J_imm;
-							end
-							else if (is_JUMP_CONDITIONAL) begin
-								pc <= pc + inst_B_imm;
-							end
+							bp_pc_launch <= pc;
+							pc <= bp_pc_hint;
 							state <= WAIT_JUMP;
 						end
 						else if (is_ECALL || is_WFI) begin

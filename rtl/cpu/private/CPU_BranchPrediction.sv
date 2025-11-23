@@ -1,0 +1,76 @@
+/*
+ Klara-RV
+ Copyright (c) 2025 Anders Pistol.
+
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
+`include "CPU_Types.sv"
+
+`timescale 1ns/1ns
+`default_nettype none
+
+module CPU_BranchPrediction (
+	input wire i_clock,
+	input wire [31:0] i_pc,
+
+	input wire i_is_jal,
+	input wire i_is_jump_conditional,
+	input wire [31:0] i_inst_B_imm,
+	input wire [31:0] i_inst_J_imm,
+
+	input wire [31:0] i_pc_launch,
+	output bit [31:0] o_pc_hint,
+
+	input wire i_jump,
+	input wire [31:0] i_jump_pc
+);
+
+	typedef struct packed
+	{
+		bit [31:0] from_pc;
+		bit [31:0] target_pc;
+	}
+	cache_t;
+
+	cache_t c[64];
+
+	genvar i;
+	generate for (i = 0; i < 64; i = i + 1) begin
+		initial c[i] = 64'b0;
+	end endgenerate
+
+	wire [5:0] i_pc_tag = i_pc[8:2];
+	wire [5:0] i_pc_launch_tag = i_pc_launch[8:2];
+
+	always_comb begin
+		o_pc_hint = i_pc;
+
+		if (c[i_pc_tag].from_pc == i_pc)
+			o_pc_hint = c[i_pc_tag].target_pc;
+		else if (i_is_jal)
+			o_pc_hint = i_pc + i_inst_J_imm;
+		else if (i_is_jump_conditional)
+			o_pc_hint = i_pc + i_inst_B_imm;
+
+	end
+
+	bit [31:0] dbg_bp_hit = 0;
+	bit [31:0] dbg_bp_miss = 0;
+
+	always_ff @(posedge i_clock) begin
+		if (i_jump) begin
+			if (i_jump_pc == o_pc_hint)
+				dbg_bp_hit <= dbg_bp_hit + 1;
+			else begin
+				dbg_bp_miss <= dbg_bp_miss + 1;
+
+				c[i_pc_launch_tag].from_pc <= i_pc_launch;
+				c[i_pc_launch_tag].target_pc <= i_jump_pc;
+
+			end
+		end
+	end
+
+endmodule
