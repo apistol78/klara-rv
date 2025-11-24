@@ -50,7 +50,6 @@ module CPU_Fetch #(
 	state_t state = WAIT_ICACHE;
 	bit [31:0] pc = RESET_VECTOR;
 	fetch_data_t data = 0;
-	bit [31:0] starve = 0;
 
 	// ICache
 	wire [31:0] icache_rdata;
@@ -217,12 +216,7 @@ module CPU_Fetch #(
 							// Move PC to next instruction.
 							pc <= pc + 4;
 						end
-
 					end
-`ifdef __VERILATOR__					
-					else if (!i_busy && !icache_ready)
-						starve <= starve + 1;
-`endif
 				end
 
 				WAIT_JUMP: begin

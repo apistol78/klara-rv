@@ -85,7 +85,7 @@ module SDRAM_controller #(
 	// Timing parameters.
 	localparam STARTUP_COUNT	= 20000;			// startup delay, 100 us
 	localparam tRP_COUNT		= 1;				// wait precharge, 20 ns
-	localparam tRFC_COUNT		= 7; 				// wait refresh, 65 ns
+	localparam tRFC_COUNT		= 6; 				// wait refresh, 65 ns
 	localparam tMRD_COUNT		= 2000;				// wait set mode, 2000 cyc @ 100 MHz
 	localparam tRCD_COUNT		= 3 + BURST_COUNT;	// wait read/write, 65 ns
 	localparam tACT_COUNT		= 1;				// wait activate
@@ -223,7 +223,7 @@ module SDRAM_controller #(
 
 			// Check if we should refresh; every 64ms for commercial grade chip.
 			refresh <= refresh + 1;
-			if (refresh >= (64 * (FREQUENCY / 1000)) / 8192) begin
+			if (refresh >= (48 * (FREQUENCY / 1000)) / 8192) begin
 				refresh <= 0;
 				should_refresh <= 1'b1;
 			end
