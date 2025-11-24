@@ -15,32 +15,6 @@ module SDRAM_controller_tb();
     bit clk;
 	bit clk_sdram;
 
-
-	// wire [15:0] m_Dq_1;
-	// bit [12:0] m_Addr_1;
-	// bit [1:0] m_Ba_1;
-	// bit m_Clk_1;
-	// bit m_Cke_1;
-	// bit m_Cs_n_1;
-	// bit m_Ras_n_1;
-	// bit m_Cas_n_1;
-	// bit m_We_n_1;
-	// bit [1:0] m_Dqm_1;
-
-	// mt48lc16m16a2 m_1(
-	// 	.Dq(m_Dq_1),
-	// 	.Addr(m_Addr_1),
-	// 	.Ba(m_Ba_1),
-	// 	.Clk(m_Clk_1),
-	// 	.Cke(m_Cke_1),
-	// 	.Cs_n(m_Cs_n_1),
-	// 	.Ras_n(m_Ras_n_1),
-	// 	.Cas_n(m_Cas_n_1),
-	// 	.We_n(m_We_n_1),
-	// 	.Dqm(m_Dqm_1)
-	// );
-
-
 	wire [15:0] m_Dq_2;
 	bit [12:0] m_Addr_2;
 	bit [1:0] m_Ba_2;
@@ -65,45 +39,12 @@ module SDRAM_controller_tb();
 		.Dqm(m_Dqm_2)
 	);
 
-
-
-
 	bit request = 1'b0;
 	bit rw = 1'b0;
 	bit [31:0] address = 32'h0000_0000;
 	bit [31:0] wdata = 32'hffff_ffff;
-	// wire [31:0] rdata_1;
 	wire [31:0] rdata_2;
-	// wire ready_1;
 	wire ready_2;
-
-
-
-	// SDRAM_interface_2 sdram_controller_1(
-	//     .i_reset(1'b0),
-	//     .i_clock(clk),
-	// 	.i_clock_sdram(clk_sdram),
-	//     .i_request(request),
-	//     .i_rw(rw),
-	//     .i_address(address),
-	//     .i_wdata(wdata),
-	//     .o_rdata(rdata_1),
-	//     .o_ready(ready_1),
-
-	//     .sdram_clk(m_Clk_1),
-	//     .sdram_clk_en(m_Cke_1),
-	//     .sdram_cas_n(m_Cas_n_1),
-	//     .sdram_ce_n(m_Cs_n_1),
-	//     .sdram_ras_n(m_Ras_n_1),
-	//     .sdram_we_n(m_We_n_1),
-	//     .sdram_dqml(m_Dqm_1[0]),
-	//     .sdram_dqmh(m_Dqm_1[1]),
-	//     .sdram_ba(m_Ba_1),
-	//     .sdram_addr(m_Addr_1),
-	//     .sdram_data(m_Dq_1)
-	// );
-
-
 
 	logic [15:0] sdram_rdata;
 	wire [15:0] sdram_wdata;
@@ -140,12 +81,6 @@ module SDRAM_controller_tb();
 	assign m_Dq_2 = sdram_data_rw ? sdram_wdata : 16'hz;
 	assign sdram_rdata = m_Dq_2;
 
-
-
-
-
-
-
     initial begin
         clk = 0;
         #1;
@@ -159,7 +94,7 @@ module SDRAM_controller_tb();
     end
 
     initial begin
-        $dumpfile("SDRAM_controlller_tb.vcd");
+        $dumpfile("build/test/SDRAM_controller_tb.vcd");
         $dumpvars(0, SDRAM_controller_tb);
 
 		// init process

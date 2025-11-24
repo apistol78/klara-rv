@@ -221,9 +221,9 @@ module SDRAM_controller #(
 			// Decrement startup counter.
 			count <= count - 1;
 
-			// Check if we should refresh; every 32ms for lowest grade chip.
+			// Check if we should refresh; every 64ms for commercial grade chip.
 			refresh <= refresh + 1;
-			if (refresh >= (32 * 100000) / 8192) begin
+			if (refresh >= (64 * (FREQUENCY / 1000)) / 8192) begin
 				refresh <= 0;
 				should_refresh <= 1'b1;
 			end
