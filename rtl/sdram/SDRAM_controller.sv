@@ -223,7 +223,7 @@ module SDRAM_controller #(
 
 			// Check if we should refresh; every 32ms for lowest grade chip.
 			refresh <= refresh + 1;
-			if (refresh >= 32 * 100_000) begin
+			if (refresh >= (32 * 100000) / 8192) begin
 				refresh <= 0;
 				should_refresh <= 1'b1;
 			end
