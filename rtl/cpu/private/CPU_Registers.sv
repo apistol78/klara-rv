@@ -55,7 +55,7 @@ module CPU_Registers #(
 		r[ 2] = STACK_POINTER;
 	end
 
-	always_ff @(posedge i_clock, posedge i_reset)
+	always_ff @(posedge i_clock)
 	begin
 		if (i_reset) begin
 			rs1 <= 0;
@@ -79,12 +79,13 @@ module CPU_Registers #(
 		else begin
 
 			// Read first.
-			rs1 <= (i_fetch_data.inst_rs1 != 0) ? r[i_fetch_data.inst_rs1] : 32'h0;
-			rs2 <= (i_fetch_data.inst_rs2 != 0) ? r[i_fetch_data.inst_rs2] : 32'h0;
-			rs3 <= (i_fetch_data.inst_rs3 != 0) ? r[i_fetch_data.inst_rs3] : 32'h0;
+			rs1 <= r[i_fetch_data.inst_rs1];
+			rs2 <= r[i_fetch_data.inst_rs2];
+			rs3 <= r[i_fetch_data.inst_rs3];
 
 			// Write later.
 			if (i_memory_data.strobe != last_write_strobe) begin
+				// Never write to "zero" register.
 				if (|i_memory_data.inst_rd) 
 					r[i_memory_data.inst_rd] <= i_memory_data.rd;
 				last_write_strobe <= i_memory_data.strobe;
