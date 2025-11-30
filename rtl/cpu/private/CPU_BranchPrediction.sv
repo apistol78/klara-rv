@@ -46,14 +46,12 @@ module CPU_BranchPrediction (
 
 	always_comb begin
 		o_pc_hint = i_pc;
-
 		if (c[i_pc_tag].from_pc == i_pc)
 			o_pc_hint = c[i_pc_tag].target_pc;
 		else if (i_is_jal)
 			o_pc_hint = i_pc + i_inst_J_imm;
 		else if (i_is_jump_conditional)
 			o_pc_hint = i_pc + i_inst_B_imm;
-
 	end
 
 	bit [31:0] dbg_bp_hit = 0;
@@ -61,14 +59,12 @@ module CPU_BranchPrediction (
 
 	always_ff @(posedge i_clock) begin
 		if (i_jump) begin
-			if (i_jump_pc == o_pc_hint)
+			if (i_jump_pc == i_pc)
 				dbg_bp_hit <= dbg_bp_hit + 1;
 			else begin
 				dbg_bp_miss <= dbg_bp_miss + 1;
-
 				c[i_pc_launch_tag].from_pc <= i_pc_launch;
 				c[i_pc_launch_tag].target_pc <= i_jump_pc;
-
 			end
 		end
 	end
