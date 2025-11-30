@@ -19,22 +19,23 @@ local SOURCE < const > =
 	PATH_SOC .. "/SoC.sv",
 	PATH_SOC .. "/SoC_BROM.sv",
 	PATH_PERIFHERIALS .. "/clock/PLL_ECP5.sv",
-	PATH_PERIFHERIALS .. "/block/BRAM.sv",
+	PATH_PERIFHERIALS .. "/sdram/SDRAM_controller.sv",
 	PATH_PERIFHERIALS .. "/uart/UART.sv",
 	PATH_PERIFHERIALS .. "/uart/UART_RX.sv",
 	PATH_PERIFHERIALS .. "/uart/UART_TX.sv",
 	PATH_PERIFHERIALS .. "/fifo/FIFO.sv",
 	PATH_PERIFHERIALS .. "/misc/XBAR_2_3.sv",
 	PATH_PERIFHERIALS .. "/cpu/CPU.sv",
-	--PATH_PERIFHERIALS .. "/cpu/CPU_BusMux.sv",
 	PATH_PERIFHERIALS .. "/cpu/CPU_PLIC.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_ALU.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_BRAM.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_BRAM_1r1w.sv",
+	PATH_PERIFHERIALS .. "/cpu/private/CPU_BranchPrediction.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_CSR.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_DCache_Comb.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_DCache_None.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_DCache_Reg.sv",
+	PATH_PERIFHERIALS .. "/cpu/private/CPU_DCache_WB.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_Decode.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_Defines.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_Divide.sv",
@@ -46,12 +47,10 @@ local SOURCE < const > =
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_ICache_Reg.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_Memory.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_Multiply.sv",
-	PATH_PERIFHERIALS .. "/cpu/private/CPU_PreDecode.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_Registers.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_SkidBuffer.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_Types.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/CPU_Writeback.sv",
-	--[[
 	PATH_PERIFHERIALS .. "/cpu/private/fpu/CPU_FPU.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/fpu/CPU_FPU_Add.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/fpu/CPU_FPU_Compare.sv",
@@ -59,8 +58,7 @@ local SOURCE < const > =
 	PATH_PERIFHERIALS .. "/cpu/private/fpu/CPU_FPU_Float.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/fpu/CPU_FPU_Int.sv",
 	PATH_PERIFHERIALS .. "/cpu/private/fpu/CPU_FPU_Mul.sv",
-	PATH_PERIFHERIALS .. "/cpu/private/fpu/CPU_FPU_MulAdd.sv",
-	]]
+	PATH_PERIFHERIALS .. "/cpu/private/fpu/CPU_FPU_MulAdd.sv"
 }
 
 function main()
@@ -77,7 +75,7 @@ function main()
 		local v = sv2v(
 			sv,
 			{ ".", "../../rtl/cpu" },
-			{},
+			{ "FPU_ENABLE=0" },
 			"build/rtl-v"
 		)
 		f = f .. " " .. v

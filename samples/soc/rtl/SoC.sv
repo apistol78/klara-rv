@@ -14,30 +14,45 @@
 
 (* top *)
 module SoC(
-      input CLOCK_p,
-      output LED_p,
-	  input UART_RX,
-	  output UART_TX
+	input CLOCK,
+	output LED_p,
+	output wire SDRAM_CLK,
+	output wire SDRAM_CKE,
+	output wire SDRAM_RAS_n,
+	output wire SDRAM_CAS_n,
+	output wire SDRAM_WE_n,
+	output wire SDRAM_CE_n,
+	output wire [12:0] SDRAM_A,
+	output wire [1:0] SDRAM_BA,
+	inout wire [15:0] SDRAM_DQ,
+	output wire [1:0] SDRAM_DQM,
+	input UART_RX,
+	output UART_TX
 );
 	wire clock;
+	wire clock_sdram;
 	wire reset = 1'b0;
 
 
+	wire pll_locked;
 	PLL_ECP5 #(
 		.CLKI_DIV(1),
 		.CLKFB_DIV(4),
-		.CLKOP_DIV(6),
-		.CLKOP_CPHASE(0),
-		.CLKOS_DIV(6),
+		
+		.CLKOP_DIV(4),
+		.CLKOP_CPHASE(4 - 1),
+		
+		.CLKOS_DIV(4),
 		.CLKOS_CPHASE(5),
-		.CLKOS2_DIV(6*3),
-		.CLKOS2_CPHASE(0)
-	) pll(
-		.i_clk(CLOCK_p),
+		
+		.CLKOS2_DIV(4*3),
+		.CLKOS2_CPHASE(4*3 - 1)
+	) pll (
+		.i_clk(CLOCK),
 		.o_clk1(clock),
-		.o_clk2(),
+		.o_clk2(clock_sdram),
 		.o_clk3(),
-		.o_clk_locked()
+		.o_clk_locked(pll_locked)
 	);
 
 	//assign LED_p = cpu_dbus_request;
@@ -58,26 +73,51 @@ module SoC(
 	);
 
 
-	//====================================================
-	// RAM
-	wire ram_request;
-	wire ram_rw;
-	wire [31:0] ram_address;
-	wire [31:0] ram_wdata;
-	wire [31:0] ram_rdata;
-	wire ram_ready;
+	//=====================================
+	// SDRAM
+	wire sdram_request;
+	wire sdram_rw;
+	wire [31:0] sdram_address;
+	wire [31:0] sdram_rdata;
+	wire [31:0] sdram_wdata;
+	wire [3:0] sdram_wmask;
+	wire sdram_ready;
 
-	BRAM #(
-		.SIZE(32'h400)
-	) ram(
+	bit [15:0] it_sdram_data_r;
+	wire [15:0] it_sdram_data_w;
+	wire it_sdram_data_rw;
+
+	assign SDRAM_DQ = it_sdram_data_rw ? it_sdram_data_w : 16'hz;
+	assign it_sdram_data_r = SDRAM_DQ;
+
+	SDRAM_controller #(
+		.FREQUENCY(`FREQUENCY),
+		.SDRAM_DATA_WIDTH(16)
+	) sdram(
+		.i_reset(reset),
 		.i_clock(clock),
-		.i_request(ram_request),
-		.i_rw(ram_rw),
-		.i_address(ram_address),
-		.i_wdata(ram_wdata),
-		.o_rdata(ram_rdata),
-		.o_ready(ram_ready),
-		.o_valid()
+		.i_clock_sdram(clock_sdram),
+
+		.i_request(sdram_request),
+		.i_rw(sdram_rw),
+		.i_address(sdram_address),
+		.i_wdata(sdram_wdata),
+		.i_wmask(sdram_wmask),
+		.o_rdata(sdram_rdata),
+		.o_ready(sdram_ready),
+
+		.sdram_clk(SDRAM_CLK),
+		.sdram_clk_en(SDRAM_CKE),
+		.sdram_cas_n(SDRAM_CAS_n),
+		.sdram_cs_n(SDRAM_CE_n),
+		.sdram_ras_n(SDRAM_RAS_n),
+		.sdram_we_n(SDRAM_WE_n),
+		.sdram_dqm(SDRAM_DQM),
+		.sdram_bs(SDRAM_BA),
+		.sdram_addr(SDRAM_A),
+		.sdram_rdata(it_sdram_data_r),
+		.sdram_wdata(it_sdram_data_w),
+		.sdram_data_rw(it_sdram_data_rw)
 	);
 
 
@@ -117,26 +157,32 @@ module SoC(
 		.i_reset(reset),
 		.i_clock(clock),
 
+		// 32'h0xxx_xxxx : ROM
 		.o_s0_rw(),
 		.o_s0_request(rom_request),
 		.i_s0_ready(rom_ready),
 		.o_s0_address(rom_address),
 		.i_s0_rdata(rom_rdata),
 		.o_s0_wdata(),
+		.o_s0_wmask(),
 
-		.o_s1_rw(ram_rw),
-		.o_s1_request(ram_request),
-		.i_s1_ready(ram_ready),
-		.o_s1_address(ram_address),
-		.i_s1_rdata(ram_rdata),
-		.o_s1_wdata(ram_wdata),
+		// 32'h1xxx_xxxx : SDRAM
+		.o_s1_rw(sdram_rw),
+		.o_s1_request(sdram_request),
+		.i_s1_ready(sdram_ready),
+		.o_s1_address(sdram_address),
+		.i_s1_rdata(sdram_rdata),
+		.o_s1_wdata(sdram_wdata),
+		.o_s1_wmask(sdram_wmask),
 
+		// 32'h2xxx_xxxx : UART
 		.o_s2_rw(uart_rw),
 		.o_s2_request(uart_request),
 		.i_s2_ready(uart_ready),
 		.o_s2_address(uart_address),
 		.i_s2_rdata(uart_rdata),
 		.o_s2_wdata(uart_wdata),
+		.o_s2_wmask(),
 
 		.i_m0_rw(1'b0),
 		.i_m0_request(cpu_ibus_request),
@@ -144,13 +190,15 @@ module SoC(
 		.i_m0_address(cpu_ibus_address),
 		.o_m0_rdata(cpu_ibus_rdata),
 		.i_m0_wdata(32'h0),
+		.i_m0_wmask(4'h0),
 
 		.i_m1_rw(cpu_dbus_rw),
 		.i_m1_request(cpu_dbus_request),
 		.o_m1_ready(cpu_dbus_ready),
 		.i_m1_address(cpu_dbus_address),
 		.o_m1_rdata(cpu_dbus_rdata),
-		.i_m1_wdata(cpu_dbus_wdata)
+		.i_m1_wdata(cpu_dbus_wdata),
+		.i_m1_wmask(cpu_dbus_wmask)
 	);
 
 
@@ -166,6 +214,7 @@ module SoC(
 	wire [31:0] cpu_dbus_address;
 	wire [31:0] cpu_dbus_rdata;
 	wire [31:0] cpu_dbus_wdata;
+	wire [3:0] cpu_dbus_wmask;
 	wire cpu_fault;
 
 	CPU #(
@@ -195,12 +244,9 @@ module SoC(
 		.o_dbus_address(cpu_dbus_address),
 		.i_dbus_rdata(cpu_dbus_rdata),
 		.o_dbus_wdata(cpu_dbus_wdata),
+		.o_dbus_wmask(cpu_dbus_wmask),
 
 		// Debug
-		.o_icache_hit(),
-		.o_icache_miss(),
-		.o_dcache_hit(),
-		.o_dcache_miss(),
 		.o_execute_busy(),
 		.o_memory_busy(),
 		.o_fault(cpu_fault)
