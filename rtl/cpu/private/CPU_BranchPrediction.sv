@@ -29,7 +29,7 @@ module CPU_BranchPrediction (
 
 	typedef struct packed
 	{
-		bit [31:0] from_pc;
+		bit [22:0] from_pc;
 		bit [31:0] target_pc;
 	}
 	cache_t;
@@ -42,16 +42,21 @@ module CPU_BranchPrediction (
 	end endgenerate
 
 	wire [5:0] i_pc_tag = i_pc[8:2];
+	wire [22:0] i_pc_rest = i_pc[31:9];
+
 	wire [5:0] i_pc_launch_tag = i_pc_launch[8:2];
+	wire [22:0] i_pc_launch_rest = i_pc_launch[31:9];
 
 	always_comb begin
 		o_pc_hint = i_pc;
-		if (c[i_pc_tag].from_pc == i_pc)
+
+		if (c[i_pc_tag].from_pc == i_pc_rest)
 			o_pc_hint = c[i_pc_tag].target_pc;
 		else if (i_is_jal)
 			o_pc_hint = i_pc + i_inst_J_imm;
 		else if (i_is_jump_conditional)
 			o_pc_hint = i_pc + i_inst_B_imm;
+
 	end
 
 	bit [31:0] dbg_bp_hit = 0;
@@ -63,8 +68,10 @@ module CPU_BranchPrediction (
 				dbg_bp_hit <= dbg_bp_hit + 1;
 			else begin
 				dbg_bp_miss <= dbg_bp_miss + 1;
-				c[i_pc_launch_tag].from_pc <= i_pc_launch;
+
+				c[i_pc_launch_tag].from_pc <= i_pc_launch_rest;
 				c[i_pc_launch_tag].target_pc <= i_jump_pc;
+
 			end
 		end
 	end

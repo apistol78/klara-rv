@@ -24,16 +24,16 @@ module ClockDividerV (
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			rate <= ~0;
-			counter <= 0;
+			counter <= ~0;
 			o_clock <= 0;
 		end
 		else begin
 			rate <= i_rate;
-			if (counter >= rate) begin
-				counter <= 0;
+			if (counter == 0) begin
+				counter <= rate;
 				o_clock <= ~o_clock;
 			end else begin
-				counter <= counter + 1'b1;
+				counter <= counter - 1'b1;
 			end
 		end
 	end
