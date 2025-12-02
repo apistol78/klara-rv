@@ -10,31 +10,32 @@
 `timescale 1ns/1ns
 `default_nettype none
 
+`ifdef SOC_ECP5
 `define FREQUENCY 100_000_000
+`endif
+
+`ifdef SOC_CV
+`define FREQUENCY 150_000_000
+`endif
 
 (* top *)
 module SoC(
-	input CLOCK,
-	output LED_p,
-	output wire SDRAM_CLK,
-	output wire SDRAM_CKE,
-	output wire SDRAM_RAS_n,
-	output wire SDRAM_CAS_n,
-	output wire SDRAM_WE_n,
-	output wire SDRAM_CE_n,
-	output wire [12:0] SDRAM_A,
-	output wire [1:0] SDRAM_BA,
-	inout wire [15:0] SDRAM_DQ,
-	output wire [1:0] SDRAM_DQM,
-	input UART_RX,
-	output UART_TX
+`ifdef SOC_ECP5
+	input wire CLOCK,
+	output wire LED_p,
+	input wire UART_RX,
+	output wire UART_TX
+`endif
+
+	input wire CLOCK_50_B5B,
+	input wire UART_RX,
+	output wire UART_TX
 );
 	wire clock;
-	wire clock_sdram;
 	wire reset = 1'b0;
-
-
 	wire pll_locked;
+
+`ifdef SOC_ECP5
 	PLL_ECP5 #(
 		.CLKI_DIV(1),
 		.CLKFB_DIV(4),
@@ -54,8 +55,17 @@ module SoC(
 		.o_clk3(),
 		.o_clk_locked(pll_locked)
 	);
+`endif
 
-	//assign LED_p = cpu_dbus_request;
+`ifdef SOC_CV
+	PLL_CV pll(
+		.refclk(CLOCK_50_B5B),
+		.rst(reset),
+		.outclk_0(clock),
+		.locked(pll_locked)
+	);
+`endif
+
 
 	//====================================================
 	// ROM
@@ -74,50 +84,25 @@ module SoC(
 
 
 	//=====================================
-	// SDRAM
-	wire sdram_request;
-	wire sdram_rw;
-	wire [31:0] sdram_address;
-	wire [31:0] sdram_rdata;
-	wire [31:0] sdram_wdata;
-	wire [3:0] sdram_wmask;
-	wire sdram_ready;
+	// RAM
+	wire ram_request;
+	wire ram_rw;
+	wire [31:0] ram_address;
+	wire [31:0] ram_wdata;
+	wire [31:0] ram_rdata;
+	wire ram_ready;
 
-	bit [15:0] it_sdram_data_r;
-	wire [15:0] it_sdram_data_w;
-	wire it_sdram_data_rw;
-
-	assign SDRAM_DQ = it_sdram_data_rw ? it_sdram_data_w : 16'hz;
-	assign it_sdram_data_r = SDRAM_DQ;
-
-	SDRAM_controller #(
-		.FREQUENCY(`FREQUENCY),
-		.SDRAM_DATA_WIDTH(16)
-	) sdram(
-		.i_reset(reset),
+	BRAM #(
+		.SIZE(32'h400)
+	) ram(
 		.i_clock(clock),
-		.i_clock_sdram(clock_sdram),
-
-		.i_request(sdram_request),
-		.i_rw(sdram_rw),
-		.i_address(sdram_address),
-		.i_wdata(sdram_wdata),
-		.i_wmask(sdram_wmask),
-		.o_rdata(sdram_rdata),
-		.o_ready(sdram_ready),
-
-		.sdram_clk(SDRAM_CLK),
-		.sdram_clk_en(SDRAM_CKE),
-		.sdram_cas_n(SDRAM_CAS_n),
-		.sdram_cs_n(SDRAM_CE_n),
-		.sdram_ras_n(SDRAM_RAS_n),
-		.sdram_we_n(SDRAM_WE_n),
-		.sdram_dqm(SDRAM_DQM),
-		.sdram_bs(SDRAM_BA),
-		.sdram_addr(SDRAM_A),
-		.sdram_rdata(it_sdram_data_r),
-		.sdram_wdata(it_sdram_data_w),
-		.sdram_data_rw(it_sdram_data_rw)
+		.i_request(ram_request),
+		.i_rw(ram_rw),
+		.i_address(ram_address),
+		.i_wdata(ram_wdata),
+		.o_rdata(ram_rdata),
+		.o_ready(ram_ready),
+		.o_valid()
 	);
 
 
@@ -132,7 +117,7 @@ module SoC(
 
 	UART #(
 		.FREQUENCY(`FREQUENCY),
-		.BAUDRATE(115200),
+		.BAUDRATE(460800),
 		.RX_FIFO_DEPTH(16),
 		.TX_FIFO_DEPTH(16)
 	) uart(
@@ -166,14 +151,14 @@ module SoC(
 		.o_s0_wdata(),
 		.o_s0_wmask(),
 
-		// 32'h1xxx_xxxx : SDRAM
-		.o_s1_rw(sdram_rw),
-		.o_s1_request(sdram_request),
-		.i_s1_ready(sdram_ready),
-		.o_s1_address(sdram_address),
-		.i_s1_rdata(sdram_rdata),
-		.o_s1_wdata(sdram_wdata),
-		.o_s1_wmask(sdram_wmask),
+		// 32'h1xxx_xxxx : RAM
+		.o_s1_rw(ram_rw),
+		.o_s1_request(ram_request),
+		.i_s1_ready(ram_ready),
+		.o_s1_address(ram_address),
+		.i_s1_rdata(ram_rdata),
+		.o_s1_wdata(ram_wdata),
+		.o_s1_wmask(),
 
 		// 32'h2xxx_xxxx : UART
 		.o_s2_rw(uart_rw),
