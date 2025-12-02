@@ -29,6 +29,7 @@ module Verify(
 	wire [31:0] cpu_dbus_address;
 	wire [31:0] cpu_dbus_rdata;
 	wire [31:0] cpu_dbus_wdata;
+	wire [3:0] cpu_dbus_wmask;
 	wire cpu_fault;
 
 	CPU #(
@@ -58,6 +59,7 @@ module Verify(
 		.o_dbus_address(cpu_dbus_address),
 		.i_dbus_rdata(cpu_dbus_rdata),
 		.o_dbus_wdata(cpu_dbus_wdata),
+		.o_dbus_wmask(cpu_dbus_wmask),
 
 		// Debug
 		.o_execute_busy(),
@@ -121,6 +123,7 @@ module Verify(
 		.i_m0_address(cpu_ibus_address),
 		.o_m0_rdata(cpu_ibus_rdata),
 		.i_m0_wdata(32'h0),
+		.i_m0_wmask(4'h0),
 
 		// CPU data bus
 		.i_m1_rw(cpu_dbus_rw),
@@ -129,6 +132,7 @@ module Verify(
 		.i_m1_address(cpu_dbus_address),
 		.o_m1_rdata(cpu_dbus_rdata),
 		.i_m1_wdata(cpu_dbus_wdata),
+		.i_m1_wmask(cpu_dbus_wmask),
 
 		// 32'h0xxx_xxxx : ROM
 		.o_s0_rw(),
@@ -137,6 +141,7 @@ module Verify(
 		.o_s0_address(rom_address),
 		.i_s0_rdata(rom_rdata),
 		.o_s0_wdata(),
+		.o_s0_wmask(),
 
 		// 32'h1xxx_xxxx : RAM
 		.o_s1_rw(ram_rw),
@@ -144,7 +149,8 @@ module Verify(
 		.i_s1_ready(ram_ready),
 		.o_s1_address(ram_address),
 		.i_s1_rdata(ram_rdata),
-		.o_s1_wdata(ram_wdata)
+		.o_s1_wdata(ram_wdata),
+		.o_s1_wmask()
 	);
 
 
