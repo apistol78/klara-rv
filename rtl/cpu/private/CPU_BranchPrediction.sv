@@ -37,7 +37,7 @@ module CPU_BranchPrediction (
 	cache_t c[64];
 
 	genvar i;
-	generate for (i = 0; i < 64; i = i + 1) begin
+	generate for (i = 0; i < 64; i = i + 1) begin : initialize_btb
 		initial c[i] = 64'b0;
 	end endgenerate
 

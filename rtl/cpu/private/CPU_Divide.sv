@@ -113,9 +113,9 @@ module CPU_Divide(
 	wire snumerator = i_numerator[31];
 	wire sdenominator = i_denominator[31];
 
-	wire [31:0] unumerator = (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;;
+	wire [31:0] unumerator = (i_signed && snumerator) ? -$signed(i_numerator) : i_numerator;
 	wire [31:0] udenominator = (i_signed && sdenominator) ? -$signed(i_denominator) : i_denominator;
-	wire [1:0] s = i_signed ? { snumerator, sdenominator } : 2'b00;;
+	wire [1:0] s = i_signed ? { snumerator, sdenominator } : 2'b00;
 
 	bit [31:0] result;
 	bit [31:0] remainder;
