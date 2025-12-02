@@ -141,7 +141,21 @@ module CPU_Fetch #(
 	
 	assign o_data = data;
 
-	bit irq_pending_r = 1'b0;
+	// Register incoming IRQ pending signals to improve timing.
+	bit irq_pending_r0 = 1'b0;
+	bit [31:0] irq_pc_r0 = 32'h0;
+	always_ff @(posedge i_clock) begin
+		irq_pending_r0 <= i_irq_pending;
+		irq_pc_r0 <= i_irq_pc;
+	end
+
+	// Register incoming jump signals to improve timing.
+	bit jump_r0 = 1'b0;
+	bit [31:0] jump_pc_r0 = 32'h0;
+	always_ff @(posedge i_clock) begin
+		jump_r0 <= i_jump;
+		jump_pc_r0 <= i_jump_pc;
+	end
 
 	// Branch prediction unit.
 	bit [31:0] bp_pc_launch;
@@ -155,10 +169,12 @@ module CPU_Fetch #(
 		.i_inst_J_imm(inst_J_imm),
 		.i_pc_launch(bp_pc_launch),
 		.o_pc_hint(bp_pc_hint),
-		.i_jump(i_jump),
-		.i_jump_pc(i_jump_pc)
+		.i_jump(jump_r0),
+		.i_jump_pc(jump_pc_r0)
 	);
 
+	// Fetch block.
+	bit irq_pending_r = 1'b0;
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			state <= WAIT_ICACHE;
@@ -170,14 +186,14 @@ module CPU_Fetch #(
 
 			o_irq_dispatched <= 1'b0;
 
-			case (state)
+			unique case (state)
 				WAIT_ICACHE: begin
 					// Issue interrupt if pending.
-					irq_pending_r <= i_irq_pending;
-					if ({ irq_pending_r, i_irq_pending } == 2'b01) begin
+					irq_pending_r <= irq_pending_r0;
+					if ({ irq_pending_r, irq_pending_r0 } == 2'b01) begin
 						o_irq_dispatched <= 1'b1;
 						o_irq_epc <= pc;
-						pc <= i_irq_pc;
+						pc <= irq_pc_r0;
 					end
 					else if (!i_busy && icache_ready) begin
 						data.strobe <= ~data.strobe;
@@ -221,19 +237,19 @@ module CPU_Fetch #(
 
 				WAIT_JUMP: begin
 					// Wait for "goto" signal.
-					if (i_jump) begin
-						pc <= i_jump_pc;
+					if (jump_r0) begin
+						pc <= jump_pc_r0;
 						state <= WAIT_ICACHE;
 					end
 				end
 
 				WAIT_IRQ: begin
 					// Wait for soft IRQ signal.
-					irq_pending_r <= i_irq_pending;
-					if ({ irq_pending_r, i_irq_pending } == 2'b01) begin
+					irq_pending_r <= irq_pending_r0;
+					if ({ irq_pending_r, irq_pending_r0 } == 2'b01) begin
 						o_irq_dispatched <= 1'b1;
 						o_irq_epc <= pc;
-						pc <= i_irq_pc;
+						pc <= irq_pc_r0;
 						state <= WAIT_ICACHE;
 					end					
 				end
