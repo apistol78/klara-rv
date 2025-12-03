@@ -45,11 +45,6 @@ module CPU_DCache_WB(
 	bit [31:0] next_wb_data [4];
 	bit [3:0] next_wb_wmask [4];
 
-	wire debug_wb_dirty0 = wb_dirty[0];
-	wire debug_wb_dirty1 = wb_dirty[1];
-	wire debug_wb_dirty2 = wb_dirty[2];
-	wire debug_wb_dirty3 = wb_dirty[3];
-
 	initial begin
 		integer i;
 		for (i = 0; i < 4; i = i + 1) begin
