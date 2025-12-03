@@ -11,7 +11,8 @@
 `default_nettype none
 
 module VIDEO_controller #(
-	parameter MAX_PITCH = 640
+	parameter MAX_PITCH = 640,
+	parameter WRITEBACK_SIZE = 0
 )(
 	input wire i_clock,
 
@@ -111,44 +112,60 @@ module VIDEO_controller #(
 	bit [31:0] wb_wdata;
 	bit [3:0] wb_wmask;
 
-	wire [24:0] vram_pa_address;
-	assign o_vram_pa_address = { 8'h0, vram_pa_address };
+	generate if (WRITEBACK_SIZE > 0) begin : video_wb_enabled
 
-	WriteBuffer #(
-		.DEPTH(32),
-		.ADDRESS_WIDTH(24),
-		.STALL_READ(0)
-	) wb(
-		.i_reset(1'b0),
-		.i_clock(i_clock),
+		wire [24:0] vram_pa_address;
+		assign o_vram_pa_address = { 8'h0, vram_pa_address };
 
-		.o_empty(),
-		.o_full(),
+		WriteBuffer #(
+			.DEPTH(32),
+			.ADDRESS_WIDTH(24),
+			.STALL_READ(0)
+		) wb(
+			.i_reset(1'b0),
+			.i_clock(i_clock),
 
-		.o_bus_rw(o_vram_pa_rw),
-		.o_bus_request(o_vram_pa_request),
-		.i_bus_ready(i_vram_pa_ready),
-		.o_bus_address(vram_pa_address),
-		.i_bus_rdata(i_vram_pa_rdata),
-		.o_bus_wdata(o_vram_pa_wdata),
-		.o_bus_wmask(o_vram_pa_wmask),
+			.o_empty(),
+			.o_full(),
 
-		.i_rw(wb_rw),
-		.i_request(wb_request),
-		.o_ready(wb_ready),
-		.i_address(wb_address),
-		.o_rdata(wb_rdata),
-		.i_wdata(wb_wdata),
-		.i_wmask(wb_wmask)
-	);
+			.o_bus_rw(o_vram_pa_rw),
+			.o_bus_request(o_vram_pa_request),
+			.i_bus_ready(i_vram_pa_ready),
+			.o_bus_address(vram_pa_address),
+			.i_bus_rdata(i_vram_pa_rdata),
+			.o_bus_wdata(o_vram_pa_wdata),
+			.o_bus_wmask(o_vram_pa_wmask),
 
-	initial begin
-		wb_rw = 1'b0;
-		wb_request = 1'b0;
-		wb_address = 24'h0;
-		wb_wdata = 32'h0;
-		wb_wmask = 4'h0;
-	end
+			.i_rw(wb_rw),
+			.i_request(wb_request),
+			.o_ready(wb_ready),
+			.i_address(wb_address),
+			.o_rdata(wb_rdata),
+			.i_wdata(wb_wdata),
+			.i_wmask(wb_wmask)
+		);
+
+		initial begin
+			wb_rw = 1'b0;
+			wb_request = 1'b0;
+			wb_address = 24'h0;
+			wb_wdata = 32'h0;
+			wb_wmask = 4'h0;
+		end
+
+	end endgenerate
+
+	generate if (WRITEBACK_SIZE == 0) begin : video_wb_disabled
+
+		assign o_vram_pa_rw = wb_rw;
+		assign o_vram_pa_request = wb_request;
+		assign wb_ready = i_vram_pa_ready;
+		assign o_vram_pa_address = { 8'h0, wb_address };
+		assign wb_rdata = i_vram_pa_rdata;
+		assign o_vram_pa_wdata = wb_wdata;
+		assign o_vram_pa_wmask = wb_wmask;
+
+	end endgenerate
 
 	//===============================
 	// CPU
