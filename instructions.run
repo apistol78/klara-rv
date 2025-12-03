@@ -1803,11 +1803,11 @@ function main(argv)
 		-- Instruction signals.
 		for _, inst in ipairs(vi) do
 			if inst.mask > 0x0000ffff or inst.data > 0x0000ffff then
-				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[31:0] & 32'h" .. string.format("%08x", inst.mask) .. ") == 32'h" .. string.format("%08x", inst.data) .. ");")
+				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[31:2] & 30'h" .. string.format("%08x", inst.mask >> 2) .. ") == 30'h" .. string.format("%08x", inst.data >> 2) .. ");")
 			elseif inst.mask > 0x00000ff or inst.data > 0x000000ff then
-				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[15:0] & 16'h" .. string.format("%04x", inst.mask) .. "    ) == 16'h" .. string.format("%04x", inst.data) .. "    );")
+				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[15:2] & 14'h" .. string.format("%04x", inst.mask >> 2) .. "    ) == 14'h" .. string.format("%04x", inst.data >> 2) .. "    );")
 			else
-				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[ 7:0] &  8'h" .. string.format("%02x", inst.mask) .. "      ) ==  8'h" .. string.format("%02x", inst.data) .. "      );")
+				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[ 7:2] &  6'h" .. string.format("%02x", inst.mask >> 2) .. "      ) ==  6'h" .. string.format("%02x", inst.data >> 2) .. "      );")
 			end
 		end
 		stdout:printLn("")
