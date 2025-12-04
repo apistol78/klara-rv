@@ -1742,6 +1742,12 @@ local function indent(s)
 	return count
 end
 
+local function tblsize(t)
+	local size = 0
+	for _, _ in pairs(t) do size = size + 1 end
+	return size
+end
+
 function main(argv)
 
 	local language = argv:get(0)
@@ -1841,13 +1847,13 @@ function main(argv)
 		-- Opcode signals.
 		for i, op in ipairs(ops) do
 			assert((op & 0x03) == 0x03)
-			stdout:printLn("wire is_OP" .. string.format("%02d", i) .. " = (`INSTRUCTION[6:2] == 5'h" .. string.format("%02x", op >> 2) .. ");")
+			stdout:printLn("wire is_OP" .. string.format("%02x", op) .. " = (`INSTRUCTION[6:2] == 5'h" .. string.format("%02x", op >> 2) .. ");")
 		end
 		stdout:printLn("")
 
 		-- Instruction signals.
 		for i, op in ipairs(ops) do
-			local opg < const > = "is_OP" .. string.format("%02d", i)
+			local opg < const > = "is_OP" .. string.format("%02x", op)
 
 			-- Count number of instructions in group; we ignore matching
 			-- instruction if there is only one in the group.
@@ -1874,19 +1880,53 @@ function main(argv)
 
 		-- Format signals.
 		for _, prefix in ipairs(P) do
+
 			local t = {}
+			local gops = {}
+			local tops = {}
+			local uops = {}
 			for i, inst in ipairs(vi) do
+				local op = inst.data & 0x7f
+				gops[op] = (gops[op] or 0) + 1
 				if inst.format == prefix then
 					table.insert(t, inst)
+					if tops[op] == nil then table.insert(uops, op) end
+					tops[op] = (tops[op] or 0) + 1
 				end
 			end
+
 			if #t > 0 then
-				stdout:print("wire is_" .. prefix .. " =")
-				for i, inst in ipairs(t) do
-					if i > 1 then stdout:print(" |") end
-					stdout:print(" is_" .. inst.name)
+
+				local all = true
+				--stdout:printLn(#uops)
+				for _, op in ipairs(uops) do
+					---stdout:printLn(":" .. op)
+					all = all and (gops[op] == tops[op])
 				end
-				stdout:printLn(";")
+
+				stdout:print("wire is_" .. prefix .. " =")
+				if all then
+					for i, op in ipairs(uops) do
+						if i > 1 then stdout:print(" |") end
+						stdout:print(" is_OP" .. string.format("%02x", op))
+					end
+				else
+					for i, inst in ipairs(t) do
+						if i > 1 then stdout:print(" |") end
+						stdout:print(" is_" .. inst.name)
+					end
+				end
+				
+				if all then
+					stdout:print("; //")
+					for i, inst in ipairs(t) do
+						if i > 1 then stdout:print(" |") end
+						stdout:print(" is_" .. inst.name)
+					end
+					stdout:printLn()
+				else
+					stdout:printLn(";")
+				end
 			else
 				stdout:printLn("wire is_" .. prefix .. " = 1'b0;")
 			end
