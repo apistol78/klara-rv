@@ -477,6 +477,7 @@ local instructions = {
 		mask = 0xffffffff,
 		data = 0x00100073,
 		name = "EBREAK",
+		format = "",
 		type = insttype.COMPLEX,
 		cpp = [[
 			return false;
@@ -489,6 +490,7 @@ local instructions = {
 		mask = 0xffffffff,
 		data = 0x00000073,
 		name = "ECALL",
+		format = "",
 		type = insttype.COMPLEX,
 		cpp = [[
 			ecall();
@@ -1746,35 +1748,62 @@ function main(argv)
 	local debug = false
 	local cnt = 0
 
+	table.sort(instructions, function(a, b)
+		return a.format < b.format
+	end)
+	
 	if language == "cpp" then
 
+		-- Figure out supported unique opcodes.
+		local ops, have = {}, {}
 		for i, inst in ipairs(instructions) do
-			assert((inst.mask & inst.data) == inst.data)
-			if inst.cpp ~= nil then 
-				if cnt >= 1 then stdout:print("else if") else stdout:print("if") end
-
-				stdout:printLn(" ((word & 0x" .. string.format("%08x", inst.mask) .. ") == 0x" .. string.format("%08x", inst.data) .. ")\t// " .. inst.name)
-				stdout:printLn("{")
-
-				local lns = iter2tbl(lines(inst.cpp))
-				while #lns > 0 and trim(lns[1]) == "" do
-					table.remove(lns, 1)
+			if inst.cpp ~= nil then
+				local op = inst.data & 0x7f
+				if have[op] == nil then
+					table.insert(ops, op)
+					have[op] = true
 				end
-				while #lns > 0 and trim(lns[#lns]) == "" do
-					table.remove(lns, #lns)
-				end
-				local ind = 80
-				for _, ln in pairs(lns) do
-					ind = math.min(ind, indent(ln))
-				end
-				for _, ln in pairs(lns) do
-					stdout:printLn("\t" .. ln:sub(ind + 1))
-				end
-
-				stdout:printLn("}")
-
-				cnt = cnt + 1
 			end
+		end
+
+		for _, op in ipairs(ops) do
+			if cnt >= 1 then stdout:print("else if") else stdout:print("if") end
+			stdout:printLn(" ((word & 0x7f) == 0x" .. string.format("%02x", op) .. ")")
+			stdout:printLn("{")
+
+			local lcnt = 0
+			for i, inst in ipairs(instructions) do
+				assert((inst.mask & inst.data) == inst.data)
+				if inst.cpp ~= nil and (inst.data & 0x7f) == op then 
+
+					stdout:printLn("\t// " .. inst.format)
+					if lcnt >= 1 then stdout:print("\telse if") else stdout:print("\tif") end
+
+					stdout:printLn(" ((word & 0x" .. string.format("%08x", inst.mask) .. ") == 0x" .. string.format("%08x", inst.data) .. ")\t// " .. inst.name)
+					stdout:printLn("\t{")
+
+					local lns = iter2tbl(lines(inst.cpp))
+					while #lns > 0 and trim(lns[1]) == "" do
+						table.remove(lns, 1)
+					end
+					while #lns > 0 and trim(lns[#lns]) == "" do
+						table.remove(lns, #lns)
+					end
+					local ind = 80
+					for _, ln in pairs(lns) do
+						ind = math.min(ind, indent(ln))
+					end
+					for _, ln in pairs(lns) do
+						stdout:printLn("\t\t" .. ln:sub(ind + 1))
+					end
+
+					stdout:printLn("\t}")
+					lcnt = lcnt + 1
+				end
+			end
+
+			stdout:printLn("}")
+			cnt = cnt + 1
 		end
 
 		stdout:printLn("else")
@@ -1795,19 +1824,50 @@ function main(argv)
 		local vi = {}
 		for _, inst in ipairs(instructions) do
 			if inst.verilog ~= nil or inst.verilog_alu ~= nil or inst.verilog_text ~= nil or inst.verilog_fpu ~= nil then
-			-- if inst.verilog ~= nil or inst.verilog_alu ~= nil or inst.verilog_text ~= nil then
 				table.insert(vi, inst)
 			end
 		end
 
+		-- Figure out supported unique opcodes.
+		local ops, have = {}, {}
+		for i, inst in ipairs(vi) do
+			local op = inst.data & 0x7f
+			if have[op] == nil then
+				table.insert(ops, op)
+				have[op] = true
+			end
+		end
+
+		-- Opcode signals.
+		for i, op in ipairs(ops) do
+			assert((op & 0x03) == 0x03)
+			stdout:printLn("wire is_OP" .. string.format("%02d", i) .. " = (`INSTRUCTION[6:2] == 5'h" .. string.format("%02x", op >> 2) .. ");")
+		end
+		stdout:printLn("")
+
 		-- Instruction signals.
-		for _, inst in ipairs(vi) do
-			if inst.mask > 0x0000ffff or inst.data > 0x0000ffff then
-				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[31:2] & 30'h" .. string.format("%08x", inst.mask >> 2) .. ") == 30'h" .. string.format("%08x", inst.data >> 2) .. ");")
-			elseif inst.mask > 0x00000ff or inst.data > 0x000000ff then
-				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[15:2] & 14'h" .. string.format("%04x", inst.mask >> 2) .. "    ) == 14'h" .. string.format("%04x", inst.data >> 2) .. "    );")
-			else
-				stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = ((`INSTRUCTION[ 7:2] &  6'h" .. string.format("%02x", inst.mask >> 2) .. "      ) ==  6'h" .. string.format("%02x", inst.data >> 2) .. "      );")
+		for i, op in ipairs(ops) do
+			local opg < const > = "is_OP" .. string.format("%02d", i)
+
+			-- Count number of instructions in group; we ignore matching
+			-- instruction if there is only one in the group.
+			local icnt = 0;
+			for _, inst in ipairs(vi) do
+				if (inst.data & 0x7f) == op then
+					icnt = icnt + 1
+				end
+			end
+
+			for _, inst in ipairs(vi) do
+				if (inst.data & 0x7f) == op then
+					if icnt > 1 and (inst.mask > 0x0000ffff or inst.data > 0x0000ffff) then
+						stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = " .. opg .. " & ((`INSTRUCTION[31:7] & 25'h" .. string.format("%07x", inst.mask >> 7) .. ") == 25'h" .. string.format("%07x", inst.data >> 7) .. ");")
+					elseif icnt > 1 and (inst.mask > 0x00000ff or inst.data > 0x000000ff) then
+						stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = " .. opg .. " & ((`INSTRUCTION[15:7] & 9'h" .. string.format("%03x", inst.mask >> 7) .. "     ) == 9'h" .. string.format("%03x", inst.data >> 7) .. "     );")
+					else
+						stdout:printLn("wire is_" .. string.format("%-9s", inst.name) .. " = " .. opg .. ";")
+					end
+				end
 			end
 		end
 		stdout:printLn("")
@@ -1832,17 +1892,6 @@ function main(argv)
 			end
 		end
 		stdout:printLn("")
-		-- stdout:printLn(
-		-- 	"wire is_B   = (`INSTRUCTION[6:0] == 7'h63);\n" ..
-		-- 	"wire is_I   = (`INSTRUCTION[6:0] == 7'h03) || (`INSTRUCTION[6:0] == 7'h13) || (`INSTRUCTION[6:0] == 7'h0f) || (`INSTRUCTION[6:0] == 7'h67);\n" ..
-		-- 	"wire is_J   = (`INSTRUCTION[6:0] == 7'h6f);\n" ..
-		-- 	"wire is_R   = (`INSTRUCTION[6:0] == 7'h33);\n" ..
-		-- 	"wire is_R4  = (`INSTRUCTION[6:0] == 7'h43) || (`INSTRUCTION[6:0] == 7'h4f) || (`INSTRUCTION[6:0] == 7'h47) || (`INSTRUCTION[6:0] == 7'h4b);\n" ..
-		-- 	"wire is_S   = (`INSTRUCTION[6:0] == 7'h23);\n" ..
-		-- 	"wire is_U   = (`INSTRUCTION[6:0] == 7'h17) || (`INSTRUCTION[6:0] == 7'h37);\n" ..
-		-- 	"wire is_CSR = (`INSTRUCTION[6:0] == 7'h73);"
-		-- )
-		-- stdout:printLn("")
 
 		-- Instruction type signals.
 		for _, it in pairs({
