@@ -86,8 +86,7 @@ module CPU_DCache_Reg #(
 		.i_address(cache_address),
 		.i_wdata(cache_wdata),
 		.o_rdata(cache_rdata),
-		.o_ready(),
-		.o_valid()
+		.o_ready()
 	);
 
 	wire [31:0] cache_entry_address = { cache_rdata.address, 2'b00 };

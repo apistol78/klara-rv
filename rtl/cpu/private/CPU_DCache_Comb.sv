@@ -82,8 +82,7 @@ module CPU_DCache_Comb #(
 		.i_address(cache_address),
 		.i_wdata(cache_wdata),
 		.o_rdata(cache_rdata),
-		.o_ready(),
-		.o_valid()
+		.o_ready()
 	);
 
 	wire cache_entry_valid = cache_rdata[0];

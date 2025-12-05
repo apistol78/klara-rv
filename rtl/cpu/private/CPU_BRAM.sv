@@ -23,20 +23,17 @@ module CPU_BRAM #(
 	input wire [ADDRESS_WIDTH - 1:0] i_address,
 	input wire [DATA_WIDTH - 1:0] i_wdata,
 	output bit [DATA_WIDTH - 1:0] o_rdata,
-	output bit o_ready,
-	output bit o_valid
+	output bit o_ready
 );
     (* ram_style = "block" *)
 	bit [DATA_WIDTH - 1:0] data [0:SIZE - 1];
 
 	initial begin
 		o_ready = 0;
-		o_valid = 1;
 	end
 
 	always_ff @(posedge i_clock) begin
 		if (i_request) begin
-			o_valid <= (i_address >> ADDR_LSH) < SIZE;
 			if (!i_rw) begin
 				o_rdata <= data[i_address >> ADDR_LSH];
 			end

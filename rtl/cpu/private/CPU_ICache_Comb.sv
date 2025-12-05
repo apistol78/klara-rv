@@ -64,8 +64,7 @@ module CPU_ICache_Comb#(
 		.i_address(cache_label),
 		.i_wdata(cache_wdata),
 		.o_rdata(cache_rdata),
-		.o_ready(),
-		.o_valid()
+		.o_ready()
 	);
 
 	assign o_bus_address = i_input_pc;
