@@ -18,7 +18,7 @@ The queue is kept small as the basic idea is to have
 a DMA channel kept busy to feed to the audio stream.
 */
 module AUDIO_controller #(
-	parameter BUFFER_SIZE = 16
+	parameter BUFFER_SIZE = 4
 )(
 	input wire i_reset,
 	input wire i_clock,
@@ -44,7 +44,7 @@ module AUDIO_controller #(
 	bit output_fifo_rd = 0;
 	wire [31:0] output_sample;
 	wire [$clog2(BUFFER_SIZE)-1:0] output_fifo_queued;
-	FIFO_BRAM #(
+	FIFO #(
 		.DEPTH(BUFFER_SIZE),
 		.WIDTH(32)
 	) output_fifo(
