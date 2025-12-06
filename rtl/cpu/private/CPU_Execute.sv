@@ -79,7 +79,8 @@ module CPU_Execute (
 		i_data.op
 
 	`define EXECUTE_DONE				\
-		data.strobe <= i_data.strobe;	\
+		last_strobe <= i_data.strobe;	\
+		data.strobe <= ~data.strobe;	\
 		data.inst_rd <= register_t'(!i_data.memory_read ? i_data.inst_rd : 0);
 
 	// ====================
@@ -176,7 +177,7 @@ module CPU_Execute (
 	);
 
 	always_comb begin
-		fpu_request = !i_memory_busy && (i_data.strobe != data.strobe) && i_data.fpu;
+		fpu_request = !i_memory_busy && (i_data.strobe != last_strobe) && i_data.fpu;
 	end
 `endif
 
@@ -185,6 +186,7 @@ module CPU_Execute (
 	assign o_csr_index = i_data.imm[11:0];
 	assign o_data = data;
 
+	bit last_strobe = 0;
 	execute_data_t data = 0;
 
 	initial begin
@@ -200,7 +202,7 @@ module CPU_Execute (
 	always_comb begin
 		o_busy =
 			(
-				(i_data.strobe != data.strobe) &&
+				(i_data.strobe != last_strobe) &&
 `ifdef FPU_ENABLE
 				(i_data.complx || i_data.fpu)
 `else
@@ -211,6 +213,7 @@ module CPU_Execute (
 
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
+			last_strobe <= 1'b0;
 			data <= 0;
 			o_csr_wdata_wr <= 1'b0;
 			o_csr_wdata <= 0;
@@ -235,7 +238,7 @@ module CPU_Execute (
 
 			if (
 				!i_memory_busy &&
-				i_data.strobe != data.strobe
+				i_data.strobe != last_strobe
 			) begin
 
 				data.pc <= i_data.pc;

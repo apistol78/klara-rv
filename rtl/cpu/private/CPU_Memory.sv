@@ -192,17 +192,19 @@ module CPU_Memory #(
 	
 	memory_data_t data = 0;
 	state_t state = IDLE;
+	bit last_strobe = 0;
 
 	always_comb begin
 		o_busy =
 			(
-				(i_data.strobe != data.strobe) &&
+				(i_data.strobe != last_strobe) &&
 				(i_data.mem_read || i_data.mem_write || i_data.mem_flush)
 			);
 	end
 
 
 	state_t next_state;
+	bit next_last_strobe;
 	bit next_data_strobe;
 	bit [31:0] next_data_pc;
 	bit [31:0] next_data_rd;
@@ -210,6 +212,7 @@ module CPU_Memory #(
 
 	always_ff @(posedge i_clock) begin
 		state <= next_state;
+		last_strobe <= next_last_strobe;
 		data.pc <= next_data_pc;
 		data.rd <= next_data_rd;
 		data.inst_rd <= next_data_inst_rd;
@@ -218,6 +221,7 @@ module CPU_Memory #(
 
 	always_comb begin
 		next_state = state;
+		next_last_strobe = last_strobe;
 		next_data_pc = data.pc;
 		next_data_rd = data.rd;
 		next_data_inst_rd = data.inst_rd;
@@ -231,7 +235,7 @@ module CPU_Memory #(
 
 		unique case (state)
 			IDLE: begin
-				if (i_data.strobe != data.strobe) begin
+				if (i_data.strobe != last_strobe) begin
 					if (i_data.mem_read) begin
 						dcache_request = 1;
 						if (dcache_ready) begin
@@ -243,7 +247,8 @@ module CPU_Memory #(
 								default: next_data_rd = 0;
 							endcase
 							next_data_inst_rd = i_data.mem_inst_rd;
-							next_data_strobe = i_data.strobe;
+							next_data_strobe = ~data.strobe;
+							next_last_strobe = i_data.strobe;
 						end
 					end
 					else if (i_data.mem_write) begin
@@ -297,7 +302,8 @@ module CPU_Memory #(
 							next_data_pc = i_data.pc;
 							next_data_rd = i_data.rd;
 							next_data_inst_rd = i_data.inst_rd;	
-							next_data_strobe = i_data.strobe;
+							next_data_strobe = ~data.strobe;
+							next_last_strobe = i_data.strobe;
 						end
 					end
 					else if (i_data.mem_flush && dcache_need_flush) begin
@@ -309,7 +315,8 @@ module CPU_Memory #(
 						next_data_pc = i_data.pc;
 						next_data_rd = i_data.rd;
 						next_data_inst_rd = i_data.inst_rd;
-						next_data_strobe = i_data.strobe;
+						next_data_strobe = ~data.strobe;
+						next_last_strobe = i_data.strobe;
 					end
 				end
 			end
@@ -322,7 +329,8 @@ module CPU_Memory #(
 					next_data_pc = i_data.pc;
 					next_data_rd = i_data.rd;
 					next_data_inst_rd = i_data.inst_rd;				
-					next_data_strobe = i_data.strobe;
+					next_data_strobe = ~data.strobe;
+					next_last_strobe = i_data.strobe;
 					next_state = IDLE;
 				end
 			end
