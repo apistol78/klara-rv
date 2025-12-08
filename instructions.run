@@ -35,6 +35,14 @@ local operations = {
 	NOT_EQUAL = "`OP_NOT_EQUAL",
 	SIGNED_GREATER_EQUAL = "`OP_SIGNED_GREATER_EQUAL",
 	UNSIGNED_GREATER_EQUAL = "`OP_UNSIGNED_GREATER_EQUAL",
+	-- Zba
+	SIGNED_ADD_SH1 = "`OP_SIGNED_ADD_SH1",
+	UNSIGNED_ADD_SH1 = "`OP_UNSIGNED_ADD_SH1",
+	SIGNED_ADD_SH2 = "`OP_SIGNED_ADD_SH2",
+	UNSIGNED_ADD_SH2 = "`OP_UNSIGNED_ADD_SH2",
+	SIGNED_ADD_SH3 = "`OP_SIGNED_ADD_SH3",
+	UNSIGNED_ADD_SH3 = "`OP_UNSIGNED_ADD_SH3",
+	UNSIGNED_SHIFT_LEFT = "`OP_UNSIGNED_SHIFT_LEFT",
 }
 
 local fpu_operations = {
@@ -1716,6 +1724,136 @@ local instructions = {
 			operand2 = operands.IMM
 		}
 	},
+
+	-- Zba
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x0800003B,	-- 0000 1000 0000 0000 0000 0000 0011 1011
+		name = "ADDUW",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) + R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_ADD,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x20002033,	-- 0010 0000 0000 0000 0010 0000 0011 0011
+		name = "SH1ADD",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = (R_s(f.rs1) << 1) + R_s(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD_SH1,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x2000203B,	-- 0010 0000 0000 0000 0010 0000 0011 1011
+		name = "SH1ADDUW",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = (R_u(f.rs1) << 1) + R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_ADD_SH1,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x20004033,	-- 0010 0000 0000 0000 0100 0000 0011 0011
+		name = "SH2ADD",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = (R_s(f.rs1) << 2) + R_s(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD_SH2,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x2000403B,	-- 0010 0000 0000 0000 0100 0000 0011 1011
+		name = "SH2ADDUW",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = (R_u(f.rs1) << 2) + R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_ADD_SH2,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x20006033,	-- 0010 0000 0000 0000 0110 0000 0011 0011
+		name = "SH3ADD",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = (R_s(f.rs1) << 3) + R_s(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_ADD_SH3,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x2000603B,	-- 0010 0000 0000 0000 0110 0000 0011 1011
+		name = "SH3ADDUW",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = (R_u(f.rs1) << 3) + R_u(f.rs2);
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_ADD_SH3,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfc00707f,	-- 1111 1100 0000 0000 0111 0000 0111 1111
+		data = 0x0800101B,	-- 0000 1000 0000 0000 0001 0000 0001 1011
+		name = "SLLIUW",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) << ((word >> 20) & 0x1f);
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_SHIFT_LEFT,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
 }
 
 local function trim(s)
@@ -2011,11 +2149,11 @@ function main(argv)
 			end
 		end
 
-		stdout:printLn("wire [3:0] alu_operation = ")
+		stdout:printLn("wire [4:0] alu_operation = ")
 		for i, inst in ipairs(alu) do
 			stdout:printLn("\tis_" .. string.format("%-5s", inst.name) .. " ? " .. string.format("%-26s", inst.verilog_alu.operation) .. " :")
 		end
-		stdout:printLn("\t4'd0;")
+		stdout:printLn("\t5'd0;")
 		stdout:printLn("")
 
 		stdout:printLn("wire [4:0] alu_operand1 = ")

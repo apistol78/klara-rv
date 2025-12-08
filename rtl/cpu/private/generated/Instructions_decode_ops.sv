@@ -4,17 +4,17 @@
 `OP <= 
 	is_EBREAK ? OP_EBREAK : 
 	is_ECALL  ? OP_ECALL  : 
-	is_CSRRW  ? OP_CSRRW  : 
-	is_MRET   ? OP_MRET   : 
-	is_CSRRS  ? OP_CSRRS  : 
 	is_CSRRC  ? OP_CSRRC  : 
+	is_MRET   ? OP_MRET   : 
+	is_CSRRW  ? OP_CSRRW  : 
+	is_CSRRS  ? OP_CSRRS  : 
 	is_FENCE  ? OP_FENCE  : 
 	is_MULHU  ? OP_MULHU  : 
-	is_MULH   ? OP_MULH   : 
-	is_MULHSU ? OP_MULHSU : 
-	is_MUL    ? OP_MUL    : 
-	is_REM    ? OP_REM    : 
 	is_REMU   ? OP_REMU   : 
+	is_MULHSU ? OP_MULHSU : 
+	is_REM    ? OP_REM    : 
+	is_MULH   ? OP_MULH   : 
 	is_DIVU   ? OP_DIVU   : 
 	is_DIV    ? OP_DIV    : 
+	is_MUL    ? OP_MUL    : 
 	0;

@@ -35,6 +35,14 @@
 `define OP_NOT_EQUAL                12
 `define OP_SIGNED_GREATER_EQUAL     13
 `define OP_UNSIGNED_GREATER_EQUAL   14
+// Zba
+`define OP_SIGNED_ADD_SH1			15
+`define OP_UNSIGNED_ADD_SH1			16
+`define OP_SIGNED_ADD_SH2			17
+`define OP_UNSIGNED_ADD_SH2			18
+`define OP_SIGNED_ADD_SH3			19
+`define OP_UNSIGNED_ADD_SH3			20
+`define OP_UNSIGNED_SHIFT_LEFT		21
 
 // FPU operations
 `define FPU_OP_ADD			0

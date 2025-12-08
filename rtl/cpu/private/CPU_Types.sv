@@ -82,7 +82,7 @@ typedef struct packed
 `ifdef FPU_ENABLE
 	bit fpu;					//!< FPU instruction.
 `endif
-	bit [3:0] alu_operation;	//!< ALU operation code.
+	bit [4:0] alu_operation;	//!< ALU operation code.
 	bit [4:0] alu_operand1;		//!< ALU operand 1, one hot.
 	bit [4:0] alu_operand2;		//!< ALU operand 2, one hot.
 	bit memory_read;			//!< Memory read instruction.
