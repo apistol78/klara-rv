@@ -53,7 +53,7 @@ module SPI #(
 	bit tx_queue_read = 0;
 	bit [7:0] tx_queue_wdata;
 	wire [7:0] tx_queue_rdata;
-	FIFO #(
+	FIFO_BRAM #(
 		.DEPTH(1024),
 		.WIDTH(8)
 	) tx_queue(
@@ -75,7 +75,7 @@ module SPI #(
 	bit rx_queue_read = 0;
 	bit [7:0] rx_queue_wdata;
 	wire [7:0] rx_queue_rdata;
-	FIFO #(
+	FIFO_BRAM #(
 		.DEPTH(1024),
 		.WIDTH(8)
 	) rx_queue(
