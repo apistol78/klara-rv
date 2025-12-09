@@ -11,8 +11,6 @@
 #include "Emulator2/CPU/Bus.h"
 #include "Emulator2/CPU/HL/DCache.h"
 
-//#define DCACHE_LOG_STAT
-
 using namespace traktor;
 
 T_IMPLEMENT_RTTI_CLASS(L"DCache", DCache, Object)
@@ -29,9 +27,8 @@ DCache::DCache(Bus* bus)
 
 DCache::~DCache()
 {
-#if defined(DCACHE_LOG_STAT)
 	log::info << L"DCache " << m_hits << L"/" << m_misses << L" (" << str(L"%.2f%%", (m_hits * 100.0) / (m_hits + m_misses)) << L")" << Endl;
-#endif
+	log::info << L"   " << m_collision << Endl;
 }
 
 void DCache::writeU32(uint32_t address, uint32_t value, uint32_t mask)
@@ -45,6 +42,7 @@ void DCache::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 		{
 			// Need to evict line which contain dirty data.
 			m_bus->writeU32(line.address, line.word, line.mask);
+			m_collision++;
 		}
 
 		if  (address == line.address)
@@ -81,6 +79,7 @@ uint32_t DCache::readU32(uint32_t address)
 		{
 			// Need to evict line which contain dirty data.
 			m_bus->writeU32(line.address, line.word, line.mask);
+			m_collision++;
 		}
 
 		const uint32_t word = m_bus->readU32(address);

@@ -79,7 +79,7 @@ namespace
 		const char hex[] = "0123456789ABCDEF";
 		uint8_t cs = 0;
 
-		T_GDB_LOG(L"[GDB] sending \"" << mbstows(msg) << L"\"");
+		T_GDB_LOG_VERBOSE(L"[GDB] sending \"" << mbstows(msg) << L"\"");
 
 		socket->send('+');
 		socket->send('$');

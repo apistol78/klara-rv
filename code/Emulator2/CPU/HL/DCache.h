@@ -43,4 +43,5 @@ private:
 	Line m_data[c_nlines];
 	uint64_t m_hits = 0;
 	uint64_t m_misses = 0;
+	uint64_t m_collision = 0;	//!< Tag collisions.
 };

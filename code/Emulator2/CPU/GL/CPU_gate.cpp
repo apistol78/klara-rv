@@ -66,6 +66,7 @@ CPU_gate::~CPU_gate()
 
 bool CPU_gate::tick(uint32_t count)
 {
+/*
 	static int s_cnt = 0;
 	if (++s_cnt > 1000)
 	{
@@ -81,7 +82,7 @@ bool CPU_gate::tick(uint32_t count)
 
 		s_cnt = 0;
 	}
-
+*/
 	for (uint32_t i = 0; i < count; ++i)
 	{
 		const uint32_t from = m_tb->rootp->CPU_top__DOT__cpu__DOT__writeback__DOT__retired;
