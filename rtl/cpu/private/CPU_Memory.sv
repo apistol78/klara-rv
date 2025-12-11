@@ -53,6 +53,7 @@ module CPU_Memory #(
 	bit [31:0] wb_wdata;
 	bit [3:0] wb_wmask;
 	wire wb_cacheable = (wb_address == 4'h1);
+	wire wb_pending;
 
 	generate if (DCACHE_WB_QUEUE != 0) begin : memory_wb
 
@@ -76,7 +77,9 @@ module CPU_Memory #(
 		.o_rdata(wb_rdata),
 		.i_wdata(wb_wdata),
 		.i_wmask(wb_wmask),
-		.i_cached(wb_cacheable)
+		.i_cached(wb_cacheable),
+
+		.o_pending(wb_pending)
 	);
 
 	end endgenerate
@@ -91,6 +94,7 @@ module CPU_Memory #(
 	assign wb_rdata = i_bus_rdata;
 	assign o_bus_wdata = wb_wdata;
 	assign o_bus_wmask = wb_wmask;
+	assign wb_pending = 1'b0;
 
 	end endgenerate
 
@@ -325,7 +329,7 @@ module CPU_Memory #(
 				dcache_request = 1;
 				dcache_flush = 1;
 
-				if (dcache_ready) begin
+				if (dcache_ready && !wb_pending) begin
 					next_data_pc = i_data.pc;
 					next_data_rd = i_data.rd;
 					next_data_inst_rd = i_data.inst_rd;				

@@ -32,7 +32,9 @@ module CPU_DCache_WB(
 	output bit [31:0] o_rdata,
 	input wire [31:0] i_wdata,
 	input wire [3:0] i_wmask,
-	input wire i_cached
+	input wire i_cached,
+
+	output wire o_pending
 );
 
 	bit wb_dirty [4];
@@ -67,6 +69,8 @@ module CPU_DCache_WB(
 
 	wire all_dirty = wb_dirty[0] & wb_dirty[1] & wb_dirty[2] & wb_dirty[3];
 	wire any_dirty = wb_dirty[0] | wb_dirty[1] | wb_dirty[2] | wb_dirty[3];
+
+	assign o_pending = any_dirty;
 
 	always_comb begin
 		integer i;
