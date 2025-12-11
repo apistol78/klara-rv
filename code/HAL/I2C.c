@@ -7,7 +7,6 @@
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
 #include "HAL/I2C.h"
-#include "HAL/Interrupt.h"
 
 #define I2C_CTRL (volatile uint32_t*)(I2C_BASE)
 #define I2C_DATA (volatile uint32_t*)(I2C_BASE + 4)
@@ -30,38 +29,34 @@ static void hal_i2c_wait_until_idle()
 	}
 }
 
-uint32_t hal_i2c_write(uint8_t deviceAddr, uint8_t controlAddr, uint8_t controlData)
+uint32_t hal_i2c_write(uint8_t deviceAddr, uint8_t controlAddr, uint8_t controlData, int32_t mode)
 {
-	// hal_interrupt_disable();
 	*I2C_CTRL = 
 		((uint32_t)controlData << 24) |
 		((uint32_t)controlAddr << 16) |
 		((uint32_t)deviceAddr << 8) |
+		//(mode ? 0x04 : 0x00) |
 		0x02;
 	const uint32_t tag = *I2C_QUEUED;
-	// hal_interrupt_enable();
 	return tag;
 }
 
-uint32_t hal_i2c_read(uint8_t deviceAddr, uint8_t controlAddr, uint8_t nbytes)
+uint32_t hal_i2c_read(uint8_t deviceAddr, uint8_t controlAddr, uint8_t nbytes, int32_t mode)
 {
-	// hal_interrupt_disable();
 	*I2C_CTRL = 
 		((uint32_t)nbytes << 24) |
 		((uint32_t)controlAddr << 16) |
 		((uint32_t)deviceAddr << 8) |
+		//(mode ? 0x04 : 0x00) |
 		0x01;
 	const uint32_t tag = *I2C_QUEUED;
-	// hal_interrupt_enable();
 	return tag;
 }
 
 void hal_i2c_read_get(uint8_t* outControlData, uint8_t nbytes)
 {
-	// hal_interrupt_disable();
 	for (uint8_t i = 0; i < nbytes; ++i)
 		outControlData[i] = *I2C_DATA;
-	// hal_interrupt_enable();
 }
 
 uint32_t hal_i2c_retired()
