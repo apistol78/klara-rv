@@ -21,14 +21,13 @@ module SRAM_controller #(
 	input wire [31:0] i_address,
 	output bit [31:0] o_rdata,
 	input wire [31:0] i_wdata,
+	input wire [3:0] i_wmask,
 	output bit o_ready,
 
 	output bit [SRAM_ADDRESS_WIDTH-1:0] SRAM_A,
-	
 	output bit [15:0] SRAM_D_w,
 	input wire [15:0] SRAM_D_r,
 	output bit SRAM_D_rw,
-
 	output wire SRAM_CE_n,
 	output bit SRAM_OE_n,
 	output bit SRAM_WE_n,
@@ -43,18 +42,18 @@ module SRAM_controller #(
 
 	bit [7:0] count;
 	bit [15:0] wdata;
+	bit [1:0] wmask;
 	
 	initial begin
 		count = 0;
 	end
 
 	assign SRAM_CE_n = 1'b0;
-	assign SRAM_LB_n = 1'b0;
-	assign SRAM_UB_n = 1'b0;
 	
 	// Output 
 	assign SRAM_D_rw = i_request && i_rw;
 	assign SRAM_D_w = wdata;
+	assign { SRAM_UB_n, SRAM_LB_n } = ~wmask;
 
 	always_comb begin
 		SRAM_OE_n = ~(i_request && !i_rw);
@@ -76,9 +75,11 @@ module SRAM_controller #(
 
 		if (count < CYCLES / 2) begin
 			wdata = i_wdata[15:0];
+			wmask = i_rw ? i_wmask[1:0] : 2'b11;
 		end
 		else begin
 			wdata = i_wdata[31:16];
+			wmask = i_rw ? i_wmask[3:2] : 2'b11;
 		end
 
 		o_ready = (i_request && count >= CYCLES) ? 1'b1 : 1'b0;
