@@ -26,6 +26,12 @@ void Bus::map(uint32_t start, uint32_t end, bool cacheable, bool tick, IDevice* 
 		m_cacheableRanges.push_back({ start, end });
 }
 
+bool Bus::valid(uint32_t address) const
+{
+	auto mappedDevice = findMappedDevice(address);
+	return mappedDevice != nullptr;
+}
+
 bool Bus::ready(uint32_t address) const
 {
 	auto mappedDevice = findMappedDevice(address);

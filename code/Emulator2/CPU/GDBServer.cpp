@@ -36,6 +36,9 @@ namespace
 	{
 		const uint32_t ra = address & ~3;
 		const uint32_t rb = address & 3;
+		if (!bus->valid(ra))
+			return 0;
+
 		const uint32_t r = bus->readU32(ra);
 		switch(rb)
 		{
@@ -48,6 +51,7 @@ namespace
 		case 3:
 			return (r >> 24) & 0xff;
 		}
+
 		return 0;
 	}
 
@@ -55,6 +59,9 @@ namespace
 	{
 		const uint32_t wa = address & ~3;
 		const uint32_t wb = address & 3;
+		if (!bus->valid(wa))
+			return;
+
 		uint32_t w = bus->readU32(wa);
 		switch(wb)
 		{
