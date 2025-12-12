@@ -10,19 +10,22 @@
 
 #include <stdint.h>
 
-#define CPU_FREQUENCY 100000000
+#define CPU_FREQUENCY   100000000
 
-#define UART_BASE	  0x20000000
-#define I2C_BASE	  0x30000000
-#define SD_BASE		  0x40000000
-#define TIMER_BASE	  0x50000000
-#define AUDIO_BASE	  0x60000000
-#define PLIC_BASE	  0x70000000
-#define VIDEO_BASE    0x80000000
-#define DMA_0_BASE    0x90000000
-#define DMA_1_BASE    0xa0000000
-#define SPRITE_BASE   0xb0000000
-#define SPI_BASE      0xc0000000
+#define UART_BASE	    0x20000000
+#define I2C_BASE	    0x30000000
+#define SD_BASE		    0x40000000
+#define TIMER_BASE	    0x50000000
+#define AUDIO_BASE	    0x60000000
+#define PLIC_BASE	    0x70000000
+#define VIDEO_BASE      0x80000000
+#define DMA_BASE        0x90000000
+#define SPRITE_BASE     0xa0000000
+#define SPI_BASE        0xb0000000
+
+#define DMA_CHANNEL_0	0x00000000
+#define DMA_CHANNEL_1	0x01000000
+#define DMA_CHANNEL_2	0x02000000
 
 #define NO_OPTIMIZE	__attribute__((optimize("O0")))
 

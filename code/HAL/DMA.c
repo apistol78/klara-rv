@@ -8,13 +8,13 @@
 */
 #include "HAL/DMA.h"
 
-#define DMA_BASE(C)		((volatile uint32_t*)(C))
-#define DMA_FROM(C)		(DMA_BASE(C) + 0)
-#define DMA_TO(C)		(DMA_BASE(C) + 1)
-#define DMA_COUNT(C)	(DMA_BASE(C) + 2)
-#define DMA_RUN(C)		(DMA_BASE(C) + 3)
-#define DMA_PITCH(C)	(DMA_BASE(C) + 4)
-#define DMA_WIDTH(C)	(DMA_BASE(C) + 5)
+#define DMA_BASE_(C)	((volatile uint32_t*)(DMA_BASE | (C)))
+#define DMA_FROM(C)		(DMA_BASE_(C) + 0)
+#define DMA_TO(C)		(DMA_BASE_(C) + 1)
+#define DMA_COUNT(C)	(DMA_BASE_(C) + 2)
+#define DMA_RUN(C)		(DMA_BASE_(C) + 3)
+#define DMA_PITCH(C)	(DMA_BASE_(C) + 4)
+#define DMA_WIDTH(C)	(DMA_BASE_(C) + 5)
 
 uint32_t hal_dma_write(uint32_t channel, void* dst, uint32_t count, uint32_t value)
 {
