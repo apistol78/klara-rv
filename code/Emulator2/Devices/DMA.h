@@ -8,6 +8,8 @@
 */
 #pragma once
 
+#include <functional>
+
 #include <Core/Containers/CircularVector.h>
 
 #include "Emulator2/CPU/IDevice.h"
@@ -22,6 +24,8 @@ public:
 	virtual uint32_t readU32(uint32_t address) const override final;
 
 	virtual bool tick(ICPU* cpu, Bus* bus) override final;
+
+	void setCallback(const std::function< void() >& callback);
 
 private:
 	struct Task
@@ -39,6 +43,7 @@ private:
 	traktor::CircularVector< Task, 64 > m_tasks;
 	uint32_t m_queued = 0;
 	uint32_t m_retired = 0;
+	std::function< void() > m_callback;
 
 	uint32_t m_from;
 	uint32_t m_to;
