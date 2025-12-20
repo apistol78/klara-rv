@@ -19,6 +19,7 @@ module FIFO_BRAM #(
 
 	output wire o_empty,
 	output wire o_full,
+	output wire o_almost_full,
 
 	input wire i_write,
 	input wire [WIDTH-1:0] i_wdata,
@@ -53,6 +54,7 @@ module FIFO_BRAM #(
 
 	assign o_empty = (r_in == r_out) ? 1'b1 : 1'b0;
 	assign o_full = (((r_in + 1) & (DEPTH - 1)) == r_out) ? 1'b1 : 1'b0;
+	assign o_almost_full = (((in + 2) & (DEPTH - 1)) == out) ? 1'b1 : o_full;
 	assign o_queued = (r_in >= r_out) ? r_in - r_out : (DEPTH - r_out) + r_in;
 
 	always_ff @ (posedge i_clock) begin

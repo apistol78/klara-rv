@@ -51,7 +51,7 @@ module AUDIO_controller #(
 		.i_reset(i_reset),
         .i_clock(i_clock),
         .o_empty(output_fifo_empty),
-		.o_full(output_fifo_full),
+		.o_almost_full(output_fifo_full),
 		.i_write(output_fifo_wr),
 		.i_wdata(i_wdata),
 		.i_read(output_fifo_rd),

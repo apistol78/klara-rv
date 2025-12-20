@@ -48,7 +48,7 @@ module UART_TX #(
 		.i_reset(i_reset || tx_fifo_reset),
 		.i_clock(i_clock),
 		.o_empty(tx_fifo_empty),
-		.o_full(tx_fifo_full),
+		.o_almost_full(tx_fifo_full),
 		.i_write(tx_fifo_write),
 		.i_wdata(i_wdata[7:0]),
 		.i_read(tx_fifo_read),

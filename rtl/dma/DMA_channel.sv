@@ -94,7 +94,7 @@ module DMA_channel #(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 		.o_empty(queue_empty),
-		.o_full(queue_full),
+		.o_almost_full(queue_full),
 		.i_write(queue_write),
 		.i_wdata(wr_command),
 		.i_read(queue_read),

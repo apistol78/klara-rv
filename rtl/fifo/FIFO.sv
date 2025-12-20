@@ -18,6 +18,7 @@ module FIFO #(
 	input wire i_clock,
 	output wire o_empty,
 	output wire o_full,
+	output wire o_almost_full,
 	input wire i_write,
 	input wire [WIDTH-1:0] i_wdata,
 	input wire i_read,
@@ -32,6 +33,7 @@ module FIFO #(
 
 	assign o_empty = (in == out) ? 1'b1 : 1'b0;
 	assign o_full = (((in + 1) & (DEPTH - 1)) == out) ? 1'b1 : 1'b0;
+	assign o_almost_full = (((in + 2) & (DEPTH - 1)) == out) ? 1'b1 : o_full;
 	assign o_rdata = rdata;
 	assign o_queued = (in >= out) ? in - out : (DEPTH - out) + in;
 
