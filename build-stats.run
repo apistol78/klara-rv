@@ -1,0 +1,41 @@
+import(traktor)
+import(traktor.run)
+
+function run.writeFile(fn, lines)
+	local f = fileSystem:open(Path(run.cwd .. "/" .. fn), File.FmWrite)
+	if f == nil then return false end
+	local so = StreamOutput(f, Utf8Encoding())
+	for _, ln in ipairs(lines) do
+		so:printLn(ln)
+	end
+	f:close()
+end
+
+function main()
+
+    local rtl = "DMA"
+    local f = "rtl/dma/DMA.sv rtl/fifo/FIFO.sv"
+
+    run:mkdir("build/stat")
+
+    run.writeFile(
+        "build/" .. rtl .. ".yosys.script",
+        {
+            "proc; opt -full; memory; opt -full; fsm; opt -full",
+            "techmap; opt -full",
+            "share -aggressive",
+            "synth_ecp5 -abc9 -iopad",
+            "tee -o build/stat/" .. rtl .. ".json stat -json",
+        }
+    )
+
+    local xc = run:execute("yosys -q -s build/" .. rtl .. ".yosys.script " .. f)
+    if xc ~= 0 then
+        stderr:printLn("yosys failed; build aborted.")
+        return 1
+    end
+
+    run:rm("build/" .. rtl .. ".yosys.script")
+
+    return 0
+end

@@ -11,7 +11,7 @@
 `default_nettype none
 
 module DMA #(
-	parameter QUEUE_DEPTH = 4
+	parameter QUEUE_DEPTH = 8
 ) (
 	input wire i_reset,
 	input wire i_clock,
@@ -39,19 +39,21 @@ module DMA #(
 		// Write
 		W_WRITE_REQ		= 4'd3,
 		W_WAIT_WRITE	= 4'd4,
+		W_INTERLEAVE	= 4'd5,
 
 		// Copy
-		C_READ_REQ		= 4'd5,
-		C_WAIT_READ		= 4'd6,
-		C_WRITE_REQ		= 4'd7,
-		C_WAIT_WRITE	= 4'd8,
+		C_READ_REQ		= 4'd6,
+		C_WAIT_READ		= 4'd7,
+		C_WRITE_REQ		= 4'd8,
+		C_WAIT_WRITE	= 4'd9,
+		C_INTERLEAVE	= 4'd10,
 
 		// Feed
-		F_READ_REQ		= 4'd9,
-		F_WAIT_READ		= 4'd10,
-		F_WRITE_REQ		= 4'd11,
-		F_WAIT_WRITE	= 4'd12,
-		F_INTERLEAVE	= 4'd13
+		F_READ_REQ		= 4'd11,
+		F_WAIT_READ		= 4'd12,
+		F_WRITE_REQ		= 4'd13,
+		F_WAIT_WRITE	= 4'd14,
+		F_INTERLEAVE	= 4'd15
 	}
 	state_t;
 
@@ -86,7 +88,7 @@ module DMA #(
 	bit queue_write = 0;
 	bit queue_read = 0;
 	dma_command_t queue_rdata;
-	wire [15:0] queue_queued;
+	wire [$clog2(QUEUE_DEPTH) - 1:0] queue_queued;
 	FIFO #(
 		.DEPTH(QUEUE_DEPTH),
 		.WIDTH($bits(queue_rdata))
@@ -119,11 +121,9 @@ module DMA #(
 			if (!i_rw) begin
 				if (i_address == 2'd0) begin
 					o_rdata <= queued_counter;
-					o_ready <= 1'b1;
 				end
 				else if (i_address == 2'd1) begin
 					o_rdata <= retired_counter;
-					o_ready <= 1'b1;
 				end
 				else if (i_address == 2'd3) begin
 					o_rdata <=
@@ -132,8 +132,8 @@ module DMA #(
 						queue_queued >= (QUEUE_DEPTH - 1), // queue_full,										// DMA full
 						(!queue_empty || state != IDLE) ? 1'b1 : 1'b0	// DMA busy
 					};
-					o_ready <= 1'b1;
 				end
+				o_ready <= 1'b1;
 			end
 			else begin
 				// Receive commands from CPU.
@@ -211,13 +211,18 @@ module DMA #(
 					rd_command.to <= rd_command.to + 4;
 					if (rd_command.count > 0) begin
 						rd_command.count <= rd_command.count - 1;
-						state <= W_WRITE_REQ;
+						state <= W_INTERLEAVE;
 					end
 					else begin
 						retired_counter <= rd_command.tag;
 						state <= IDLE;
 					end
 				end
+			end
+
+			W_INTERLEAVE: begin
+				// Allow other bus masters to access bus.
+				state <= W_WRITE_REQ;
 			end
 
 			// Copy
@@ -252,13 +257,18 @@ module DMA #(
 					rd_command.to <= rd_command.to + 4;
 					if (rd_command.count > 0) begin
 						rd_command.count <= rd_command.count - 1;
-						state <= C_READ_REQ;
+						state <= C_INTERLEAVE;
 					end
 					else begin
 						retired_counter <= rd_command.tag;
 						state <= IDLE;
 					end
 				end
+			end
+
+			C_INTERLEAVE: begin
+				// Allow other bus masters to access bus.
+				state <= C_READ_REQ;
 			end
 
 			// Feed
