@@ -166,16 +166,9 @@ bool DMA::tick(ICPU* cpu, Bus* bus)
 
 	if (task.count == 0)
 	{
-		if (m_callback)
-			m_callback();
 		m_retired = task.tag;
 		m_tasks.pop_front();
 	}
 	
 	return true;
-}
-
-void DMA::setCallback(const std::function< void() >& callback)
-{
-	m_callback = callback;
 }
