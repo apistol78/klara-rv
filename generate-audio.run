@@ -1,0 +1,6 @@
+import(traktor)
+
+function main(argv)
+	local NCHANNELS = tonumber(argv:get(0))
+	run:run("rtl/audio2/AUDIO_controller.sv.template " .. NCHANNELS, "rtl/audio2/AUDIO_controller_" .. NCHANNELS .. ".sv")
+end
