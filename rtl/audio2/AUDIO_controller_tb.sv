@@ -26,9 +26,7 @@ module AUDIO_controller_tb();
 	bit ac_dma_ready = 1'b0;
 	wire [31:0] ac_dma_address;
 
-	AUDIO_controller_2 #(
-		.BUFFER_SIZE(4)
-	) ac(
+	AUDIO_controller_2 ac(
 		.i_reset(1'b0),
 		.i_clock(clk),
 

@@ -16,6 +16,8 @@ module AUDIO_channel_tb();
 	bit sample_clock;
 
 	bit ac_dma_setup_request = 1'b0;
+	bit ac_dma_setup_append_or_replace = 1'b0;
+	bit [31:0] ac_dma_setup_address = 32'h0;
 
 	wire [15:0] ac_output_sample_left;
 	wire [15:0] ac_output_sample_right;
@@ -24,15 +26,14 @@ module AUDIO_channel_tb();
 	bit ac_dma_ready = 1'b0;
 	wire [31:0] ac_dma_address;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(4)
-	) ac(
+	AUDIO_channel ac(
 		.i_reset(1'b0),
 		.i_clock(clk),
 
 		.i_dma_setup_request(ac_dma_setup_request),
-		.i_dma_setup_count(16),
-		.i_dma_setup_address(32'h10002000),
+		.i_dma_setup_append_or_replace(ac_dma_setup_append_or_replace),
+		.i_dma_setup_count(24'd16),
+		.i_dma_setup_address(ac_dma_setup_address),
 
 		.o_dma_request(ac_dma_request),
 		.o_dma_address(ac_dma_address),
@@ -65,10 +66,24 @@ module AUDIO_channel_tb();
 		repeat (100) @ (posedge clk);
 
 		ac_dma_setup_request <= 1;
+		ac_dma_setup_address <= 32'hcafe_0000;
+		@(posedge clk);
+		ac_dma_setup_request <= 0;
+		
+		@(posedge clk);
+
+		ac_dma_setup_request <= 1;
+		ac_dma_setup_address <= 32'hbabe_0000;
 		@(posedge clk);
 		ac_dma_setup_request <= 0;
 
+		repeat (200) @ (posedge clk);
 
+		ac_dma_setup_request <= 1;
+		ac_dma_setup_append_or_replace <= 1;
+		ac_dma_setup_address <= 32'h3333_0000;
+		@(posedge clk);
+		ac_dma_setup_request <= 0;
 
 		repeat (100000) @ (posedge clk);
 

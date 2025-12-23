@@ -50,7 +50,8 @@ for i = 0, CHANNELS - 1 do
 --!>
 	// Channel <!-- P(i) --!>
 	bit ch<!-- P(i) --!>_dma_setup_request = 1'b0;
-	bit [31:0] ch<!-- P(i) --!>_dma_setup_count;
+	bit ch<!-- P(i) --!>_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch<!-- P(i) --!>_dma_setup_count;
 	bit [31:0] ch<!-- P(i) --!>_dma_setup_address;
 
 	wire ch<!-- P(i) --!>_dma_request;
@@ -67,6 +68,7 @@ for i = 0, CHANNELS - 1 do
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch<!-- P(i) --!>_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch<!-- P(i) --!>_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch<!-- P(i) --!>_dma_setup_count),
 		.i_dma_setup_address(ch<!-- P(i) --!>_dma_setup_address),
 
@@ -123,7 +125,8 @@ for i = 0, CHANNELS - 1 do
 						o_ready <= 1'b1;
 					end
 					8'h<!-- P(string.format("%02x", i * 2 + 2)) --!>: begin
-						ch<!-- P(i) --!>_dma_setup_count <= i_wdata;
+						ch<!-- P(i) --!>_dma_setup_count <= i_wdata[23:0];
+						ch<!-- P(i) --!>_dma_setup_append_or_replace <= i_wdata[31];
 						ch<!-- P(i) --!>_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end

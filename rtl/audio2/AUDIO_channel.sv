@@ -16,8 +16,9 @@ module AUDIO_channel(
 
 	// DMA setup
 	input wire i_dma_setup_request,
+	input wire i_dma_setup_append_or_replace,
 	input wire [31:0] i_dma_setup_address,
-	input wire [31:0] i_dma_setup_count,
+	input wire [23:0] i_dma_setup_count,
 
 	// DMA bus master
 	output bit o_dma_request,
@@ -33,31 +34,30 @@ module AUDIO_channel(
 	output bit [15:0] o_output_sample_left,
 	output bit [15:0] o_output_sample_right
 );
-	// DMA command FIFO.
-	typedef struct packed
-	{
-		bit [31:0] address;
-		bit [31:0] count;
-	}
-	dma_command_t;
+	bit [31:0] dma_address;
+	bit [23:0] dma_count = 0;
 
-    wire dma_fifo_empty;
-	wire dma_fifo_full;
-	bit dma_fifo_rd = 1'b0;
-	dma_command_t dma_fifo_rcmd;
-	FIFO #(
-		.DEPTH(4),
-		.WIDTH($bits(dma_command_t))
-	) dma_fifo(
+	// DMA command queue.
+	wire cmdq_next_have;
+	wire [31:0] cmdq_next_address;
+	wire [23:0] cmdq_next_count;
+	wire cmdq_next_queued;
+
+	AUDIO_cmdq cmdq(
 		.i_reset(i_reset),
-        .i_clock(i_clock),
-        .o_empty(dma_fifo_empty),
-		.o_almost_full(dma_fifo_full),
-		.i_write(i_dma_setup_request),
-		.i_wdata(dma_command_t'({ i_dma_setup_address, i_dma_setup_count })),
-		.i_read(dma_fifo_rd),
-		.o_rdata(dma_fifo_rcmd),
-		.o_queued()
+		.i_clock(i_clock),
+
+		.i_setup_request(i_dma_setup_request),
+		.i_setup_append_or_replace(i_dma_setup_append_or_replace),
+		.i_setup_address(i_dma_setup_address),
+		.i_setup_count(i_dma_setup_count),
+
+		.i_next_ready(~|dma_count),
+		.o_next_have(cmdq_next_have),
+		.o_next_address(cmdq_next_address),
+		.o_next_count(cmdq_next_count),
+
+		.o_next_queued(cmdq_next_queued)
 	);
 
 	// Sample FIFO.
@@ -66,6 +66,7 @@ module AUDIO_channel(
 	bit sample_fifo_wr = 1'b0;
 	bit sample_fifo_rd = 1'b0;
 	wire [31:0] sample_fifo_rdata;
+	
 	FIFO #(
 		.DEPTH(4),
 		.WIDTH(32)
@@ -81,9 +82,6 @@ module AUDIO_channel(
 		.o_queued()
 	);
 
-	bit [31:0] dma_address;
-	bit [31:0] dma_count = 0;
-
 	initial begin
 		o_dma_request = 1'b0;
 		o_busy = 1'b0;
@@ -91,9 +89,9 @@ module AUDIO_channel(
 		o_output_sample_right = 0;
 	end
 
-	// Channel is only busy when DMA command FIFO is full.
+	// Channel is only busy when DMA command queue have any pending.
 	always_comb begin
-		o_busy = dma_fifo_full;
+		o_busy = cmdq_next_queued;
 	end
 
 	// Process DMA setup and read samples into FIFO.
@@ -101,14 +99,10 @@ module AUDIO_channel(
 		o_dma_request <= 1'b0;
 		sample_fifo_wr <= 1'b0;
 
-		// Read DMA command from DMA FIFO.
-		if (dma_fifo_rd) begin
-			dma_address <= dma_fifo_rcmd.address;
-			dma_count <= dma_fifo_rcmd.count;
-			dma_fifo_rd <= 1'b0;
-		end
-		else if (!|dma_count && !dma_fifo_empty) begin
-			dma_fifo_rd <= 1'b1;
+		// Get next DMA command from queue.
+		if (cmdq_next_have) begin
+			dma_address <= cmdq_next_address;
+			dma_count <= cmdq_next_count;
 		end
 
 		// Process DMA command; ie reading samples from BUS and inserting into sample FIFO.

@@ -45,7 +45,8 @@ module AUDIO_controller_16(
 
 	// Channel 0
 	bit ch0_dma_setup_request = 1'b0;
-	bit [31:0] ch0_dma_setup_count;
+	bit ch0_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch0_dma_setup_count;
 	bit [31:0] ch0_dma_setup_address;
 
 	wire ch0_dma_request;
@@ -62,6 +63,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch0_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch0_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch0_dma_setup_count),
 		.i_dma_setup_address(ch0_dma_setup_address),
 
@@ -79,7 +81,8 @@ module AUDIO_controller_16(
 
 	// Channel 1
 	bit ch1_dma_setup_request = 1'b0;
-	bit [31:0] ch1_dma_setup_count;
+	bit ch1_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch1_dma_setup_count;
 	bit [31:0] ch1_dma_setup_address;
 
 	wire ch1_dma_request;
@@ -96,6 +99,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch1_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch1_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch1_dma_setup_count),
 		.i_dma_setup_address(ch1_dma_setup_address),
 
@@ -113,7 +117,8 @@ module AUDIO_controller_16(
 
 	// Channel 2
 	bit ch2_dma_setup_request = 1'b0;
-	bit [31:0] ch2_dma_setup_count;
+	bit ch2_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch2_dma_setup_count;
 	bit [31:0] ch2_dma_setup_address;
 
 	wire ch2_dma_request;
@@ -130,6 +135,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch2_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch2_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch2_dma_setup_count),
 		.i_dma_setup_address(ch2_dma_setup_address),
 
@@ -147,7 +153,8 @@ module AUDIO_controller_16(
 
 	// Channel 3
 	bit ch3_dma_setup_request = 1'b0;
-	bit [31:0] ch3_dma_setup_count;
+	bit ch3_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch3_dma_setup_count;
 	bit [31:0] ch3_dma_setup_address;
 
 	wire ch3_dma_request;
@@ -164,6 +171,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch3_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch3_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch3_dma_setup_count),
 		.i_dma_setup_address(ch3_dma_setup_address),
 
@@ -181,7 +189,8 @@ module AUDIO_controller_16(
 
 	// Channel 4
 	bit ch4_dma_setup_request = 1'b0;
-	bit [31:0] ch4_dma_setup_count;
+	bit ch4_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch4_dma_setup_count;
 	bit [31:0] ch4_dma_setup_address;
 
 	wire ch4_dma_request;
@@ -198,6 +207,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch4_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch4_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch4_dma_setup_count),
 		.i_dma_setup_address(ch4_dma_setup_address),
 
@@ -215,7 +225,8 @@ module AUDIO_controller_16(
 
 	// Channel 5
 	bit ch5_dma_setup_request = 1'b0;
-	bit [31:0] ch5_dma_setup_count;
+	bit ch5_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch5_dma_setup_count;
 	bit [31:0] ch5_dma_setup_address;
 
 	wire ch5_dma_request;
@@ -232,6 +243,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch5_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch5_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch5_dma_setup_count),
 		.i_dma_setup_address(ch5_dma_setup_address),
 
@@ -249,7 +261,8 @@ module AUDIO_controller_16(
 
 	// Channel 6
 	bit ch6_dma_setup_request = 1'b0;
-	bit [31:0] ch6_dma_setup_count;
+	bit ch6_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch6_dma_setup_count;
 	bit [31:0] ch6_dma_setup_address;
 
 	wire ch6_dma_request;
@@ -266,6 +279,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch6_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch6_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch6_dma_setup_count),
 		.i_dma_setup_address(ch6_dma_setup_address),
 
@@ -283,7 +297,8 @@ module AUDIO_controller_16(
 
 	// Channel 7
 	bit ch7_dma_setup_request = 1'b0;
-	bit [31:0] ch7_dma_setup_count;
+	bit ch7_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch7_dma_setup_count;
 	bit [31:0] ch7_dma_setup_address;
 
 	wire ch7_dma_request;
@@ -300,6 +315,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch7_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch7_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch7_dma_setup_count),
 		.i_dma_setup_address(ch7_dma_setup_address),
 
@@ -317,7 +333,8 @@ module AUDIO_controller_16(
 
 	// Channel 8
 	bit ch8_dma_setup_request = 1'b0;
-	bit [31:0] ch8_dma_setup_count;
+	bit ch8_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch8_dma_setup_count;
 	bit [31:0] ch8_dma_setup_address;
 
 	wire ch8_dma_request;
@@ -334,6 +351,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch8_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch8_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch8_dma_setup_count),
 		.i_dma_setup_address(ch8_dma_setup_address),
 
@@ -351,7 +369,8 @@ module AUDIO_controller_16(
 
 	// Channel 9
 	bit ch9_dma_setup_request = 1'b0;
-	bit [31:0] ch9_dma_setup_count;
+	bit ch9_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch9_dma_setup_count;
 	bit [31:0] ch9_dma_setup_address;
 
 	wire ch9_dma_request;
@@ -368,6 +387,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch9_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch9_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch9_dma_setup_count),
 		.i_dma_setup_address(ch9_dma_setup_address),
 
@@ -385,7 +405,8 @@ module AUDIO_controller_16(
 
 	// Channel 10
 	bit ch10_dma_setup_request = 1'b0;
-	bit [31:0] ch10_dma_setup_count;
+	bit ch10_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch10_dma_setup_count;
 	bit [31:0] ch10_dma_setup_address;
 
 	wire ch10_dma_request;
@@ -402,6 +423,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch10_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch10_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch10_dma_setup_count),
 		.i_dma_setup_address(ch10_dma_setup_address),
 
@@ -419,7 +441,8 @@ module AUDIO_controller_16(
 
 	// Channel 11
 	bit ch11_dma_setup_request = 1'b0;
-	bit [31:0] ch11_dma_setup_count;
+	bit ch11_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch11_dma_setup_count;
 	bit [31:0] ch11_dma_setup_address;
 
 	wire ch11_dma_request;
@@ -436,6 +459,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch11_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch11_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch11_dma_setup_count),
 		.i_dma_setup_address(ch11_dma_setup_address),
 
@@ -453,7 +477,8 @@ module AUDIO_controller_16(
 
 	// Channel 12
 	bit ch12_dma_setup_request = 1'b0;
-	bit [31:0] ch12_dma_setup_count;
+	bit ch12_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch12_dma_setup_count;
 	bit [31:0] ch12_dma_setup_address;
 
 	wire ch12_dma_request;
@@ -470,6 +495,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch12_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch12_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch12_dma_setup_count),
 		.i_dma_setup_address(ch12_dma_setup_address),
 
@@ -487,7 +513,8 @@ module AUDIO_controller_16(
 
 	// Channel 13
 	bit ch13_dma_setup_request = 1'b0;
-	bit [31:0] ch13_dma_setup_count;
+	bit ch13_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch13_dma_setup_count;
 	bit [31:0] ch13_dma_setup_address;
 
 	wire ch13_dma_request;
@@ -504,6 +531,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch13_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch13_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch13_dma_setup_count),
 		.i_dma_setup_address(ch13_dma_setup_address),
 
@@ -521,7 +549,8 @@ module AUDIO_controller_16(
 
 	// Channel 14
 	bit ch14_dma_setup_request = 1'b0;
-	bit [31:0] ch14_dma_setup_count;
+	bit ch14_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch14_dma_setup_count;
 	bit [31:0] ch14_dma_setup_address;
 
 	wire ch14_dma_request;
@@ -538,6 +567,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch14_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch14_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch14_dma_setup_count),
 		.i_dma_setup_address(ch14_dma_setup_address),
 
@@ -555,7 +585,8 @@ module AUDIO_controller_16(
 
 	// Channel 15
 	bit ch15_dma_setup_request = 1'b0;
-	bit [31:0] ch15_dma_setup_count;
+	bit ch15_dma_setup_append_or_replace = 1'b0;
+	bit [23:0] ch15_dma_setup_count;
 	bit [31:0] ch15_dma_setup_address;
 
 	wire ch15_dma_request;
@@ -572,6 +603,7 @@ module AUDIO_controller_16(
 		.i_clock(i_clock),
 
 		.i_dma_setup_request(ch15_dma_setup_request),
+		.i_dma_setup_append_or_replace(ch15_dma_setup_append_or_replace),
 		.i_dma_setup_count(ch15_dma_setup_count),
 		.i_dma_setup_address(ch15_dma_setup_address),
 
@@ -654,7 +686,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h02: begin
-						ch0_dma_setup_count <= i_wdata;
+						ch0_dma_setup_count <= i_wdata[23:0];
+						ch0_dma_setup_append_or_replace <= i_wdata[31];
 						ch0_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -663,7 +696,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h04: begin
-						ch1_dma_setup_count <= i_wdata;
+						ch1_dma_setup_count <= i_wdata[23:0];
+						ch1_dma_setup_append_or_replace <= i_wdata[31];
 						ch1_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -672,7 +706,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h06: begin
-						ch2_dma_setup_count <= i_wdata;
+						ch2_dma_setup_count <= i_wdata[23:0];
+						ch2_dma_setup_append_or_replace <= i_wdata[31];
 						ch2_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -681,7 +716,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h08: begin
-						ch3_dma_setup_count <= i_wdata;
+						ch3_dma_setup_count <= i_wdata[23:0];
+						ch3_dma_setup_append_or_replace <= i_wdata[31];
 						ch3_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -690,7 +726,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h0a: begin
-						ch4_dma_setup_count <= i_wdata;
+						ch4_dma_setup_count <= i_wdata[23:0];
+						ch4_dma_setup_append_or_replace <= i_wdata[31];
 						ch4_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -699,7 +736,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h0c: begin
-						ch5_dma_setup_count <= i_wdata;
+						ch5_dma_setup_count <= i_wdata[23:0];
+						ch5_dma_setup_append_or_replace <= i_wdata[31];
 						ch5_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -708,7 +746,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h0e: begin
-						ch6_dma_setup_count <= i_wdata;
+						ch6_dma_setup_count <= i_wdata[23:0];
+						ch6_dma_setup_append_or_replace <= i_wdata[31];
 						ch6_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -717,7 +756,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h10: begin
-						ch7_dma_setup_count <= i_wdata;
+						ch7_dma_setup_count <= i_wdata[23:0];
+						ch7_dma_setup_append_or_replace <= i_wdata[31];
 						ch7_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -726,7 +766,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h12: begin
-						ch8_dma_setup_count <= i_wdata;
+						ch8_dma_setup_count <= i_wdata[23:0];
+						ch8_dma_setup_append_or_replace <= i_wdata[31];
 						ch8_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -735,7 +776,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h14: begin
-						ch9_dma_setup_count <= i_wdata;
+						ch9_dma_setup_count <= i_wdata[23:0];
+						ch9_dma_setup_append_or_replace <= i_wdata[31];
 						ch9_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -744,7 +786,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h16: begin
-						ch10_dma_setup_count <= i_wdata;
+						ch10_dma_setup_count <= i_wdata[23:0];
+						ch10_dma_setup_append_or_replace <= i_wdata[31];
 						ch10_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -753,7 +796,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h18: begin
-						ch11_dma_setup_count <= i_wdata;
+						ch11_dma_setup_count <= i_wdata[23:0];
+						ch11_dma_setup_append_or_replace <= i_wdata[31];
 						ch11_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -762,7 +806,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h1a: begin
-						ch12_dma_setup_count <= i_wdata;
+						ch12_dma_setup_count <= i_wdata[23:0];
+						ch12_dma_setup_append_or_replace <= i_wdata[31];
 						ch12_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -771,7 +816,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h1c: begin
-						ch13_dma_setup_count <= i_wdata;
+						ch13_dma_setup_count <= i_wdata[23:0];
+						ch13_dma_setup_append_or_replace <= i_wdata[31];
 						ch13_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -780,7 +826,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h1e: begin
-						ch14_dma_setup_count <= i_wdata;
+						ch14_dma_setup_count <= i_wdata[23:0];
+						ch14_dma_setup_append_or_replace <= i_wdata[31];
 						ch14_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
@@ -789,7 +836,8 @@ module AUDIO_controller_16(
 						o_ready <= 1'b1;
 					end
 					8'h20: begin
-						ch15_dma_setup_count <= i_wdata;
+						ch15_dma_setup_count <= i_wdata[23:0];
+						ch15_dma_setup_append_or_replace <= i_wdata[31];
 						ch15_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
