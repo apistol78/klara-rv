@@ -34,6 +34,9 @@ module AUDIO_channel #(
 	input wire i_dma_ready,
 	input wire [31:0] i_dma_rdata,
 
+	// Status
+	output bit o_busy,
+
 	// Audio output stream
 	input wire i_output_sample_clock,
 	output bit [15:0] o_output_sample_left,
@@ -64,23 +67,26 @@ module AUDIO_channel #(
 	bit [31:0] dma_count = 0;
 
 	initial begin
-		o_dma_request = 0;
+		o_dma_request = 1'b0;
+		o_busy = 1'b0;
 		o_output_sample_left = 0;
 		o_output_sample_right = 0;
 	end
 
-	// Process DMA setup.
 	always_ff @(posedge i_clock) begin
+		o_busy <= |dma_count;
+	end
+
+	// Process DMA setup and read samples into FIFO.
+	always_ff @(posedge i_clock) begin
+		o_dma_request <= 1'b0;
+		fifo_wr <= 1'b0;
+
 		if (i_dma_setup_request) begin
 			dma_count <= i_dma_setup_count;
 			dma_address <= i_dma_setup_address;
 		end
-	end
 
-	// Process DMA read samples into FIFO.
-	always_ff @(posedge i_clock) begin
-		o_dma_request <= 1'b0;
-		fifo_wr <= 1'b0;
 		if (!fifo_full && |dma_count) begin
 			o_dma_request <= 1'b1;
 			o_dma_address <= dma_address;

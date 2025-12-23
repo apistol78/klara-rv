@@ -10,7 +10,7 @@
 `timescale 1ns/1ns
 `default_nettype none
 
-module AUDIO_controller_2 #(
+module AUDIO_controller_4 #(
 	parameter BUFFER_SIZE = 4
 )(
 	input wire i_reset,
@@ -117,10 +117,84 @@ module AUDIO_controller_2 #(
 		.o_output_sample_right(ch1_sample_right)
 	);
 
+	// Channel 2
+	bit ch2_dma_setup_request = 1'b0;
+	bit [31:0] ch2_dma_setup_count;
+	bit [31:0] ch2_dma_setup_address;
+
+	wire ch2_dma_request;
+	wire [31:0] ch2_dma_address;
+	bit ch2_dma_ready;
+
+	wire ch2_busy;
+
+	bit [15:0] ch2_sample_left;
+	bit [15:0] ch2_sample_right;
+
+	AUDIO_channel #(
+		.BUFFER_SIZE(BUFFER_SIZE)
+	) ch2 (
+		.i_reset(i_reset),
+		.i_clock(i_clock),
+
+		.i_dma_setup_request(ch2_dma_setup_request),
+		.i_dma_setup_count(ch2_dma_setup_count),
+		.i_dma_setup_address(ch2_dma_setup_address),
+
+		.o_dma_request(ch2_dma_request),
+		.o_dma_address(ch2_dma_address),
+		.i_dma_ready(ch2_dma_ready),
+		.i_dma_rdata(i_dma_rdata),
+
+		.o_busy(ch2_busy),
+
+		.i_output_sample_clock(i_output_sample_clock),
+		.o_output_sample_left(ch2_sample_left),
+		.o_output_sample_right(ch2_sample_right)
+	);
+
+	// Channel 3
+	bit ch3_dma_setup_request = 1'b0;
+	bit [31:0] ch3_dma_setup_count;
+	bit [31:0] ch3_dma_setup_address;
+
+	wire ch3_dma_request;
+	wire [31:0] ch3_dma_address;
+	bit ch3_dma_ready;
+
+	wire ch3_busy;
+
+	bit [15:0] ch3_sample_left;
+	bit [15:0] ch3_sample_right;
+
+	AUDIO_channel #(
+		.BUFFER_SIZE(BUFFER_SIZE)
+	) ch3 (
+		.i_reset(i_reset),
+		.i_clock(i_clock),
+
+		.i_dma_setup_request(ch3_dma_setup_request),
+		.i_dma_setup_count(ch3_dma_setup_count),
+		.i_dma_setup_address(ch3_dma_setup_address),
+
+		.o_dma_request(ch3_dma_request),
+		.o_dma_address(ch3_dma_address),
+		.i_dma_ready(ch3_dma_ready),
+		.i_dma_rdata(i_dma_rdata),
+
+		.o_busy(ch3_busy),
+
+		.i_output_sample_clock(i_output_sample_clock),
+		.o_output_sample_left(ch3_sample_left),
+		.o_output_sample_right(ch3_sample_right)
+	);
+
 	// CPU register access.
 	wire [31:0] channels_busy =
 	{
-		30'h0,
+		28'h0,
+		ch3_busy,
+		ch2_busy,
 		ch1_busy,
 		ch0_busy
 	};
@@ -129,6 +203,8 @@ module AUDIO_controller_2 #(
 
 		ch0_dma_setup_request <= 1'b0;
 		ch1_dma_setup_request <= 1'b0;
+		ch2_dma_setup_request <= 1'b0;
+		ch3_dma_setup_request <= 1'b0;
 
 		if (i_request && !o_ready) begin
 			if (!i_rw) begin
@@ -169,6 +245,24 @@ module AUDIO_controller_2 #(
 						ch1_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
+					8'h05: begin
+						ch2_dma_setup_address <= i_wdata;
+						o_ready <= 1'b1;
+					end
+					8'h06: begin
+						ch2_dma_setup_count <= i_wdata;
+						ch2_dma_setup_request <= 1'b1;
+						o_ready <= 1'b1;
+					end
+					8'h07: begin
+						ch3_dma_setup_address <= i_wdata;
+						o_ready <= 1'b1;
+					end
+					8'h08: begin
+						ch3_dma_setup_count <= i_wdata;
+						ch3_dma_setup_request <= 1'b1;
+						o_ready <= 1'b1;
+					end
 					default:
 						o_ready <= 1'b1;
 				endcase
@@ -185,6 +279,8 @@ module AUDIO_controller_2 #(
 	always_comb begin
 		ch0_dma_ready = ch0_dma_request & i_dma_ready;
 		ch1_dma_ready = ch1_dma_request & i_dma_ready;
+		ch2_dma_ready = ch2_dma_request & i_dma_ready;
+		ch3_dma_ready = ch3_dma_request & i_dma_ready;
 	end
 
 	always_ff @(posedge i_clock) begin
@@ -196,7 +292,7 @@ module AUDIO_controller_2 #(
 				o_dma_address <= ch0_dma_address;
 			end
 			else
-				sched_channel <= (sched_channel + 1) & 1;
+				sched_channel <= (sched_channel + 1) & 3;
 		end
 		else if (sched_channel == 1) begin
 			if (ch1_dma_request) begin
@@ -204,14 +300,30 @@ module AUDIO_controller_2 #(
 				o_dma_address <= ch1_dma_address;
 			end
 			else
-				sched_channel <= (sched_channel + 1) & 1;
+				sched_channel <= (sched_channel + 1) & 3;
+		end
+		else if (sched_channel == 2) begin
+			if (ch2_dma_request) begin
+				o_dma_request <= 1'b1;
+				o_dma_address <= ch2_dma_address;
+			end
+			else
+				sched_channel <= (sched_channel + 1) & 3;
+		end
+		else if (sched_channel == 3) begin
+			if (ch3_dma_request) begin
+				o_dma_request <= 1'b1;
+				o_dma_address <= ch3_dma_address;
+			end
+			else
+				sched_channel <= (sched_channel + 1) & 3;
 		end
 	end
 
 	// Mixer
 	always_ff @(posedge i_clock) begin
-		o_output_sample_left <= $signed(ch0_sample_left) + $signed(ch1_sample_left);
-		o_output_sample_right <= $signed(ch0_sample_right) + $signed(ch1_sample_right);
+		o_output_sample_left <= $signed(ch0_sample_left) + $signed(ch1_sample_left) + $signed(ch2_sample_left) + $signed(ch3_sample_left);
+		o_output_sample_right <= $signed(ch0_sample_right) + $signed(ch1_sample_right) + $signed(ch2_sample_right) + $signed(ch3_sample_right);
 	end
 
 endmodule

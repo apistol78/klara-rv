@@ -47,11 +47,10 @@ module AUDIO_controller_<!-- P(CHANNELS) --!> #(
 		o_output_sample_left = 16'd0;
 		o_output_sample_right = 16'd0;
 	end
-
 <!--
 for i = 0, CHANNELS - 1 do
 --!>
-
+	// Channel <!-- P(i) --!>
 	bit ch<!-- P(i) --!>_dma_setup_request = 1'b0;
 	bit [31:0] ch<!-- P(i) --!>_dma_setup_count;
 	bit [31:0] ch<!-- P(i) --!>_dma_setup_address;
@@ -59,6 +58,8 @@ for i = 0, CHANNELS - 1 do
 	wire ch<!-- P(i) --!>_dma_request;
 	wire [31:0] ch<!-- P(i) --!>_dma_address;
 	bit ch<!-- P(i) --!>_dma_ready;
+
+	wire ch<!-- P(i) --!>_busy;
 
 	bit [15:0] ch<!-- P(i) --!>_sample_left;
 	bit [15:0] ch<!-- P(i) --!>_sample_right;
@@ -78,29 +79,35 @@ for i = 0, CHANNELS - 1 do
 		.i_dma_ready(ch<!-- P(i) --!>_dma_ready),
 		.i_dma_rdata(i_dma_rdata),
 
+		.o_busy(ch<!-- P(i) --!>_busy),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch<!-- P(i) --!>_sample_left),
 		.o_output_sample_right(ch<!-- P(i) --!>_sample_right)
 	);
-
 <!--
 end
 --!>
-
 	// CPU register access.
+	wire [31:0] channels_busy =
+	{
+		<!-- P(32 - CHANNELS) --!>'h0,
+<!-- for i = 0, CHANNELS - 1 do --!>		ch<!-- P(CHANNELS - i - 1) --!>_busy<!-- if i < CHANNELS - 1 then P(",") end --!>
+<!-- end --!>	};
+
 	always_ff @(posedge i_clock) begin
-<!--
-for i = 0, CHANNELS - 1 do
---!>
-		ch<!-- P(i) --!>_dma_setup_request <= 1'b0;
-<!--
-end
---!>
+
+<!-- for i = 0, CHANNELS - 1 do --!>		ch<!-- P(i) --!>_dma_setup_request <= 1'b0;
+<!-- end --!>
 		if (i_request && !o_ready) begin
 			if (!i_rw) begin
 				case (i_address)
-					4'h0: begin
+					8'h00: begin
 						o_rdata <= o_output_sample_rate;
+						o_ready <= 1'b1;
+					end
+					8'h01: begin
+						o_rdata <= channels_busy;
 						o_ready <= 1'b1;
 					end
 					default:
@@ -109,26 +116,24 @@ end
 			end
 			else begin
 				case (i_address)
-					4'h0: begin
+					8'h00: begin
 						o_output_sample_rate <= i_wdata;
 						o_ready <= 1'b1;
 					end
 <!--
 for i = 0, CHANNELS - 1 do
---!>
-					4'h<!-- P(i * 2 + 1) --!>: begin
+--!>					8'h<!-- P(string.format("%02x", i * 2 + 1)) --!>: begin
 						ch<!-- P(i) --!>_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					4'h<!-- P(i * 2 + 2) --!>: begin
+					8'h<!-- P(string.format("%02x", i * 2 + 2)) --!>: begin
 						ch<!-- P(i) --!>_dma_setup_count <= i_wdata;
 						ch<!-- P(i) --!>_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
 <!--
 end
---!>
-					default:
+--!>					default:
 						o_ready <= 1'b1;
 				endcase
 			end
@@ -138,40 +143,35 @@ end
 		end
 	end
 
-
 	// DMA round robin scheduler
 	bit [3:0] sched_channel = 0;
 
 	always_comb begin
 <!--
 for i = 0, CHANNELS - 1 do
---!>
-		ch<!-- P(i) --!>_dma_ready = ch<!-- P(i) --!>_dma_request & i_dma_ready;
+--!>		ch<!-- P(i) --!>_dma_ready = ch<!-- P(i) --!>_dma_request & i_dma_ready;
 <!--
 end
---!>
-	end
+--!>	end
 
 	always_ff @(posedge i_clock) begin
 		o_dma_request <= 1'b0;
 <!--
 for i = 0, CHANNELS - 1 do
 --!>
-		if (sched_channel == <!-- P(i) --!>) begin
+		<!-- if i > 0 then P("else ") end --!>if (sched_channel == <!-- P(i) --!>) begin
 			if (ch<!-- P(i) --!>_dma_request) begin
 				o_dma_request <= 1'b1;
 				o_dma_address <= ch<!-- P(i) --!>_dma_address;
 			end
 			else
 				sched_channel <= (sched_channel + 1) & <!-- P(CHANNELS - 1) --!>;
-		end
-<!--
+		end<!--
 end
 --!>
 	end
 
 	// Mixer
-
 	always_ff @(posedge i_clock) begin
 		o_output_sample_left <= <!--
 			for i = 0, CHANNELS - 1 do
