@@ -10,9 +10,7 @@
 `timescale 1ns/1ns
 `default_nettype none
 
-module AUDIO_controller_2 #(
-	parameter BUFFER_SIZE = 4
-)(
+module AUDIO_controller_2(
 	input wire i_reset,
 	input wire i_clock,
 
@@ -59,9 +57,7 @@ module AUDIO_controller_2 #(
 	bit [15:0] ch0_sample_left;
 	bit [15:0] ch0_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch0 (
+	AUDIO_channel ch0(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -95,9 +91,7 @@ module AUDIO_controller_2 #(
 	bit [15:0] ch1_sample_left;
 	bit [15:0] ch1_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch1 (
+	AUDIO_channel ch1(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 

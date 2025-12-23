@@ -10,23 +10,14 @@
 `timescale 1ns/1ns
 `default_nettype none
 
-/*!
-AUDIO controller which basically holds the audio
-configuration registers and also a small FIFO to
-queue samples to the output AUDIO device.
-The queue is kept small as the basic idea is to have
-a DMA channel kept busy to feed to the audio stream.
-*/
-module AUDIO_channel #(
-	parameter BUFFER_SIZE = 4
-)(
+module AUDIO_channel(
 	input wire i_reset,
 	input wire i_clock,
 
 	// DMA setup
 	input wire i_dma_setup_request,
-	input wire [31:0] i_dma_setup_count,
 	input wire [31:0] i_dma_setup_address,
+	input wire [31:0] i_dma_setup_count,
 
 	// DMA bus master
 	output bit o_dma_request,
@@ -42,24 +33,51 @@ module AUDIO_channel #(
 	output bit [15:0] o_output_sample_left,
 	output bit [15:0] o_output_sample_right
 );
-	// Sample FIFO.
-	wire fifo_empty;
-	wire fifo_full;
-	bit fifo_wr = 0;
-	bit fifo_rd = 0;
-	wire [31:0] fifo_rdata;
+	// DMA command FIFO.
+	typedef struct packed
+	{
+		bit [31:0] address;
+		bit [31:0] count;
+	}
+	dma_command_t;
+
+    wire dma_fifo_empty;
+	wire dma_fifo_full;
+	bit dma_fifo_rd = 1'b0;
+	dma_command_t dma_fifo_rcmd;
 	FIFO #(
-		.DEPTH(BUFFER_SIZE),
+		.DEPTH(4),
+		.WIDTH($bits(dma_command_t))
+	) dma_fifo(
+		.i_reset(i_reset),
+        .i_clock(i_clock),
+        .o_empty(dma_fifo_empty),
+		.o_almost_full(dma_fifo_full),
+		.i_write(i_dma_setup_request),
+		.i_wdata(dma_command_t'({ i_dma_setup_address, i_dma_setup_count })),
+		.i_read(dma_fifo_rd),
+		.o_rdata(dma_fifo_rcmd),
+		.o_queued()
+	);
+
+	// Sample FIFO.
+	wire sample_fifo_empty;
+	wire sample_fifo_full;
+	bit sample_fifo_wr = 1'b0;
+	bit sample_fifo_rd = 1'b0;
+	wire [31:0] sample_fifo_rdata;
+	FIFO #(
+		.DEPTH(4),
 		.WIDTH(32)
-	) fifo(
+	) sample_fifo(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
-		.o_empty(fifo_empty),
-		.o_almost_full(fifo_full),
-		.i_write(fifo_wr),
+		.o_empty(sample_fifo_empty),
+		.o_almost_full(sample_fifo_full),
+		.i_write(sample_fifo_wr),
 		.i_wdata(i_dma_rdata),
-		.i_read(fifo_rd),
-		.o_rdata(fifo_rdata),
+		.i_read(sample_fifo_rd),
+		.o_rdata(sample_fifo_rdata),
 		.o_queued()
 	);
 
@@ -73,25 +91,32 @@ module AUDIO_channel #(
 		o_output_sample_right = 0;
 	end
 
-	always_ff @(posedge i_clock) begin
-		o_busy <= |dma_count;
+	// Channel is only busy when DMA command FIFO is full.
+	always_comb begin
+		o_busy = dma_fifo_full;
 	end
 
 	// Process DMA setup and read samples into FIFO.
 	always_ff @(posedge i_clock) begin
 		o_dma_request <= 1'b0;
-		fifo_wr <= 1'b0;
+		sample_fifo_wr <= 1'b0;
 
-		if (i_dma_setup_request) begin
-			dma_count <= i_dma_setup_count;
-			dma_address <= i_dma_setup_address;
+		// Read DMA command from DMA FIFO.
+		if (dma_fifo_rd) begin
+			dma_address <= dma_fifo_rcmd.address;
+			dma_count <= dma_fifo_rcmd.count;
+			dma_fifo_rd <= 1'b0;
+		end
+		else if (!|dma_count && !dma_fifo_empty) begin
+			dma_fifo_rd <= 1'b1;
 		end
 
-		if (!fifo_full && |dma_count) begin
+		// Process DMA command; ie reading samples from BUS and inserting into sample FIFO.
+		if (!sample_fifo_full && |dma_count) begin
 			o_dma_request <= 1'b1;
 			o_dma_address <= dma_address;
 			if (i_dma_ready) begin
-				fifo_wr <= 1'b1;
+				sample_fifo_wr <= 1'b1;
 				o_dma_request <= 1'b0;
 				dma_count <= dma_count - 1;
 				dma_address <= dma_address + 4;
@@ -106,13 +131,13 @@ module AUDIO_channel #(
 	always_ff @(posedge i_clock) begin
 
 		last_sample_clock <= i_output_sample_clock;
-		last_fifo_rd <= fifo_rd;
+		last_fifo_rd <= sample_fifo_rd;
 
-		fifo_rd <= 1'b0;
+		sample_fifo_rd <= 1'b0;
 
 		if (i_output_sample_clock != last_sample_clock) begin
-			if (!fifo_empty)
-				fifo_rd <= 1'b1;
+			if (!sample_fifo_empty)
+				sample_fifo_rd <= 1'b1;
 			else begin
 				o_output_sample_left <= 0;
 				o_output_sample_right <= 0;
@@ -120,8 +145,8 @@ module AUDIO_channel #(
 		end
 
 		if (last_fifo_rd) begin
-			o_output_sample_left <= fifo_rdata[31:16];
-			o_output_sample_right <= fifo_rdata[15:0];
+			o_output_sample_left <= sample_fifo_rdata[31:16];
+			o_output_sample_right <= sample_fifo_rdata[15:0];
 		end
 	end
 

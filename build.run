@@ -114,6 +114,10 @@ end
 
 function main()
 	run:run("generate-instructions.run")
+	run:run("generate-audio.run 2", "rtl/audio2/AUDIO_controller_2.sv")
+	run:run("generate-audio.run 4", "rtl/audio2/AUDIO_controller_4.sv")
+	run:run("generate-audio.run 8", "rtl/audio2/AUDIO_controller_8.sv")
+	run:run("generate-audio.run 16", "rtl/audio2/AUDIO_controller_16.sv")
 	run:run("generate-xbar.run 2 1", "rtl/misc/XBAR_2_1.sv")
 	run:run("generate-xbar.run 2 2", "rtl/misc/XBAR_2_2.sv")
 	run:run("generate-xbar.run 2 3", "rtl/misc/XBAR_2_3.sv")

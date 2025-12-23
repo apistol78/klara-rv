@@ -13,9 +13,7 @@ local P = function(s) output:print(s) end
 `timescale 1ns/1ns
 `default_nettype none
 
-module AUDIO_controller_<!-- P(CHANNELS) --!> #(
-	parameter BUFFER_SIZE = 4
-)(
+module AUDIO_controller_<!-- P(CHANNELS) --!>(
 	input wire i_reset,
 	input wire i_clock,
 
@@ -64,9 +62,7 @@ for i = 0, CHANNELS - 1 do
 	bit [15:0] ch<!-- P(i) --!>_sample_left;
 	bit [15:0] ch<!-- P(i) --!>_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch<!-- P(i) --!> (
+	AUDIO_channel ch<!-- P(i) --!>(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 

@@ -10,9 +10,7 @@
 `timescale 1ns/1ns
 `default_nettype none
 
-module AUDIO_controller_16 #(
-	parameter BUFFER_SIZE = 4
-)(
+module AUDIO_controller_16(
 	input wire i_reset,
 	input wire i_clock,
 
@@ -59,9 +57,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch0_sample_left;
 	bit [15:0] ch0_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch0 (
+	AUDIO_channel ch0(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -95,9 +91,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch1_sample_left;
 	bit [15:0] ch1_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch1 (
+	AUDIO_channel ch1(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -131,9 +125,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch2_sample_left;
 	bit [15:0] ch2_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch2 (
+	AUDIO_channel ch2(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -167,9 +159,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch3_sample_left;
 	bit [15:0] ch3_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch3 (
+	AUDIO_channel ch3(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -203,9 +193,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch4_sample_left;
 	bit [15:0] ch4_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch4 (
+	AUDIO_channel ch4(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -239,9 +227,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch5_sample_left;
 	bit [15:0] ch5_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch5 (
+	AUDIO_channel ch5(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -275,9 +261,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch6_sample_left;
 	bit [15:0] ch6_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch6 (
+	AUDIO_channel ch6(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -311,9 +295,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch7_sample_left;
 	bit [15:0] ch7_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch7 (
+	AUDIO_channel ch7(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -347,9 +329,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch8_sample_left;
 	bit [15:0] ch8_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch8 (
+	AUDIO_channel ch8(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -383,9 +363,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch9_sample_left;
 	bit [15:0] ch9_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch9 (
+	AUDIO_channel ch9(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -419,9 +397,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch10_sample_left;
 	bit [15:0] ch10_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch10 (
+	AUDIO_channel ch10(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -455,9 +431,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch11_sample_left;
 	bit [15:0] ch11_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch11 (
+	AUDIO_channel ch11(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -491,9 +465,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch12_sample_left;
 	bit [15:0] ch12_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch12 (
+	AUDIO_channel ch12(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -527,9 +499,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch13_sample_left;
 	bit [15:0] ch13_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch13 (
+	AUDIO_channel ch13(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -563,9 +533,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch14_sample_left;
 	bit [15:0] ch14_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch14 (
+	AUDIO_channel ch14(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
@@ -599,9 +567,7 @@ module AUDIO_controller_16 #(
 	bit [15:0] ch15_sample_left;
 	bit [15:0] ch15_sample_right;
 
-	AUDIO_channel #(
-		.BUFFER_SIZE(BUFFER_SIZE)
-	) ch15 (
+	AUDIO_channel ch15(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 
