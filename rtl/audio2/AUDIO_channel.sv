@@ -30,6 +30,9 @@ module AUDIO_channel(
 	// Status
 	output bit o_busy,
 
+	// Parameters.
+	input wire [3:0] i_volume,
+
 	// Audio output stream
 	input wire i_output_sample_clock,
 	output bit [15:0] o_output_sample_left,
@@ -131,19 +134,30 @@ module AUDIO_channel(
 	// Read new sample from FIFO whenever sample clock change.
 	bit last_sample_clock = 1'b0;
 
+	bit [19:0] sample_left_0;
+	bit [19:0] sample_right_0;
+	bit [19:0] sample_left_1;
+	bit [19:0] sample_right_1;
+
 	always_ff @(posedge i_clock) begin
 		last_sample_clock <= i_output_sample_clock;
 		if (i_output_sample_clock != last_sample_clock) begin
 			if (!sample_fifo_empty) begin
-				o_output_sample_left <= sample_fifo_data[sample_fifo_out][31:16];
-				o_output_sample_right <= sample_fifo_data[sample_fifo_out][15:0];
+				sample_left_0 <= $signed(sample_fifo_data[sample_fifo_out][31:16]) * i_volume;
+				sample_right_0 <= $signed(sample_fifo_data[sample_fifo_out][15:0]) * i_volume;
 				sample_fifo_out <= (sample_fifo_out + 1) & (SAMPLE_FIFO_DEPTH - 1);
 			end
 			else begin
-				o_output_sample_left <= 0;
-				o_output_sample_right <= 0;
+				sample_left_0 <= 0;
+				sample_right_0 <= 0;
 			end
 		end
+		
+		sample_left_1 <= sample_left_0;
+		sample_right_1 <= sample_right_0;
+
+		o_output_sample_left <= sample_left_1[19:4];
+		o_output_sample_right <= sample_right_1[19:4];
 	end
 
 endmodule

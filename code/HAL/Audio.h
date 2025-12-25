@@ -23,3 +23,4 @@ EXTERN_C uint32_t hal_audio_get_channels_busy();
 
 EXTERN_C void hal_audio_setup_channel(uint8_t channel, const void* samples, uint32_t nsamples, uint32_t mode);
 
+EXTERN_C void hal_audio_set_channel_volume(uint8_t channel, uint8_t volume);

@@ -60,6 +60,7 @@ for i = 0, CHANNELS - 1 do
 
 	wire ch<!-- P(i) --!>_busy;
 
+	bit [3:0] ch<!-- P(i) --!>_volume = 4'hf;
 	bit [15:0] ch<!-- P(i) --!>_sample_left;
 	bit [15:0] ch<!-- P(i) --!>_sample_right;
 
@@ -78,6 +79,8 @@ for i = 0, CHANNELS - 1 do
 		.i_dma_rdata(i_dma_rdata),
 
 		.o_busy(ch<!-- P(i) --!>_busy),
+
+		.i_volume(ch<!-- P(i) --!>_volume),
 
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch<!-- P(i) --!>_sample_left),
@@ -114,25 +117,30 @@ end
 			end
 			else begin
 				case (i_address)
-					8'h00: begin
-						o_output_sample_rate <= i_wdata;
-						o_ready <= 1'b1;
-					end
 <!--
 for i = 0, CHANNELS - 1 do
---!>					8'h<!-- P(string.format("%02x", i * 2 + 1)) --!>: begin
+--!>					8'h<!-- P(string.format("%02x", i * 4 + 0)) --!>: begin
 						ch<!-- P(i) --!>_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h<!-- P(string.format("%02x", i * 2 + 2)) --!>: begin
+					8'h<!-- P(string.format("%02x", i * 4 + 1)) --!>: begin
 						ch<!-- P(i) --!>_dma_setup_count <= i_wdata[23:0];
 						ch<!-- P(i) --!>_dma_setup_append_or_replace <= i_wdata[31];
 						ch<!-- P(i) --!>_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
+					8'h<!-- P(string.format("%02x", i * 4 + 2)) --!>: begin
+						ch<!-- P(i) --!>_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
 <!--
 end
---!>					default:
+--!>
+					8'hf0: begin
+						o_output_sample_rate <= i_wdata;
+						o_ready <= 1'b1;
+					end
+					default:
 						o_ready <= 1'b1;
 				endcase
 			end

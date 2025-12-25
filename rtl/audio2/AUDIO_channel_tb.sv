@@ -41,6 +41,8 @@ module AUDIO_channel_tb();
 		.i_dma_ready(ac_dma_ready),
 		.i_dma_rdata(ac_dma_address),
 
+		.i_volume(4'h1),
+
 		.i_output_sample_clock(sample_clock),
 		.o_output_sample_left(ac_output_sample_left),
 		.o_output_sample_right(ac_output_sample_right)

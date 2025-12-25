@@ -55,6 +55,7 @@ module AUDIO_controller_8(
 
 	wire ch0_busy;
 
+	bit [3:0] ch0_volume = 4'hf;
 	bit [15:0] ch0_sample_left;
 	bit [15:0] ch0_sample_right;
 
@@ -74,6 +75,8 @@ module AUDIO_controller_8(
 
 		.o_busy(ch0_busy),
 
+		.i_volume(ch0_volume),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch0_sample_left),
 		.o_output_sample_right(ch0_sample_right)
@@ -91,6 +94,7 @@ module AUDIO_controller_8(
 
 	wire ch1_busy;
 
+	bit [3:0] ch1_volume = 4'hf;
 	bit [15:0] ch1_sample_left;
 	bit [15:0] ch1_sample_right;
 
@@ -110,6 +114,8 @@ module AUDIO_controller_8(
 
 		.o_busy(ch1_busy),
 
+		.i_volume(ch1_volume),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch1_sample_left),
 		.o_output_sample_right(ch1_sample_right)
@@ -127,6 +133,7 @@ module AUDIO_controller_8(
 
 	wire ch2_busy;
 
+	bit [3:0] ch2_volume = 4'hf;
 	bit [15:0] ch2_sample_left;
 	bit [15:0] ch2_sample_right;
 
@@ -146,6 +153,8 @@ module AUDIO_controller_8(
 
 		.o_busy(ch2_busy),
 
+		.i_volume(ch2_volume),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch2_sample_left),
 		.o_output_sample_right(ch2_sample_right)
@@ -163,6 +172,7 @@ module AUDIO_controller_8(
 
 	wire ch3_busy;
 
+	bit [3:0] ch3_volume = 4'hf;
 	bit [15:0] ch3_sample_left;
 	bit [15:0] ch3_sample_right;
 
@@ -182,6 +192,8 @@ module AUDIO_controller_8(
 
 		.o_busy(ch3_busy),
 
+		.i_volume(ch3_volume),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch3_sample_left),
 		.o_output_sample_right(ch3_sample_right)
@@ -199,6 +211,7 @@ module AUDIO_controller_8(
 
 	wire ch4_busy;
 
+	bit [3:0] ch4_volume = 4'hf;
 	bit [15:0] ch4_sample_left;
 	bit [15:0] ch4_sample_right;
 
@@ -218,6 +231,8 @@ module AUDIO_controller_8(
 
 		.o_busy(ch4_busy),
 
+		.i_volume(ch4_volume),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch4_sample_left),
 		.o_output_sample_right(ch4_sample_right)
@@ -235,6 +250,7 @@ module AUDIO_controller_8(
 
 	wire ch5_busy;
 
+	bit [3:0] ch5_volume = 4'hf;
 	bit [15:0] ch5_sample_left;
 	bit [15:0] ch5_sample_right;
 
@@ -254,6 +270,8 @@ module AUDIO_controller_8(
 
 		.o_busy(ch5_busy),
 
+		.i_volume(ch5_volume),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch5_sample_left),
 		.o_output_sample_right(ch5_sample_right)
@@ -271,6 +289,7 @@ module AUDIO_controller_8(
 
 	wire ch6_busy;
 
+	bit [3:0] ch6_volume = 4'hf;
 	bit [15:0] ch6_sample_left;
 	bit [15:0] ch6_sample_right;
 
@@ -290,6 +309,8 @@ module AUDIO_controller_8(
 
 		.o_busy(ch6_busy),
 
+		.i_volume(ch6_volume),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch6_sample_left),
 		.o_output_sample_right(ch6_sample_right)
@@ -307,6 +328,7 @@ module AUDIO_controller_8(
 
 	wire ch7_busy;
 
+	bit [3:0] ch7_volume = 4'hf;
 	bit [15:0] ch7_sample_left;
 	bit [15:0] ch7_sample_right;
 
@@ -325,6 +347,8 @@ module AUDIO_controller_8(
 		.i_dma_rdata(i_dma_rdata),
 
 		.o_busy(ch7_busy),
+
+		.i_volume(ch7_volume),
 
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch7_sample_left),
@@ -374,87 +398,120 @@ module AUDIO_controller_8(
 			else begin
 				case (i_address)
 					8'h00: begin
-						o_output_sample_rate <= i_wdata;
-						o_ready <= 1'b1;
-					end
-					8'h01: begin
 						ch0_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h02: begin
+					8'h01: begin
 						ch0_dma_setup_count <= i_wdata[23:0];
 						ch0_dma_setup_append_or_replace <= i_wdata[31];
 						ch0_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
-					8'h03: begin
-						ch1_dma_setup_address <= i_wdata;
+					8'h02: begin
+						ch0_volume <= i_wdata[3:0];
 						o_ready <= 1'b1;
 					end
 					8'h04: begin
+						ch1_dma_setup_address <= i_wdata;
+						o_ready <= 1'b1;
+					end
+					8'h05: begin
 						ch1_dma_setup_count <= i_wdata[23:0];
 						ch1_dma_setup_append_or_replace <= i_wdata[31];
 						ch1_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
-					8'h05: begin
+					8'h06: begin
+						ch1_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
+					8'h08: begin
 						ch2_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h06: begin
+					8'h09: begin
 						ch2_dma_setup_count <= i_wdata[23:0];
 						ch2_dma_setup_append_or_replace <= i_wdata[31];
 						ch2_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
-					8'h07: begin
+					8'h0a: begin
+						ch2_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
+					8'h0c: begin
 						ch3_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h08: begin
+					8'h0d: begin
 						ch3_dma_setup_count <= i_wdata[23:0];
 						ch3_dma_setup_append_or_replace <= i_wdata[31];
 						ch3_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
-					8'h09: begin
+					8'h0e: begin
+						ch3_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
+					8'h10: begin
 						ch4_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h0a: begin
+					8'h11: begin
 						ch4_dma_setup_count <= i_wdata[23:0];
 						ch4_dma_setup_append_or_replace <= i_wdata[31];
 						ch4_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
-					8'h0b: begin
+					8'h12: begin
+						ch4_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
+					8'h14: begin
 						ch5_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h0c: begin
+					8'h15: begin
 						ch5_dma_setup_count <= i_wdata[23:0];
 						ch5_dma_setup_append_or_replace <= i_wdata[31];
 						ch5_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
-					8'h0d: begin
+					8'h16: begin
+						ch5_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
+					8'h18: begin
 						ch6_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h0e: begin
+					8'h19: begin
 						ch6_dma_setup_count <= i_wdata[23:0];
 						ch6_dma_setup_append_or_replace <= i_wdata[31];
 						ch6_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
-					8'h0f: begin
+					8'h1a: begin
+						ch6_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
+					8'h1c: begin
 						ch7_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h10: begin
+					8'h1d: begin
 						ch7_dma_setup_count <= i_wdata[23:0];
 						ch7_dma_setup_append_or_replace <= i_wdata[31];
 						ch7_dma_setup_request <= 1'b1;
+						o_ready <= 1'b1;
+					end
+					8'h1e: begin
+						ch7_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
+
+					8'hf0: begin
+						o_output_sample_rate <= i_wdata;
 						o_ready <= 1'b1;
 					end
 					default:

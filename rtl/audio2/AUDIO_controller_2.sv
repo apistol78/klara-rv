@@ -55,6 +55,7 @@ module AUDIO_controller_2(
 
 	wire ch0_busy;
 
+	bit [3:0] ch0_volume = 4'hf;
 	bit [15:0] ch0_sample_left;
 	bit [15:0] ch0_sample_right;
 
@@ -74,6 +75,8 @@ module AUDIO_controller_2(
 
 		.o_busy(ch0_busy),
 
+		.i_volume(ch0_volume),
+
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch0_sample_left),
 		.o_output_sample_right(ch0_sample_right)
@@ -91,6 +94,7 @@ module AUDIO_controller_2(
 
 	wire ch1_busy;
 
+	bit [3:0] ch1_volume = 4'hf;
 	bit [15:0] ch1_sample_left;
 	bit [15:0] ch1_sample_right;
 
@@ -109,6 +113,8 @@ module AUDIO_controller_2(
 		.i_dma_rdata(i_dma_rdata),
 
 		.o_busy(ch1_busy),
+
+		.i_volume(ch1_volume),
 
 		.i_output_sample_clock(i_output_sample_clock),
 		.o_output_sample_left(ch1_sample_left),
@@ -146,27 +152,36 @@ module AUDIO_controller_2(
 			else begin
 				case (i_address)
 					8'h00: begin
-						o_output_sample_rate <= i_wdata;
-						o_ready <= 1'b1;
-					end
-					8'h01: begin
 						ch0_dma_setup_address <= i_wdata;
 						o_ready <= 1'b1;
 					end
-					8'h02: begin
+					8'h01: begin
 						ch0_dma_setup_count <= i_wdata[23:0];
 						ch0_dma_setup_append_or_replace <= i_wdata[31];
 						ch0_dma_setup_request <= 1'b1;
 						o_ready <= 1'b1;
 					end
-					8'h03: begin
-						ch1_dma_setup_address <= i_wdata;
+					8'h02: begin
+						ch0_volume <= i_wdata[3:0];
 						o_ready <= 1'b1;
 					end
 					8'h04: begin
+						ch1_dma_setup_address <= i_wdata;
+						o_ready <= 1'b1;
+					end
+					8'h05: begin
 						ch1_dma_setup_count <= i_wdata[23:0];
 						ch1_dma_setup_append_or_replace <= i_wdata[31];
 						ch1_dma_setup_request <= 1'b1;
+						o_ready <= 1'b1;
+					end
+					8'h06: begin
+						ch1_volume <= i_wdata[3:0];
+						o_ready <= 1'b1;
+					end
+
+					8'hf0: begin
+						o_output_sample_rate <= i_wdata;
 						o_ready <= 1'b1;
 					end
 					default:
