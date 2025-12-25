@@ -94,6 +94,7 @@ module AUDIO_channel(
 	// Process DMA setup and read samples into FIFO.
 	always_ff @(posedge i_clock) begin
 		o_dma_request <= 1'b0;
+		o_dma_address = dma_address;
 
 		// Get next DMA command from queue.
 		if (cmdq_next_have) begin
@@ -105,7 +106,6 @@ module AUDIO_channel(
 		// Process DMA command; ie reading samples from BUS and inserting into sample FIFO.
 		if (!sample_fifo_almost_full && |dma_count) begin
 			o_dma_request <= 1'b1;
-			o_dma_address <= dma_address;
 			if (i_dma_ready && o_dma_request) begin
 				if (dma_mono_or_stereo == 1'b0) begin // mono
 					if (dma_count >= 2) begin
@@ -117,7 +117,7 @@ module AUDIO_channel(
 					else if (dma_count == 1) begin	// last word
 						sample_fifo_data[sample_fifo_in] <= { i_dma_rdata[15:0], i_dma_rdata[15:0] };
 						sample_fifo_in <= (sample_fifo_in + 1) & (SAMPLE_FIFO_DEPTH - 1);
-						dma_count <= 0;
+						dma_count <= dma_count - 1;
 					end
 				end
 				else begin // stereo
