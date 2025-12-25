@@ -43,6 +43,7 @@ private:
 	traktor::Ref< traktor::sound::AudioSystem > m_audioSystem;
 	traktor::Ref< traktor::sound::IAudioBuffer > m_audioBuffer;
 	std::function< void() > m_callback;
-	uint32_t m_channel = 0;
-	uint32_t m_lastQ = 0;
+	// uint32_t m_channel = 0;
+	// uint32_t m_lastQ = 0;
+	uint32_t m_latchAddress[16] = {};
 };

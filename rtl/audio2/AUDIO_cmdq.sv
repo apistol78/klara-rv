@@ -16,11 +16,13 @@ module AUDIO_cmdq(
 
 	input wire i_setup_request,
 	input wire i_setup_append_or_replace,
+	input wire i_setup_mono_or_stereo,
 	input wire [31:0] i_setup_address,
 	input wire [23:0] i_setup_count,
 
 	input wire i_next_ready,
 	output bit o_next_have,
+	output bit o_next_mono_or_stereo,
 	output bit [31:0] o_next_address,
 	output bit [23:0] o_next_count,
 
@@ -29,6 +31,7 @@ module AUDIO_cmdq(
 
 	initial o_next_have = 1'b0;
 
+	bit next_mono_or_stereo = 1'b0;
 	bit [31:0] next_address = 32'h0;
 	bit [23:0] next_count = 24'h0;
 	bit next_pending = 1'b0;
@@ -42,6 +45,7 @@ module AUDIO_cmdq(
 		o_next_have <= 1'b0;
 
 		if (i_next_ready && next_pending) begin
+			o_next_mono_or_stereo <= next_mono_or_stereo;
 			o_next_address <= next_address;
 			o_next_count <= next_count;
 			o_next_have <= 1'b1;
@@ -51,12 +55,14 @@ module AUDIO_cmdq(
 		if (i_setup_request) begin
 			if (i_setup_append_or_replace == 1'b0) begin
 				// Append as next.
+				next_mono_or_stereo <= i_setup_mono_or_stereo;
 				next_address <= i_setup_address;
 				next_count <= i_setup_count;
 				next_pending <= 1'b1;
 			end
 			else begin
 				// Replace current.
+				o_next_mono_or_stereo <= i_setup_mono_or_stereo;
 				o_next_address <= i_setup_address;
 				o_next_count <= i_setup_count;
 				o_next_have <= 1'b1;

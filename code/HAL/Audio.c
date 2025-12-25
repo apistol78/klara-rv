@@ -27,16 +27,9 @@ uint32_t hal_audio_get_channels_busy()
 	return audio[1];
 }
 
-void hal_audio_append_channel(uint8_t channel, const void* samples, uint32_t nsamples)
+void hal_audio_setup_channel(uint8_t channel, const void* samples, uint32_t nsamples, uint32_t mode)
 {
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
 	audio[1 + channel * 2 + 0] = (uint32_t)samples;
-	audio[1 + channel * 2 + 1] = nsamples & 0x00ffffff;
-}
-
-void hal_audio_replace_channel(uint8_t channel, const void* samples, uint32_t nsamples)
-{
-	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
-	audio[1 + channel * 2 + 0] = (uint32_t)samples;
-	audio[1 + channel * 2 + 1] = 0x80000000 | (nsamples & 0x00ffffff);
+	audio[1 + channel * 2 + 1] = mode | (nsamples & 0x00ffffff);
 }

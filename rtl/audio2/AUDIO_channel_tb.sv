@@ -32,8 +32,9 @@ module AUDIO_channel_tb();
 
 		.i_dma_setup_request(ac_dma_setup_request),
 		.i_dma_setup_append_or_replace(ac_dma_setup_append_or_replace),
-		.i_dma_setup_count(24'd16),
+		.i_dma_setup_mono_or_stereo(1'b0),
 		.i_dma_setup_address(ac_dma_setup_address),
+		.i_dma_setup_count(24'd16),
 
 		.o_dma_request(ac_dma_request),
 		.o_dma_address(ac_dma_address),
