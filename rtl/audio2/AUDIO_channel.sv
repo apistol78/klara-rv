@@ -38,9 +38,21 @@ module AUDIO_channel(
 	output bit [15:0] o_output_sample_left,
 	output bit [15:0] o_output_sample_right
 );
-	bit dma_mono_or_stereo = 1'b0;
+	typedef enum bit [2:0]
+	{
+		DS_MONO_WAIT_SAMPLE_FIFO,
+		DS_MONO_ISSUE_DMA_REQUEST,
+		DS_MONO_ENQUEUE_0,
+		DS_MONO_ENQUEUE_1,
+		DS_STEREO_WAIT_SAMPLE_FIFO,
+		DS_STEREO_ISSUE_DMA_REQUEST,
+		DS_STEREO_ENQUEUE_0
+	}
+	dma_state_t;
+
 	bit [31:0] dma_address;
 	bit [23:0] dma_count = 24'h0;
+	dma_state_t dma_state = DS_MONO_WAIT_SAMPLE_FIFO;
 
 	// DMA command queue.
 	wire cmdq_next_have;
@@ -69,15 +81,27 @@ module AUDIO_channel(
 	);
 
 	// Sample FIFO.
-	parameter SAMPLE_FIFO_DEPTH = 4;
-
-	bit [31:0] sample_fifo_data [SAMPLE_FIFO_DEPTH];
-	bit [$clog2(SAMPLE_FIFO_DEPTH) - 1:0] sample_fifo_in = 0;
-	bit [$clog2(SAMPLE_FIFO_DEPTH) - 1:0] sample_fifo_out = 0;
-
-	wire sample_fifo_empty = (sample_fifo_in == sample_fifo_out) ? 1'b1 : 1'b0;
-	wire sample_fifo_full = (((sample_fifo_in + 1) & (SAMPLE_FIFO_DEPTH - 1)) == sample_fifo_out) ? 1'b1 : 1'b0;
-	wire sample_fifo_almost_full = (((sample_fifo_in + 2) & (SAMPLE_FIFO_DEPTH - 1)) == sample_fifo_out) ? 1'b1 : sample_fifo_full;
+	wire sample_fifo_empty;
+	wire sample_fifo_full;
+	bit sample_fifo_wr = 1'b0;
+	bit sample_fifo_rd = 1'b0;
+	bit [31:0] sample_fifo_wdata;
+	wire [31:0] sample_fifo_rdata;
+	
+	FIFO #(
+		.DEPTH(4),
+		.WIDTH(32)
+	) sample_fifo(
+		.i_reset(i_reset),
+		.i_clock(i_clock),
+		.o_empty(sample_fifo_empty),
+		.o_almost_full(sample_fifo_full),
+		.i_write(sample_fifo_wr),
+		.i_wdata(sample_fifo_wdata),
+		.i_read(sample_fifo_rd),
+		.o_rdata(sample_fifo_rdata),
+		.o_queued()
+	);
 
 	initial begin
 		o_dma_request = 1'b0;
@@ -96,68 +120,84 @@ module AUDIO_channel(
 		o_dma_request <= 1'b0;
 		o_dma_address = dma_address;
 
+		sample_fifo_wr <= 1'b0;
+
 		// Get next DMA command from queue.
 		if (cmdq_next_have) begin
-			dma_mono_or_stereo <= cmdq_next_mono_or_stereo;
 			dma_address <= cmdq_next_address;
 			dma_count <= cmdq_next_count;
+			dma_state <= dma_state_t'(cmdq_next_mono_or_stereo ? DS_STEREO_WAIT_SAMPLE_FIFO : DS_MONO_WAIT_SAMPLE_FIFO);
 		end
-
-		// Process DMA command; ie reading samples from BUS and inserting into sample FIFO.
-		if (!sample_fifo_almost_full && |dma_count) begin
-			o_dma_request <= 1'b1;
-			if (i_dma_ready && o_dma_request) begin
-				if (dma_mono_or_stereo == 1'b0) begin // mono
-					if (dma_count >= 2) begin
-						sample_fifo_data[sample_fifo_in + 0] <= { i_dma_rdata[15:0], i_dma_rdata[15:0] };
-						sample_fifo_data[sample_fifo_in + 1] <= { i_dma_rdata[31:16], i_dma_rdata[31:16] };
-						sample_fifo_in <= (sample_fifo_in + 2) & (SAMPLE_FIFO_DEPTH - 1);
-						dma_count <= dma_count - 2;
-					end
-					else if (dma_count == 1) begin	// last word
-						sample_fifo_data[sample_fifo_in] <= { i_dma_rdata[15:0], i_dma_rdata[15:0] };
-						sample_fifo_in <= (sample_fifo_in + 1) & (SAMPLE_FIFO_DEPTH - 1);
-						dma_count <= dma_count - 1;
-					end
-				end
-				else begin // stereo
-					sample_fifo_data[sample_fifo_in] <= i_dma_rdata;
-					sample_fifo_in <= (sample_fifo_in + 1) & (SAMPLE_FIFO_DEPTH - 1);
-					dma_count <= dma_count - 1;
-				end
-				o_dma_request <= 1'b0;
-				dma_address <= dma_address + 4;
+		// Process DMA command.
+		else begin
+			case (dma_state)
+			DS_MONO_WAIT_SAMPLE_FIFO: begin
+				if (|dma_count && !sample_fifo_full)
+					dma_state <= DS_MONO_ISSUE_DMA_REQUEST;
 			end
+			DS_MONO_ISSUE_DMA_REQUEST: begin
+				o_dma_request <= !i_dma_ready;
+				if (i_dma_ready)
+					dma_state <= DS_MONO_ENQUEUE_0;
+			end
+			DS_MONO_ENQUEUE_0: begin
+				sample_fifo_wr <= 1'b1;
+				sample_fifo_wdata <= { i_dma_rdata[15:0], i_dma_rdata[15:0] };
+				dma_count <= dma_count - 1;
+				dma_state <= DS_MONO_ENQUEUE_1;
+			end
+			DS_MONO_ENQUEUE_1: begin
+				sample_fifo_wr <= 1'b1;
+				sample_fifo_wdata <= { i_dma_rdata[31:16], i_dma_rdata[31:16] };
+				dma_address <= dma_address + 4;
+				dma_count <= dma_count - 1;
+				dma_state <= DS_MONO_WAIT_SAMPLE_FIFO;
+			end
+
+			DS_STEREO_WAIT_SAMPLE_FIFO: begin
+				if (|dma_count && !sample_fifo_full)
+					dma_state <= DS_STEREO_ISSUE_DMA_REQUEST;
+			end
+			DS_STEREO_ISSUE_DMA_REQUEST: begin
+				o_dma_request <= !i_dma_ready;
+				if (i_dma_ready)
+					dma_state <= DS_STEREO_ENQUEUE_0;
+			end
+			DS_STEREO_ENQUEUE_0: begin
+				sample_fifo_wr <= 1'b1;
+				sample_fifo_wdata <= i_dma_rdata;
+				dma_address <= dma_address + 4;
+				dma_count <= dma_count - 1;
+				dma_state <= DS_STEREO_WAIT_SAMPLE_FIFO;
+			end
+			endcase
 		end
 	end
 
 	// Read new sample from FIFO whenever sample clock change.
 	bit last_sample_clock = 1'b0;
-
-	bit [19:0] sample_left_0;
-	bit [19:0] sample_right_0;
-	bit [19:0] sample_left_1;
-	bit [19:0] sample_right_1;
+	bit last_fifo_rd = 1'b0;
 
 	always_ff @(posedge i_clock) begin
+
 		last_sample_clock <= i_output_sample_clock;
+		last_fifo_rd <= sample_fifo_rd;
+
+		sample_fifo_rd <= 1'b0;
+
 		if (i_output_sample_clock != last_sample_clock) begin
-			if (!sample_fifo_empty) begin
-				sample_left_0 <= $signed(sample_fifo_data[sample_fifo_out][31:16]) * i_volume;
-				sample_right_0 <= $signed(sample_fifo_data[sample_fifo_out][15:0]) * i_volume;
-				sample_fifo_out <= (sample_fifo_out + 1) & (SAMPLE_FIFO_DEPTH - 1);
-			end
+			if (!sample_fifo_empty)
+				sample_fifo_rd <= 1'b1;
 			else begin
-				sample_left_0 <= 0;
-				sample_right_0 <= 0;
+				o_output_sample_left <= 0;
+				o_output_sample_right <= 0;
 			end
 		end
-		
-		sample_left_1 <= sample_left_0;
-		sample_right_1 <= sample_right_0;
 
-		o_output_sample_left <= sample_left_1[19:4];
-		o_output_sample_right <= sample_right_1[19:4];
+		if (last_fifo_rd) begin
+			o_output_sample_left <= sample_fifo_rdata[31:16];
+			o_output_sample_right <= sample_fifo_rdata[15:0];
+		end
 	end
 
 endmodule
