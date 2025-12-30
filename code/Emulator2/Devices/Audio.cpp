@@ -223,7 +223,7 @@ bool Audio::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 	AudioBuffer* audioBuffer = (AudioBuffer*)m_audioBuffer.ptr();
 	T_ANONYMOUS_VAR(Acquire< Semaphore >)(audioBuffer->m_lock);
 
-	if (address == 0x00)
+	if (address == (0xf0 << 2))
 	{
 		const uint32_t rate = 100000000 / (567ULL * (uint64_t)value);
 		log::info << L"[AUDIO] play back rate " << rate << L" (" << value << L")" << Endl;
@@ -231,15 +231,16 @@ bool Audio::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 	}
 	else
 	{
-		const int32_t na = (address - 0x04) / 0x04;
-		const int32_t ch = na / 2;
+		const int32_t na = address >> 2;
+		const int32_t ch = na / 4;
+		const int32_t ca = na % 4;
 		if (ch < 16)
 		{
-			if (na % 2 == 0)
+			if (ca == 0)
 			{
 				m_latchAddress[ch] = value;
 			}
-			else
+			else if (ca == 1)
 			{
 				const uint32_t mode = value & 0xff000000;
 				const uint32_t count = value & 0x00ffffff;
@@ -261,6 +262,10 @@ bool Audio::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 					);
 				}
 			}
+			else if (ca == 2)
+			{
+				// Channel volume
+			}
 		}
 		else
 		{
@@ -277,7 +282,7 @@ uint32_t Audio::readU32(uint32_t address) const
 	AudioBuffer* audioBuffer = (AudioBuffer*)m_audioBuffer.ptr();
 	T_ANONYMOUS_VAR(Acquire< Semaphore >)(audioBuffer->m_lock);
 
-	if (address == 0x04)
+	if (address == (0xf0 << 2))
 	{
 		uint32_t busy = 0;
 		for (int32_t i = 0; i < 16; ++i)
