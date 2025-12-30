@@ -29,6 +29,8 @@ class Audio : public IDevice
 public:
 	Audio();
 
+	virtual bool tickable() const override final { return true; }
+
 	virtual bool ready(uint32_t address) const override final;
 
 	virtual bool writeU32(uint32_t address, uint32_t value, uint32_t mask) override final;

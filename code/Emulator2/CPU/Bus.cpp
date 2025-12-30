@@ -16,13 +16,13 @@ using namespace traktor;
 
 T_IMPLEMENT_RTTI_CLASS(L"Bus", Bus, Object)
 
-void Bus::map(uint32_t start, uint32_t end, bool cacheable, bool tick, IDevice* device)
+void Bus::map(uint32_t start, uint32_t end, IDevice* device)
 {
 	if (start < end)
 		m_mappedDevices.push_back({ start, end, device });
-	if (tick)
+	if (device->tickable())
 		m_tickDevices.push_back(device);
-	if (cacheable)
+	if (device->cacheable())
 		m_cacheableRanges.push_back({ start, end });
 }
 
@@ -39,7 +39,7 @@ bool Bus::ready(uint32_t address) const
 		return mappedDevice->device->ready(address - mappedDevice->start);
 	else
 	{
-		log::error << L"No device at 0x" << str(L"%08x", address) << L", trying to check ready." << Endl;
+		log::error << L"[BUS] no device at 0x" << str(L"%08x", address) << L", trying to check ready." << Endl;
 		m_error = true;
 		return false;
 	}
@@ -55,7 +55,7 @@ bool Bus::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 	}
 	else
 	{
-		log::error << L"No device at 0x" << str(L"%08x", address) << L", trying to write 0x" << str(L"%08x", value) << L"." << Endl;
+		log::error << L"[BUS] no device at 0x" << str(L"%08x", address) << L", trying to write 0x" << str(L"%08x", value) << L"." << Endl;
 		m_error = true;
 	}
 	return !m_error;
@@ -68,7 +68,7 @@ uint32_t Bus::readU32(uint32_t address) const
 		return mappedDevice->device->readU32(address - mappedDevice->start);
 	else
 	{
-		log::error << L"No device at 0x" << str(L"%08x", address) << L", trying to read." << Endl;
+		log::error << L"[BUS] no device at 0x" << str(L"%08x", address) << L", trying to read." << Endl;
 		m_error = true;
 		return 0;
 	}
@@ -80,7 +80,7 @@ bool Bus::tick(ICPU* cpu)
 	{
 		if (!device->tick(cpu, this))
 		{
-			log::error << L"Device " << type_name(device) << L" failed to tick." << Endl;
+			log::error << L"[BUS] device " << type_name(device) << L" failed to tick." << Endl;
 			m_error = true;
 			return false;
 		}

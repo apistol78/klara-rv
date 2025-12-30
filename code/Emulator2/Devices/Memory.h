@@ -17,11 +17,13 @@ class Memory : public IDevice
 	T_RTTI_CLASS;
 
 public:
-	explicit Memory(uint32_t capacity);
+	explicit Memory(uint32_t capacity, bool cacheable);
 
 	uint32_t getCapacity() const;
 
 	void setReadOnly(bool readOnly);
+
+	virtual bool cacheable() const override final { return m_cacheable; }
 
 	virtual bool writeU32(uint32_t address, uint32_t value, uint32_t mask) override final;
 
@@ -32,5 +34,6 @@ public:
 private:
 	traktor::AutoArrayPtr< uint8_t > m_data;
 	uint32_t m_capacity;
+	bool m_cacheable = false;
 	bool m_readOnly = false;
 };

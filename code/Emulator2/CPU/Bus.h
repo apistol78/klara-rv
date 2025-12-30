@@ -20,7 +20,7 @@ class Bus : public traktor::Object
 	T_RTTI_CLASS;
 
 public:
-	void map(uint32_t start, uint32_t end, bool cacheable, bool tick, IDevice* device);
+	void map(uint32_t start, uint32_t end, IDevice* device);
 
 	IDevice* device(uint32_t address) const
 	{

@@ -17,8 +17,9 @@ using namespace traktor;
 
 T_IMPLEMENT_RTTI_CLASS(L"Memory", Memory, IDevice)
 
-Memory::Memory(uint32_t capacity)
+Memory::Memory(uint32_t capacity, bool cacheable)
 :	m_capacity(capacity)
+,	m_cacheable(cacheable)
 {
 	m_data.reset(new uint8_t [capacity]);
 

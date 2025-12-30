@@ -18,6 +18,10 @@ class IDevice : public traktor::Object
 	T_RTTI_CLASS;
 
 public:
+	virtual bool tickable() const { return false; }
+
+	virtual bool cacheable() const { return false; }
+
 	virtual bool ready(uint32_t address) const { return true; }
 
 	virtual bool writeU32(uint32_t address, uint32_t value, uint32_t mask) = 0;
