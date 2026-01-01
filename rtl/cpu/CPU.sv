@@ -37,6 +37,7 @@ module CPU #(
 	// Control
 	input wire i_timer_interrupt,
 	input wire i_external_interrupt,
+	output wire o_external_interrupt_enable,
 	
 	// Instruction bus
 	output wire o_ibus_request,			// IO request.
@@ -102,6 +103,7 @@ module CPU #(
 
 		.i_timer_interrupt(i_timer_interrupt),
 		.i_external_interrupt(i_external_interrupt),
+		.o_external_interrupt_enable(o_external_interrupt_enable),
 
 		.i_ecall(execute_ecall),
 		.i_mret(execute_mret),
