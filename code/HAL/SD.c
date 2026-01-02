@@ -921,7 +921,7 @@ int32_t hal_sd_init(int32_t mode)
 	for (int32_t count = 0;; ++count)
 	{
 		if (!hal_sd_cmd55(0x0000))
-			return 1;
+			return SD_RESULT_INVALID_CARD;
 
 		if (!hal_sd_acmd41(hostOCR32, &OCR))
 		{

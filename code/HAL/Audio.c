@@ -18,13 +18,13 @@ void hal_audio_set_playback_rate(uint32_t rate)
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
 	const uint64_t f = CPU_FREQUENCY;
 	const uint64_t d = 256ULL * (uint64_t)rate;
-	audio[0] = (uint32_t)(f / d);
+	audio[0xf0] = (uint32_t)(f / d);
 }
 
 uint32_t hal_audio_get_channels_busy()
 {
 	volatile int32_t* audio = (volatile int32_t*)AUDIO_BASE;
-	return audio[0xf0];
+	return audio[1];
 }
 
 void hal_audio_setup_channel(uint8_t channel, const void* samples, uint32_t nsamples, uint32_t mode)

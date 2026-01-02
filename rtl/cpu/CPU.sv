@@ -57,7 +57,8 @@ module CPU #(
 	// Debug
 	output wire o_execute_busy,
 	output wire o_memory_busy,
-	output wire o_fault
+	output wire o_fault,
+	output wire [31:0] o_scratch
 );
 
 	//====================================================
@@ -112,7 +113,9 @@ module CPU #(
 		.o_rdata(csr_rdata),
 		.i_wdata_wr(csr_wdata_wr),
 		.i_wdata(csr_wdata),
+
 		.o_epc(csr_epc),
+		.o_scratch(o_scratch),
 
 		.i_retired(csr_retired),
 

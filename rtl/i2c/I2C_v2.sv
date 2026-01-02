@@ -19,7 +19,8 @@
 `define I2C_READ(rs) begin; i2c_read_rs <= rs; state <= S_I2C_READ_0; end
 
 module I2C_v2 #(
-	parameter DELAY = 128
+	parameter DELAY_SLOW,
+	parameter DELAY_FAST
 )(
 	input i_reset,
 	input i_clock,
@@ -44,16 +45,24 @@ module I2C_v2 #(
 	assign I2C_SDA_direction = sda_rw;
 	assign I2C_SDA_w = sda_w;
 
-	typedef enum bit [1:0]
+	typedef enum bit
 	{
-		I2C_CMD_READ	= 2'd1,
-		I2C_CMD_WRITE	= 2'd2
+		I2C_CMD_READ	= 1'd0,
+		I2C_CMD_WRITE	= 1'd1
 	}
 	i2c_command_type_t;
+
+	typedef enum bit
+	{
+		I2C_CMD_SLOW	= 1'd0,
+		I2C_CMD_FAST	= 1'd1
+	}
+	i2c_command_speed_t;
 
 	typedef struct packed
 	{
 		i2c_command_type_t cmd;
+		i2c_command_speed_t speed;
 		bit [7:0] device_address;
 		bit [7:0] control_address;
 		bit [7:0] nbytes_or_data;
@@ -180,6 +189,7 @@ module I2C_v2 #(
 
 	state_t dly_next_state;
 	bit [23:0] dly_count;
+	bit [23:0] dly_speed = DELAY_SLOW;
 
 	state_t state = IDLE;
 	bit [2:0] read_state = 0;
@@ -237,7 +247,8 @@ module I2C_v2 #(
 			end
 			else begin
 				if (i_address == 2'd0) begin
-					queue_wdata.cmd <= i_wdata[1:0];
+					queue_wdata.cmd <= i_wdata[0];
+					queue_wdata.speed <= i_wdata[1];
 					queue_wdata.device_address <= i_wdata[15:8];
 					queue_wdata.control_address <= i_wdata[23:16];
 					queue_wdata.nbytes_or_data <= i_wdata[31:24];
@@ -278,6 +289,7 @@ module I2C_v2 #(
 			end
 
 			READ_CMD: begin
+				dly_speed <= queue_rdata.speed ? DELAY_FAST : DELAY_SLOW;
 				if (queue_rdata.cmd == I2C_CMD_READ) begin
 					i2c_read_device_address <= queue_rdata.device_address;
 					i2c_read_control_address <= queue_rdata.control_address;
@@ -508,13 +520,13 @@ module I2C_v2 #(
 			// Delay states.
 
 			WAIT_DELAY: begin
-				dly_count <= 0;
+				dly_count <= dly_speed;
 				state <= WAIT_DELAY_I;
 			end
 
 			WAIT_DELAY_I: begin
-				dly_count <= dly_count + 1;
-				if (dly_count >= DELAY)
+				dly_count <= dly_count - 1;
+				if (dly_count == 0)
 					state <= dly_next_state;
 			end
 		endcase

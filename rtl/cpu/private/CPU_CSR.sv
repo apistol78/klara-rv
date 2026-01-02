@@ -38,6 +38,7 @@ module CPU_CSR #(
 
 	// Direct read access.
 	output wire [31:0] o_epc,
+	output wire [31:0] o_scratch,
 
 	// Pending interrupt output.
 	output bit o_irq_pending,
@@ -74,6 +75,7 @@ module CPU_CSR #(
 	bit [2:0] issued = 0;
 
 	assign o_epc = mepc;
+	assign o_scratch = mscratch;
 	assign o_external_interrupt_enable = mie_meie;
 
 	// Read CSR value by index.

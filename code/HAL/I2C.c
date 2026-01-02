@@ -35,8 +35,8 @@ uint32_t hal_i2c_write(uint8_t deviceAddr, uint8_t controlAddr, uint8_t controlD
 		((uint32_t)controlData << 24) |
 		((uint32_t)controlAddr << 16) |
 		((uint32_t)deviceAddr << 8) |
-		//(mode ? 0x04 : 0x00) |
-		0x02;
+		(mode ? 0x02 : 0x00) |
+		0x1;
 	const uint32_t tag = *I2C_QUEUED;
 	return tag;
 }
@@ -47,8 +47,8 @@ uint32_t hal_i2c_read(uint8_t deviceAddr, uint8_t controlAddr, uint8_t nbytes, i
 		((uint32_t)nbytes << 24) |
 		((uint32_t)controlAddr << 16) |
 		((uint32_t)deviceAddr << 8) |
-		//(mode ? 0x04 : 0x00) |
-		0x01;
+		(mode ? 0x02 : 0x00) |
+		0x0;
 	const uint32_t tag = *I2C_QUEUED;
 	return tag;
 }

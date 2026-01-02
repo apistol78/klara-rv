@@ -81,6 +81,7 @@
         ]
       }
     },
-    "terminal.integrated.defaultProfile.linux": "BashWithStartup"
+    "terminal.integrated.defaultProfile.linux": "BashWithStartup",
+    "workbench.colorTheme": "Solarized Dark"
 
 }
