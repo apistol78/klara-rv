@@ -35,8 +35,8 @@ module AUDIO_channel(
 
 	// Audio output stream
 	input wire i_output_sample_clock,
-	output bit [15:0] o_output_sample_left,
-	output bit [15:0] o_output_sample_right
+	output wire [15:0] o_output_sample_left,
+	output wire [15:0] o_output_sample_right
 );
 	typedef enum bit [2:0]
 	{
@@ -106,8 +106,6 @@ module AUDIO_channel(
 	initial begin
 		o_dma_request = 1'b0;
 		o_busy = 1'b0;
-		o_output_sample_left = 0;
-		o_output_sample_right = 0;
 	end
 
 	// Channel is only busy when DMA command queue have any pending.
@@ -174,6 +172,23 @@ module AUDIO_channel(
 		end
 	end
 
+	// Volume multipliers.
+	bit [15:0] vmul_l_sample = 16'd0;
+	AUDIO_mul_16x4 vmul_l(
+		.clk(i_clock),
+		.a(vmul_l_sample),
+		.b(i_volume),
+		.y(o_output_sample_left)
+	);
+
+	bit [15:0] vmul_r_sample = 16'd0;
+	AUDIO_mul_16x4 vmul_r(
+		.clk(i_clock),
+		.a(vmul_r_sample),
+		.b(i_volume),
+		.y(o_output_sample_right)
+	);
+
 	// Read new sample from FIFO whenever sample clock change.
 	bit last_sample_clock = 1'b0;
 	bit last_fifo_rd = 1'b0;
@@ -189,14 +204,14 @@ module AUDIO_channel(
 			if (!sample_fifo_empty)
 				sample_fifo_rd <= 1'b1;
 			else begin
-				o_output_sample_left <= 0;
-				o_output_sample_right <= 0;
+				vmul_l_sample <= 0;
+				vmul_r_sample <= 0;
 			end
 		end
 
 		if (last_fifo_rd) begin
-			o_output_sample_left <= sample_fifo_rdata[31:16];
-			o_output_sample_right <= sample_fifo_rdata[15:0];
+			vmul_l_sample <= sample_fifo_rdata[31:16];
+			vmul_r_sample <= sample_fifo_rdata[15:0];
 		end
 	end
 
