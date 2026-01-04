@@ -19,7 +19,7 @@ T_IMPLEMENT_RTTI_CLASS(L"I2C.ISlave", I2C::ISlave, Object)
 
 bool I2C::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
-	const uint8_t dir = value & 0xff;
+	const uint8_t dir = value & 0x01;
 	const uint8_t deviceAddr = (value >> 8) & 0xff;
 	const uint8_t controlAddr = (value >> 16) & 0xff;
 	const uint8_t controlDataOrCount = (value >> 24) & 0xff;
@@ -31,21 +31,16 @@ bool I2C::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 		return true;
 	}
 
-	if (dir == 0x02)	// write
+	if (dir == 0x1)	// write
 	{
 		slave->write(controlAddr, controlDataOrCount);
 	}
-	else if (dir == 0x01)	// read
+	else // read
 	{
 		uint8_t data[16];
 		slave->read(controlAddr, controlDataOrCount, data);
 		for (uint8_t i = 0; i < controlDataOrCount; ++i)
 			m_data.push_back(data[i]);
-	}
-	else
-	{
-		log::error << L"[I2C] attempt write to unknown address " << str(L"0x%08x", address) << L"." << Endl;
-		return false;
 	}
 
 	return true;

@@ -282,7 +282,7 @@ uint32_t Audio::readU32(uint32_t address) const
 	AudioBuffer* audioBuffer = (AudioBuffer*)m_audioBuffer.ptr();
 	T_ANONYMOUS_VAR(Acquire< Semaphore >)(audioBuffer->m_lock);
 
-	if (address == (0xf0 << 2))
+	if (address == 0x04)
 	{
 		uint32_t busy = 0;
 		for (int32_t i = 0; i < 16; ++i)
