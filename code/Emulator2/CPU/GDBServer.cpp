@@ -150,7 +150,6 @@ void GDBServer::process()
 			{
 				T_GDB_LOG(L"[GDB] client disconnected.");
 				safeClose(m_clientSocket);
-				setMode(ModeRun);
 				continue;
 			}
 
@@ -372,7 +371,7 @@ void GDBServer::setMode(int32_t mode)
 	if (mode != m_mode)
 		T_GDB_LOG(L"[GDB] mode changed to " << modeNames[mode] << L" (from " << modeNames[m_mode] << L")");
 
-	if (mode == ModeStopped)
+	if (m_clientSocket != nullptr && mode == ModeStopped)
 		send(m_clientSocket, "S05");
 
 	m_mode = mode;
