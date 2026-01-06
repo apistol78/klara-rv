@@ -31,7 +31,7 @@ using namespace traktor;
 class AudioChannel
 {
 public:
-	void tick(Bus* bus);
+	bool tick(Bus* bus);
 
 	uint32_t read();
 
@@ -51,8 +51,9 @@ private:
 	CircularVector< uint32_t, 4096 > m_queue;
 };
 
-void AudioChannel::tick(Bus* bus)
+bool AudioChannel::tick(Bus* bus)
 {
+	bool irq = false;
 	if (m_dmaCount > 0)
 	{
 		if (!m_queue.full())
@@ -70,6 +71,9 @@ void AudioChannel::tick(Bus* bus)
 			}
 			m_dmaAddress += 4;
 			m_dmaCount--;
+
+			if (m_dmaCount == 0)
+				irq = true;
 		}
 	}
 	else
@@ -81,6 +85,7 @@ void AudioChannel::tick(Bus* bus)
 		m_dmaNextCount = 0;
 		m_dmaNextMode = 0;
 	}
+	return irq;
 }
 
 uint32_t AudioChannel::read()
@@ -304,8 +309,13 @@ bool Audio::tick(ICPU* cpu, Bus* bus)
 	AudioBuffer* audioBuffer = (AudioBuffer*)m_audioBuffer.ptr();
 	T_ANONYMOUS_VAR(Acquire< Semaphore >)(audioBuffer->m_lock);
 
+	bool irq = false;
+	
 	for (int32_t i = 0; i < 16; ++i)
-		audioBuffer->m_channels[i].tick(bus);
+		irq |= audioBuffer->m_channels[i].tick(bus);
+
+	if (irq)
+		m_callback();
 
 	return true;
 }

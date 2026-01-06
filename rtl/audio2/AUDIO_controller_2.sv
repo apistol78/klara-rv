@@ -32,7 +32,10 @@ module AUDIO_controller_2(
 	input wire i_output_sample_clock,
 	output bit [31:0] o_output_sample_rate,
 	output bit [15:0] o_output_sample_left,
-	output bit [15:0] o_output_sample_right
+	output bit [15:0] o_output_sample_right,
+
+	// Audio interrupt
+	output bit o_interrupt
 );
 
 	initial begin
@@ -41,6 +44,7 @@ module AUDIO_controller_2(
 		o_output_sample_rate = 100_000_000 / (256 * 22050);
 		o_output_sample_left = 16'd0;
 		o_output_sample_right = 16'd0;
+		o_interrupt = 1'b0;
 	end
 
 	// Channel 0
@@ -125,7 +129,7 @@ module AUDIO_controller_2(
 		.o_output_sample_right(ch1_sample_right)
 	);
 
-	// CPU register access.
+	// Busy register.
 	wire [31:0] channels_busy =
 	{
 		30'h0,
@@ -133,6 +137,14 @@ module AUDIO_controller_2(
 		ch0_busy
 	};
 
+	// Issue interrupt whenever a busy bit becomes zero.
+	bit [31:0] channels_busy_r = 32'h0;
+	always_ff @(posedge i_clock) begin
+		channels_busy_r <= channels_busy;
+		o_interrupt <= (channels_busy_r & ~channels_busy);
+	end
+
+	// CPU register access.
 	always_ff @(posedge i_clock) begin
 
 		ch0_dma_setup_request <= 1'b0;
