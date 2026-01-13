@@ -19,38 +19,52 @@
  	`define REG_ID_SIZE				5
 // `endif
 
-// ALU operations
+// ALU operations (default)
 `define OP_SIGNED_ADD               0
 `define OP_UNSIGNED_ADD             1
 `define OP_SIGNED_SUB               2
 `define OP_AND                      3
 `define OP_OR                       4
 `define OP_XOR                      5
-`define OP_SHIFT_LEFT               6
-`define OP_SHIFT_RIGHT              7
-`define OP_ARITHMETIC_SHIFT_RIGHT   8
-`define OP_SIGNED_LESS_THAN         9
-`define OP_UNSIGNED_LESS_THAN       10
-`define OP_EQUAL                    11
-`define OP_NOT_EQUAL                12
-`define OP_SIGNED_GREATER_EQUAL     13
-`define OP_UNSIGNED_GREATER_EQUAL   14
 // Zba
-`define OP_SIGNED_ADD_SH1			15
-`define OP_UNSIGNED_ADD_SH1			16
-`define OP_SIGNED_ADD_SH2			17
-`define OP_UNSIGNED_ADD_SH2			18
-`define OP_SIGNED_ADD_SH3			19
-`define OP_UNSIGNED_ADD_SH3			20
-`define OP_UNSIGNED_SHIFT_LEFT		21
+`define OP_SIGNED_ADD_SH1			6
+`define OP_UNSIGNED_ADD_SH1			7
+`define OP_SIGNED_ADD_SH2			8
+`define OP_UNSIGNED_ADD_SH2			9
+`define OP_SIGNED_ADD_SH3			10
+`define OP_UNSIGNED_ADD_SH3			11
 // Zbb
-`define OP_ANDN						22
-`define OP_ORN						23
-`define OP_XNOR						24
-`define OP_SIGNED_MAX				25
-`define OP_UNSIGNED_MAX				26
-`define OP_SIGNED_MIN				27
-`define OP_UNSIGNED_MIN				28
+`define OP_ANDN						12
+`define OP_ORN						13
+`define OP_XNOR						14
+`define OP_SIGNED_MAX				15
+`define OP_UNSIGNED_MAX				16
+`define OP_SIGNED_MIN				17
+`define OP_UNSIGNED_MIN				18
+`define OP_SIGN_EXTEND_BYTE			19
+`define OP_SIGN_EXTEND_WORD			20
+`define OP_REVERSE_8				21
+`define OP_OR_COMBINE				22
+
+// ALU operations (shift)
+`define OP_SHIFT_LEFT               0
+`define OP_SHIFT_RIGHT              1
+`define OP_ARITHMETIC_SHIFT_RIGHT   2
+// Zba
+`define OP_UNSIGNED_SHIFT_LEFT		3
+// Zbb
+`define OP_ROTATE_LEFT				4
+`define OP_ROTATE_LEFT_WORD			5
+`define OP_ROTATE_RIGHT				6
+`define OP_ROTATE_RIGHT_WORD		7
+
+// ALU operations (compare)
+`define OP_SIGNED_LESS_THAN         0
+`define OP_UNSIGNED_LESS_THAN       1
+`define OP_EQUAL                    2
+`define OP_NOT_EQUAL                3
+`define OP_SIGNED_GREATER_EQUAL     4
+`define OP_UNSIGNED_GREATER_EQUAL   5
 
 // FPU operations
 `define FPU_OP_ADD			0

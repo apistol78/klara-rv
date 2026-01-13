@@ -188,6 +188,39 @@ uint32_t countPopulation(uint32_t value)
 	return std::popcount(value);
 }
 
+uint32_t signExtentB(uint32_t value)
+{
+	return (value & 0x0000007f) | ((value & 0x00000080) ? 0xffffff00 : 0x00000000);
+}
+
+uint32_t signExtentH(uint32_t value)
+{
+	return (value & 0x00007fff) | ((value & 0x00008000) ? 0xffff0000 : 0x00000000);
+}
+
+uint32_t zeroExtentH(uint32_t value)
+{
+	return value & 0x0000ffff;
+}
+
+uint32_t reverse8(uint32_t value)
+{
+	const uint32_t a = value >> 24;
+	const uint32_t b = (value >> 16) & 0xff;
+	const uint32_t c = (value >> 8) & 0xff;
+	const uint32_t d = value & 0xff;
+	return (d << 24) | (c << 16) | (b << 8) | a;
+}
+
+uint32_t combine(uint32_t value)
+{
+	return
+		((value & 0xff000000) ? 0xff000000 : 0x00000000) |
+		((value & 0x00ff0000) ? 0x00ff0000 : 0x00000000) |
+		((value & 0x0000ff00) ? 0x0000ff00 : 0x00000000) |
+		((value & 0x000000ff) ? 0x000000ff : 0x00000000);
+}
+
 #define PC m_pc
 #define PC_NEXT m_next
 

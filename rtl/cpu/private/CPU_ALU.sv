@@ -57,6 +57,17 @@ module CPU_ALU(
 	wire [31:0] unsigned_max_result = (i_op1 > i_op2) ? i_op1 : i_op2;
 	wire [31:0] signed_min_result = ($signed(i_op1) < $signed(i_op2)) ? i_op1 : i_op2;
 	wire [31:0] unsigned_min_result = (i_op1 < i_op2) ? i_op1 : i_op2;
+	wire [31:0] sign_extend_byte_result = { { 24{ i_op2[7] } }, i_op1[7:0] };
+	wire [31:0] sign_extend_word_result = { { 16{ i_op2[15] } }, i_op1[15:0] };
+	wire [31:0] reverse_8_result = { i_op1[7:0], i_op1[15:8], i_op1[23:16], i_op1[31:24] };
+	wire [31:0] or_combine_result = { 
+		(|i_op1[31:24]) ? 8'hff : 8'h00,
+		(|i_op1[23:16]) ? 8'hff : 8'h00,
+		(|i_op1[15:8]) ? 8'hff : 8'h00,
+		(|i_op1[7:0]) ? 8'hff : 8'h00
+	};
+	wire [31:0] rol_result = { i_op1 << i_op2[4:0], i_op1 >> (32 - i_op2[4:0]) };
+	wire [31:0] ror_result = { i_op1 >> i_op2[4:0], i_op1 << (32 - i_op2[4:0]) };
 
 	assign o_result =
 		i_op == `OP_SIGNED_ADD ? signed_sum :
@@ -80,6 +91,10 @@ module CPU_ALU(
 		i_op == `OP_UNSIGNED_MAX ? unsigned_max_result :
 		i_op == `OP_SIGNED_MIN ? signed_min_result :
 		i_op == `OP_UNSIGNED_MIN ? unsigned_min_result :
+		i_op == `OP_SIGN_EXTEND_BYTE ? sign_extend_byte_result :
+		i_op == `OP_SIGN_EXTEND_WORD ? sign_extend_word_result :
+		i_op == `OP_REVERSE_8 ? reverse_8_result :
+		i_op == `OP_OR_COMBINE ? or_combine_result :
 		32'd0;
 
 	assign o_shift_result =
@@ -88,6 +103,11 @@ module CPU_ALU(
 		i_op == `OP_ARITHMETIC_SHIFT_RIGHT ? ashr_result :
 // Zba
 		i_op == `OP_UNSIGNED_SHIFT_LEFT ? unsigned_shl_result :
+// Zbb
+		i_op == `OP_ROTATE_LEFT ? rol_result :
+		i_op == `OP_ROTATE_LEFT_WORD ? rol_result :		// #fixme
+		i_op == `OP_ROTATE_LEFT ? ror_result :
+		i_op == `OP_ROTATE_RIGHT_WORD ? ror_result :	// #fixme
 		32'd0;
 		
 	assign o_signed_sum_result = signed_sum;

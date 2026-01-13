@@ -51,6 +51,14 @@ local operations = {
 	UNSIGNED_MAX = "`OP_UNSIGNED_MAX",
 	SIGNED_MIN = "`OP_SIGNED_MIN",
 	UNSIGNED_MIN = "`OP_UNSIGNED_MIN",
+	SIGN_EXTEND_BYTE = "`OP_SIGN_EXTEND_BYTE",
+	SIGN_EXTEND_WORD = "`OP_SIGN_EXTEND_WORD",
+	REVERSE_8 = "`OP_REVERSE_8",
+	ROTATE_LEFT = "`OP_ROTATE_LEFT",
+	ROTATE_LEFT_WORD = "`OP_ROTATE_LEFT_WORD",
+	ROTATE_RIGHT = "`OP_ROTATE_RIGHT",
+	ROTATE_RIGHT_WORD = "`OP_ROTATE_RIGHT_WORD",
+	OR_COMBINE = "`OP_OR_COMBINE",
 }
 
 local fpu_operations = {
@@ -1873,7 +1881,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = R_u(f.rs1) & ~R_u(f.rs2);
-			log::info << L"ANDN" << Endl;
 		]],
 		verilog_alu = {
 			operation = operations.ANDN,
@@ -1890,7 +1897,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = R_u(f.rs1) | ~R_u(f.rs2);
-			log::info << L"ORN" << Endl;
 		]],
 		verilog_alu = {
 			operation = operations.ORN,
@@ -1907,7 +1913,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = ~(R_u(f.rs1) ^ R_u(f.rs2));
-			log::info << L"XNOR" << Endl;
 		]],
 		verilog_alu = {
 			operation = operations.XNOR,
@@ -1924,7 +1929,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = countLeadingZeros(R_u(f.rs1));
-			log::info << L"CLZ" << Endl;
 		]],
 		verilog_text = [[
 			`EXECUTE_DONE;
@@ -1939,7 +1943,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = countTrailingZeros(R_u(f.rs1));
-			log::info << L"CTZ" << Endl;
 		]],
 		verilog_text = [[
 			`EXECUTE_DONE;
@@ -1954,7 +1957,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = countPopulation(R_u(f.rs1));
-			log::info << L"CPOP" << Endl;
 		]],
 		verilog_text = [[
 			`EXECUTE_DONE;
@@ -1969,7 +1971,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_s(f.rd) = std::max(R_s(f.rs1), R_s(f.rs2));
-			log::info << L"MAX" << Endl;
 		]],
 		verilog_alu = {
 			operation = operations.SIGNED_MAX,
@@ -1986,7 +1987,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = std::max(R_u(f.rs1), R_u(f.rs2));
-			log::info << L"MAXU" << Endl;
 		]],
 		verilog_alu = {
 			operation = operations.UNSIGNED_MAX,
@@ -2003,7 +2003,6 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_s(f.rd) = std::min(R_s(f.rs1), R_s(f.rs2));
-			log::info << L"MIN" << Endl;
 		]],
 		verilog_alu = {
 			operation = operations.SIGNED_MIN,
@@ -2020,14 +2019,198 @@ local instructions = {
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = std::min(R_u(f.rs1), R_u(f.rs2));
-			log::info << L"MINU" << Endl;
 		]],
 		verilog_alu = {
 			operation = operations.UNSIGNED_MIN,
 			operand1 = operands.RS1,
 			operand2 = operands.RS2
 		}
-	},		
+	},
+	{
+		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
+		data = 0x60401013,	-- 0110 0000 0100 0000 0001 0000 0001 0011
+		name = "SEXT_B",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = signExtentB(R_u(f.rs1));
+		]],
+		verilog_alu = {
+			operation = operations.SIGN_EXTEND_BYTE,
+			operand1 = operands.RS1,
+			operand2 = operands.RS1
+		}
+	},
+	{
+		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
+		data = 0x60501013,	-- 0110 0000 0101 0000 0001 0000 0001 0011
+		name = "SEXT_H",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = signExtentH(R_u(f.rs1));
+		]],
+		verilog_alu = {
+			operation = operations.SIGN_EXTEND_WORD,
+			operand1 = operands.RS1,
+			operand2 = operands.RS1
+		}
+	},
+	{
+		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
+		data = 0x08004033,	-- 0000 1000 0000 0000 0100 0000 0011 0011
+		name = "ZEXT_H",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = zeroExtentH(R_u(f.rs1));
+		]],
+		verilog_alu = {
+			operation = operations.SIGN_EXTEND_WORD,
+			operand1 = operands.RS1,
+			operand2 = operands.ZERO
+		}
+	},
+	{
+		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
+		data = 0x69805013,	-- 0110 1001 1000 0000 0101 0000 0001 0011
+		name = "REV8",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = reverse8(R_u(f.rs1));
+		]],
+		verilog_alu = {
+			operation = operations.REVERSE_8,
+			operand1 = operands.RS1,
+			operand2 = operands.ZERO
+		}
+	},
+	{
+		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x60001033,	-- 0110 0000 0000 0000 0001 0000 0011 0011
+		name = "ROL",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t shamt = R_u(f.rs2);
+			R_u(f.rd) = (R_u(f.rs1) << shamt) | (R_u(f.rs1) >> (32 - shamt));
+		]],
+		verilog_alu = {
+			operation = operations.ROTATE_LEFT,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x6000103B,	-- 0110 0000 0000 0000 0001 0000 0011 1011
+		name = "ROLW",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t shamt = R_u(f.rs2);
+			const uint32_t value = zeroExtentH(R_u(f.rs1));
+			R_u(f.rd) = signExtentH((value << shamt) | (value >> (32 - shamt)));
+		]],
+		verilog_alu = {
+			operation = operations.ROTATE_LEFT_WORD,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x60005033,	-- 0110 0000 0000 0000 0101 0000 0011 0011
+		name = "ROR",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t shamt = R_u(f.rs2);
+			R_u(f.rd) = (R_u(f.rs1) >> shamt) | (R_u(f.rs1) << (32 - shamt));
+		]],
+		verilog_alu = {
+			operation = operations.ROTATE_RIGHT,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x60005013,	-- 0110 0000 0000 0000 0101 0000 0001 0011
+		name = "RORI",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t shamt = (uint32_t)((word >> 20) & 0x1f);
+			R_u(f.rd) = (R_u(f.rs1) >> shamt) | (R_u(f.rs1) << (32 - shamt));
+		]],
+		verilog_alu = {
+			operation = operations.ROTATE_RIGHT,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x6000501B,	-- 0110 0000 0000 0000 0101 0000 0001 1011
+		name = "RORIW",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t shamt = (uint32_t)((word >> 20) & 0x1f);
+			const uint32_t value = zeroExtentH(R_u(f.rs1));
+			R_u(f.rd) = signExtentH((value >> shamt) | (value << (32 - shamt)));
+		]],
+		verilog_alu = {
+			operation = operations.ROTATE_RIGHT_WORD,
+			operand1 = operands.RS1,
+			operand2 = operands.IMM
+		}
+	},
+	{
+		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x6000503B,	-- 0110 0000 0000 0000 0101 0000 0011 1011
+		name = "RORW",
+		format = "R",
+		type = insttype.SHIFT,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			const uint32_t shamt = R_u(f.rs2);
+			const uint32_t value = zeroExtentH(R_u(f.rs1));
+			R_u(f.rd) = signExtentH((value >> shamt) | (value << (32 - shamt)));
+		]],
+		verilog_alu = {
+			operation = operations.ROTATE_RIGHT,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
+		data = 0x28705013,	-- 0010 1000 0111 0000 0101 0000 0001 0011
+		name = "ORC_B",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = combine(R_s(f.rs1));
+		]],
+		verilog_alu = {
+			operation = operations.OR_COMBINE,
+			operand1 = operands.RS1,
+			operand2 = operands.ZERO
+		}
+	},
 }
 
 local function trim(s)
@@ -2119,6 +2302,12 @@ function main(argv)
 					lcnt = lcnt + 1
 				end
 			end
+
+			stdout:printLn("\telse")
+			stdout:printLn("\t{")
+			stdout:printLn("\t\tlog::error << L\"Unknown instruction, \" << str(L\"%08x\", word) << L\", opcode 0x" .. string.format("%02x", op) .. "\" << Endl;")
+			stdout:printLn("\t\treturn false;")
+			stdout:printLn("\t}")
 
 			stdout:printLn("}")
 			cnt = cnt + 1
