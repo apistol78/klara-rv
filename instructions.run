@@ -43,6 +43,14 @@ local operations = {
 	SIGNED_ADD_SH3 = "`OP_SIGNED_ADD_SH3",
 	UNSIGNED_ADD_SH3 = "`OP_UNSIGNED_ADD_SH3",
 	UNSIGNED_SHIFT_LEFT = "`OP_UNSIGNED_SHIFT_LEFT",
+	-- Zbb
+	ANDN = "`OP_ANDN",
+	ORN = "`OP_ORN",
+	XNOR = "`OP_XNOR",
+	SIGNED_MAX = "`OP_SIGNED_MAX",
+	UNSIGNED_MAX = "`OP_UNSIGNED_MAX",
+	SIGNED_MIN = "`OP_SIGNED_MIN",
+	UNSIGNED_MIN = "`OP_UNSIGNED_MIN",
 }
 
 local fpu_operations = {
@@ -1854,6 +1862,172 @@ local instructions = {
 			operand2 = operands.IMM
 		}
 	},
+
+	-- Zbb
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x40007033,	-- 0100 0000 0000 0000 0111 0000 0011 0011
+		name = "ANDN",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) & ~R_u(f.rs2);
+			log::info << L"ANDN" << Endl;
+		]],
+		verilog_alu = {
+			operation = operations.ANDN,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x40006033,	-- 0100 0000 0000 0000 0110 0000 0011 0011
+		name = "ORN",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = R_u(f.rs1) | ~R_u(f.rs2);
+			log::info << L"ORN" << Endl;
+		]],
+		verilog_alu = {
+			operation = operations.ORN,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x40004033,	-- 0100 0000 0000 0000 0100 0000 0011 0011
+		name = "XNOR",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = ~(R_u(f.rs1) ^ R_u(f.rs2));
+			log::info << L"XNOR" << Endl;
+		]],
+		verilog_alu = {
+			operation = operations.XNOR,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
+		data = 0x60001013,	-- 0110 0000 0000 0000 0001 0000 0001 0011
+		name = "CLZ",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = countLeadingZeros(R_u(f.rs1));
+			log::info << L"CLZ" << Endl;
+		]],
+		verilog_text = [[
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
+		data = 0x60101013,	-- 0110 0000 0001 0000 0001 0000 0001 0011
+		name = "CTZ",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = countTrailingZeros(R_u(f.rs1));
+			log::info << L"CTZ" << Endl;
+		]],
+		verilog_text = [[
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
+		data = 0x60201013,	-- 0110 0000 0010 0000 0001 0000 0001 0011
+		name = "CPOP",
+		format = "R",
+		type = insttype.COMPLEX,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = countPopulation(R_u(f.rs1));
+			log::info << L"CPOP" << Endl;
+		]],
+		verilog_text = [[
+			`EXECUTE_DONE;
+		]]
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x0A006033,	-- 0000 1010 0000 0000 0110 0000 0011 0011
+		name = "MAX",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = std::max(R_s(f.rs1), R_s(f.rs2));
+			log::info << L"MAX" << Endl;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_MAX,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x0A007033,	-- 0000 1010 0000 0000 0111 0000 0011 0011
+		name = "MAXU",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = std::max(R_u(f.rs1), R_u(f.rs2));
+			log::info << L"MAXU" << Endl;
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_MAX,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x0A004033,	-- 0000 1010 0000 0000 0100 0000 0011 0011
+		name = "MIN",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_s(f.rd) = std::min(R_s(f.rs1), R_s(f.rs2));
+			log::info << L"MIN" << Endl;
+		]],
+		verilog_alu = {
+			operation = operations.SIGNED_MIN,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},
+	{
+		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111
+		data = 0x0A005033,	-- 0000 1010 0000 0000 0101 0000 0011 0011
+		name = "MINU",
+		format = "R",
+		type = insttype.ARITHMETIC,
+		cpp = [[
+			const auto f = FormatR::parse(word);
+			R_u(f.rd) = std::min(R_u(f.rs1), R_u(f.rs2));
+			log::info << L"MINU" << Endl;
+		]],
+		verilog_alu = {
+			operation = operations.UNSIGNED_MIN,
+			operand1 = operands.RS1,
+			operand2 = operands.RS2
+		}
+	},		
 }
 
 local function trim(s)

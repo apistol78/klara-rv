@@ -43,6 +43,14 @@
 `define OP_SIGNED_ADD_SH3			19
 `define OP_UNSIGNED_ADD_SH3			20
 `define OP_UNSIGNED_SHIFT_LEFT		21
+// Zbb
+`define OP_ANDN						22
+`define OP_ORN						23
+`define OP_XNOR						24
+`define OP_SIGNED_MAX				25
+`define OP_UNSIGNED_MAX				26
+`define OP_SIGNED_MIN				27
+`define OP_UNSIGNED_MIN				28
 
 // FPU operations
 `define FPU_OP_ADD			0

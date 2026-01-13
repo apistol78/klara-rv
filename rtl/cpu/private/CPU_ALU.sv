@@ -49,6 +49,15 @@ module CPU_ALU(
 	wire [31:0] unsigned_sum_sh3 = (i_op1 << 3) + i_op2;
 	wire [31:0] unsigned_shl_result = i_op1 << i_op2[4:0];
 
+// Zbb
+	wire [31:0] andn_result = i_op1 & ~i_op2;
+	wire [31:0] orn_result = i_op1 | ~i_op2;
+	wire [31:0] xnor_result = ~xor_result;
+	wire [31:0] signed_max_result = ($signed(i_op1) > $signed(i_op2)) ? i_op1 : i_op2;
+	wire [31:0] unsigned_max_result = (i_op1 > i_op2) ? i_op1 : i_op2;
+	wire [31:0] signed_min_result = ($signed(i_op1) < $signed(i_op2)) ? i_op1 : i_op2;
+	wire [31:0] unsigned_min_result = (i_op1 < i_op2) ? i_op1 : i_op2;
+
 	assign o_result =
 		i_op == `OP_SIGNED_ADD ? signed_sum :
 		i_op == `OP_UNSIGNED_ADD ? unsigned_sum :
@@ -63,6 +72,14 @@ module CPU_ALU(
 		i_op == `OP_UNSIGNED_ADD_SH2 ? unsigned_sum_sh2 :
 		i_op == `OP_SIGNED_ADD_SH3 ? signed_sum_sh3 :
 		i_op == `OP_UNSIGNED_ADD_SH3 ? unsigned_sum_sh3 :
+// Zbb
+		i_op == `OP_ANDN ? andn_result :
+		i_op == `OP_ORN ? orn_result :
+		i_op == `OP_XNOR ? xnor_result :
+		i_op == `OP_SIGNED_MAX ? signed_max_result :
+		i_op == `OP_UNSIGNED_MAX ? unsigned_max_result :
+		i_op == `OP_SIGNED_MIN ? signed_min_result :
+		i_op == `OP_UNSIGNED_MIN ? unsigned_min_result :
 		32'd0;
 
 	assign o_shift_result =

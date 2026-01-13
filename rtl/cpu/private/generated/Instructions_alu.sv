@@ -2,81 +2,88 @@
 // ==================================================
 
 wire [4:0] alu_operation = 
-	is_BGEU  ? `OP_UNSIGNED_GREATER_EQUAL :
-	is_BNE   ? `OP_NOT_EQUAL              :
-	is_BEQ   ? `OP_EQUAL                  :
 	is_BLT   ? `OP_SIGNED_LESS_THAN       :
-	is_BGE   ? `OP_SIGNED_GREATER_EQUAL   :
+	is_BGEU  ? `OP_UNSIGNED_GREATER_EQUAL :
+	is_BEQ   ? `OP_EQUAL                  :
 	is_BLTU  ? `OP_UNSIGNED_LESS_THAN     :
-	is_SLTIU ? `OP_UNSIGNED_LESS_THAN     :
+	is_BNE   ? `OP_NOT_EQUAL              :
+	is_BGE   ? `OP_SIGNED_GREATER_EQUAL   :
 	is_SLTI  ? `OP_SIGNED_LESS_THAN       :
-	is_ORI   ? `OP_OR                     :
-	is_JALR  ? `OP_SIGNED_ADD             :
 	is_LB    ? `OP_SIGNED_ADD             :
-	is_ADDI  ? `OP_SIGNED_ADD             :
-	is_LHU   ? `OP_SIGNED_ADD             :
-	is_ANDI  ? `OP_AND                    :
-	is_LW    ? `OP_SIGNED_ADD             :
-	is_LH    ? `OP_SIGNED_ADD             :
+	is_SLTIU ? `OP_UNSIGNED_LESS_THAN     :
+	is_JALR  ? `OP_SIGNED_ADD             :
 	is_LBU   ? `OP_SIGNED_ADD             :
 	is_XORI  ? `OP_XOR                    :
+	is_LHU   ? `OP_SIGNED_ADD             :
+	is_ORI   ? `OP_OR                     :
+	is_ADDI  ? `OP_SIGNED_ADD             :
+	is_ANDI  ? `OP_AND                    :
+	is_LH    ? `OP_SIGNED_ADD             :
+	is_LW    ? `OP_SIGNED_ADD             :
 	is_JAL   ? `OP_SIGNED_ADD             :
-	is_OR    ? `OP_OR                     :
+	is_SLT   ? `OP_SIGNED_LESS_THAN       :
+	is_SLLI  ? `OP_SHIFT_LEFT             :
 	is_SLL   ? `OP_SHIFT_LEFT             :
-	is_ADDUW ? `OP_UNSIGNED_ADD           :
+	is_SLTU  ? `OP_UNSIGNED_LESS_THAN     :
+	is_SRA   ? `OP_ARITHMETIC_SHIFT_RIGHT :
+	is_ANDN  ? `OP_ANDN                   :
+	is_ORN   ? `OP_ORN                    :
+	is_SLLIUW ? `OP_UNSIGNED_SHIFT_LEFT    :
+	is_SH3ADDUW ? `OP_UNSIGNED_ADD_SH3       :
+	is_SH3ADD ? `OP_SIGNED_ADD_SH3         :
+	is_XNOR  ? `OP_XNOR                   :
+	is_MAXU  ? `OP_UNSIGNED_MAX           :
+	is_MAX   ? `OP_SIGNED_MAX             :
+	is_SRAI  ? `OP_ARITHMETIC_SHIFT_RIGHT :
+	is_SH2ADDUW ? `OP_UNSIGNED_ADD_SH2       :
+	is_SH1ADDUW ? `OP_UNSIGNED_ADD_SH1       :
+	is_SRLI  ? `OP_SHIFT_RIGHT            :
+	is_SRL   ? `OP_SHIFT_RIGHT            :
+	is_SH2ADD ? `OP_SIGNED_ADD_SH2         :
 	is_XOR   ? `OP_XOR                    :
 	is_SUB   ? `OP_SIGNED_SUB             :
 	is_SH1ADD ? `OP_SIGNED_ADD_SH1         :
-	is_SH2ADD ? `OP_SIGNED_ADD_SH2         :
-	is_SH1ADDUW ? `OP_UNSIGNED_ADD_SH1       :
-	is_SH3ADD ? `OP_SIGNED_ADD_SH3         :
-	is_SH2ADDUW ? `OP_UNSIGNED_ADD_SH2       :
-	is_SLLI  ? `OP_SHIFT_LEFT             :
-	is_SRLI  ? `OP_SHIFT_RIGHT            :
-	is_SLTU  ? `OP_UNSIGNED_LESS_THAN     :
-	is_SLT   ? `OP_SIGNED_LESS_THAN       :
-	is_SRA   ? `OP_ARITHMETIC_SHIFT_RIGHT :
-	is_SRAI  ? `OP_ARITHMETIC_SHIFT_RIGHT :
-	is_SRL   ? `OP_SHIFT_RIGHT            :
+	is_ADDUW ? `OP_UNSIGNED_ADD           :
+	is_OR    ? `OP_OR                     :
 	is_ADD   ? `OP_SIGNED_ADD             :
-	is_SLLIUW ? `OP_UNSIGNED_SHIFT_LEFT    :
 	is_AND   ? `OP_AND                    :
-	is_SH3ADDUW ? `OP_UNSIGNED_ADD_SH3       :
+	is_MINU  ? `OP_UNSIGNED_MIN           :
+	is_MIN   ? `OP_SIGNED_MIN             :
+	is_SH    ? `OP_SIGNED_ADD             :
 	is_SW    ? `OP_SIGNED_ADD             :
 	is_SB    ? `OP_SIGNED_ADD             :
-	is_SH    ? `OP_SIGNED_ADD             :
-	is_AUIPC ? `OP_SIGNED_ADD             :
 	is_LUI   ? `OP_UNSIGNED_ADD           :
+	is_AUIPC ? `OP_SIGNED_ADD             :
 	5'd0;
 
 wire [4:0] alu_operand1 = 
 	is_JAL   ? `PC   :
-	is_AUIPC ? `PC   :
 	is_LUI   ? `IMM  :
+	is_AUIPC ? `PC   :
 	`RS1;
 
 wire [4:0] alu_operand2 = 
-	is_SLTIU ? `IMM  :
 	is_SLTI  ? `IMM  :
-	is_ORI   ? `IMM  :
-	is_JALR  ? `IMM  :
 	is_LB    ? `IMM  :
-	is_ADDI  ? `IMM  :
-	is_LHU   ? `IMM  :
-	is_ANDI  ? `IMM  :
-	is_LW    ? `IMM  :
-	is_LH    ? `IMM  :
+	is_SLTIU ? `IMM  :
+	is_JALR  ? `IMM  :
 	is_LBU   ? `IMM  :
 	is_XORI  ? `IMM  :
+	is_LHU   ? `IMM  :
+	is_ORI   ? `IMM  :
+	is_ADDI  ? `IMM  :
+	is_ANDI  ? `IMM  :
+	is_LH    ? `IMM  :
+	is_LW    ? `IMM  :
 	is_JAL   ? `IMM  :
 	is_SLLI  ? `IMM  :
-	is_SRLI  ? `IMM  :
-	is_SRAI  ? `IMM  :
 	is_SLLIUW ? `IMM  :
+	is_SRAI  ? `IMM  :
+	is_SRLI  ? `IMM  :
+	is_SH    ? `IMM  :
 	is_SW    ? `IMM  :
 	is_SB    ? `IMM  :
-	is_SH    ? `IMM  :
-	is_AUIPC ? `IMM  :
 	is_LUI   ? `ZERO :
+	is_AUIPC ? `IMM  :
 	`RS2;
 

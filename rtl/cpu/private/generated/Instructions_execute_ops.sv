@@ -8,9 +8,10 @@ case (`EXECUTE_OP)
 		o_csr_wdata_wr <= 1;
 		`EXECUTE_DONE;
 	end
-	OP_MRET: begin
-		`GOTO(`MEPC);
-		`MRET <= 1'b1;
+	OP_CSRRS: begin
+		`RD <= i_csr_rdata;
+		o_csr_wdata <= i_csr_rdata | `RS1;
+		o_csr_wdata_wr <= 1;
 		`EXECUTE_DONE;
 	end
 	OP_CSRRW: begin
@@ -19,21 +20,20 @@ case (`EXECUTE_OP)
 		o_csr_wdata_wr <= 1;
 		`EXECUTE_DONE;
 	end
-	OP_CSRRS: begin
-		`RD <= i_csr_rdata;
-		o_csr_wdata <= i_csr_rdata | `RS1;
-		o_csr_wdata_wr <= 1;
+	OP_MRET: begin
+		`GOTO(`MEPC);
+		`MRET <= 1'b1;
 		`EXECUTE_DONE;
 	end
 	OP_FENCE: begin
 		`MEM_FLUSH <= 1;
 		`EXECUTE_DONE;
 	end
-	OP_MULHU: begin
-		mul_request <= 1'b1;
-		mul_signed <= 1'b0;
-		if (mul_ready) begin
-			`RD <= mul_result[63:32];
+	OP_REM: begin
+		div_request <= 1'b1;
+		div_signed <= 1'b1;
+		if (div_ready) begin
+			`RD <= div_remainder[31:0];
 			`EXECUTE_DONE;
 		end
 	end
@@ -45,23 +45,16 @@ case (`EXECUTE_OP)
 			`EXECUTE_DONE;
 		end
 	end
+	OP_CTZ: begin
+		`EXECUTE_DONE;
+	end
+	OP_CLZ: begin
+		`EXECUTE_DONE;
+	end
+	OP_CPOP: begin
+		`EXECUTE_DONE;
+	end
 	OP_MULHSU: begin
-		mul_request <= 1'b1;
-		mul_signed <= 1'b1;
-		if (mul_ready) begin
-			`RD <= mul_result[63:32];
-			`EXECUTE_DONE;
-		end
-	end
-	OP_REM: begin
-		div_request <= 1'b1;
-		div_signed <= 1'b1;
-		if (div_ready) begin
-			`RD <= div_remainder[31:0];
-			`EXECUTE_DONE;
-		end
-	end
-	OP_MULH: begin
 		mul_request <= 1'b1;
 		mul_signed <= 1'b1;
 		if (mul_ready) begin
@@ -85,11 +78,27 @@ case (`EXECUTE_OP)
 			`EXECUTE_DONE;
 		end
 	end
+	OP_MULH: begin
+		mul_request <= 1'b1;
+		mul_signed <= 1'b1;
+		if (mul_ready) begin
+			`RD <= mul_result[63:32];
+			`EXECUTE_DONE;
+		end
+	end
 	OP_MUL: begin
 		mul_request <= 1'b1;
 		mul_signed <= 1'b1;
 		if (mul_ready) begin
 			`RD <= mul_result[31:0];
+			`EXECUTE_DONE;
+		end
+	end
+	OP_MULHU: begin
+		mul_request <= 1'b1;
+		mul_signed <= 1'b0;
+		if (mul_ready) begin
+			`RD <= mul_result[63:32];
 			`EXECUTE_DONE;
 		end
 	end

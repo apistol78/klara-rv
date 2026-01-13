@@ -3,27 +3,27 @@
 
 wire memory_read = 
 	is_LB  |
-	is_LHU |
-	is_LW  |
-	is_LH  |
 	is_LBU |
+	is_LHU |
+	is_LH  |
+	is_LW  |
 	1'b0;
 
 wire memory_write = 
+	is_SH  |
 	is_SW  |
 	is_SB  |
-	is_SH  |
 	1'b0;
 
 wire [1:0] memory_width = 
 	is_LB  ? 2'b00 :
-	is_LHU ? 2'b01 :
-	is_LW  ? 2'b10 :
-	is_LH  ? 2'b01 :
 	is_LBU ? 2'b00 :
+	is_LHU ? 2'b01 :
+	is_LH  ? 2'b01 :
+	is_LW  ? 2'b10 :
+	is_SH  ? 2'b01 :
 	is_SW  ? 2'b10 :
 	is_SB  ? 2'b00 :
-	is_SH  ? 2'b01 :
 	3'd0;
 
 wire memory_signed = 

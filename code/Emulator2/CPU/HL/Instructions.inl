@@ -1,12 +1,7 @@
 if ((word & 0x7f) == 0x73)
 {
 	// 
-	if ((word & 0xffffffff) == 0x10500073)	// WFI
-	{
-		m_waitForInterrupt = true;
-	}
-	// 
-	else if ((word & 0xffffffff) == 0x00100073)	// EBREAK
+	if ((word & 0xffffffff) == 0x00100073)	// EBREAK
 	{
 		return false;
 	}
@@ -14,6 +9,21 @@ if ((word & 0x7f) == 0x73)
 	else if ((word & 0xffffffff) == 0x00000073)	// ECALL
 	{
 		ecall();
+	}
+	// 
+	else if ((word & 0xffffffff) == 0x10500073)	// WFI
+	{
+		m_waitForInterrupt = true;
+	}
+	// CSR
+	else if ((word & 0x0000707f) == 0x00005073)	// CSRRWI
+	{
+		log::info << L"CSRRWI" << Endl;
+	}
+	// CSR
+	else if ((word & 0x0000707f) == 0x00007073)	// CSRRCI
+	{
+		log::info << L"CSRRCI" << Endl;
 	}
 	// CSR
 	else if ((word & 0x0000707f) == 0x00003073)	// CSRRC
@@ -25,24 +35,13 @@ if ((word & 0x7f) == 0x73)
 		writeCSR(f.csr, R_u(f.rd) & ~tmp);
 	}
 	// CSR
-	else if ((word & 0xffffffff) == 0x30200073)	// MRET
+	else if ((word & 0x0000707f) == 0x00002073)	// CSRRS
 	{
-		returnFromInterrupt();
-	}
-	// CSR
-	else if ((word & 0x0000707f) == 0x00006073)	// CSRRSI
-	{
-		log::info << L"CSRRSI" << Endl;
-	}
-	// CSR
-	else if ((word & 0x0000707f) == 0x00007073)	// CSRRCI
-	{
-		log::info << L"CSRRCI" << Endl;
-	}
-	// CSR
-	else if ((word & 0x0000707f) == 0x00005073)	// CSRRWI
-	{
-		log::info << L"CSRRWI" << Endl;
+		const auto f = FormatCSR::parse(word);
+		const uint32_t data = readCSR(f.csr);
+		const uint32_t tmp = R_u(f.rs1);
+		R_u(f.rd) = data;
+		writeCSR(f.csr, R_u(f.rd) | tmp);
 	}
 	// CSR
 	else if ((word & 0x0000707f) == 0x00001073)	// CSRRW
@@ -52,29 +51,30 @@ if ((word & 0x7f) == 0x73)
 		writeCSR(f.csr, R_s(f.rs1));
 	}
 	// CSR
-	else if ((word & 0x0000707f) == 0x00002073)	// CSRRS
+	else if ((word & 0x0000707f) == 0x00006073)	// CSRRSI
 	{
-		const auto f = FormatCSR::parse(word);
-		const uint32_t data = readCSR(f.csr);
-		const uint32_t tmp = R_u(f.rs1);
-		R_u(f.rd) = data;
-		writeCSR(f.csr, R_u(f.rd) | tmp);
+		log::info << L"CSRRSI" << Endl;
+	}
+	// CSR
+	else if ((word & 0xffffffff) == 0x30200073)	// MRET
+	{
+		returnFromInterrupt();
 	}
 }
 else if ((word & 0x7f) == 0x63)
 {
 	// B
-	if ((word & 0x0000707f) == 0x00007063)	// BGEU
+	if ((word & 0x0000707f) == 0x00004063)	// BLT
 	{
 		const auto f = FormatB::parse(word);
-		if (R_u(f.rs1) >= R_u(f.rs2))
+		if (R_s(f.rs1) < R_s(f.rs2))
 			PC_NEXT = PC + f.imm;
 	}
 	// B
-	else if ((word & 0x0000707f) == 0x00001063)	// BNE
+	else if ((word & 0x0000707f) == 0x00007063)	// BGEU
 	{
 		const auto f = FormatB::parse(word);
-		if (R_s(f.rs1) != R_s(f.rs2))
+		if (R_u(f.rs1) >= R_u(f.rs2))
 			PC_NEXT = PC + f.imm;
 	}
 	// B
@@ -85,10 +85,17 @@ else if ((word & 0x7f) == 0x63)
 			PC_NEXT = PC + f.imm;
 	}
 	// B
-	else if ((word & 0x0000707f) == 0x00004063)	// BLT
+	else if ((word & 0x0000707f) == 0x00006063)	// BLTU
 	{
 		const auto f = FormatB::parse(word);
-		if (R_s(f.rs1) < R_s(f.rs2))
+		if (R_u(f.rs1) < R_u(f.rs2))
+			PC_NEXT = PC + f.imm;
+	}
+	// B
+	else if ((word & 0x0000707f) == 0x00001063)	// BNE
+	{
+		const auto f = FormatB::parse(word);
+		if (R_s(f.rs1) != R_s(f.rs2))
 			PC_NEXT = PC + f.imm;
 	}
 	// B
@@ -98,27 +105,26 @@ else if ((word & 0x7f) == 0x63)
 		if (R_s(f.rs1) >= R_s(f.rs2))
 			PC_NEXT = PC + f.imm;
 	}
-	// B
-	else if ((word & 0x0000707f) == 0x00006063)	// BLTU
-	{
-		const auto f = FormatB::parse(word);
-		if (R_u(f.rs1) < R_u(f.rs2))
-			PC_NEXT = PC + f.imm;
-	}
 }
 else if ((word & 0x7f) == 0x13)
 {
 	// I
-	if ((word & 0x0000707f) == 0x00003013)	// SLTIU
+	if ((word & 0x0000707f) == 0x00002013)	// SLTI
+	{
+		const auto f = FormatI::parse(word);
+		R_u(f.rd) = (R_s(f.rs1) < f.imm) ? 1 : 0;
+	}
+	// I
+	else if ((word & 0x0000707f) == 0x00003013)	// SLTIU
 	{
 		const auto f = FormatI::parse(word);
 		R_u(f.rd) = (R_u(f.rs1) < f.imm) ? 1 : 0;
 	}
 	// I
-	else if ((word & 0x0000707f) == 0x00002013)	// SLTI
+	else if ((word & 0x0000707f) == 0x00004013)	// XORI
 	{
 		const auto f = FormatI::parse(word);
-		R_u(f.rd) = (R_s(f.rs1) < f.imm) ? 1 : 0;
+		R_u(f.rd) = R_u(f.rs1) ^ f.imm;
 	}
 	// I
 	else if ((word & 0x0000707f) == 0x00006013)	// ORI
@@ -138,12 +144,6 @@ else if ((word & 0x7f) == 0x13)
 		const auto f = FormatI::parse(word);
 		R_u(f.rd) = R_u(f.rs1) & f.imm;
 	}
-	// I
-	else if ((word & 0x0000707f) == 0x00004013)	// XORI
-	{
-		const auto f = FormatI::parse(word);
-		R_u(f.rd) = R_u(f.rs1) ^ f.imm;
-	}
 	// R
 	else if ((word & 0xfc00707f) == 0x00001013)	// SLLI
 	{
@@ -151,10 +151,25 @@ else if ((word & 0x7f) == 0x13)
 		R_s(f.rd) = R_s(f.rs1) << ((word >> 20) & 0x1f);
 	}
 	// R
-	else if ((word & 0xfc00707f) == 0x00005013)	// SRLI
+	else if ((word & 0xfff0707f) == 0x60101013)	// CTZ
 	{
 		const auto f = FormatR::parse(word);
-		R_u(f.rd) = R_u(f.rs1) >> ((word >> 20) & 0x1f);
+		R_u(f.rd) = countTrailingZeros(R_u(f.rs1));
+		log::info << L"CTZ" << Endl;
+	}
+	// R
+	else if ((word & 0xfff0707f) == 0x60001013)	// CLZ
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = countLeadingZeros(R_u(f.rs1));
+		log::info << L"CLZ" << Endl;
+	}
+	// R
+	else if ((word & 0xfff0707f) == 0x60201013)	// CPOP
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = countPopulation(R_u(f.rs1));
+		log::info << L"CPOP" << Endl;
 	}
 	// R
 	else if ((word & 0xfc00707f) == 0x40005013)	// SRAI
@@ -162,6 +177,45 @@ else if ((word & 0x7f) == 0x13)
 		const auto f = FormatR::parse(word);
 		const int32_t sh = (int32_t)((word >> 20) & 0x1f);
 		R_s(f.rd) = R_s(f.rs1) >> sh;
+	}
+	// R
+	else if ((word & 0xfc00707f) == 0x00005013)	// SRLI
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = R_u(f.rs1) >> ((word >> 20) & 0x1f);
+	}
+}
+else if ((word & 0x7f) == 0x03)
+{
+	// I
+	if ((word & 0x0000707f) == 0x00000003)	// LB
+	{
+		const auto f = FormatI::parse(word);
+		R_s(f.rd) = (int8_t)MEM_RD_U8(R_u(f.rs1) + f.imm);
+	}
+	// I
+	else if ((word & 0x0000707f) == 0x00004003)	// LBU
+	{
+		const auto f = FormatI::parse(word);
+		R_u(f.rd) = MEM_RD_U8(R_u(f.rs1) + f.imm);
+	}
+	// I
+	else if ((word & 0x0000707f) == 0x00005003)	// LHU
+	{
+		const auto f = FormatI::parse(word);
+		R(f.rd) = MEM_RD_U16(R(f.rs1) + f.imm);			
+	}
+	// I
+	else if ((word & 0x0000707f) == 0x00001003)	// LH
+	{
+		const auto f = FormatI::parse(word);
+		R_s(f.rd) = (int16_t)MEM_RD_U16(R_u(f.rs1) + f.imm);
+	}
+	// I
+	else if ((word & 0x0000707f) == 0x00002003)	// LW
+	{
+		const auto f = FormatI::parse(word);
+		R_s(f.rd) = (int32_t)MEM_RD(R_u(f.rs1) + f.imm);
 	}
 }
 else if ((word & 0x7f) == 0x0f)
@@ -183,39 +237,6 @@ else if ((word & 0x7f) == 0x67)
 		R_u(f.rd) = tmp;
 	}
 }
-else if ((word & 0x7f) == 0x03)
-{
-	// I
-	if ((word & 0x0000707f) == 0x00000003)	// LB
-	{
-		const auto f = FormatI::parse(word);
-		R_s(f.rd) = (int8_t)MEM_RD_U8(R_u(f.rs1) + f.imm);
-	}
-	// I
-	else if ((word & 0x0000707f) == 0x00005003)	// LHU
-	{
-		const auto f = FormatI::parse(word);
-		R(f.rd) = MEM_RD_U16(R(f.rs1) + f.imm);			
-	}
-	// I
-	else if ((word & 0x0000707f) == 0x00002003)	// LW
-	{
-		const auto f = FormatI::parse(word);
-		R_s(f.rd) = (int32_t)MEM_RD(R_u(f.rs1) + f.imm);
-	}
-	// I
-	else if ((word & 0x0000707f) == 0x00001003)	// LH
-	{
-		const auto f = FormatI::parse(word);
-		R_s(f.rd) = (int16_t)MEM_RD_U16(R_u(f.rs1) + f.imm);
-	}
-	// I
-	else if ((word & 0x0000707f) == 0x00004003)	// LBU
-	{
-		const auto f = FormatI::parse(word);
-		R_u(f.rd) = MEM_RD_U8(R_u(f.rs1) + f.imm);
-	}
-}
 else if ((word & 0x7f) == 0x6f)
 {
 	// J
@@ -229,37 +250,10 @@ else if ((word & 0x7f) == 0x6f)
 else if ((word & 0x7f) == 0x33)
 {
 	// R
-	if ((word & 0xfe00707f) == 0x02003033)	// MULHU
+	if ((word & 0xfe00707f) == 0x00002033)	// SLT
 	{
 		const auto f = FormatR::parse(word);
-		const uint64_t lh = (uint64_t)R(f.rs1);
-		const uint64_t rh = (uint64_t)R(f.rs2);
-		R(f.rd) = (lh * rh) >> 32;
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x02007033)	// REMU
-	{
-		const auto f = FormatR::parse(word);
-		const uint32_t dividend = R_u(f.rs1);
-		const uint32_t divisor = R_u(f.rs2);
-		if (divisor == 0)
-			R_u(f.rd) = dividend;
-		else
-			R_u(f.rd) = dividend % divisor;
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x00006033)	// OR
-	{
-		const auto f = FormatR::parse(word);
-		R_u(f.rd) = R_u(f.rs1) | R_u(f.rs2);
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x02002033)	// MULHSU
-	{
-		const auto f = FormatR::parse(word);
-		const int64_t lh = (int64_t)R_s(f.rs1);
-		const uint64_t rh = (uint64_t)R(f.rs2);
-		R_s(f.rd) = (lh * rh) >> 32;
+		R_u(f.rd) = (R_s(f.rs1) < R_s(f.rs2)) ? 1 : 0;
 	}
 	// R
 	else if ((word & 0xfe00707f) == 0x02006033)	// REM
@@ -275,10 +269,90 @@ else if ((word & 0x7f) == 0x33)
 			R_s(f.rd) = dividend % divisor;
 	}
 	// R
+	else if ((word & 0xfe00707f) == 0x02007033)	// REMU
+	{
+		const auto f = FormatR::parse(word);
+		const uint32_t dividend = R_u(f.rs1);
+		const uint32_t divisor = R_u(f.rs2);
+		if (divisor == 0)
+			R_u(f.rd) = dividend;
+		else
+			R_u(f.rd) = dividend % divisor;
+	}
+	// R
 	else if ((word & 0xfe00707f) == 0x00001033)	// SLL
 	{
 		const auto f = FormatR::parse(word);
 		R_s(f.rd) = R_s(f.rs1) << R_u(f.rs2);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x00003033)	// SLTU
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = (R_u(f.rs1) < R_u(f.rs2)) ? 1 : 0;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x40005033)	// SRA
+	{
+		const auto f = FormatR::parse(word);
+		const int32_t sh = R_s(f.rs2);
+		if (sh >= 0)
+			R_s(f.rd) = R_s(f.rs1) >> sh;
+		else
+			log::error << L"SRA, shift by negative not supported!" << Endl;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x40007033)	// ANDN
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = R_u(f.rs1) & ~R_u(f.rs2);
+		log::info << L"ANDN" << Endl;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x40006033)	// ORN
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = R_u(f.rs1) | ~R_u(f.rs2);
+		log::info << L"ORN" << Endl;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x20006033)	// SH3ADD
+	{
+		const auto f = FormatR::parse(word);
+		R_s(f.rd) = (R_s(f.rs1) << 3) + R_s(f.rs2);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x40004033)	// XNOR
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = ~(R_u(f.rs1) ^ R_u(f.rs2));
+		log::info << L"XNOR" << Endl;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x0a007033)	// MAXU
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = std::max(R_u(f.rs1), R_u(f.rs2));
+		log::info << L"MAXU" << Endl;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x0a006033)	// MAX
+	{
+		const auto f = FormatR::parse(word);
+		R_s(f.rd) = std::max(R_s(f.rs1), R_s(f.rs2));
+		log::info << L"MAX" << Endl;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x00005033)	// SRL
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = R_u(f.rs1) >> R_u(f.rs2);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x20004033)	// SH2ADD
+	{
+		const auto f = FormatR::parse(word);
+		R_s(f.rd) = (R_s(f.rs1) << 2) + R_s(f.rs2);
 	}
 	// R
 	else if ((word & 0xfe00707f) == 0x00004033)	// XOR
@@ -299,58 +373,24 @@ else if ((word & 0x7f) == 0x33)
 		R_s(f.rd) = (R_s(f.rs1) << 1) + R_s(f.rs2);
 	}
 	// R
-	else if ((word & 0xfe00707f) == 0x20004033)	// SH2ADD
+	else if ((word & 0xfe00707f) == 0x00006033)	// OR
 	{
 		const auto f = FormatR::parse(word);
-		R_s(f.rd) = (R_s(f.rs1) << 2) + R_s(f.rs2);
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x20006033)	// SH3ADD
-	{
-		const auto f = FormatR::parse(word);
-		R_s(f.rd) = (R_s(f.rs1) << 3) + R_s(f.rs2);
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x00003033)	// SLTU
-	{
-		const auto f = FormatR::parse(word);
-		R_u(f.rd) = (R_u(f.rs1) < R_u(f.rs2)) ? 1 : 0;
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x00002033)	// SLT
-	{
-		const auto f = FormatR::parse(word);
-		R_u(f.rd) = (R_s(f.rs1) < R_s(f.rs2)) ? 1 : 0;
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x40005033)	// SRA
-	{
-		const auto f = FormatR::parse(word);
-		const int32_t sh = R_s(f.rs2);
-		if (sh >= 0)
-			R_s(f.rd) = R_s(f.rs1) >> sh;
-		else
-			log::error << L"SRA, shift by negative not supported!" << Endl;
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x00005033)	// SRL
-	{
-		const auto f = FormatR::parse(word);
-		R_u(f.rd) = R_u(f.rs1) >> R_u(f.rs2);
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x02001033)	// MULH
-	{
-		const auto f = FormatR::parse(word);
-		const int64_t lh = (int64_t)R_s(f.rs1);
-		const int64_t rh = (int64_t)R_s(f.rs2);
-		R_s(f.rd) = (lh * rh) >> 32;
+		R_u(f.rd) = R_u(f.rs1) | R_u(f.rs2);
 	}
 	// R
 	else if ((word & 0xfe00707f) == 0x00000033)	// ADD
 	{
 		const auto f = FormatR::parse(word);
 		R_s(f.rd) = R_s(f.rs1) + R_s(f.rs2);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x02002033)	// MULHSU
+	{
+		const auto f = FormatR::parse(word);
+		const int64_t lh = (int64_t)R_s(f.rs1);
+		const uint64_t rh = (uint64_t)R(f.rs2);
+		R_s(f.rd) = (lh * rh) >> 32;
 	}
 	// R
 	else if ((word & 0xfe00707f) == 0x02005033)	// DIVU
@@ -383,37 +423,40 @@ else if ((word & 0x7f) == 0x33)
 		R_u(f.rd) = R_u(f.rs1) & R_u(f.rs2);
 	}
 	// R
+	else if ((word & 0xfe00707f) == 0x0a005033)	// MINU
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = std::min(R_u(f.rs1), R_u(f.rs2));
+		log::info << L"MINU" << Endl;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x0a004033)	// MIN
+	{
+		const auto f = FormatR::parse(word);
+		R_s(f.rd) = std::min(R_s(f.rs1), R_s(f.rs2));
+		log::info << L"MIN" << Endl;
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x02001033)	// MULH
+	{
+		const auto f = FormatR::parse(word);
+		const int64_t lh = (int64_t)R_s(f.rs1);
+		const int64_t rh = (int64_t)R_s(f.rs2);
+		R_s(f.rd) = (lh * rh) >> 32;
+	}
+	// R
 	else if ((word & 0xfe00707f) == 0x02000033)	// MUL
 	{
 		const auto f = FormatR::parse(word);
 		R_s(f.rd) = R_s(f.rs1) * R_s(f.rs2);
 	}
-}
-else if ((word & 0x7f) == 0x3b)
-{
 	// R
-	if ((word & 0xfe00707f) == 0x0800003b)	// ADDUW
+	else if ((word & 0xfe00707f) == 0x02003033)	// MULHU
 	{
 		const auto f = FormatR::parse(word);
-		R_u(f.rd) = R_u(f.rs1) + R_u(f.rs2);
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x2000203b)	// SH1ADDUW
-	{
-		const auto f = FormatR::parse(word);
-		R_u(f.rd) = (R_u(f.rs1) << 1) + R_u(f.rs2);
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x2000403b)	// SH2ADDUW
-	{
-		const auto f = FormatR::parse(word);
-		R_u(f.rd) = (R_u(f.rs1) << 2) + R_u(f.rs2);
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x2000603b)	// SH3ADDUW
-	{
-		const auto f = FormatR::parse(word);
-		R_u(f.rd) = (R_u(f.rs1) << 3) + R_u(f.rs2);
+		const uint64_t lh = (uint64_t)R(f.rs1);
+		const uint64_t rh = (uint64_t)R(f.rs2);
+		R(f.rd) = (lh * rh) >> 32;
 	}
 }
 else if ((word & 0x7f) == 0x1b)
@@ -425,19 +468,46 @@ else if ((word & 0x7f) == 0x1b)
 		R_u(f.rd) = R_u(f.rs1) << ((word >> 20) & 0x1f);
 	}
 }
+else if ((word & 0x7f) == 0x3b)
+{
+	// R
+	if ((word & 0xfe00707f) == 0x2000603b)	// SH3ADDUW
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = (R_u(f.rs1) << 3) + R_u(f.rs2);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x2000403b)	// SH2ADDUW
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = (R_u(f.rs1) << 2) + R_u(f.rs2);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x2000203b)	// SH1ADDUW
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = (R_u(f.rs1) << 1) + R_u(f.rs2);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x0800003b)	// ADDUW
+	{
+		const auto f = FormatR::parse(word);
+		R_u(f.rd) = R_u(f.rs1) + R_u(f.rs2);
+	}
+}
 else if ((word & 0x7f) == 0x53)
 {
 	// R
-	if ((word & 0xfff0007f) == 0xc0000053)	// FCVT_W_S
-	{
-		const auto f = FormatR::parse(word);
-		R_s(f.rd) = (int32_t)FR(f.rs1);
-	}
-	// R
-	else if ((word & 0xfe00007f) == 0x00000053)	// FADD
+	if ((word & 0xfe00007f) == 0x00000053)	// FADD
 	{
 		const auto f = FormatR::parse(word);
 		FR(f.rd) = FR(f.rs1) + FR(f.rs2);
+	}
+	// R
+	else if ((word & 0xfff0007f) == 0xc0000053)	// FCVT_W_S
+	{
+		const auto f = FormatR::parse(word);
+		R_s(f.rd) = (int32_t)FR(f.rs1);
 	}
 	// R
 	else if ((word & 0xfff0007f) == 0xd0000053)	// FCVT_S_W
@@ -477,44 +547,16 @@ else if ((word & 0x7f) == 0x53)
 		R(f.rd) = (FR(f.rs1) == FR(f.rs2) ? 1 : 0);
 	}
 	// R
-	else if ((word & 0xfe00707f) == 0x28001053)	// FMAX
-	{
-		const auto f = FormatR::parse(word);
-		FR(f.rd) = std::max(FR(f.rs1), FR(f.rs2));
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x28000053)	// FMIN
-	{
-		const auto f = FormatR::parse(word);
-		FR(f.rd) = std::min(FR(f.rs1), FR(f.rs2));
-	}
-	// R
 	else if ((word & 0xfe00007f) == 0x08000053)	// FSUB
 	{
 		const auto f = FormatR::parse(word);
 		FR(f.rd) = FR(f.rs1) - FR(f.rs2);
 	}
 	// R
-	else if ((word & 0xfe00707f) == 0x20002053)	// FSGNJX
+	else if ((word & 0xfe00707f) == 0xa0001053)	// FLT
 	{
 		const auto f = FormatR::parse(word);
-		const uint32_t tmp1 = FR_u(f.rs1);
-		const uint32_t tmp2 = FR_u(f.rs2);
-		FR_u(f.rd) = (tmp1 & 0x7fffffff) | ((tmp2 & 0x80000000) ^ (tmp1 & 0x80000000));
-	}
-	// R
-	else if ((word & 0xfe00007f) == 0x10000053)	// FMUL
-	{
-		const auto f = FormatR::parse(word);
-		FR(f.rd) = FR(f.rs1) * FR(f.rs2);
-	}
-	// R
-	else if ((word & 0xfe00707f) == 0x20000053)	// FSGNJ
-	{
-		const auto f = FormatR::parse(word);
-		const uint32_t tmp1 = FR_u(f.rs1);
-		const uint32_t tmp2 = FR_u(f.rs2);
-		FR_u(f.rd) = (tmp1 & 0x7fffffff) | (tmp2 & 0x80000000);
+		R(f.rd) = (FR(f.rs1) < FR(f.rs2) ? 1 : 0);
 	}
 	// R
 	else if ((word & 0xfe00707f) == 0x20001053)	// FSGNJN
@@ -525,19 +567,47 @@ else if ((word & 0x7f) == 0x53)
 		FR_u(f.rd) = (tmp1 & 0x7fffffff) | ((tmp2 & 0x80000000) ^ 0x80000000);
 	}
 	// R
-	else if ((word & 0xfe00707f) == 0xa0001053)	// FLT
+	else if ((word & 0xfe00707f) == 0x20002053)	// FSGNJX
 	{
 		const auto f = FormatR::parse(word);
-		R(f.rd) = (FR(f.rs1) < FR(f.rs2) ? 1 : 0);
+		const uint32_t tmp1 = FR_u(f.rs1);
+		const uint32_t tmp2 = FR_u(f.rs2);
+		FR_u(f.rd) = (tmp1 & 0x7fffffff) | ((tmp2 & 0x80000000) ^ (tmp1 & 0x80000000));
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x20000053)	// FSGNJ
+	{
+		const auto f = FormatR::parse(word);
+		const uint32_t tmp1 = FR_u(f.rs1);
+		const uint32_t tmp2 = FR_u(f.rs2);
+		FR_u(f.rd) = (tmp1 & 0x7fffffff) | (tmp2 & 0x80000000);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x28000053)	// FMIN
+	{
+		const auto f = FormatR::parse(word);
+		FR(f.rd) = std::min(FR(f.rs1), FR(f.rs2));
+	}
+	// R
+	else if ((word & 0xfe00007f) == 0x10000053)	// FMUL
+	{
+		const auto f = FormatR::parse(word);
+		FR(f.rd) = FR(f.rs1) * FR(f.rs2);
+	}
+	// R
+	else if ((word & 0xfe00707f) == 0x28001053)	// FMAX
+	{
+		const auto f = FormatR::parse(word);
+		FR(f.rd) = std::max(FR(f.rs1), FR(f.rs2));
 	}
 }
-else if ((word & 0x7f) == 0x43)
+else if ((word & 0x7f) == 0x4f)
 {
 	// R4
-	if ((word & 0x0600007f) == 0x00000043)	// FMADD
+	if ((word & 0x0600007f) == 0x0000004f)	// FNMADD
 	{
 		const auto f = FormatR4::parse(word);
-		FR(f.rd) = FR(f.rs1) * FR(f.rs2) + FR(f.rs3);
+		FR(f.rd) = -(FR(f.rs1) * FR(f.rs2)) - FR(f.rs3);
 	}
 }
 else if ((word & 0x7f) == 0x47)
@@ -549,13 +619,13 @@ else if ((word & 0x7f) == 0x47)
 		FR(f.rd) = FR(f.rs1) * FR(f.rs2) - FR(f.rs3);
 	}
 }
-else if ((word & 0x7f) == 0x4f)
+else if ((word & 0x7f) == 0x43)
 {
 	// R4
-	if ((word & 0x0600007f) == 0x0000004f)	// FNMADD
+	if ((word & 0x0600007f) == 0x00000043)	// FMADD
 	{
 		const auto f = FormatR4::parse(word);
-		FR(f.rd) = -(FR(f.rs1) * FR(f.rs2)) - FR(f.rs3);
+		FR(f.rd) = FR(f.rs1) * FR(f.rs2) + FR(f.rs3);
 	}
 }
 else if ((word & 0x7f) == 0x4b)
@@ -570,7 +640,13 @@ else if ((word & 0x7f) == 0x4b)
 else if ((word & 0x7f) == 0x23)
 {
 	// S
-	if ((word & 0x0000707f) == 0x00002023)	// SW
+	if ((word & 0x0000707f) == 0x00001023)	// SH
+	{
+		const auto f = FormatS::parse(word);
+		MEM_WR_U16(R_u(f.rs1) + f.imm, R_u(f.rs2));
+	}
+	// S
+	else if ((word & 0x0000707f) == 0x00002023)	// SW
 	{
 		const auto f = FormatS::parse(word);
 		MEM_WR(R_u(f.rs1) + f.imm, R_u(f.rs2));
@@ -581,11 +657,14 @@ else if ((word & 0x7f) == 0x23)
 		const auto f = FormatS::parse(word);
 		MEM_WR_U8(R_u(f.rs1) + f.imm, (uint8_t)R_u(f.rs2));
 	}
-	// S
-	else if ((word & 0x0000707f) == 0x00001023)	// SH
+}
+else if ((word & 0x7f) == 0x37)
+{
+	// U
+	if ((word & 0x0000007f) == 0x00000037)	// LUI
 	{
-		const auto f = FormatS::parse(word);
-		MEM_WR_U16(R_u(f.rs1) + f.imm, R_u(f.rs2));
+		const auto f = FormatU::parse(word);
+		R_s(f.rd) = f.imm;
 	}
 }
 else if ((word & 0x7f) == 0x17)
@@ -595,15 +674,6 @@ else if ((word & 0x7f) == 0x17)
 	{
 		const auto f = FormatU::parse(word);
 		R_u(f.rd) = PC + f.imm;
-	}
-}
-else if ((word & 0x7f) == 0x37)
-{
-	// U
-	if ((word & 0x0000007f) == 0x00000037)	// LUI
-	{
-		const auto f = FormatU::parse(word);
-		R_s(f.rd) = f.imm;
 	}
 }
 else

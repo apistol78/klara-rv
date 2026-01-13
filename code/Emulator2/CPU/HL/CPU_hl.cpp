@@ -6,6 +6,8 @@
  License, v. 2.0. If a copy of the MPL was not distributed with this
  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */
+#include <bit>
+
 #include <Core/Io/OutputStream.h>
 #include <Core/Log/Log.h>
 #include <Core/Misc/String.h>
@@ -170,6 +172,21 @@ struct FormatR4
 		};
 	}
 };
+
+uint32_t countLeadingZeros(uint32_t value)
+{
+	return std::countl_zero(value);
+}
+
+uint32_t countTrailingZeros(uint32_t value)
+{
+	return std::countr_zero(value);
+}
+
+uint32_t countPopulation(uint32_t value)
+{
+	return std::popcount(value);
+}
 
 #define PC m_pc
 #define PC_NEXT m_next
