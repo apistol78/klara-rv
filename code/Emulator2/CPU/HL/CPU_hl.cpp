@@ -190,12 +190,12 @@ uint32_t countPopulation(uint32_t value)
 
 uint32_t signExtentB(uint32_t value)
 {
-	return (value & 0x0000007f) | ((value & 0x00000080) ? 0xffffff00 : 0x00000000);
+	return (value & 0x000000ff) | ((value & 0x00000080) ? 0xffffff00 : 0x00000000);
 }
 
 uint32_t signExtentH(uint32_t value)
 {
-	return (value & 0x00007fff) | ((value & 0x00008000) ? 0xffff0000 : 0x00000000);
+	return (value & 0x0000ffff) | ((value & 0x00008000) ? 0xffff0000 : 0x00000000);
 }
 
 uint32_t zeroExtentH(uint32_t value)
