@@ -47,24 +47,24 @@
 `define OP_OR_COMBINE				22
 
 // ALU operations (shift)
-`define OP_SHIFT_LEFT               0
-`define OP_SHIFT_RIGHT              1
-`define OP_ARITHMETIC_SHIFT_RIGHT   2
+`define OP_SHIFT_LEFT               23
+`define OP_SHIFT_RIGHT              24
+`define OP_ARITHMETIC_SHIFT_RIGHT   25
 // Zba
-`define OP_UNSIGNED_SHIFT_LEFT		3
+`define OP_UNSIGNED_SHIFT_LEFT		26
 // Zbb
-`define OP_ROTATE_LEFT				4
-`define OP_ROTATE_LEFT_WORD			5
-`define OP_ROTATE_RIGHT				6
-`define OP_ROTATE_RIGHT_WORD		7
+`define OP_ROTATE_LEFT				27
+`define OP_ROTATE_LEFT_WORD			28
+`define OP_ROTATE_RIGHT				29
+`define OP_ROTATE_RIGHT_WORD		30
 
 // ALU operations (compare)
-`define OP_SIGNED_LESS_THAN         0
-`define OP_UNSIGNED_LESS_THAN       1
-`define OP_EQUAL                    2
-`define OP_NOT_EQUAL                3
-`define OP_SIGNED_GREATER_EQUAL     4
-`define OP_UNSIGNED_GREATER_EQUAL   5
+`define OP_SIGNED_LESS_THAN         31
+`define OP_UNSIGNED_LESS_THAN       32
+`define OP_EQUAL                    33
+`define OP_NOT_EQUAL                34
+`define OP_SIGNED_GREATER_EQUAL     35
+`define OP_UNSIGNED_GREATER_EQUAL   36
 
 // FPU operations
 `define FPU_OP_ADD			0

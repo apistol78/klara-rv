@@ -111,17 +111,13 @@ module CPU_Execute (
 	end
 
 	wire [31:0] alu_result;
-	wire [31:0] alu_shift_result;
 	wire [31:0] alu_signed_sum_result;
-	wire alu_compare_result;
 	CPU_ALU alu(
 		.i_op(i_data.alu_operation),
 		.i_op1(alu_operand1),
 		.i_op2(alu_operand2),
 		.o_result(alu_result),
-		.o_shift_result(alu_shift_result),
-		.o_signed_sum_result(alu_signed_sum_result),
-		.o_compare_result(alu_compare_result)
+		.o_signed_sum_result(alu_signed_sum_result)
 	);
 
 	// ====================
@@ -256,21 +252,13 @@ module CPU_Execute (
 					`RD <= alu_result;
 					`EXECUTE_DONE;
 				end
-				else if (i_data.shift) begin
-					`RD <= alu_shift_result;
-					`EXECUTE_DONE;
-				end
-				else if (i_data.compare) begin
-					`RD <= { 31'b0, alu_compare_result };
-					`EXECUTE_DONE;
-				end
 				else if (i_data.jump) begin
 					`RD <= `PC + 4;
 					`GOTO(alu_signed_sum_result);
 					`EXECUTE_DONE;
 				end
 				else if (i_data.jump_conditional) begin
-					if (alu_compare_result) begin
+					if (alu_result[0]) begin
 						`GOTO($signed(`PC) + $signed(`IMM));
 					end
 					else begin

@@ -98,8 +98,6 @@ module CPU_Decode(
 				32'h0;
 		
 			data.arithmetic <= is_ARITHMETIC;
-			data.shift <= is_SHIFT;
-			data.compare <= is_COMPARE;
 			data.complx <= is_COMPLEX;
 			data.jump <= is_JUMP;
 			data.jump_conditional <= is_JUMP_CONDITIONAL;
