@@ -56,9 +56,7 @@ local operations = {
 	SIGN_EXTEND_WORD = "`OP_SIGN_EXTEND_WORD",
 	REVERSE_8 = "`OP_REVERSE_8",
 	ROTATE_LEFT = "`OP_ROTATE_LEFT",
-	ROTATE_LEFT_WORD = "`OP_ROTATE_LEFT_WORD",
 	ROTATE_RIGHT = "`OP_ROTATE_RIGHT",
-	ROTATE_RIGHT_WORD = "`OP_ROTATE_RIGHT_WORD",
 	OR_COMBINE = "`OP_OR_COMBINE",
 }
 
@@ -2116,24 +2114,6 @@ local instructions = {
 	},
 	{
 		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
-		data = 0x6000103B,	-- 0110 0000 0000 0000 0001 0000 0011 1011
-		name = "ROLW",
-		format = "R",
-		type = insttype.ARITHMETIC,
-		cpp = [[
-			const auto f = FormatR::parse(word);
-			const uint32_t shamt = R_u(f.rs2);
-			const uint32_t value = zeroExtentH(R_u(f.rs1));
-			R_u(f.rd) = signExtentH((value << shamt) | (value >> (32 - shamt)));
-		]],
-		verilog_alu = {
-			operation = operations.ROTATE_LEFT_WORD,
-			operand1 = operands.RS1,
-			operand2 = operands.RS2
-		}
-	},
-	{
-		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
 		data = 0x60005033,	-- 0110 0000 0000 0000 0101 0000 0011 0011
 		name = "ROR",
 		format = "R",
@@ -2164,42 +2144,6 @@ local instructions = {
 			operation = operations.ROTATE_RIGHT,
 			operand1 = operands.RS1,
 			operand2 = operands.IMM
-		}
-	},
-	{
-		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
-		data = 0x6000501B,	-- 0110 0000 0000 0000 0101 0000 0001 1011
-		name = "RORIW",
-		format = "R",
-		type = insttype.ARITHMETIC,
-		cpp = [[
-			const auto f = FormatR::parse(word);
-			const uint32_t shamt = (uint32_t)((word >> 20) & 0x1f);
-			const uint32_t value = zeroExtentH(R_u(f.rs1));
-			R_u(f.rd) = signExtentH((value >> shamt) | (value << (32 - shamt)));
-		]],
-		verilog_alu = {
-			operation = operations.ROTATE_RIGHT_WORD,
-			operand1 = operands.RS1,
-			operand2 = operands.IMM
-		}
-	},
-	{
-		mask = 0xFE00707F,	-- 1111 1110 0000 0000 0111 0000 0111 1111
-		data = 0x6000503B,	-- 0110 0000 0000 0000 0101 0000 0011 1011
-		name = "RORW",
-		format = "R",
-		type = insttype.ARITHMETIC,
-		cpp = [[
-			const auto f = FormatR::parse(word);
-			const uint32_t shamt = R_u(f.rs2);
-			const uint32_t value = zeroExtentH(R_u(f.rs1));
-			R_u(f.rd) = signExtentH((value >> shamt) | (value << (32 - shamt)));
-		]],
-		verilog_alu = {
-			operation = operations.ROTATE_RIGHT,
-			operand1 = operands.RS1,
-			operand2 = operands.RS2
 		}
 	},
 	{

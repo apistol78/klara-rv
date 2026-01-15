@@ -95,6 +95,7 @@ module CPU_top(
 		// Control
 		.i_timer_interrupt(timer_interrupt),
 		.i_external_interrupt(external_interrupt),
+		.o_external_interrupt_enable(),
 
 		// Instruction bus
 		.o_ibus_request(cpu_ibus_request),
@@ -114,7 +115,8 @@ module CPU_top(
 		// Debug
 		.o_execute_busy(),
 		.o_memory_busy(),
-		.o_fault(cpu_fault)
+		.o_fault(cpu_fault),
+		.o_scratch()
 	);
 
 endmodule;

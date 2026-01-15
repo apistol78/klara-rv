@@ -57,17 +57,15 @@
 `define OP_UNSIGNED_SHIFT_LEFT		29
 // Zbb
 `define OP_ROTATE_LEFT				30
-`define OP_ROTATE_LEFT_WORD			31
-`define OP_ROTATE_RIGHT				32
-`define OP_ROTATE_RIGHT_WORD		33
+`define OP_ROTATE_RIGHT				31
 
 // ALU operations (compare)
-`define OP_SIGNED_LESS_THAN         34
-`define OP_UNSIGNED_LESS_THAN       35
-`define OP_EQUAL                    36
-`define OP_NOT_EQUAL                37
-`define OP_SIGNED_GREATER_EQUAL     38
-`define OP_UNSIGNED_GREATER_EQUAL   39
+`define OP_SIGNED_LESS_THAN         32
+`define OP_UNSIGNED_LESS_THAN       33
+`define OP_EQUAL                    34
+`define OP_NOT_EQUAL                35
+`define OP_SIGNED_GREATER_EQUAL     36
+`define OP_UNSIGNED_GREATER_EQUAL   37
 
 // FPU operations
 `define FPU_OP_ADD			0

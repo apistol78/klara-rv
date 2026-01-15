@@ -117,9 +117,7 @@ module CPU_ALU(
 		i_op == `OP_REVERSE_8 ? reverse_8_result :
 		i_op == `OP_OR_COMBINE ? or_combine_result :
 		i_op == `OP_ROTATE_LEFT ? rol_result :
-		i_op == `OP_ROTATE_LEFT_WORD ? rol_result :		// #fixme
-		i_op == `OP_ROTATE_LEFT ? ror_result :
-		i_op == `OP_ROTATE_RIGHT_WORD ? ror_result :	// #fixme
+		i_op == `OP_ROTATE_RIGHT ? ror_result :
 		32'd0;
 		
 	assign o_signed_sum_result = signed_sum;

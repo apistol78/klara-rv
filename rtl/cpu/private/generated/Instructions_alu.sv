@@ -2,112 +2,108 @@
 // ==================================================
 
 wire [5:0] alu_operation = 
-	is_BEQ   ? `OP_EQUAL                  :
-	is_BLTU  ? `OP_UNSIGNED_LESS_THAN     :
-	is_BGE   ? `OP_SIGNED_GREATER_EQUAL   :
-	is_BNE   ? `OP_NOT_EQUAL              :
 	is_BLT   ? `OP_SIGNED_LESS_THAN       :
 	is_BGEU  ? `OP_UNSIGNED_GREATER_EQUAL :
+	is_BLTU  ? `OP_UNSIGNED_LESS_THAN     :
+	is_BEQ   ? `OP_EQUAL                  :
+	is_BGE   ? `OP_SIGNED_GREATER_EQUAL   :
+	is_BNE   ? `OP_NOT_EQUAL              :
+	is_LHU   ? `OP_SIGNED_ADD             :
 	is_XORI  ? `OP_XOR                    :
+	is_JALR  ? `OP_SIGNED_ADD             :
+	is_LH    ? `OP_SIGNED_ADD             :
+	is_LBU   ? `OP_SIGNED_ADD             :
 	is_LB    ? `OP_SIGNED_ADD             :
+	is_LW    ? `OP_SIGNED_ADD             :
+	is_ADDI  ? `OP_SIGNED_ADD             :
 	is_SLTIU ? `OP_UNSIGNED_LESS_THAN     :
 	is_SLTI  ? `OP_SIGNED_LESS_THAN       :
 	is_ORI   ? `OP_OR                     :
-	is_JALR  ? `OP_SIGNED_ADD             :
-	is_LW    ? `OP_SIGNED_ADD             :
-	is_LH    ? `OP_SIGNED_ADD             :
-	is_LHU   ? `OP_SIGNED_ADD             :
-	is_LBU   ? `OP_SIGNED_ADD             :
 	is_ANDI  ? `OP_AND                    :
-	is_ADDI  ? `OP_SIGNED_ADD             :
 	is_JAL   ? `OP_SIGNED_ADD             :
-	is_ROL   ? `OP_ROTATE_LEFT            :
-	is_REV8  ? `OP_REVERSE_8              :
-	is_ZEXT_H ? `OP_SIGN_EXTEND_WORD       :
-	is_SRAI  ? `OP_ARITHMETIC_SHIFT_RIGHT :
-	is_SEXT_B ? `OP_SIGN_EXTEND_BYTE       :
-	is_SEXT_H ? `OP_SIGN_EXTEND_WORD       :
-	is_ROLW  ? `OP_ROTATE_LEFT_WORD       :
-	is_SRA   ? `OP_ARITHMETIC_SHIFT_RIGHT :
+	is_SRLI  ? `OP_SHIFT_RIGHT            :
+	is_SRL   ? `OP_SHIFT_RIGHT            :
+	is_SLL   ? `OP_SHIFT_LEFT             :
+	is_SLT   ? `OP_SIGNED_LESS_THAN       :
 	is_SLTU  ? `OP_UNSIGNED_LESS_THAN     :
 	is_SLLI  ? `OP_SHIFT_LEFT             :
-	is_SLL   ? `OP_SHIFT_LEFT             :
-	is_MINU  ? `OP_UNSIGNED_MIN           :
-	is_RORIW ? `OP_ROTATE_RIGHT_WORD      :
-	is_SLT   ? `OP_SIGNED_LESS_THAN       :
-	is_ROR   ? `OP_ROTATE_RIGHT           :
-	is_RORI  ? `OP_ROTATE_RIGHT           :
-	is_CLZ   ? `OP_CLZ                    :
-	is_MIN   ? `OP_SIGNED_MIN             :
-	is_SRL   ? `OP_SHIFT_RIGHT            :
-	is_SH2ADDUW ? `OP_UNSIGNED_ADD_SH2       :
-	is_CTZ   ? `OP_CTZ                    :
-	is_SH2ADD ? `OP_SIGNED_ADD_SH2         :
-	is_CPOP  ? `OP_CPOP                   :
-	is_SH3ADD ? `OP_SIGNED_ADD_SH3         :
-	is_SLLIUW ? `OP_UNSIGNED_SHIFT_LEFT    :
-	is_SH3ADDUW ? `OP_UNSIGNED_ADD_SH3       :
-	is_ORN   ? `OP_ORN                    :
-	is_ANDN  ? `OP_ANDN                   :
-	is_XNOR  ? `OP_XNOR                   :
-	is_SH1ADDUW ? `OP_UNSIGNED_ADD_SH1       :
-	is_ADDUW ? `OP_UNSIGNED_ADD           :
-	is_SRLI  ? `OP_SHIFT_RIGHT            :
+	is_SRA   ? `OP_ARITHMETIC_SHIFT_RIGHT :
+	is_SRAI  ? `OP_ARITHMETIC_SHIFT_RIGHT :
 	is_SH1ADD ? `OP_SIGNED_ADD_SH1         :
 	is_SUB   ? `OP_SIGNED_SUB             :
+	is_MIN   ? `OP_SIGNED_MIN             :
+	is_MINU  ? `OP_UNSIGNED_MIN           :
 	is_MAXU  ? `OP_UNSIGNED_MAX           :
+	is_CPOP  ? `OP_CPOP                   :
 	is_MAX   ? `OP_SIGNED_MAX             :
+	is_CTZ   ? `OP_CTZ                    :
+	is_SEXT_B ? `OP_SIGN_EXTEND_BYTE       :
+	is_ZEXT_H ? `OP_SIGN_EXTEND_WORD       :
+	is_ROR   ? `OP_ROTATE_RIGHT           :
+	is_SEXT_H ? `OP_SIGN_EXTEND_WORD       :
+	is_ROL   ? `OP_ROTATE_LEFT            :
+	is_REV8  ? `OP_REVERSE_8              :
+	is_CLZ   ? `OP_CLZ                    :
+	is_ORN   ? `OP_ORN                    :
+	is_SH1ADDUW ? `OP_UNSIGNED_ADD_SH1       :
+	is_ADDUW ? `OP_UNSIGNED_ADD           :
 	is_XOR   ? `OP_XOR                    :
+	is_XNOR  ? `OP_XNOR                   :
+	is_SH2ADD ? `OP_SIGNED_ADD_SH2         :
+	is_SH3ADD ? `OP_SIGNED_ADD_SH3         :
+	is_ANDN  ? `OP_ANDN                   :
+	is_SH2ADDUW ? `OP_UNSIGNED_ADD_SH2       :
+	is_SLLIUW ? `OP_UNSIGNED_SHIFT_LEFT    :
+	is_SH3ADDUW ? `OP_UNSIGNED_ADD_SH3       :
 	is_ADD   ? `OP_SIGNED_ADD             :
-	is_AND   ? `OP_AND                    :
 	is_ORC_B ? `OP_OR_COMBINE             :
-	is_RORW  ? `OP_ROTATE_RIGHT           :
+	is_AND   ? `OP_AND                    :
 	is_OR    ? `OP_OR                     :
-	is_SB    ? `OP_SIGNED_ADD             :
+	is_RORI  ? `OP_ROTATE_RIGHT           :
 	is_SH    ? `OP_SIGNED_ADD             :
+	is_SB    ? `OP_SIGNED_ADD             :
 	is_SW    ? `OP_SIGNED_ADD             :
-	is_AUIPC ? `OP_SIGNED_ADD             :
 	is_LUI   ? `OP_UNSIGNED_ADD           :
+	is_AUIPC ? `OP_SIGNED_ADD             :
 	5'd0;
 
 wire [4:0] alu_operand1 = 
 	is_JAL   ? `PC   :
-	is_AUIPC ? `PC   :
 	is_LUI   ? `IMM  :
+	is_AUIPC ? `PC   :
 	`RS1;
 
 wire [4:0] alu_operand2 = 
+	is_LHU   ? `IMM  :
 	is_XORI  ? `IMM  :
+	is_JALR  ? `IMM  :
+	is_LH    ? `IMM  :
+	is_LBU   ? `IMM  :
 	is_LB    ? `IMM  :
+	is_LW    ? `IMM  :
+	is_ADDI  ? `IMM  :
 	is_SLTIU ? `IMM  :
 	is_SLTI  ? `IMM  :
 	is_ORI   ? `IMM  :
-	is_JALR  ? `IMM  :
-	is_LW    ? `IMM  :
-	is_LH    ? `IMM  :
-	is_LHU   ? `IMM  :
-	is_LBU   ? `IMM  :
 	is_ANDI  ? `IMM  :
-	is_ADDI  ? `IMM  :
 	is_JAL   ? `IMM  :
-	is_REV8  ? `ZERO :
-	is_ZEXT_H ? `ZERO :
-	is_SRAI  ? `IMM  :
-	is_SEXT_B ? `RS1  :
-	is_SEXT_H ? `RS1  :
-	is_SLLI  ? `IMM  :
-	is_RORIW ? `IMM  :
-	is_RORI  ? `IMM  :
-	is_CLZ   ? `ZERO :
-	is_CTZ   ? `ZERO :
-	is_CPOP  ? `ZERO :
-	is_SLLIUW ? `IMM  :
 	is_SRLI  ? `IMM  :
+	is_SLLI  ? `IMM  :
+	is_SRAI  ? `IMM  :
+	is_CPOP  ? `ZERO :
+	is_CTZ   ? `ZERO :
+	is_SEXT_B ? `RS1  :
+	is_ZEXT_H ? `ZERO :
+	is_SEXT_H ? `RS1  :
+	is_REV8  ? `ZERO :
+	is_CLZ   ? `ZERO :
+	is_SLLIUW ? `IMM  :
 	is_ORC_B ? `ZERO :
-	is_SB    ? `IMM  :
+	is_RORI  ? `IMM  :
 	is_SH    ? `IMM  :
+	is_SB    ? `IMM  :
 	is_SW    ? `IMM  :
-	is_AUIPC ? `IMM  :
 	is_LUI   ? `ZERO :
+	is_AUIPC ? `IMM  :
 	`RS2;
 
