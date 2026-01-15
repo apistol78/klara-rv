@@ -82,6 +82,7 @@
       }
     },
     "terminal.integrated.defaultProfile.linux": "BashWithStartup",
-    "workbench.colorTheme": "Solarized Dark"
+    "workbench.colorTheme": "Solarized Dark",
 
+    "task.autoDetect": "off"
 }
