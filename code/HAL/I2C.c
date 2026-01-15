@@ -19,16 +19,6 @@
 #define I2C_STATUS_CMD_QUEUE_EMPTY	0x00000008
 #define I2C_STATUS_CMD_QUEUE_BUSY	0x00000010
 
-static void hal_i2c_wait_until_idle()
-{
-	for (;;)
-	{
-		const uint32_t status = *I2C_CTRL;
-		if ((status & I2C_STATUS_CMD_QUEUE_BUSY) == 0)
-			break;
-	}
-}
-
 uint32_t hal_i2c_write(uint8_t deviceAddr, uint8_t controlAddr, uint8_t controlData, int32_t mode)
 {
 	*I2C_CTRL = 
