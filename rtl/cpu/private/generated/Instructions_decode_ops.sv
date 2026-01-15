@@ -9,9 +9,6 @@
 	is_CSRRC  ? OP_CSRRC  : 
 	is_CSRRS  ? OP_CSRRS  : 
 	is_FENCE  ? OP_FENCE  : 
-	is_CLZ    ? OP_CLZ    : 
-	is_CTZ    ? OP_CTZ    : 
-	is_CPOP   ? OP_CPOP   : 
 	is_DIVU   ? OP_DIVU   : 
 	is_DIV    ? OP_DIV    : 
 	is_MULHU  ? OP_MULHU  : 

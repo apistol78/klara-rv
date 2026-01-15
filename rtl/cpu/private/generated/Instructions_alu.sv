@@ -37,10 +37,13 @@ wire [5:0] alu_operation =
 	is_SLT   ? `OP_SIGNED_LESS_THAN       :
 	is_ROR   ? `OP_ROTATE_RIGHT           :
 	is_RORI  ? `OP_ROTATE_RIGHT           :
+	is_CLZ   ? `OP_CLZ                    :
 	is_MIN   ? `OP_SIGNED_MIN             :
 	is_SRL   ? `OP_SHIFT_RIGHT            :
 	is_SH2ADDUW ? `OP_UNSIGNED_ADD_SH2       :
+	is_CTZ   ? `OP_CTZ                    :
 	is_SH2ADD ? `OP_SIGNED_ADD_SH2         :
+	is_CPOP  ? `OP_CPOP                   :
 	is_SH3ADD ? `OP_SIGNED_ADD_SH3         :
 	is_SLLIUW ? `OP_UNSIGNED_SHIFT_LEFT    :
 	is_SH3ADDUW ? `OP_UNSIGNED_ADD_SH3       :
@@ -95,6 +98,9 @@ wire [4:0] alu_operand2 =
 	is_SLLI  ? `IMM  :
 	is_RORIW ? `IMM  :
 	is_RORI  ? `IMM  :
+	is_CLZ   ? `ZERO :
+	is_CTZ   ? `ZERO :
+	is_CPOP  ? `ZERO :
 	is_SLLIUW ? `IMM  :
 	is_SRLI  ? `IMM  :
 	is_ORC_B ? `ZERO :

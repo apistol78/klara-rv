@@ -37,34 +37,37 @@
 `define OP_ANDN						12
 `define OP_ORN						13
 `define OP_XNOR						14
-`define OP_SIGNED_MAX				15
-`define OP_UNSIGNED_MAX				16
-`define OP_SIGNED_MIN				17
-`define OP_UNSIGNED_MIN				18
-`define OP_SIGN_EXTEND_BYTE			19
-`define OP_SIGN_EXTEND_WORD			20
-`define OP_REVERSE_8				21
-`define OP_OR_COMBINE				22
+`define OP_CLZ						15
+`define OP_CTZ						16
+`define OP_CPOP						17
+`define OP_SIGNED_MAX				18
+`define OP_UNSIGNED_MAX				19
+`define OP_SIGNED_MIN				20
+`define OP_UNSIGNED_MIN				21
+`define OP_SIGN_EXTEND_BYTE			22
+`define OP_SIGN_EXTEND_WORD			23
+`define OP_REVERSE_8				24
+`define OP_OR_COMBINE				25
 
 // ALU operations (shift)
-`define OP_SHIFT_LEFT               23
-`define OP_SHIFT_RIGHT              24
-`define OP_ARITHMETIC_SHIFT_RIGHT   25
+`define OP_SHIFT_LEFT               26
+`define OP_SHIFT_RIGHT              27
+`define OP_ARITHMETIC_SHIFT_RIGHT   28
 // Zba
-`define OP_UNSIGNED_SHIFT_LEFT		26
+`define OP_UNSIGNED_SHIFT_LEFT		29
 // Zbb
-`define OP_ROTATE_LEFT				27
-`define OP_ROTATE_LEFT_WORD			28
-`define OP_ROTATE_RIGHT				29
-`define OP_ROTATE_RIGHT_WORD		30
+`define OP_ROTATE_LEFT				30
+`define OP_ROTATE_LEFT_WORD			31
+`define OP_ROTATE_RIGHT				32
+`define OP_ROTATE_RIGHT_WORD		33
 
 // ALU operations (compare)
-`define OP_SIGNED_LESS_THAN         31
-`define OP_UNSIGNED_LESS_THAN       32
-`define OP_EQUAL                    33
-`define OP_NOT_EQUAL                34
-`define OP_SIGNED_GREATER_EQUAL     35
-`define OP_UNSIGNED_GREATER_EQUAL   36
+`define OP_SIGNED_LESS_THAN         34
+`define OP_UNSIGNED_LESS_THAN       35
+`define OP_EQUAL                    36
+`define OP_NOT_EQUAL                37
+`define OP_SIGNED_GREATER_EQUAL     38
+`define OP_UNSIGNED_GREATER_EQUAL   39
 
 // FPU operations
 `define FPU_OP_ADD			0

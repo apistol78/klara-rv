@@ -45,6 +45,9 @@ local operations = {
 	ANDN = "`OP_ANDN",
 	ORN = "`OP_ORN",
 	XNOR = "`OP_XNOR",
+	CLZ = "`OP_CLZ",
+	CTZ = "`OP_CTZ",
+	CPOP = "`OP_CPOP",
 	SIGNED_MAX = "`OP_SIGNED_MAX",
 	UNSIGNED_MAX = "`OP_UNSIGNED_MAX",
 	SIGNED_MIN = "`OP_SIGNED_MIN",
@@ -1923,42 +1926,48 @@ local instructions = {
 		data = 0x60001013,	-- 0110 0000 0000 0000 0001 0000 0001 0011
 		name = "CLZ",
 		format = "R",
-		type = insttype.COMPLEX,
+		type = insttype.ARITHMETIC,
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = countLeadingZeros(R_u(f.rs1));
 		]],
-		verilog_text = [[
-			`EXECUTE_DONE;
-		]]
+		verilog_alu = {
+			operation = operations.CLZ,
+			operand1 = operands.RS1,
+			operand2 = operands.ZERO
+		}
 	},
 	{
 		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
 		data = 0x60101013,	-- 0110 0000 0001 0000 0001 0000 0001 0011
 		name = "CTZ",
 		format = "R",
-		type = insttype.COMPLEX,
+		type = insttype.ARITHMETIC,
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = countTrailingZeros(R_u(f.rs1));
 		]],
-		verilog_text = [[
-			`EXECUTE_DONE;
-		]]
+		verilog_alu = {
+			operation = operations.CTZ,
+			operand1 = operands.RS1,
+			operand2 = operands.ZERO
+		}
 	},
 	{
 		mask = 0xFFF0707F,	-- 1111 1111 1111 0000 0111 0000 0111 1111
 		data = 0x60201013,	-- 0110 0000 0010 0000 0001 0000 0001 0011
 		name = "CPOP",
 		format = "R",
-		type = insttype.COMPLEX,
+		type = insttype.ARITHMETIC,
 		cpp = [[
 			const auto f = FormatR::parse(word);
 			R_u(f.rd) = countPopulation(R_u(f.rs1));
 		]],
-		verilog_text = [[
-			`EXECUTE_DONE;
-		]]
+		verilog_alu = {
+			operation = operations.CPOP,
+			operand1 = operands.RS1,
+			operand2 = operands.ZERO
+		}
 	},
 	{
 		mask = 0xfe00707f,	-- 1111 1110 0000 0000 0111 0000 0111 1111

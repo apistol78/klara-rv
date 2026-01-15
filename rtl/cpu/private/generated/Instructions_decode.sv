@@ -132,8 +132,8 @@ wire is_S = is_OP23; // is_SB | is_SH | is_SW
 wire is_U = is_OP17 | is_OP37; // is_AUIPC | is_LUI
 wire is_CSR = is_MRET | is_CSRRW | is_CSRRC | is_CSRRS;
 
-wire is_ARITHMETIC = is_XORI | is_SLTIU | is_SLTI | is_ORI | is_ANDI | is_ADDI | is_ROL | is_REV8 | is_ZEXT_H | is_SRAI | is_SEXT_B | is_SEXT_H | is_ROLW | is_SRA | is_SLTU | is_SLLI | is_SLL | is_MINU | is_RORIW | is_SLT | is_ROR | is_RORI | is_MIN | is_SRL | is_SH2ADDUW | is_SH2ADD | is_SH3ADD | is_SLLIUW | is_SH3ADDUW | is_ORN | is_ANDN | is_XNOR | is_SH1ADDUW | is_ADDUW | is_SRLI | is_SH1ADD | is_SUB | is_MAXU | is_MAX | is_XOR | is_ADD | is_AND | is_ORC_B | is_RORW | is_OR | is_AUIPC | is_LUI;
-wire is_COMPLEX = is_EBREAK | is_WFI | is_ECALL | is_MRET | is_CSRRW | is_CSRRC | is_CSRRS | is_FENCE | is_CLZ | is_CTZ | is_CPOP | is_DIVU | is_DIV | is_MULHU | is_MULHSU | is_MUL | is_MULH | is_REMU | is_REM;
+wire is_ARITHMETIC = is_XORI | is_SLTIU | is_SLTI | is_ORI | is_ANDI | is_ADDI | is_ROL | is_REV8 | is_ZEXT_H | is_SRAI | is_SEXT_B | is_SEXT_H | is_ROLW | is_SRA | is_SLTU | is_SLLI | is_SLL | is_MINU | is_RORIW | is_SLT | is_ROR | is_RORI | is_CLZ | is_MIN | is_SRL | is_SH2ADDUW | is_CTZ | is_SH2ADD | is_CPOP | is_SH3ADD | is_SLLIUW | is_SH3ADDUW | is_ORN | is_ANDN | is_XNOR | is_SH1ADDUW | is_ADDUW | is_SRLI | is_SH1ADD | is_SUB | is_MAXU | is_MAX | is_XOR | is_ADD | is_AND | is_ORC_B | is_RORW | is_OR | is_AUIPC | is_LUI;
+wire is_COMPLEX = is_EBREAK | is_WFI | is_ECALL | is_MRET | is_CSRRW | is_CSRRC | is_CSRRS | is_FENCE | is_DIVU | is_DIV | is_MULHU | is_MULHSU | is_MUL | is_MULH | is_REMU | is_REM;
 wire is_JUMP = is_JALR | is_JAL;
 wire is_JUMP_CONDITIONAL = is_BEQ | is_BLTU | is_BGE | is_BNE | is_BLT | is_BGEU;
 wire is_MEMORY = is_LB | is_LW | is_LH | is_LHU | is_LBU | is_SB | is_SH | is_SW;

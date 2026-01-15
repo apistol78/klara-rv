@@ -66,6 +66,16 @@ module CPU_ALU(
 	};
 	wire [31:0] rol_result = { i_op1 << i_op2[4:0], i_op1 >> (32 - i_op2[4:0]) };
 	wire [31:0] ror_result = { i_op1 >> i_op2[4:0], i_op1 << (32 - i_op2[4:0]) };
+	wire [5:0] czt_result;
+	wire [5:0] czl_result;
+	wire [5:0] cpop_result;
+
+	CPU_CTZ ctz(
+		.i_value(i_op1),
+		.o_result_czt(czt_result),
+		.o_result_czl(czl_result),
+		.o_result_cpop(cpop_result)
+	);
 
 	assign o_result =
 		i_op == `OP_SIGNED_ADD ? signed_sum :
@@ -95,6 +105,9 @@ module CPU_ALU(
 		i_op == `OP_ANDN ? andn_result :
 		i_op == `OP_ORN ? orn_result :
 		i_op == `OP_XNOR ? xnor_result :
+		i_op == `OP_CLZ ? { 26'b0, czl_result } :
+		i_op == `OP_CTZ ? { 26'b0, czt_result } :
+		i_op == `OP_CPOP ? { 26'b0, cpop_result } :
 		i_op == `OP_SIGNED_MAX ? signed_max_result :
 		i_op == `OP_UNSIGNED_MAX ? unsigned_max_result :
 		i_op == `OP_SIGNED_MIN ? signed_min_result :

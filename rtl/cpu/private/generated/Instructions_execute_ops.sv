@@ -29,15 +29,6 @@ case (`EXECUTE_OP)
 		`MEM_FLUSH <= 1;
 		`EXECUTE_DONE;
 	end
-	OP_CLZ: begin
-		`EXECUTE_DONE;
-	end
-	OP_CTZ: begin
-		`EXECUTE_DONE;
-	end
-	OP_CPOP: begin
-		`EXECUTE_DONE;
-	end
 	OP_DIVU: begin
 		div_request <= 1'b1;
 		div_signed <= 1'b0;
