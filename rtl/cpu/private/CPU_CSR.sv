@@ -202,23 +202,24 @@ module CPU_CSR #(
 			if (i_mret) begin
 				if (mstatus_mie)
 					$display("recursive interrupt detected, not validated");
+
 				mstatus_mie <= mstatus_mpie;
 				mstatus_mpie <= 1'b0;
+
+				if (issued[0])
+					mip_mtip <= 1'b0;
+				else if (issued[1])
+					mip_meip <= 1'b0;
+				else if (issued[2])
+					mip_msip <= 1'b0;
+
+				issued <= 0;
 			end
 			
 			// Clear interrupt pending flags.
 			if (i_irq_dispatched) begin
 				mepc <= i_irq_epc;
-
-				if (issued[0])
-					mip_mtip <= 1'b0;
-				if (issued[1])
-					mip_meip <= 1'b0;
-				if (issued[2])
-					mip_msip <= 1'b0;
-
 				o_irq_pending <= 1'b0;
-				issued <= 0;
 			end
 		end
 	end

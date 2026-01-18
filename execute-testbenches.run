@@ -3,11 +3,12 @@ import(traktor)
 local TESTBENCHES =
 {
 	-- { "rtl/audio/AUDIO_tb.sv", "rtl/audio/AUDIO_i2s_output.sv", "rtl/audio/AUDIO_controller.sv", "rtl/misc/ClockDivider.sv", "rtl/misc/ClockDividerV.sv", "rtl/fifo/FIFO_BRAM.sv", "rtl/block/BRAM_1r1w.sv" },
-	{ "rtl/audio2/AUDIO_channel_tb.sv", "rtl/audio2/AUDIO_channel.sv", "rtl/audio2/AUDIO_cmdq.sv", "rtl/fifo/FIFO.sv" },
+	-- { "rtl/audio2/AUDIO_channel_tb.sv", "rtl/audio2/AUDIO_channel.sv", "rtl/audio2/AUDIO_cmdq.sv", "rtl/fifo/FIFO.sv" },
 	-- { "rtl/audio2/AUDIO_controller_tb.sv", "rtl/audio2/AUDIO_controller_2.sv", "rtl/audio2/AUDIO_channel.sv", "rtl/audio2/AUDIO_cmdq.sv", "rtl/fifo/FIFO.sv" },
 	-- { "rtl/cpu/private/CPU_DCache_WB_tb.sv", "rtl/cpu/private/CPU_DCache_WB.sv" },
 	-- { "rtl/cpu/private/CPU_ICache_Reg_tb.sv", "rtl/cpu/private/CPU_ICache_Reg.sv", "rtl/cpu/private/CPU_BRAM_1r1w.sv" },
 	-- { "rtl/cpu/private/CPU_Multiply_tb.sv", "rtl/cpu/private/CPU_Multiply.sv" },
+	{ "rtl/cpu/CPU_PLIC_tb.sv", "rtl/cpu/CPU_PLIC.sv" },
 	-- { "rtl/dma/DMA_tb.sv", "rtl/dma/DMA.sv", "rtl/block/BRAM.sv", "rtl/fifo/FIFO.sv" },
 	-- { "rtl/flash/SPI_Flash_tb.sv", "rtl/flash/SPI_Flash.sv" },
 	-- { "rtl/misc/Timer_tb.sv", "rtl/misc/Timer.sv" },
