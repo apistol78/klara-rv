@@ -200,70 +200,77 @@ module I2C_v2 #(
 	// CPU interface
 	// Receive commands and insert into queue.
 	always_ff @(posedge i_clock) begin
+		if (i_reset) begin
+			o_ready <= 1'b0;
+			read_state <= 0;		
+			queue_write <= 1'b0;
+			rx_queue_read <= 1'b0;
+		end
+		else begin
+			queue_write <= 1'b0;
+			rx_queue_read <= 1'b0;
 
-		queue_write <= 1'b0;
-		rx_queue_read <= 1'b0;
-
-		if (i_request && !o_ready) begin
-			if (!i_rw) begin
-				if (i_address == 2'd0) begin
-					o_rdata <=
-					{
-						27'b0,
-						state != IDLE,
-						queue_empty,
-						queue_full,
-						rx_queue_empty,
-						rx_queue_full
-					};
-					o_ready <= 1'b1;
-				end
-				else if (i_address == 2'd1) begin
-					case (read_state)
-						0: begin
-							if (!rx_queue_empty) begin
-								rx_queue_read <= 1'b1;
-								read_state <= 1;
+			if (i_request && !o_ready) begin
+				if (!i_rw) begin
+					if (i_address == 2'd0) begin
+						o_rdata <=
+						{
+							27'b0,
+							state != IDLE,
+							queue_empty,
+							queue_full,
+							rx_queue_empty,
+							rx_queue_full
+						};
+						o_ready <= 1'b1;
+					end
+					else if (i_address == 2'd1) begin
+						case (read_state)
+							0: begin
+								if (!rx_queue_empty) begin
+									rx_queue_read <= 1'b1;
+									read_state <= 1;
+								end
 							end
-						end
-						1: begin
-							rx_queue_read <= 1'b0;
-							read_state <= 2;
-						end
-						2: begin
-							o_rdata <= rx_queue_rdata;
-							o_ready <= 1'b1;
-						end
-					endcase
-				end
-				else if (i_address == 2'd2) begin
-					o_rdata <= queued_counter;
-					o_ready <= 1'b1;
-				end
-				else if (i_address == 2'd3) begin
-					o_rdata <= retired_counter;
-					o_ready <= 1'b1;
-				end
-			end
-			else begin
-				if (i_address == 2'd0) begin
-					queue_wdata.cmd <= i_wdata[0];
-					queue_wdata.speed <= i_wdata[1];
-					queue_wdata.device_address <= i_wdata[15:8];
-					queue_wdata.control_address <= i_wdata[23:16];
-					queue_wdata.nbytes_or_data <= i_wdata[31:24];
-					queue_wdata.tag <= queued_counter + 1;
-					if (!queue_full) begin
-						queue_write <= 1'b1;
-						queued_counter <= queued_counter + 1;
+							1: begin
+								rx_queue_read <= 1'b0;
+								read_state <= 2;
+							end
+							2: begin
+								o_rdata <= rx_queue_rdata;
+								o_ready <= 1'b1;
+							end
+						endcase
+					end
+					else if (i_address == 2'd2) begin
+						o_rdata <= queued_counter;
+						o_ready <= 1'b1;
+					end
+					else if (i_address == 2'd3) begin
+						o_rdata <= retired_counter;
 						o_ready <= 1'b1;
 					end
 				end
+				else begin
+					if (i_address == 2'd0) begin
+						queue_wdata.cmd <= i_wdata[0];
+						queue_wdata.speed <= i_wdata[1];
+						queue_wdata.device_address <= i_wdata[15:8];
+						queue_wdata.control_address <= i_wdata[23:16];
+						queue_wdata.nbytes_or_data <= i_wdata[31:24];
+						queue_wdata.tag <= queued_counter + 1;
+						if (!queue_full) begin
+							queue_write <= 1'b1;
+							queued_counter <= queued_counter + 1;
+							o_ready <= 1'b1;
+						end
+					end
+				end
 			end
-		end
-		else if (!i_request) begin
-			o_ready <= 1'b0;
-			read_state <= 0;
+			else if (!i_request) begin
+				o_ready <= 1'b0;
+				read_state <= 0;
+			end
 		end
 	end
 
@@ -271,265 +278,276 @@ module I2C_v2 #(
 	// I2C state machine
 	bit [31:0] busy_counter = 0;
 	always_ff @(posedge i_clock) begin
-		
-		unique case (state)
+		if (i_reset) begin
+			scl <= 1'b1;
+			sda_rw <= 1'b0;
+			sda_w <= 1'b1;
 
-			// Read command from queue.
+			state <= IDLE;
 
-			IDLE: begin
-				if (!queue_empty) begin
-					queue_read <= 1'b1;
-					state <= READ_CMD_0;
+			queue_read <= 0;
+			rx_queue_write <= 0;
+
+			dly_speed <= DELAY_SLOW;
+		end
+		else begin
+			unique case (state)
+
+				IDLE: begin
+					if (!queue_empty) begin
+						queue_read <= 1'b1;
+						state <= READ_CMD_0;
+					end
 				end
-			end
 
-			READ_CMD_0: begin
-				queue_read <= 1'b0;
-				state <= READ_CMD;
-			end
-
-			READ_CMD: begin
-				dly_speed <= queue_rdata.speed ? DELAY_FAST : DELAY_SLOW;
-				if (queue_rdata.cmd == I2C_CMD_READ) begin
-					i2c_read_device_address <= queue_rdata.device_address;
-					i2c_read_control_address <= queue_rdata.control_address;
-					i2c_read_nbytes <= queue_rdata.nbytes_or_data;
-					busy_counter <= queue_rdata.tag;
-					`I2C_READ(READ_CMD_RETIRED);
+				READ_CMD_0: begin
+					queue_read <= 1'b0;
+					state <= READ_CMD;
 				end
-				else if (queue_rdata.cmd == I2C_CMD_WRITE) begin
-					i2c_write_device_address <= queue_rdata.device_address;
-					i2c_write_control_address <= queue_rdata.control_address;
-					i2c_write_data <= queue_rdata.nbytes_or_data;
-					busy_counter <= queue_rdata.tag;
-					`I2C_WRITE(READ_CMD_RETIRED);
+
+				READ_CMD: begin
+					dly_speed <= queue_rdata.speed ? DELAY_FAST : DELAY_SLOW;
+					if (queue_rdata.cmd == I2C_CMD_READ) begin
+						i2c_read_device_address <= queue_rdata.device_address;
+						i2c_read_control_address <= queue_rdata.control_address;
+						i2c_read_nbytes <= queue_rdata.nbytes_or_data;
+						busy_counter <= queue_rdata.tag;
+						`I2C_READ(READ_CMD_RETIRED);
+					end
+					else if (queue_rdata.cmd == I2C_CMD_WRITE) begin
+						i2c_write_device_address <= queue_rdata.device_address;
+						i2c_write_control_address <= queue_rdata.control_address;
+						i2c_write_data <= queue_rdata.nbytes_or_data;
+						busy_counter <= queue_rdata.tag;
+						`I2C_WRITE(READ_CMD_RETIRED);
+					end
+					else
+						state <= READ_CMD_RETIRED;
 				end
-				else
-					state <= READ_CMD_RETIRED;
-			end
 
-			READ_CMD_RETIRED: begin
-				retired_counter <= busy_counter;
-				state <= IDLE;
-			end
-
-
-			// I2C_READ
-
-			S_I2C_READ_0: begin
-				$display("S_I2C_READ_0 device address %02x, control %02x, nbytes %d", i2c_read_device_address, i2c_read_control_address, i2c_read_nbytes);
-				`I2C_START(S_I2C_READ_1);
-			end
-			S_I2C_READ_1: begin
-				i2c_tx_addr_device_address <= { i2c_read_device_address, 1'b0 };
-				`I2C_TX_ADDR(S_I2C_READ_2);
-			end
-			S_I2C_READ_2: begin
-				i2c_tx_addr_device_address <= i2c_read_control_address;
-				`I2C_TX_ADDR(S_I2C_READ_3);
-			end
-			S_I2C_READ_3: begin
-				`I2C_START(S_I2C_READ_4);
-			end
-			S_I2C_READ_4: begin
-				i2c_tx_addr_device_address <= { i2c_read_device_address, 1'b1 };
-				`I2C_TX_ADDR(S_I2C_READ_5);
-			end
-			S_I2C_READ_5: begin
-				i2c_rx_ack <= (i2c_read_nbytes > 1) ? 1'b1 : 1'b0;
-				`I2C_RX(S_I2C_READ_6);
-			end
-			S_I2C_READ_6: begin
-				rx_queue_write <= 1'b1;
-				rx_queue_wdata <= i2c_rx_data;
-				state <= S_I2C_READ_7;
-			end
-			S_I2C_READ_7: begin
-				rx_queue_write <= 1'b0;
-				i2c_read_nbytes <= i2c_read_nbytes - 1;
-				if (i2c_read_nbytes > 1)
-					`DLY_NEXT(S_I2C_READ_5)
-				else
-					`I2C_STOP(i2c_read_rs);
-			end
-
-			// I2C_WRITE
-
-			S_I2C_WRITE_0: begin
-				$display("S_I2C_WRITE_0 device address %02x, control %02x, data %02x", i2c_write_device_address, i2c_write_control_address, i2c_write_data);
-				`I2C_START(S_I2C_WRITE_1);
-			end
-			S_I2C_WRITE_1: begin
-				i2c_tx_addr_device_address <= { i2c_write_device_address, 1'b0 };
-				`I2C_TX_ADDR(S_I2C_WRITE_2);
-			end
-			S_I2C_WRITE_2: begin
-				i2c_tx_addr_device_address <= i2c_write_control_address;
-				`I2C_TX_ADDR(S_I2C_WRITE_3);
-			end
-			S_I2C_WRITE_3: begin
-				i2c_tx_addr_device_address <= i2c_write_data;
-				`I2C_TX_ADDR(S_I2C_WRITE_4);
-			end
-			S_I2C_WRITE_4: begin
-				`I2C_STOP(i2c_write_rs);
-			end
-
-			// I2C_START
-
-			S_I2C_START_0: begin
-				$display("S_I2C_START_0");
-				sda_rw <= 1'b1;
-				sda_w <= 1'b1;
-				`DLY_NEXT(S_I2C_START_1);
-			end
-			S_I2C_START_1: begin
-				scl <= 1'b1;
-				`DLY_NEXT(S_I2C_START_2);
-			end
-			S_I2C_START_2: begin
-				sda_rw <= 1'b1;
-				sda_w <= 1'b0;
-				`DLY_NEXT(S_I2C_START_3);
-			end
-			S_I2C_START_3: begin
-				scl <= 1'b0;
-				`DLY_NEXT(i2c_start_rs);
-			end
-
-			// I2C_STOP
-
-			S_I2C_STOP_0: begin
-				$display("S_I2C_STOP_0");
-				sda_rw <= 1'b1;
-				sda_w <= 1'b0;
-				`DLY_NEXT(S_I2C_STOP_1);
-			end
-			S_I2C_STOP_1: begin
-				scl <= 1'b1;
-				`DLY_NEXT(S_I2C_STOP_2);
-			end
-			S_I2C_STOP_2: begin
-				sda_rw <= 1'b1;
-				sda_w <= 1'b1;
-				`DLY_NEXT(i2c_stop_rs);
-			end
-
-			// I2C_RX
-
-			S_I2C_RX_0: begin
-				$display("S_I2C_RX_0, ack %d", i2c_rx_ack);
-				scl <= 1'b0;
-				sda_w <= 1'b1;
-				sda_rw <= 1'b1;
-				i2c_rx_data <= 8'h0;
-				i2c_rx_counter <= 5'h0;
-				`DLY_NEXT(S_I2C_RX_0_1);
-			end
-			S_I2C_RX_0_1: begin
-				sda_rw <= 1'b0;
-				`DLY_NEXT(S_I2C_RX_1);
-			end
-			S_I2C_RX_1: begin
-				scl <= 1'b1;
-				`DLY_NEXT(S_I2C_RX_2);
-			end
-			S_I2C_RX_2: begin
-				// if (scl == 0)
-				// 	state <= S_I2C_RX_1;
-				// else begin
-				//	i2c_rx_counter <= i2c_rx_counter + 1;
-				// 	`DLY_NEXT(S_I2C_RX_3);
-				// end
-				i2c_rx_data <= { i2c_rx_data[6:0], sda_r };
-				i2c_rx_counter <= i2c_rx_counter + 5'h1;
-				`DLY_NEXT(S_I2C_RX_3);
-			end
-			S_I2C_RX_3: begin
-				scl <= 1'b0;
-				if (i2c_rx_counter < 5'd8)
-					`DLY_NEXT(S_I2C_RX_1)
-				else begin
-					`DLY_NEXT(S_I2C_RX_4)
+				READ_CMD_RETIRED: begin
+					retired_counter <= busy_counter;
+					state <= IDLE;
 				end
-			end
-			S_I2C_RX_4: begin
-				sda_rw <= 1'b1;
-				sda_w <= ~i2c_rx_ack;
-				`DLY_NEXT(S_I2C_RX_5);
-			end
-			S_I2C_RX_5: begin
-				scl <= 1'b1;
-				`DLY_NEXT(S_I2C_RX_5_1);
-			end
-			S_I2C_RX_5_1: begin
-				`DLY_NEXT(S_I2C_RX_6);
-			end
-			S_I2C_RX_6: begin
-				scl <= 1'b0;
 
-				sda_rw <= 1'b0;
-				sda_w <= 1'b1;
 
-				`DLY_NEXT(i2c_rx_rs);
-			end
+				// I2C_READ
 
-			// I2C_TX_ADDR
+				S_I2C_READ_0: begin
+					$display("S_I2C_READ_0 device address %02x, control %02x, nbytes %d", i2c_read_device_address, i2c_read_control_address, i2c_read_nbytes);
+					`I2C_START(S_I2C_READ_1);
+				end
+				S_I2C_READ_1: begin
+					i2c_tx_addr_device_address <= { i2c_read_device_address, 1'b0 };
+					`I2C_TX_ADDR(S_I2C_READ_2);
+				end
+				S_I2C_READ_2: begin
+					i2c_tx_addr_device_address <= i2c_read_control_address;
+					`I2C_TX_ADDR(S_I2C_READ_3);
+				end
+				S_I2C_READ_3: begin
+					`I2C_START(S_I2C_READ_4);
+				end
+				S_I2C_READ_4: begin
+					i2c_tx_addr_device_address <= { i2c_read_device_address, 1'b1 };
+					`I2C_TX_ADDR(S_I2C_READ_5);
+				end
+				S_I2C_READ_5: begin
+					i2c_rx_ack <= (i2c_read_nbytes > 1) ? 1'b1 : 1'b0;
+					`I2C_RX(S_I2C_READ_6);
+				end
+				S_I2C_READ_6: begin
+					rx_queue_write <= 1'b1;
+					rx_queue_wdata <= i2c_rx_data;
+					state <= S_I2C_READ_7;
+				end
+				S_I2C_READ_7: begin
+					rx_queue_write <= 1'b0;
+					i2c_read_nbytes <= i2c_read_nbytes - 1;
+					if (i2c_read_nbytes > 1)
+						`DLY_NEXT(S_I2C_READ_5)
+					else
+						`I2C_STOP(i2c_read_rs);
+				end
 
-			// Write data.
-			S_I2C_TX_ADDR_0: begin
-				$display("S_I2C_TX_ADDR_0 device address %02x, read %d", i2c_tx_addr_device_address[6:0], i2c_tx_addr_device_address[7]);
-				i2c_tx_addr_counter <= 5'h0;
-				state <= S_I2C_TX_ADDR_1;
-			end
-			S_I2C_TX_ADDR_1: begin
-				sda_rw <= 1'b1;
-				sda_w <= i2c_tx_addr_device_address[7];
-				i2c_tx_addr_device_address <= i2c_tx_addr_device_address << 1;
-				i2c_tx_addr_counter <= i2c_tx_addr_counter + 5'h1;
-				`DLY_NEXT(S_I2C_TX_ADDR_2);
-			end
-			S_I2C_TX_ADDR_2: begin
-				scl <= 1'b1;
-				`DLY_NEXT(S_I2C_TX_ADDR_3);
-			end
-			S_I2C_TX_ADDR_3: begin
-				scl <= 1'b0;
-				if (i2c_tx_addr_counter < 5'h8)
-					`DLY_NEXT(S_I2C_TX_ADDR_1)
-				else begin
+				// I2C_WRITE
+
+				S_I2C_WRITE_0: begin
+					$display("S_I2C_WRITE_0 device address %02x, control %02x, data %02x", i2c_write_device_address, i2c_write_control_address, i2c_write_data);
+					`I2C_START(S_I2C_WRITE_1);
+				end
+				S_I2C_WRITE_1: begin
+					i2c_tx_addr_device_address <= { i2c_write_device_address, 1'b0 };
+					`I2C_TX_ADDR(S_I2C_WRITE_2);
+				end
+				S_I2C_WRITE_2: begin
+					i2c_tx_addr_device_address <= i2c_write_control_address;
+					`I2C_TX_ADDR(S_I2C_WRITE_3);
+				end
+				S_I2C_WRITE_3: begin
+					i2c_tx_addr_device_address <= i2c_write_data;
+					`I2C_TX_ADDR(S_I2C_WRITE_4);
+				end
+				S_I2C_WRITE_4: begin
+					`I2C_STOP(i2c_write_rs);
+				end
+
+				// I2C_START
+
+				S_I2C_START_0: begin
+					$display("S_I2C_START_0");
+					sda_rw <= 1'b1;
+					sda_w <= 1'b1;
+					`DLY_NEXT(S_I2C_START_1);
+				end
+				S_I2C_START_1: begin
+					scl <= 1'b1;
+					`DLY_NEXT(S_I2C_START_2);
+				end
+				S_I2C_START_2: begin
+					sda_rw <= 1'b1;
+					sda_w <= 1'b0;
+					`DLY_NEXT(S_I2C_START_3);
+				end
+				S_I2C_START_3: begin
+					scl <= 1'b0;
+					`DLY_NEXT(i2c_start_rs);
+				end
+
+				// I2C_STOP
+
+				S_I2C_STOP_0: begin
+					$display("S_I2C_STOP_0");
+					sda_rw <= 1'b1;
+					sda_w <= 1'b0;
+					`DLY_NEXT(S_I2C_STOP_1);
+				end
+				S_I2C_STOP_1: begin
+					scl <= 1'b1;
+					`DLY_NEXT(S_I2C_STOP_2);
+				end
+				S_I2C_STOP_2: begin
+					sda_rw <= 1'b1;
+					sda_w <= 1'b1;
+					`DLY_NEXT(i2c_stop_rs);
+				end
+
+				// I2C_RX
+
+				S_I2C_RX_0: begin
+					$display("S_I2C_RX_0, ack %d", i2c_rx_ack);
+					scl <= 1'b0;
+					sda_w <= 1'b1;
+					sda_rw <= 1'b1;
+					i2c_rx_data <= 8'h0;
+					i2c_rx_counter <= 5'h0;
+					`DLY_NEXT(S_I2C_RX_0_1);
+				end
+				S_I2C_RX_0_1: begin
 					sda_rw <= 1'b0;
-					`DLY_NEXT(S_I2C_TX_ADDR_4)
+					`DLY_NEXT(S_I2C_RX_1);
 				end
-			end
-			// Read ACK from slave.
-			S_I2C_TX_ADDR_4: begin
-				`DLY_NEXT(S_I2C_TX_ADDR_5);
-			end
-			S_I2C_TX_ADDR_5: begin
-				scl <= 1'b1;
-				`DLY_NEXT(S_I2C_TX_ADDR_6);
-			end
-			S_I2C_TX_ADDR_6: begin
-				i2c_tx_addr_ack <= sda_r;
-				scl <= 1'b0;
-				sda_rw <= 1'b1;
-				`DLY_NEXT(i2c_tx_addr_rs);
-			end
+				S_I2C_RX_1: begin
+					scl <= 1'b1;
+					`DLY_NEXT(S_I2C_RX_2);
+				end
+				S_I2C_RX_2: begin
+					// if (scl == 0)
+					// 	state <= S_I2C_RX_1;
+					// else begin
+					//	i2c_rx_counter <= i2c_rx_counter + 1;
+					// 	`DLY_NEXT(S_I2C_RX_3);
+					// end
+					i2c_rx_data <= { i2c_rx_data[6:0], sda_r };
+					i2c_rx_counter <= i2c_rx_counter + 5'h1;
+					`DLY_NEXT(S_I2C_RX_3);
+				end
+				S_I2C_RX_3: begin
+					scl <= 1'b0;
+					if (i2c_rx_counter < 5'd8)
+						`DLY_NEXT(S_I2C_RX_1)
+					else begin
+						`DLY_NEXT(S_I2C_RX_4)
+					end
+				end
+				S_I2C_RX_4: begin
+					sda_rw <= 1'b1;
+					sda_w <= ~i2c_rx_ack;
+					`DLY_NEXT(S_I2C_RX_5);
+				end
+				S_I2C_RX_5: begin
+					scl <= 1'b1;
+					`DLY_NEXT(S_I2C_RX_5_1);
+				end
+				S_I2C_RX_5_1: begin
+					`DLY_NEXT(S_I2C_RX_6);
+				end
+				S_I2C_RX_6: begin
+					scl <= 1'b0;
 
-			// Delay states.
+					sda_rw <= 1'b0;
+					sda_w <= 1'b1;
 
-			WAIT_DELAY: begin
-				dly_count <= dly_speed;
-				state <= WAIT_DELAY_I;
-			end
+					`DLY_NEXT(i2c_rx_rs);
+				end
 
-			WAIT_DELAY_I: begin
-				dly_count <= dly_count - 1;
-				if (dly_count == 0)
-					state <= dly_next_state;
-			end
-		endcase
+				// I2C_TX_ADDR
+
+				// Write data.
+				S_I2C_TX_ADDR_0: begin
+					$display("S_I2C_TX_ADDR_0 device address %02x, read %d", i2c_tx_addr_device_address[6:0], i2c_tx_addr_device_address[7]);
+					i2c_tx_addr_counter <= 5'h0;
+					state <= S_I2C_TX_ADDR_1;
+				end
+				S_I2C_TX_ADDR_1: begin
+					sda_rw <= 1'b1;
+					sda_w <= i2c_tx_addr_device_address[7];
+					i2c_tx_addr_device_address <= i2c_tx_addr_device_address << 1;
+					i2c_tx_addr_counter <= i2c_tx_addr_counter + 5'h1;
+					`DLY_NEXT(S_I2C_TX_ADDR_2);
+				end
+				S_I2C_TX_ADDR_2: begin
+					scl <= 1'b1;
+					`DLY_NEXT(S_I2C_TX_ADDR_3);
+				end
+				S_I2C_TX_ADDR_3: begin
+					scl <= 1'b0;
+					if (i2c_tx_addr_counter < 5'h8)
+						`DLY_NEXT(S_I2C_TX_ADDR_1)
+					else begin
+						sda_rw <= 1'b0;
+						`DLY_NEXT(S_I2C_TX_ADDR_4)
+					end
+				end
+				// Read ACK from slave.
+				S_I2C_TX_ADDR_4: begin
+					`DLY_NEXT(S_I2C_TX_ADDR_5);
+				end
+				S_I2C_TX_ADDR_5: begin
+					scl <= 1'b1;
+					`DLY_NEXT(S_I2C_TX_ADDR_6);
+				end
+				S_I2C_TX_ADDR_6: begin
+					i2c_tx_addr_ack <= sda_r;
+					scl <= 1'b0;
+					sda_rw <= 1'b1;
+					`DLY_NEXT(i2c_tx_addr_rs);
+				end
+
+				// Delay states.
+
+				WAIT_DELAY: begin
+					dly_count <= dly_speed;
+					state <= WAIT_DELAY_I;
+				end
+
+				WAIT_DELAY_I: begin
+					dly_count <= dly_count - 1;
+					if (dly_count == 0)
+						state <= dly_next_state;
+				end
+			endcase
+		end
 	end
 
 endmodule

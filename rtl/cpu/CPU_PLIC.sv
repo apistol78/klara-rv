@@ -42,7 +42,7 @@ module CPU_PLIC(
 	bit [2:0] claimed = 0;
 
 	initial begin
-		o_rdata = 1'b0;
+		o_rdata = 32'h0;
 		o_ready = 1'b0;
 	end
 
@@ -60,6 +60,8 @@ module CPU_PLIC(
 			enable <= 0;
 			pending <= 0;
 			claimed <= 1'b0;
+			o_rdata <= 32'h0;
+			o_ready <= 1'b0;
 		end
 		else begin
 
@@ -71,57 +73,62 @@ module CPU_PLIC(
 
 			// Latch pending flags.
 			if (enable[0] && interrupt_0 == 2'b01) begin
-				pending[0] <= 1;
+				pending[0] <= 1'b1;
 			end
 			if (enable[1] && interrupt_1 == 2'b01) begin
-				pending[1] <= 1;
+				pending[1] <= 1'b1;
 			end
 			if (enable[2] && interrupt_2 == 2'b01) begin
-				pending[2] <= 1;
+				pending[2] <= 1'b1;
 			end
 			if (enable[3] && interrupt_3 == 2'b01) begin
-				pending[3] <= 1;
+				pending[3] <= 1'b1;
 			end
 
 			// Handle claim and completion.
-			o_ready <= 0;
-
-			if (i_request && !i_rw && !o_ready) begin
-				if (i_address == 24'h200004) begin	// claim context 0
-					if (pending[0]) begin
-						o_rdata <= 1;
-						claimed <= 1;
-						pending[0] <= 0;
-					end
-					else if (pending[1]) begin
-						o_rdata <= 2;
-						claimed <= 2;
-						pending[1] <= 0;
-					end
-					else if (pending[2]) begin
-						o_rdata <= 3;
-						claimed <= 3;
-						pending[2] <= 0;
-					end
-					else if (pending[3]) begin
-						o_rdata <= 4;
-						claimed <= 4;
-						pending[3] <= 0;
-					end
-				end
-			end
-
-			if (i_request && i_rw && !o_ready) begin
-				if (i_address == 24'h002000) begin	// enable
-					enable <= i_wdata[4:1];
-				end
-				else if (i_address == 24'h200004) begin	// complete context 0
-					claimed <= 0;
-				end
-			end
+			o_ready <= 1'b0;
 
 			if (i_request) begin
-				o_ready <= 1;
+				if (!o_ready) begin
+					if (!i_rw) begin
+						if (i_address == 24'h200004) begin	// claim
+							if (pending[0]) begin
+								o_rdata <= 1;
+								claimed <= 1;
+								pending[0] <= 1'b0;
+							end
+							else if (pending[1]) begin
+								o_rdata <= 2;
+								claimed <= 2;
+								pending[1] <= 1'b0;
+							end
+							else if (pending[2]) begin
+								o_rdata <= 3;
+								claimed <= 3;
+								pending[2] <= 1'b0;
+							end
+							else if (pending[3]) begin
+								o_rdata <= 4;
+								claimed <= 4;
+								pending[3] <= 1'b0;
+							end
+							else begin
+								// Trying to claim an interrupt but none has been issued.
+								o_rdata <= 0;
+								claimed <= 0;
+							end
+						end
+					end
+					else begin
+						if (i_address == 24'h002000) begin	// enable
+							enable <= i_wdata[4:1];
+						end
+						else if (i_address == 24'h200004) begin	// completed
+							claimed <= 0;
+						end
+					end
+				end
+				o_ready <= 1'b1;
 			end
 		end
 	end

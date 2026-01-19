@@ -24,7 +24,6 @@ module CPU_CSR #(
 	// External interrupt input.
 	input wire i_timer_interrupt,
 	input wire i_external_interrupt,
-	output wire o_external_interrupt_enable,
 
 	// Software interrupt input.
 	input wire i_ecall,
@@ -72,11 +71,9 @@ module CPU_CSR #(
 	bit [63:0] cycle = 64'd0;
 	bit [63:0] wtime = 64'd0;
 	bit [PRESCALE_WIDTH - 1:0] prescale = 0;
-	bit [2:0] issued = 0;
 
 	assign o_epc = mepc;
 	assign o_scratch = mscratch;
-	assign o_external_interrupt_enable = mie_meie;
 
 	// Read CSR value by index.
 	always_comb begin
@@ -130,7 +127,6 @@ module CPU_CSR #(
 			mip_mtip <= 0;
 			mip_msip <= 0;
 			mscratch <= 0;
-			issued <= 0;
 			o_irq_pending <= 1'b0;
 		end
 		else begin
@@ -151,10 +147,12 @@ module CPU_CSR #(
 				else if (i_index == `CSR_MEPC)
 					mepc <= i_wdata;
 				else if (i_index == `CSR_MIP) begin
+					// We allow pending interrupts to be written so we
+					// can yield current thread by forcing timer interrupt.
 					mip_meip <= i_wdata[11];
 					mip_mtip <= i_wdata[7];
 					mip_msip <= i_wdata[3];
-				end
+				end					
 			end
 
 			// Latch interrupts pending.
@@ -172,24 +170,20 @@ module CPU_CSR #(
 			if (!o_irq_pending && mstatus_mie) begin
 
 				// Handle in priority order; external interrupts have higest prio.
-				if (mip_meip && mie_meie) begin
+				if (mip_meip) begin
 					mcause <= 32'h80000000 | (1 << 11);					
-					issued <= 3'b010;
+					mip_meip <= 1'b0;
 				end
-				else if (mip_mtip && mie_mtie) begin
+				else if (mip_mtip) begin
 					mcause <= 32'h80000000 | (1 << 7);
-					issued <= 3'b001;
+					mip_mtip <= 1'b0;
 				end
-				else if (mip_msip && mie_msie) begin
+				else if (mip_msip) begin
 					mcause <= 32'h00000000 | (1 << 11);					
-					issued <= 3'b100;
+					mip_msip <= 1'b0;
 				end
 
-				if (
-					(mip_meip && mie_meie) ||
-					(mip_mtip && mie_mtie) ||
-					(mip_msip && mie_msie)
-				) begin
+				if (mip_meip || mip_mtip || mip_msip) begin
 					o_irq_pending <= 1'b1;
 					o_irq_pc <= mtvec;
 
@@ -197,28 +191,19 @@ module CPU_CSR #(
 					mstatus_mie <= 1'b0;
 				end
 			end
-
-			// Restore interrupt enable from "stack".
-			if (i_mret) begin
-				if (mstatus_mie)
-					$display("recursive interrupt detected, not validated");
-
-				mstatus_mie <= mstatus_mpie;
-				mstatus_mpie <= 1'b0;
-
-				if (issued[0])
-					mip_mtip <= 1'b0;
-				else if (issued[1])
-					mip_meip <= 1'b0;
-				else if (issued[2])
-					mip_msip <= 1'b0;
-
-				issued <= 0;
-			end
-			
-			// Clear interrupt pending flags.
+		
+			// IRQ has been dispatched by the fetch unit;
+			// save interrupt return address.
 			if (i_irq_dispatched) begin
 				mepc <= i_irq_epc;
+			end
+
+			// IRQ has returned by the execution unit;
+			// restore interrupt enable from "stack" and
+			// make CSR ready to dispatch another interrupt.
+			if (i_mret) begin
+				mstatus_mie <= mstatus_mpie;
+				mstatus_mpie <= 1'b0;
 				o_irq_pending <= 1'b0;
 			end
 		end
@@ -228,14 +213,14 @@ module CPU_CSR #(
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			wtime <= 64'd0;
-			prescale <= 0;
+			prescale <= PRESCALE;
 			cycle <= 0;
 		end
 		else begin
-			prescale <= prescale + 1;
-			if (prescale >= PRESCALE) begin
+			prescale <= prescale - 1;
+			if (prescale == 0) begin
 				wtime <= wtime + 64'd1;
-				prescale <= 0;
+				prescale <= PRESCALE;
 			end
 			cycle <= cycle + 64'd1;
 		end
