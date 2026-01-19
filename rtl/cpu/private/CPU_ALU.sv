@@ -33,12 +33,12 @@ module CPU_ALU(
 	wire [31:0] shr_result = i_op1 >> i_op2[4:0];
 	wire [31:0] ashr_result = $signed(i_op1) >>> i_op2[4:0];
 
-	wire [31:0] signed_lt_result = ($signed(i_op1) < $signed(i_op2)) ? 1'b1 : 1'b0;
-	wire [31:0] unsigned_lt_result = (i_op1 < i_op2) ? 1'b1 : 1'b0;
-	wire [31:0] equal_result = (i_op1 == i_op2) ? 1'b1 : 1'b0;
-	wire [31:0] not_equal_result = (i_op1 != i_op2) ? 1'b1 : 1'b0;
-	wire [31:0] signed_get_result = ($signed(i_op1) >= $signed(i_op2)) ? 1'b1 : 1'b0;
-	wire [31:0] unsigned_get_result = (i_op1 >= i_op2) ? 1'b1 : 1'b0;
+	wire signed_lt_result = ($signed(i_op1) < $signed(i_op2)) ? 1'b1 : 1'b0;
+	wire unsigned_lt_result = (i_op1 < i_op2) ? 1'b1 : 1'b0;
+	wire equal_result = (i_op1 == i_op2) ? 1'b1 : 1'b0;
+	wire not_equal_result = (i_op1 != i_op2) ? 1'b1 : 1'b0;
+	wire signed_get_result = ($signed(i_op1) >= $signed(i_op2)) ? 1'b1 : 1'b0;
+	wire unsigned_get_result = (i_op1 >= i_op2) ? 1'b1 : 1'b0;
 	
 // Zba
 	wire [31:0] signed_sum_sh1 = ($signed(i_op1) << 1) + $signed(i_op2);
