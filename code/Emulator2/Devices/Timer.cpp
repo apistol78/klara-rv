@@ -74,7 +74,7 @@ uint32_t Timer::readU32(uint32_t address) const
 
 bool Timer::tick(ICPU* cpu, Bus* bus)
 {
-	const int32_t cyclesPerTick = 1;
+	const int32_t cyclesPerTick = 8;
 	for (int32_t i = 0; i < cyclesPerTick; ++i)
 	{
 		if (++m_cycles == m_compare && m_compare != 0)

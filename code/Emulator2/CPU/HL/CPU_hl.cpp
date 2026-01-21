@@ -237,21 +237,29 @@ bool CPU_hl::tick(uint32_t count)
 	{
 		// Handle interrupts.
 		uint32_t mstatus = readCSR(CSR::MSTATUS);
-		bool interruptsEnable = (bool)((mstatus & (1 << 3)) != 0);
+		const bool interruptsEnable = (bool)((mstatus & (1 << 3)) != 0);
 		if (interruptsEnable)
 		{
-			const uint32_t mie = (readCSR(CSR::MIE) & 0x888);
 			uint32_t mip = readCSR(CSR::MIP);
-			if ((mip & mie) != 0)
+			if (mip != 0)
 			{
 				writeCSR(CSR::MEPC, m_pc);
 			
-				if ((mie & 0x80) != 0 && (mip & 0x80) != 0)
+				if ((mip & 0x80) != 0)
+				{
 					writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 7));	// Timer
-				else if ((mie & 0x800) != 0 && (mip & 0x800) != 0)
+					mip &= ~0x80;
+				}
+				else if ((mip & 0x800) != 0)
+				{
 					writeCSR(CSR::MCAUSE, 0x80000000 | (1 << 11));	// External
-				else if ((mie & 0x8) != 0 && (mip & 0x8) != 0)
+					mip &= ~0x800;
+				}
+				else if ((mip & 0x8) != 0)
+				{
 					writeCSR(CSR::MCAUSE, 0x00000000 | (1 << 11));	// Software
+					mip &= ~0x8;
+				}
 
 				// Push MIE and then disable interrupts.
 				mstatus &= ~(1 << 3);
@@ -260,13 +268,6 @@ bool CPU_hl::tick(uint32_t count)
 
 				const uint32_t mtvec = readCSR(CSR::MTVEC);
 				m_pc = mtvec;
-
-				if ((mie & 0x80) != 0 && (mip & 0x80) != 0)
-					mip &= ~0x80;
-				else if ((mie & 0x800) != 0 && (mip & 0x800) != 0)
-					mip &= ~0x800;
-				else if ((mie & 0x8) != 0 && (mip & 0x8) != 0)
-					mip &= ~0x8;
 
 				writeCSR(CSR::MIP, mip);
 
@@ -315,11 +316,12 @@ bool CPU_hl::tick(uint32_t count)
 
 void CPU_hl::interrupt(uint32_t mask)
 {
-	if (mask & SOFT)
+	const uint32_t mie = (readCSR(CSR::MIE) & 0x888);
+	if ((mie & 0x8) != 0 && (mask & SOFT) != 0)
 		m_csr[CSR::MIP] |= 0x8;
-	if (mask & TIMER)
+	if ((mie & 0x80) != 0 && (mask & TIMER) != 0)
 		m_csr[CSR::MIP] |= 0x80;
-	if (mask & EXTERNAL)
+	if ((mie & 0x800) != 0 && (mask & EXTERNAL) != 0)
 		m_csr[CSR::MIP] |= 0x800;
 }
 
