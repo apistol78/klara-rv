@@ -31,6 +31,8 @@ public:
 
 	virtual bool tick(ICPU* cpu, Bus* bus) override final;
 
+	const uint8_t* getData() const { return m_data.c_ptr(); }
+
 private:
 	traktor::AutoArrayPtr< uint8_t > m_data;
 	uint32_t m_capacity;

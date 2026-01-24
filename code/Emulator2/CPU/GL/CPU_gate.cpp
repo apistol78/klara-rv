@@ -218,3 +218,8 @@ uint32_t CPU_gate::getCSR(uint16_t csr) const
 	}
 	return 0;
 }
+
+uint32_t CPU_gate::snoopReadU32(uint32_t address) const
+{
+	return 0;
+}

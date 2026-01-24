@@ -18,7 +18,9 @@ enum CSR
 	MSCRATCH = 0x340,
 	MEPC = 0x341,
 	MCAUSE = 0x342,
-	MIP = 0x344
+	MIP = 0x344,
+	MTIME = 0xc01,
+	MTIMEH = 0xc81
 };
 
 enum InterruptMask
@@ -48,6 +50,8 @@ public:
 	virtual uint32_t getRegister(uint32_t index) const = 0;
 
 	virtual uint32_t getCSR(uint16_t csr) const = 0;
+
+	virtual uint32_t snoopReadU32(uint32_t address) const = 0;
 
 	// Convenience
 

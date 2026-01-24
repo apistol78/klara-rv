@@ -48,6 +48,8 @@ public:
 
 	virtual uint32_t getCSR(uint16_t csr) const override final;
 
+	virtual uint32_t snoopReadU32(uint32_t address) const override final;
+
 	void reset();
 
 	void push(uint32_t value);

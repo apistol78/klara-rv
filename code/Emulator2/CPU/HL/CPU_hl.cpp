@@ -224,6 +224,8 @@ CPU_hl::CPU_hl(Bus* bus, OutputStream* trace, bool twoWayICache)
 		m_csr[i] = 0x00000000;
 
 	writeCSR(CSR::MSTATUS, 0x8);
+
+	m_timer.reset();
 }
 
 bool CPU_hl::tick(uint32_t count)
@@ -359,6 +361,11 @@ uint32_t CPU_hl::getCSR(uint16_t csr) const
 	return readCSR(csr);
 }
 
+uint32_t CPU_hl::snoopReadU32(uint32_t address) const
+{
+	return m_busAccess->readU32(m_pc, address);
+}
+
 void CPU_hl::reset()
 {
 	m_pc = 0x000000000;
@@ -395,10 +402,10 @@ uint32_t CPU_hl::readCSR(uint16_t csr) const
 		return (uint32_t)m_cycles;
 	else if (csr == 0xc80)
 		return (uint32_t)(m_cycles >> 32);
-	else if (csr == 0xc01 || csr == 0xc81)
+	else if (csr == MTIME || csr == MTIMEH)
 	{
 		const uint64_t time = (uint64_t)(m_timer.getElapsedTime() * 1000);
-		if (csr == 0xc01)
+		if (csr == MTIME)
 			return (uint32_t)time;
 		else
 			return (uint32_t)(time >> 32);

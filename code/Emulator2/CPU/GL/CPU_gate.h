@@ -39,6 +39,8 @@ public:
 
 	virtual uint32_t getCSR(uint16_t csr) const override final;
 
+	virtual uint32_t snoopReadU32(uint32_t address) const override final;
+
 private:
 	traktor::Ref< Bus > m_bus;
 	VCPU_top* m_tb = nullptr;
