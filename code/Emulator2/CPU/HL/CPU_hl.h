@@ -34,7 +34,7 @@ public:
 
 	virtual bool tick(uint32_t count) override final;
 
-	virtual void interrupt(uint32_t mask) override final;
+	virtual uint32_t& getInterruptPending() override final;
 
 	virtual void flushCaches() override final;
 
@@ -75,6 +75,7 @@ private:
 	uint32_t m_csr[4096];
 	uint64_t m_cycles;
 	bool m_waitForInterrupt;
+	uint32_t m_pending = 0;
 
 	bool decode(uint32_t word);
 

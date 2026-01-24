@@ -22,16 +22,7 @@ bool PLIC::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 		m_enable = value >> 1;
 	else if (address == 0x00200004)
 	{
-		if (value >= 1 && value <= 4)
-		{
-			value--;
-			m_raised &= ~(1 << (value & 3));
-			m_issued &= ~(1 << (value & 3));
-		}
-		else
-		{
-			log::error << L"[PLIC] attempt to complete unknown interrupt " << str(L"%d", value) << L"." << Endl;
-		}
+		// Complete interrupt.
 	}	
 	else
 	{
@@ -46,16 +37,18 @@ uint32_t PLIC::readU32(uint32_t address) const
 {
 	if (address == 0x00200004)
 	{
+		// Claim pending interrupt.
 		for (int i = 0; i < 4; ++i)
 		{
-			if (
-				(m_raised & (1 << i)) != 0 &&
-				(m_issued & (1 << i)) != 0
-			)
+			if ((m_raised & (1 << i)) != 0)
 			{
+				m_raised &= ~(1 << i);
 				return i + 1;
 			}
 		}
+		// Reaching here indicate something wrong
+		// since should only be read when an interrupt
+		// has been issued.
 		log::info << L"[PLIC] no pending interrupts." << Endl;
 		return 0;
 	}
@@ -70,32 +63,15 @@ uint32_t PLIC::readU32(uint32_t address) const
 
 bool PLIC::tick(ICPU* cpu, Bus* bus)
 {
-	for (uint32_t i = 0; i < 4; ++i)
-	{
-		if (
-			((m_raised & (1 << i)) != 0) &&
-			((m_issued & (1 << i)) == 0)
-		)
-		{			
-			m_issued |= (1 << i);
-			cpu->interrupt(EXTERNAL);
-			break;
-		}
-	}
+	if (m_raised)
+		cpu->getInterruptPending() |= EXTERNAL;
+	else
+		cpu->getInterruptPending() &= ~EXTERNAL;
+
 	return true;
 }
 
 void PLIC::raise(uint32_t channel)
 {
 	m_raised |= 1 << channel;
-}
-
-bool PLIC::raised(uint32_t channel) const
-{
-	return (m_raised & (1 << channel)) != 0;
-}
-
-bool PLIC::issued(uint32_t channel) const
-{
-	return (m_issued & (1 << channel)) != 0;
 }

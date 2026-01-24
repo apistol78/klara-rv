@@ -37,7 +37,7 @@ class ICPU : public traktor::Object
 public:
 	virtual bool tick(uint32_t count) = 0;
 
-	virtual void interrupt(uint32_t mask) = 0;
+	virtual uint32_t& getInterruptPending() = 0;
 
 	virtual void flushCaches() = 0;
 

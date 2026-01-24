@@ -232,17 +232,29 @@ bool CPU_hl::tick(uint32_t count)
 {
 	// Check if CPU in low power mode and
 	// are waiting for interrupt.
-	if (m_waitForInterrupt && readCSR(CSR::MIP) == 0)
+	if (m_waitForInterrupt && readCSR(CSR::MIP) == 0 && m_pending == 0)
 		return true;
 
 	for (uint32_t i = 0; i < count; ++i)
 	{
+		// Latch pending interrupts.
+		const uint32_t mie = (m_csr[CSR::MIE] & 0x888);
+		if ((mie & 0x8) != 0 && (m_pending & SOFT) != 0)
+			m_csr[CSR::MIP] |= 0x8;
+		if ((mie & 0x80) != 0 && (m_pending & TIMER) != 0)
+		{
+			m_csr[CSR::MIP] |= 0x80;
+			m_pending &= ~TIMER;
+		}
+		if ((mie & 0x800) != 0 && (m_pending & EXTERNAL) != 0)
+			m_csr[CSR::MIP] |= 0x800;
+
 		// Handle interrupts.
 		uint32_t mstatus = readCSR(CSR::MSTATUS);
 		const bool interruptsEnable = (bool)((mstatus & (1 << 3)) != 0);
 		if (interruptsEnable)
 		{
-			uint32_t mip = readCSR(CSR::MIP);
+			uint32_t mip = m_csr[CSR::MIP];
 			if (mip != 0)
 			{
 				writeCSR(CSR::MEPC, m_pc);
@@ -271,7 +283,7 @@ bool CPU_hl::tick(uint32_t count)
 				const uint32_t mtvec = readCSR(CSR::MTVEC);
 				m_pc = mtvec;
 
-				writeCSR(CSR::MIP, mip);
+				m_csr[CSR::MIP] = mip;
 
 				m_waitForInterrupt = false;
 			}
@@ -316,15 +328,9 @@ bool CPU_hl::tick(uint32_t count)
 	return true;
 }
 
-void CPU_hl::interrupt(uint32_t mask)
+uint32_t& CPU_hl::getInterruptPending()
 {
-	const uint32_t mie = (readCSR(CSR::MIE) & 0x888);
-	if ((mie & 0x8) != 0 && (mask & SOFT) != 0)
-		m_csr[CSR::MIP] |= 0x8;
-	if ((mie & 0x80) != 0 && (mask & TIMER) != 0)
-		m_csr[CSR::MIP] |= 0x80;
-	if ((mie & 0x800) != 0 && (mask & EXTERNAL) != 0)
-		m_csr[CSR::MIP] |= 0x800;
+	return m_pending;
 }
 
 void CPU_hl::flushCaches()

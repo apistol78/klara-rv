@@ -152,9 +152,9 @@ bool CPU_gate::tick(uint32_t count)
 	return true;
 }
 
-void CPU_gate::interrupt(uint32_t mask)
+uint32_t& CPU_gate::getInterruptPending()
 {
-	m_interrupt |= mask;
+	return m_interrupt;
 }
 
 void CPU_gate::flushCaches()
