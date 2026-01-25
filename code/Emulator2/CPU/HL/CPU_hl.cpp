@@ -248,13 +248,15 @@ bool CPU_hl::tick(uint32_t count)
 		}
 		if ((mie & 0x800) != 0 && (m_pending & EXTERNAL) != 0)
 			m_csr[CSR::MIP] |= 0x800;
+		else
+			m_csr[CSR::MIP] &= ~0x800;
 
 		// Handle interrupts.
 		uint32_t mstatus = readCSR(CSR::MSTATUS);
-		const bool interruptsEnable = (bool)((mstatus & (1 << 3)) != 0);
-		if (interruptsEnable)
+		const bool ie = (bool)((mstatus & (1 << 3)) != 0);
+		if (ie)
 		{
-			uint32_t mip = m_csr[CSR::MIP];
+			uint32_t mip = (m_csr[CSR::MIP] & 0x888);
 			if (mip != 0)
 			{
 				writeCSR(CSR::MEPC, m_pc);

@@ -16,6 +16,11 @@ using namespace traktor;
 
 T_IMPLEMENT_RTTI_CLASS(L"PLIC", PLIC, IDevice)
 
+PLIC::PLIC(ICPU* cpu)
+:	m_cpu(cpu)
+{
+}
+
 bool PLIC::writeU32(uint32_t address, uint32_t value, uint32_t mask)
 {
 	if (address == 0x00002000)
@@ -43,6 +48,8 @@ uint32_t PLIC::readU32(uint32_t address) const
 			if ((m_raised & (1 << i)) != 0)
 			{
 				m_raised &= ~(1 << i);
+				if (!m_raised)
+					m_cpu->getInterruptPending() &= ~EXTERNAL;
 				return i + 1;
 			}
 		}
@@ -61,17 +68,8 @@ uint32_t PLIC::readU32(uint32_t address) const
 	return 0;
 }
 
-bool PLIC::tick(ICPU* cpu, Bus* bus)
-{
-	if (m_raised)
-		cpu->getInterruptPending() |= EXTERNAL;
-	else
-		cpu->getInterruptPending() &= ~EXTERNAL;
-
-	return true;
-}
-
 void PLIC::raise(uint32_t channel)
 {
 	m_raised |= 1 << channel;
+	m_cpu->getInterruptPending() |= EXTERNAL;
 }
