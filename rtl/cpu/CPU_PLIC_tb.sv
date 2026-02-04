@@ -58,6 +58,7 @@ module CPU_PLIC_tb();
 		plic_wdata <= { 4'b1111, 1'b0 };
 		while (!plic_ready) @(posedge clk);
 		plic_request <= 1'b0;
+		plic_rw <= 1'b0;
 
 		repeat (10) @(posedge clk);
 
@@ -82,8 +83,6 @@ module CPU_PLIC_tb();
 
 		repeat (10) @(posedge clk);
 
-		plic_interrupt_0 <= 1'b0;
-
 		plic_interrupt_2 <= 1'b1;
 		repeat (4) @(posedge clk);
 		plic_interrupt_2 <= 1'b0;
@@ -98,6 +97,8 @@ module CPU_PLIC_tb();
 		plic_wdata <= 1;
 		while (!plic_ready) @(posedge clk);
 		plic_request <= 1'b0;
+
+		plic_interrupt_0 <= 1'b0;
 
 
 		repeat (10) @(posedge clk);

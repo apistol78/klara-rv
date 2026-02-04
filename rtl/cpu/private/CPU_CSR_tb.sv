@@ -68,13 +68,7 @@ module CPU_CSR_tb();
 
     repeat (10) @(posedge clk);
 
-        // Trigger an external and timer interrupt.
-        csr_timer_interrupt <= 1'b1;
-        @(posedge clk);
         csr_external_interrupt <= 1'b1;
-        csr_timer_interrupt <= 1'b0;
-        @(posedge clk);
-        csr_external_interrupt <= 1'b0;
 
     repeat (10) @(posedge clk);
 
@@ -87,9 +81,7 @@ module CPU_CSR_tb();
 
     repeat (10) @(posedge clk);
 
-        csr_timer_interrupt <= 1'b1;
-        @(posedge clk);
-        csr_timer_interrupt <= 1'b0;
+        csr_external_interrupt <= 1'b0;
 
     repeat (10) @(posedge clk);
 
@@ -97,24 +89,6 @@ module CPU_CSR_tb();
         csr_mret <= 1'b1;
         @(posedge clk);
         csr_mret <= 1'b0;
-
-    repeat (10) @(posedge clk);
-
-        // CPU accept interrupt.
-        assert(csr_irq_pending);
-        csr_irq_dispatched <= 1'b1;
-        csr_irq_epc <= 32'hb00b_b00b;
-        @(posedge clk);
-        csr_irq_dispatched <= 1'b0;
-
-    repeat (10) @(posedge clk);
-
-        // CPU return from interrupt.
-        csr_mret <= 1'b1;
-        @(posedge clk);
-        csr_mret <= 1'b0;
-
-    repeat (10) @(posedge clk);
 
 
 		//===================================

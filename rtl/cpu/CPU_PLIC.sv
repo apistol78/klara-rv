@@ -22,7 +22,6 @@ module CPU_PLIC(
 
 	// Output
 	output bit o_interrupt,
-	output bit o_claimed,
 
 	// CPU interface
 	input wire i_request,
@@ -47,8 +46,7 @@ module CPU_PLIC(
 	end
 
 	always_comb begin
-		o_interrupt = |pending;
-		o_claimed = |claimed;
+		o_interrupt = |pending && !(|claimed);
 	end
 
 	always_ff @(posedge i_clock) begin
@@ -87,11 +85,16 @@ module CPU_PLIC(
 
 			// Handle claim and completion.
 			o_ready <= 1'b0;
+			o_rdata <= 0;
 
 			if (i_request) begin
 				if (!o_ready) begin
 					if (!i_rw) begin
 						if (i_address == 24'h200004) begin	// claim
+
+							// assert(!(|claimed));
+							// assert(pending);
+
 							if (pending[0]) begin
 								o_rdata <= 1;
 								claimed <= 1;
@@ -112,11 +115,6 @@ module CPU_PLIC(
 								claimed <= 4;
 								pending[3] <= 1'b0;
 							end
-							else begin
-								// Trying to claim an interrupt but none has been issued.
-								o_rdata <= 0;
-								claimed <= 0;
-							end
 						end
 					end
 					else begin
@@ -124,6 +122,8 @@ module CPU_PLIC(
 							enable <= i_wdata[4:1];
 						end
 						else if (i_address == 24'h200004) begin	// completed
+							// Clearing claimed causes the o_interrupt signal
+							// to be raised again if there are more pending.
 							claimed <= 0;
 						end
 					end
