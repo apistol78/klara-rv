@@ -8,8 +8,8 @@ local TESTBENCHES =
 	-- { "rtl/cpu/private/CPU_DCache_WB_tb.sv", "rtl/cpu/private/CPU_DCache_WB.sv" },
 	-- { "rtl/cpu/private/CPU_ICache_Reg_tb.sv", "rtl/cpu/private/CPU_ICache_Reg.sv", "rtl/cpu/private/CPU_BRAM_1r1w.sv" },
 	-- { "rtl/cpu/private/CPU_Multiply_tb.sv", "rtl/cpu/private/CPU_Multiply.sv" },
-	{ "rtl/cpu/CPU_PLIC_tb.sv", "rtl/cpu/CPU_PLIC.sv" },
-	{ "rtl/cpu/private/CPU_CSR_tb.sv", "rtl/cpu/private/CPU_CSR.sv" },
+	-- { "rtl/cpu/CPU_PLIC_tb.sv", "rtl/cpu/CPU_PLIC.sv" },
+	-- { "rtl/cpu/private/CPU_CSR_tb.sv", "rtl/cpu/private/CPU_CSR.sv" },
 	-- { "rtl/dma/DMA_tb.sv", "rtl/dma/DMA.sv", "rtl/block/BRAM.sv", "rtl/fifo/FIFO.sv" },
 	-- { "rtl/flash/SPI_Flash_tb.sv", "rtl/flash/SPI_Flash.sv" },
 	-- { "rtl/misc/Timer_tb.sv", "rtl/misc/Timer.sv" },
@@ -22,6 +22,7 @@ local TESTBENCHES =
 	-- { "rtl/misc/XBAR_2_2_tb.sv", "rtl/misc/XBAR_2_2.sv", "rtl/block/BRAM.sv" },
 	-- { "rtl/misc/BusX_tb.sv", "rtl/misc/BusX.sv" },
 	-- { "rtl/i2c/I2C_v2_tb.sv", "rtl/i2c/I2C_v2.sv", "rtl/fifo/FIFO.sv" },
+	{ "rtl/jtag/JTAG_Simple_tb.sv", "rtl/jtag/JTAG_Simple.sv" },
 }
 
 function main()
