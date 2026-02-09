@@ -137,7 +137,7 @@ module JTAG_Simple_tb;
         // Shift 4 bits into IR.
 		tmp = 32'h0000_000c;
 		for (int i = 0; i < 4; i++) begin			
-            jtag_tick(0, tmp[3 - i]);
+            jtag_tick(0, tmp[i]);
         end
 
         exit_shift();
