@@ -19,6 +19,7 @@ module JTAG_Simple #(
 	input wire i_clock,
 
 	input wire [31:0] i_usercode,
+	output wire [3:0] o_state,
 
 	input wire TDI,
 	output bit TDO,
@@ -27,22 +28,22 @@ module JTAG_Simple #(
 );
 	typedef enum bit [3:0]
 	{
-		TEST_LOGIC_RESET,
+		TEST_LOGIC_RESET,	// 0
 		RUN_TEST_IDLE,
 		SELECT_DR_SCAN,
 		CAPTURE_DR,
-		SHIFT_DR,
+		SHIFT_DR,			// 4
 		EXIT_1_DR,
-		PAUSE_DR,
+		PAUSE_DR,			// 6
 		EXIT_2_DR,
 		UPDATE_DR,
 		SELECT_IR_SCAN,
-		CAPTURE_IR,
+		CAPTURE_IR,			// 10
 		SHIFT_IR,
 		EXIT_1_IR,
 		PAUSE_IR,
 		EXIT_2_IR,
-		UPDATE_IR
+		UPDATE_IR			// 15
 	} state_t;
 	
 	wire [31:0] idcode = { IDCODE_VERSION, IDCODE_PART, IDCODE_MANUFACTURER, 1'b1 };
@@ -53,66 +54,66 @@ module JTAG_Simple #(
 		TDO = 1'b0;
 	end
 
-	bit [31:0] dr;
-	bit [31:0] dr_out = 0;
+	assign o_state = state;
+
+	bit [31:0] dr_active;
+	bit [31:0] dr = 0;
 	bit bypass = 1'b0;
 
 	always_comb begin
 		case (ir)
-			4'h5, 4'h6: begin
-				dr = idcode;
+			4'h1, 4'h2, 4'h5, 4'h6, 4'hb: begin
+				dr_active = idcode;
 			end
 			4'hc, 4'he: begin
-				dr = i_usercode;
+				dr_active = i_usercode;
 			end
 			default: begin
-				dr = 32'hffff_ffff;
+				dr_active = 32'hffff_ffff;
 			end
 		endcase
 	end
 
-	bit [1:0] tck = 2'b00;
-	wire [1:0] tck_p = { tck[0], TCK };
+	bit [2:0] tck_r = 3'b000;
+	wire [2:0] tck_p = { tck_r[1:0], TCK & ~i_reset };
+	wire PE = (tck_p[1:0] == 2'b01);
+	wire BE = (tck_p == 3'b011);
+
+	bit [31:0] tick_count = 0;
 
 	always_ff @(posedge i_clock) begin
-	// always_ff @(posedge TCK) begin
 		if (i_reset) begin
 			state <= TEST_LOGIC_RESET;
 			ir <= 4'h0;
-			// tck <= 2'b00;
-			// TDO <= 1'b0;
+			dr <= 0;
+			bypass <= 1'b0;
+			tck_r <= 2'b00;
+			TDO <= 1'b0;
 		end
 		else begin
-			tck <= tck_p;
-			if (tck_p == 2'b01) begin
-			// begin
+			tck_r <= tck_p;
+			if (tck_p[1:0] == 2'b01) begin
+
+				tick_count <= tick_count + 1;
 
 				// Update FSM
 				case (state)
 					TEST_LOGIC_RESET: begin
-						dr_out <= idcode;
-						if (TMS == 1'b0) begin
-							$display("TEST_LOGIC_RESET -> RUN_TEST_IDLE");
+						dr <= idcode;
+						if (TMS == 1'b0)
 							state <= RUN_TEST_IDLE;
-						end
 					end
 
 					RUN_TEST_IDLE: begin
-						if (TMS == 1'b1) begin
-							$display("RUN_TEST_IDLE -> SELECT_DR_SCAN");
+						if (TMS == 1'b1)
 							state <= SELECT_DR_SCAN;
-						end
 					end
 
 					SELECT_DR_SCAN: begin
-						if (TMS == 1'b1) begin
-							$display("SELECT_DR_SCAN -> SELECT_IR_SCAN");
+						if (TMS == 1'b1)
 							state <= SELECT_IR_SCAN;
-						end
-						else begin
-							$display("SELECT_DR_SCAN -> CAPTURE_DR");
+						else
 							state <= CAPTURE_DR;
-						end
 					end
 
 					// DR
@@ -125,11 +126,10 @@ module JTAG_Simple #(
 					end
 
 					SHIFT_DR: begin
-						if (TMS == 1'b0) begin
-							dr_out <= { 1'b0, dr_out[31:1] };
-						end
-						else
+						if (TMS == 1'b1)
 							state <= EXIT_1_DR;
+						else
+							dr <= { TDI, dr[31:1] };
 					end
 
 					EXIT_1_DR: begin
@@ -161,18 +161,13 @@ module JTAG_Simple #(
 					// IR
 
 					SELECT_IR_SCAN: begin
-						if (TMS == 1'b1) begin
-							$display("SELECT_IR_SCAN -> TEST_LOGIC_RESET");
+						if (TMS == 1'b1)
 							state <= TEST_LOGIC_RESET;
-						end
-						else begin
-							$display("SELECT_IR_SCAN -> CAPTURE_IR");
+						else
 							state <= CAPTURE_IR;
-						end
 					end
 
 					CAPTURE_IR: begin
-						ir <= 4'h0;
 						if (TMS == 1'b1)
 							state <= EXIT_1_IR;
 						else
@@ -180,11 +175,10 @@ module JTAG_Simple #(
 					end
 
 					SHIFT_IR: begin
-						if (TMS == 1'b0) begin
-							ir <= { TDI, ir[3:1] };
-						end
-						else
+						if (TMS == 1'b1)
 							state <= EXIT_1_IR;
+						else
+							ir <= { TDI, ir[3:1] };
 					end
 
 					EXIT_1_IR: begin
@@ -212,7 +206,7 @@ module JTAG_Simple #(
 						// 	bypass <= 1'b1;
 						// else begin
 						// 	bypass <= 1'b0;
-							dr_out <= dr;
+						dr <= dr_active;
 						// end
 
 						if (TMS == 1'b1)
@@ -222,39 +216,28 @@ module JTAG_Simple #(
 					end
 
 				endcase
-
-				// Should be out when TCK goes low, ie negedge
-				// if (state == SHIFT_IR)
+			end
+			
+			// Shift out one clock delay instead on negative TCK;
+			// this to ensure TDO is stable before negative TCK.
+			//if (tck_p == 3'b011) begin
+				// if (state == CAPTURE_IR || state == SHIFT_IR)
 				// 	TDO <= ir[0];
-				// else if (state == SHIFT_DR)
-				// 	TDO <= dr_out[0];
+				// else if (state == CAPTURE_DR || state == SHIFT_DR)
+				// 	TDO <= dr[0];
 				// else
 				// 	TDO <= 1'b0;
-
-			end
-			else if (tck_p == 2'b10) begin
-				if (state == SHIFT_IR)
-					TDO <= ir[0];
-				else if (state == SHIFT_DR)
-					TDO <= dr_out[0];
-				else
-					TDO <= 1'b0;
-			end
+			//end
 		end
 	end
 
-	// always_ff @(negedge TCK) begin
-	// 	// if (!bypass)
-
-	// 	if (state == SHIFT_IR)
-	// 		TDO <= ir[0];
-	// 	else if (state == SHIFT_DR)
-	// 		TDO <= dr_out[0];
-	// 	else
-	// 		TDO <= 1'b0;
-
-	// 	// else
-	// 	// 	TDO <= TDI;		
-	// end
+	always_comb begin
+		if (state == CAPTURE_IR || state == SHIFT_IR)
+			TDO = ir[0];
+		else if (state == CAPTURE_DR || state == SHIFT_DR)
+			TDO = dr[0];
+		else
+			TDO = 1'b0;
+	end		
 
 endmodule

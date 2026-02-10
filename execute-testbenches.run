@@ -34,7 +34,7 @@ function main()
 		end
 		stdout:printLn(cmd)
 		run:execute(cmd)
-		run:execute("./a.out")
+		run:execute("vvp ./a.out -fst")
 		run:rm("./a.out")
 	end
 end
