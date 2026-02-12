@@ -21,20 +21,20 @@ wire is_OP17 = (`INSTRUCTION[6:2] == 5'h05);
 wire is_OP37 = (`INSTRUCTION[6:2] == 5'h0d);
 
 wire is_WFI       = is_OP73 & ((`INSTRUCTION[31:7] & 25'h1ffffff) == 25'h020a000);
-wire is_EBREAK    = is_OP73 & ((`INSTRUCTION[31:7] & 25'h1ffffff) == 25'h0002000);
-wire is_ECALL     = is_OP73 & ((`INSTRUCTION[31:7] & 25'h1ffffff) == 25'h0000000);
-wire is_CSRRC     = is_OP73 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h060     );
 wire is_MRET      = is_OP73 & ((`INSTRUCTION[31:7] & 25'h1ffffff) == 25'h0604000);
+wire is_CSRRC     = is_OP73 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h060     );
 wire is_CSRRW     = is_OP73 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h020     );
 wire is_CSRRS     = is_OP73 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h040     );
-wire is_BGEU      = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h0e0     );
-wire is_BNE       = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h020     );
+wire is_ECALL     = is_OP73 & ((`INSTRUCTION[31:7] & 25'h1ffffff) == 25'h0000000);
+wire is_EBREAK    = is_OP73 & ((`INSTRUCTION[31:7] & 25'h1ffffff) == 25'h0002000);
 wire is_BEQ       = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h000     );
-wire is_BLT       = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h080     );
+wire is_BGEU      = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h0e0     );
 wire is_BGE       = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h0a0     );
+wire is_BLT       = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h080     );
 wire is_BLTU      = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h0c0     );
-wire is_SLTIU     = is_OP13 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h060     );
+wire is_BNE       = is_OP63 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h020     );
 wire is_SLTI      = is_OP13 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h040     );
+wire is_SLTIU     = is_OP13 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h060     );
 wire is_ORI       = is_OP13 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h0c0     );
 wire is_ADDI      = is_OP13 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h000     );
 wire is_ANDI      = is_OP13 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h0e0     );
@@ -102,21 +102,21 @@ wire is_SH        = is_OP23 & ((`INSTRUCTION[15:7] & 9'h0e0     ) == 9'h020     
 wire is_AUIPC     = is_OP17;
 wire is_LUI       = is_OP37;
 
-wire is_B = is_OP63; // is_BGEU | is_BNE | is_BEQ | is_BLT | is_BGE | is_BLTU
-wire is_I = is_SLTIU | is_SLTI | is_ORI | is_FENCE | is_JALR | is_LB | is_ADDI | is_LHU | is_ANDI | is_LW | is_LH | is_LBU | is_XORI;
+wire is_B = is_OP63; // is_BEQ | is_BGEU | is_BGE | is_BLT | is_BLTU | is_BNE
+wire is_I = is_SLTI | is_SLTIU | is_FENCE | is_ORI | is_JALR | is_LB | is_ADDI | is_LHU | is_ANDI | is_LW | is_LH | is_LBU | is_XORI;
 wire is_J = is_OP6f; // is_JAL
 wire is_R = is_MULHU | is_REMU | is_OR | is_MULHSU | is_REM | is_SLL | is_ADDUW | is_XOR | is_SUB | is_SH1ADD | is_SH2ADD | is_SH1ADDUW | is_SH3ADD | is_SH2ADDUW | is_SLLI | is_SRLI | is_SLTU | is_SLT | is_SRA | is_SRAI | is_SRL | is_MULH | is_ADD | is_SLLIUW | is_DIVU | is_DIV | is_AND | is_FCVT_W_S | is_FADD | is_FCVT_S_W | is_FCVT_WU_S | is_MUL | is_FDIV | is_FCVT_S_WU | is_FLE | is_FEQ | is_FMAX | is_FMIN | is_FSUB | is_FSGNJX | is_FMUL | is_FSGNJ | is_SH3ADDUW | is_FSGNJN | is_FLT;
 wire is_R4 = is_OP43 | is_OP47 | is_OP4f | is_OP4b; // is_FMADD | is_FMSUB | is_FNMADD | is_FNMSUB
 wire is_S = is_OP23; // is_SW | is_SB | is_SH
 wire is_U = is_OP17 | is_OP37; // is_AUIPC | is_LUI
-wire is_CSR = is_CSRRC | is_MRET | is_CSRRW | is_CSRRS;
+wire is_CSR = is_MRET | is_CSRRC | is_CSRRW | is_CSRRS | is_ECALL | is_EBREAK;
 
 wire is_ARITHMETIC = is_ORI | is_ADDI | is_ANDI | is_XORI | is_OR | is_ADDUW | is_XOR | is_SUB | is_SH1ADD | is_SH2ADD | is_SH1ADDUW | is_SH3ADD | is_SH2ADDUW | is_ADD | is_AND | is_SH3ADDUW | is_AUIPC | is_LUI;
 wire is_SHIFT = is_SLL | is_SLLI | is_SRLI | is_SRA | is_SRAI | is_SRL | is_SLLIUW;
-wire is_COMPARE = is_SLTIU | is_SLTI | is_SLTU | is_SLT;
-wire is_COMPLEX = is_WFI | is_EBREAK | is_ECALL | is_CSRRC | is_MRET | is_CSRRW | is_CSRRS | is_FENCE | is_MULHU | is_REMU | is_MULHSU | is_REM | is_MULH | is_DIVU | is_DIV | is_MUL;
+wire is_COMPARE = is_SLTI | is_SLTIU | is_SLTU | is_SLT;
+wire is_COMPLEX = is_WFI | is_MRET | is_CSRRC | is_CSRRW | is_CSRRS | is_ECALL | is_EBREAK | is_FENCE | is_MULHU | is_REMU | is_MULHSU | is_REM | is_MULH | is_DIVU | is_DIV | is_MUL;
 wire is_JUMP = is_JALR | is_JAL;
-wire is_JUMP_CONDITIONAL = is_BGEU | is_BNE | is_BEQ | is_BLT | is_BGE | is_BLTU;
+wire is_JUMP_CONDITIONAL = is_BEQ | is_BGEU | is_BGE | is_BLT | is_BLTU | is_BNE;
 wire is_MEMORY = is_LB | is_LHU | is_LW | is_LH | is_LBU | is_SW | is_SB | is_SH;
 wire is_FPU = is_FCVT_W_S | is_FADD | is_FCVT_S_W | is_FCVT_WU_S | is_FDIV | is_FCVT_S_WU | is_FLE | is_FEQ | is_FMAX | is_FMIN | is_FSUB | is_FSGNJX | is_FMUL | is_FSGNJ | is_FSGNJN | is_FLT | is_FMADD | is_FMSUB | is_FNMADD | is_FNMSUB;
 wire is_FPU_MEMORY = 1'b0;

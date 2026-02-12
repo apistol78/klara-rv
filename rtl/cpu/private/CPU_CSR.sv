@@ -37,6 +37,9 @@ module CPU_CSR #(
 
 	// Direct read access.
 	output wire [31:0] o_epc,
+	output wire [31:0] o_status,
+	output wire [31:0] o_ie,
+	output wire [31:0] o_ip,
 	output wire [31:0] o_scratch,
 
 	// Pending interrupt output.
@@ -71,6 +74,8 @@ module CPU_CSR #(
 	bit [63:0] cycle = 64'd0;
 	bit [63:0] wtime = 64'd0;
 	bit [PRESCALE_WIDTH - 1:0] prescale = 0;
+
+	bit waiting_on_mret = 1'b0;
 
 	assign o_epc = mepc;
 	assign o_scratch = mscratch;
@@ -116,6 +121,7 @@ module CPU_CSR #(
 
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
+			mstatus_mpie <= 0;
 			mstatus_mie <= 0;
 			mie_meie <= 1'b1;
 			mie_mtie <= 1'b1;
@@ -128,6 +134,8 @@ module CPU_CSR #(
 			mip_msip <= 0;
 			mscratch <= 0;
 			o_irq_pending <= 1'b0;
+			o_irq_pc <= 0;
+			waiting_on_mret <= 1'b0;
 		end
 		else begin
 			// Write CSR registers.
@@ -147,11 +155,19 @@ module CPU_CSR #(
 				else if (i_index == `CSR_MEPC)
 					mepc <= i_wdata;
 				else if (i_index == `CSR_MIP) begin
+					//
 					// We allow pending interrupts to be written so we
 					// can yield current thread by forcing timer interrupt.
-					mip_meip <= i_wdata[11];
-					mip_mtip <= i_wdata[7];
-					mip_msip <= i_wdata[3];
+					//
+
+					if (mie_meie)
+						mip_meip <= i_wdata[11];
+					
+					if (mie_mtie)
+						mip_mtip <= i_wdata[7];
+
+					if (mie_msie)
+						mip_msip <= i_wdata[3];
 				end					
 			end
 
@@ -167,7 +183,7 @@ module CPU_CSR #(
 			end
 
 			// Issue interrupts.
-			if (!o_irq_pending && mstatus_mie) begin
+			if (!waiting_on_mret && mstatus_mie) begin
 
 				// Handle in priority order; external interrupts have higest prio.
 				if (mip_meip) begin
@@ -189,12 +205,15 @@ module CPU_CSR #(
 
 					mstatus_mpie <= mstatus_mie;
 					mstatus_mie <= 1'b0;
+
+					waiting_on_mret <= 1'b1;
 				end
 			end
 		
 			// IRQ has been dispatched by the fetch unit;
 			// save interrupt return address.
 			if (i_irq_dispatched) begin
+				o_irq_pending <= 1'b0;
 				mepc <= i_irq_epc;
 			end
 
@@ -204,7 +223,7 @@ module CPU_CSR #(
 			if (i_mret) begin
 				mstatus_mie <= mstatus_mpie;
 				mstatus_mpie <= 1'b0;
-				o_irq_pending <= 1'b0;
+				waiting_on_mret <= 1'b0;
 			end
 		end
 	end

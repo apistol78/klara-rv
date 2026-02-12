@@ -57,7 +57,13 @@ module CPU #(
 	output wire o_execute_busy,
 	output wire o_memory_busy,
 	output wire o_fault,
-	output wire [31:0] o_scratch
+	output wire [31:0] o_debug_pc,
+	output wire [31:0] o_debug_registers [32],
+	output wire [31:0] o_debug_epc,
+	output wire [31:0] o_debug_status,
+	output wire [31:0] o_debug_ie,
+	output wire [31:0] o_debug_ip,
+	output wire [31:0] o_debug_pc_trace [4]
 );
 
 	//====================================================
@@ -85,6 +91,9 @@ module CPU #(
 	wire csr_wdata_wr;
 	wire [31:0] csr_wdata;
 	wire [31:0] csr_epc;
+	wire [31:0] csr_status;
+	wire [31:0] csr_ie;
+	wire [31:0] csr_ip;
 	wire [63:0] csr_retired;
 	wire csr_irq_pending;
 	wire [31:0] csr_irq_pc;
@@ -113,7 +122,10 @@ module CPU #(
 		.i_wdata(csr_wdata),
 
 		.o_epc(csr_epc),
-		.o_scratch(o_scratch),
+		.o_status(csr_status),
+		.o_ie(csr_ie),
+		.o_ip(csr_ip),
+		.o_scratch(),
 
 		.i_retired(csr_retired),
 
@@ -141,7 +153,10 @@ module CPU #(
 		.o_rs2(rs2),
 		.o_rs3(rs3),
 
-		.i_memory_data(memory_data)
+		.i_memory_data(memory_data),
+
+		// Debug
+		.o_debug_registers(o_debug_registers)
 	);
 
 	//====================================================
@@ -175,7 +190,10 @@ module CPU #(
 
 		// Output
 		.i_busy(execute_busy | memory_busy),
-		.o_data(fetch_data_0)
+		.o_data(fetch_data_0),
+
+		// Debug
+		.o_debug_pc(o_debug_pc)
 	);
 
 	CPU_SkidBuffer #(
@@ -312,5 +330,31 @@ module CPU #(
 	assign o_execute_busy = execute_busy;
 	assign o_memory_busy = memory_busy;
 	assign o_fault = decode_fault || execute_fault;
+	assign o_debug_epc = csr_epc;
+	assign o_debug_status = csr_status;
+	assign o_debug_ie = csr_ie;
+	assign o_debug_ip = csr_ip;
+
+	//====================================================
+
+	bit [31:0] pc_trace [4];
+
+	initial begin
+		pc_trace[0] = 32'h0;
+		pc_trace[1] = 32'h0;
+		pc_trace[2] = 32'h0;
+		pc_trace[3] = 32'h0;
+	end
+
+	always_ff @(posedge i_clock) begin
+		if (!o_fault && o_debug_pc != pc_trace[0]) begin
+			pc_trace[3] <= pc_trace[2];
+			pc_trace[2] <= pc_trace[1];
+			pc_trace[1] <= pc_trace[0];
+			pc_trace[0] <= o_debug_pc;
+		end
+	end
+
+	assign o_debug_pc_trace = pc_trace;
 
 endmodule

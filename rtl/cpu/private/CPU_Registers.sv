@@ -22,14 +22,17 @@ module CPU_Registers #(
 	output wire [31:0] o_rs2,
 	output wire [31:0] o_rs3,
 
-	input memory_data_t i_memory_data
+	input memory_data_t i_memory_data,
+
+	// Debug
+	output wire [31:0] o_debug_registers [32]
 );
 	bit last_write_strobe = 1'b0;
 
 // `ifdef FPU_ENABLE
-// 	bit [31:0] r[63:0];
+// 	bit [31:0] r[64];
 // `else
-	bit [31:0] r[31:0];
+	bit [31:0] r[32];
 // `endif
 
 	bit [31:0] rs1 = 0;
@@ -39,6 +42,8 @@ module CPU_Registers #(
 	assign o_rs1 = rs1;
 	assign o_rs2 = rs2;
 	assign o_rs3 = rs3;
+
+	assign o_debug_registers = r;
 
 	integer I;
 	initial begin

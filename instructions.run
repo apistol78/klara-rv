@@ -485,7 +485,7 @@ local instructions = {
 		mask = 0xffffffff,
 		data = 0x00100073,
 		name = "EBREAK",
-		format = "",
+		format = "CSR",
 		type = insttype.COMPLEX,
 		cpp = [[
 			return false;
@@ -498,7 +498,7 @@ local instructions = {
 		mask = 0xffffffff,
 		data = 0x00000073,
 		name = "ECALL",
-		format = "",
+		format = "CSR",
 		type = insttype.COMPLEX,
 		cpp = [[
 			ecall();

@@ -5,15 +5,15 @@ if ((word & 0x7f) == 0x73)
 	{
 		m_waitForInterrupt = true;
 	}
-	// 
-	else if ((word & 0xffffffff) == 0x00100073)	// EBREAK
+	// CSR
+	else if ((word & 0x0000707f) == 0x00006073)	// CSRRSI
 	{
-		return false;
+		log::info << L"CSRRSI" << Endl;
 	}
-	// 
-	else if ((word & 0xffffffff) == 0x00000073)	// ECALL
+	// CSR
+	else if ((word & 0xffffffff) == 0x30200073)	// MRET
 	{
-		ecall();
+		returnFromInterrupt();
 	}
 	// CSR
 	else if ((word & 0x0000707f) == 0x00003073)	// CSRRC
@@ -25,31 +25,16 @@ if ((word & 0x7f) == 0x73)
 		writeCSR(f.csr, R_u(f.rd) & ~tmp);
 	}
 	// CSR
-	else if ((word & 0xffffffff) == 0x30200073)	// MRET
-	{
-		returnFromInterrupt();
-	}
-	// CSR
-	else if ((word & 0x0000707f) == 0x00006073)	// CSRRSI
-	{
-		log::info << L"CSRRSI" << Endl;
-	}
-	// CSR
-	else if ((word & 0x0000707f) == 0x00007073)	// CSRRCI
-	{
-		log::info << L"CSRRCI" << Endl;
-	}
-	// CSR
-	else if ((word & 0x0000707f) == 0x00005073)	// CSRRWI
-	{
-		log::info << L"CSRRWI" << Endl;
-	}
-	// CSR
 	else if ((word & 0x0000707f) == 0x00001073)	// CSRRW
 	{
 		const auto f = FormatCSR::parse(word);
 		R_s(f.rd) = readCSR(f.csr);
 		writeCSR(f.csr, R_s(f.rs1));
+	}
+	// CSR
+	else if ((word & 0x0000707f) == 0x00007073)	// CSRRCI
+	{
+		log::info << L"CSRRCI" << Endl;
 	}
 	// CSR
 	else if ((word & 0x0000707f) == 0x00002073)	// CSRRS
@@ -60,35 +45,36 @@ if ((word & 0x7f) == 0x73)
 		R_u(f.rd) = data;
 		writeCSR(f.csr, R_u(f.rd) | tmp);
 	}
+	// CSR
+	else if ((word & 0x0000707f) == 0x00005073)	// CSRRWI
+	{
+		log::info << L"CSRRWI" << Endl;
+	}
+	// CSR
+	else if ((word & 0xffffffff) == 0x00000073)	// ECALL
+	{
+		ecall();
+	}
+	// CSR
+	else if ((word & 0xffffffff) == 0x00100073)	// EBREAK
+	{
+		return false;
+	}
 }
 else if ((word & 0x7f) == 0x63)
 {
 	// B
-	if ((word & 0x0000707f) == 0x00007063)	// BGEU
-	{
-		const auto f = FormatB::parse(word);
-		if (R_u(f.rs1) >= R_u(f.rs2))
-			PC_NEXT = PC + f.imm;
-	}
-	// B
-	else if ((word & 0x0000707f) == 0x00001063)	// BNE
-	{
-		const auto f = FormatB::parse(word);
-		if (R_s(f.rs1) != R_s(f.rs2))
-			PC_NEXT = PC + f.imm;
-	}
-	// B
-	else if ((word & 0x0000707f) == 0x00000063)	// BEQ
+	if ((word & 0x0000707f) == 0x00000063)	// BEQ
 	{
 		const auto f = FormatB::parse(word);
 		if (R_s(f.rs1) == R_s(f.rs2))
 			PC_NEXT = PC + f.imm;
 	}
 	// B
-	else if ((word & 0x0000707f) == 0x00004063)	// BLT
+	else if ((word & 0x0000707f) == 0x00007063)	// BGEU
 	{
 		const auto f = FormatB::parse(word);
-		if (R_s(f.rs1) < R_s(f.rs2))
+		if (R_u(f.rs1) >= R_u(f.rs2))
 			PC_NEXT = PC + f.imm;
 	}
 	// B
@@ -99,26 +85,40 @@ else if ((word & 0x7f) == 0x63)
 			PC_NEXT = PC + f.imm;
 	}
 	// B
+	else if ((word & 0x0000707f) == 0x00004063)	// BLT
+	{
+		const auto f = FormatB::parse(word);
+		if (R_s(f.rs1) < R_s(f.rs2))
+			PC_NEXT = PC + f.imm;
+	}
+	// B
 	else if ((word & 0x0000707f) == 0x00006063)	// BLTU
 	{
 		const auto f = FormatB::parse(word);
 		if (R_u(f.rs1) < R_u(f.rs2))
 			PC_NEXT = PC + f.imm;
 	}
+	// B
+	else if ((word & 0x0000707f) == 0x00001063)	// BNE
+	{
+		const auto f = FormatB::parse(word);
+		if (R_s(f.rs1) != R_s(f.rs2))
+			PC_NEXT = PC + f.imm;
+	}
 }
 else if ((word & 0x7f) == 0x13)
 {
 	// I
-	if ((word & 0x0000707f) == 0x00003013)	// SLTIU
-	{
-		const auto f = FormatI::parse(word);
-		R_u(f.rd) = (R_u(f.rs1) < f.imm) ? 1 : 0;
-	}
-	// I
-	else if ((word & 0x0000707f) == 0x00002013)	// SLTI
+	if ((word & 0x0000707f) == 0x00002013)	// SLTI
 	{
 		const auto f = FormatI::parse(word);
 		R_u(f.rd) = (R_s(f.rs1) < f.imm) ? 1 : 0;
+	}
+	// I
+	else if ((word & 0x0000707f) == 0x00003013)	// SLTIU
+	{
+		const auto f = FormatI::parse(word);
+		R_u(f.rd) = (R_u(f.rs1) < f.imm) ? 1 : 0;
 	}
 	// I
 	else if ((word & 0x0000707f) == 0x00006013)	// ORI

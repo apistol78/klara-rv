@@ -83,7 +83,7 @@ module UART_TX #(
 				ready <= 1'b1;
 			end
 			else begin
-				ready <= 1'b1;
+				ready <= 1'b1; // Unknown
 			end
 		end
 	end

@@ -250,6 +250,8 @@ module I2C_v2 #(
 						o_rdata <= retired_counter;
 						o_ready <= 1'b1;
 					end
+					else
+						o_ready <= 1'b1;
 				end
 				else begin
 					if (i_address == 2'd0) begin
@@ -265,6 +267,8 @@ module I2C_v2 #(
 							o_ready <= 1'b1;
 						end
 					end
+					else
+						o_ready <= 1'b1;
 				end
 			end
 			else if (!i_request) begin

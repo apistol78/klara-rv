@@ -114,7 +114,9 @@ module CPU_top(
 		// Debug
 		.o_execute_busy(),
 		.o_memory_busy(),
-		.o_fault(cpu_fault)
+		.o_fault(cpu_fault),
+		.o_debug_pc(),
+		.o_debug_registers()
 	);
 
 endmodule;

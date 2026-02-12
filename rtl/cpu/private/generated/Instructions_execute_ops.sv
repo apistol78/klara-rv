@@ -2,15 +2,15 @@
 // ==================================================
 
 case (`EXECUTE_OP)
+	OP_MRET: begin
+		`GOTO(`MEPC);
+		`MRET <= 1'b1;
+		`EXECUTE_DONE;
+	end
 	OP_CSRRC: begin
 		`RD <= i_csr_rdata;
 		o_csr_wdata <= i_csr_rdata & ~`RS1;
 		o_csr_wdata_wr <= 1;
-		`EXECUTE_DONE;
-	end
-	OP_MRET: begin
-		`GOTO(`MEPC);
-		`MRET <= 1'b1;
 		`EXECUTE_DONE;
 	end
 	OP_CSRRW: begin
@@ -24,6 +24,13 @@ case (`EXECUTE_OP)
 		o_csr_wdata <= i_csr_rdata | `RS1;
 		o_csr_wdata_wr <= 1;
 		`EXECUTE_DONE;
+	end
+	OP_ECALL: begin
+		`ECALL <= 1'b1;
+		`EXECUTE_DONE;
+	end
+	OP_EBREAK: begin
+		`FAULT <= 1'b1;
 	end
 	OP_FENCE: begin
 		`MEM_FLUSH <= 1;

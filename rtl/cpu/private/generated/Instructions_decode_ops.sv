@@ -2,12 +2,12 @@
 // ==================================================
 
 `OP <= 
-	is_EBREAK ? OP_EBREAK : 
-	is_ECALL  ? OP_ECALL  : 
-	is_CSRRC  ? OP_CSRRC  : 
 	is_MRET   ? OP_MRET   : 
+	is_CSRRC  ? OP_CSRRC  : 
 	is_CSRRW  ? OP_CSRRW  : 
 	is_CSRRS  ? OP_CSRRS  : 
+	is_ECALL  ? OP_ECALL  : 
+	is_EBREAK ? OP_EBREAK : 
 	is_FENCE  ? OP_FENCE  : 
 	is_MULHU  ? OP_MULHU  : 
 	is_REMU   ? OP_REMU   : 

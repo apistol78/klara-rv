@@ -158,6 +158,8 @@ module DMA #(
 						o_ready <= 1'b1;
 					end
 				end
+				else
+					o_ready <= 1'b1;
 			end
 		end
 		else if (!i_request) begin

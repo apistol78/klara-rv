@@ -105,6 +105,9 @@ module UART_RX #(
 					o_rdata <= 32'hcafe_babe;
 					rds <= 5;
 				end
+				else begin // Unknown
+					rds <= 5;
+				end
 			end
 			else begin
 				// No request; ensure FSM return to idle.

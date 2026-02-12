@@ -2,14 +2,14 @@
 // ==================================================
 
 wire [4:0] alu_operation = 
-	is_BGEU  ? `OP_UNSIGNED_GREATER_EQUAL :
-	is_BNE   ? `OP_NOT_EQUAL              :
 	is_BEQ   ? `OP_EQUAL                  :
-	is_BLT   ? `OP_SIGNED_LESS_THAN       :
+	is_BGEU  ? `OP_UNSIGNED_GREATER_EQUAL :
 	is_BGE   ? `OP_SIGNED_GREATER_EQUAL   :
+	is_BLT   ? `OP_SIGNED_LESS_THAN       :
 	is_BLTU  ? `OP_UNSIGNED_LESS_THAN     :
-	is_SLTIU ? `OP_UNSIGNED_LESS_THAN     :
+	is_BNE   ? `OP_NOT_EQUAL              :
 	is_SLTI  ? `OP_SIGNED_LESS_THAN       :
+	is_SLTIU ? `OP_UNSIGNED_LESS_THAN     :
 	is_ORI   ? `OP_OR                     :
 	is_JALR  ? `OP_SIGNED_ADD             :
 	is_LB    ? `OP_SIGNED_ADD             :
@@ -56,8 +56,8 @@ wire [4:0] alu_operand1 =
 	`RS1;
 
 wire [4:0] alu_operand2 = 
-	is_SLTIU ? `IMM  :
 	is_SLTI  ? `IMM  :
+	is_SLTIU ? `IMM  :
 	is_ORI   ? `IMM  :
 	is_JALR  ? `IMM  :
 	is_LB    ? `IMM  :

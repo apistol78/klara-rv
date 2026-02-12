@@ -46,30 +46,33 @@ module JTAG_Simple #(
 		UPDATE_IR			// 15
 	} state_t;
 	
-	wire [31:0] idcode = { IDCODE_VERSION, IDCODE_PART, IDCODE_MANUFACTURER, 1'b1 };
-	state_t state = TEST_LOGIC_RESET;
-	bit [3:0] ir = 4'h0;    // IR size 4 bits
+	wire [31:0] idcode = { IDCODE_VERSION[4:0], IDCODE_PART[15:0], IDCODE_MANUFACTURER[10:0], 1'b1 };
+	state_t state = RUN_TEST_IDLE;
 
-	initial begin
-		TDO = 1'b0;
-	end
+	// initial begin
+	// 	TDO = 1'b0;
+	// end
 
 	assign o_state = state;
 
-	bit [31:0] dr_active;
+	bit [3:0] ir = 4'h0;    // IR size 4 bits
+	bit [3:0] ir_in = 4'h0;
+	bit [3:0] ir_out = 4'h0;
+
 	bit [31:0] dr = 0;
-	bit bypass = 1'b0;
+	bit [31:0] dr_in = 0;
+	bit [31:0] dr_out = 0;
 
 	always_comb begin
 		case (ir)
 			4'h1, 4'h2, 4'h5, 4'h6, 4'hb: begin
-				dr_active = idcode;
+				dr = idcode;
 			end
-			4'hc, 4'he: begin
-				dr_active = i_usercode;
+			4'h8, 4'hc, 4'he: begin
+				dr = i_usercode;
 			end
 			default: begin
-				dr_active = 32'hffff_ffff;
+				dr = 32'hffff_ffff;
 			end
 		endcase
 	end
@@ -82,17 +85,25 @@ module JTAG_Simple #(
 	bit [31:0] tick_count = 0;
 
 	always_ff @(posedge i_clock) begin
+	// always_ff @(posedge TCK) begin
 		if (i_reset) begin
-			state <= TEST_LOGIC_RESET;
+			state <= RUN_TEST_IDLE;
+			
 			ir <= 4'h0;
+			ir_in <= 4'h0;
+			ir_out <= 4'h0;
+
 			dr <= 0;
-			bypass <= 1'b0;
-			tck_r <= 2'b00;
-			TDO <= 1'b0;
+			dr_in <= 0;
+			dr_out <= 0;
+
+			tck_r <= 3'b000;
+			// TDO <= 1'b0;
 		end
 		else begin
 			tck_r <= tck_p;
 			if (tck_p[1:0] == 2'b01) begin
+			// begin
 
 				tick_count <= tick_count + 1;
 
@@ -119,6 +130,10 @@ module JTAG_Simple #(
 					// DR
 
 					CAPTURE_DR: begin
+
+						dr_in <= 0;
+						dr_out <= dr;
+
 						if (TMS == 1'b1)
 							state <= EXIT_1_DR;
 						else
@@ -128,8 +143,10 @@ module JTAG_Simple #(
 					SHIFT_DR: begin
 						if (TMS == 1'b1)
 							state <= EXIT_1_DR;
-						else
-							dr <= { TDI, dr[31:1] };
+						else begin
+							dr_in <= { TDI, dr_in[31:1] };
+							dr_out <= { 1'b0, dr_out[31:1] };
+						end
 					end
 
 					EXIT_1_DR: begin
@@ -152,6 +169,9 @@ module JTAG_Simple #(
 					end
 
 					UPDATE_DR: begin
+
+						dr <= dr_in;
+
 						if (TMS == 1'b1)
 							state <= SELECT_DR_SCAN;
 						else
@@ -168,6 +188,10 @@ module JTAG_Simple #(
 					end
 
 					CAPTURE_IR: begin
+
+						ir_in <= 0;
+						ir_out <= ir;
+
 						if (TMS == 1'b1)
 							state <= EXIT_1_IR;
 						else
@@ -177,8 +201,10 @@ module JTAG_Simple #(
 					SHIFT_IR: begin
 						if (TMS == 1'b1)
 							state <= EXIT_1_IR;
-						else
-							ir <= { TDI, ir[3:1] };
+						else begin
+							ir_in <= { TDI, ir_in[3:1] };
+							ir_out <= { 1'b0, ir_out[3:1] };
+						end
 					end
 
 					EXIT_1_IR: begin
@@ -201,13 +227,8 @@ module JTAG_Simple #(
 					end
 
 					UPDATE_IR: begin
-						// Activate DR from IR code.
-						// if (ir == 4'b1111)
-						// 	bypass <= 1'b1;
-						// else begin
-						// 	bypass <= 1'b0;
-						dr <= dr_active;
-						// end
+						
+						ir <= ir_in;
 
 						if (TMS == 1'b1)
 							state <= SELECT_DR_SCAN;
@@ -215,29 +236,38 @@ module JTAG_Simple #(
 							state <= RUN_TEST_IDLE;
 					end
 
+					default: begin
+						state <= TEST_LOGIC_RESET;
+					end
+
 				endcase
 			end
 			
 			// Shift out one clock delay instead on negative TCK;
 			// this to ensure TDO is stable before negative TCK.
-			//if (tck_p == 3'b011) begin
-				// if (state == CAPTURE_IR || state == SHIFT_IR)
-				// 	TDO <= ir[0];
-				// else if (state == CAPTURE_DR || state == SHIFT_DR)
-				// 	TDO <= dr[0];
-				// else
-				// 	TDO <= 1'b0;
-			//end
+			if (tck_p == 3'b011) begin
+				if (ir == 4'b1111)
+					TDO <= TDI;
+				else if (state == SHIFT_IR)
+					TDO <= ir_out[0];
+				else if (state == SHIFT_DR)
+					TDO <= dr_out[0];
+				else
+					TDO <= 1'b0;
+			end
 		end
 	end
 
-	always_comb begin
-		if (state == CAPTURE_IR || state == SHIFT_IR)
-			TDO = ir[0];
-		else if (state == CAPTURE_DR || state == SHIFT_DR)
-			TDO = dr[0];
-		else
-			TDO = 1'b0;
-	end		
+	// always_ff @(negedge TCK) begin
+	// // always_comb begin
+	// 	if (ir == 4'b1111)
+	// 		TDO <= TDI;
+	// 	else if (state == SHIFT_IR)
+	// 		TDO <= ir_out[0];
+	// 	else if (state == SHIFT_DR)
+	// 		TDO <= dr_out[0];
+	// 	else
+	// 		TDO <= 1'b0;
+	// end		
 
 endmodule

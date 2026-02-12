@@ -133,6 +133,8 @@ module SPI #(
 							o_rdata <= rx_queue_rdata;
 							o_ready <= 1'b1;
 						end
+						default:
+							o_ready <= 1'b1;
 					endcase
 				end
 				else if (i_address == 2'd1) begin
@@ -147,6 +149,8 @@ module SPI #(
 					};
 					o_ready <= 1'b1;
 				end
+				else
+					o_ready <= 1'b1;
 			end
 			else begin
 				if (i_address == 2'd0) begin
@@ -161,6 +165,8 @@ module SPI #(
 					spi_rx_enable <= i_wdata[1];
 					o_ready <= 1'b1;
 				end
+				else
+					o_ready <= 1'b1;
 			end
 		end
 		else if (!i_request) begin
