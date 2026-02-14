@@ -69,6 +69,12 @@ module CPU_DCache_WB(
 
 	wire all_dirty = wb_dirty[0] & wb_dirty[1] & wb_dirty[2] & wb_dirty[3];
 	wire any_dirty = wb_dirty[0] | wb_dirty[1] | wb_dirty[2] | wb_dirty[3];
+	wire any_matching = (
+		(wb_dirty[0] && i_address == wb_address[0]) ||
+		(wb_dirty[1] && i_address == wb_address[1]) ||
+		(wb_dirty[2] && i_address == wb_address[2]) ||
+		(wb_dirty[3] && i_address == wb_address[3])
+	);
 
 	assign o_pending = any_dirty;
 
@@ -107,7 +113,7 @@ module CPU_DCache_WB(
 			o_ready = i_bus_ready;
 		end
 		// Cached write request; need to have at least one slot free.
-		else if (i_request && i_rw && i_cached && !all_dirty) begin
+		else if (i_request && i_rw && i_cached && !any_matching && !all_dirty) begin
 			if (!wb_dirty[0]) begin
 				next_wb_address[0] = i_address;
 				next_wb_data[0] = i_wdata;
@@ -134,7 +140,7 @@ module CPU_DCache_WB(
 			end
 			o_ready = 1'b1;
 		end
-		// No request; flush queued writes.
+		// No request or unable to process request atm; flush queued writes.
 		else if (wb_dirty[0]) begin
 			o_bus_rw = 1'b1;
 			o_bus_request = 1'b1;
