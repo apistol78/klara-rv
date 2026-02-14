@@ -173,25 +173,22 @@ module AUDIO_channel(
 	end
 
 	// Volume multipliers.
-	bit [15:0] vmul_l_sample = 16'd0;
+	bit [15:0] vmul_sample = 16'd0;
+	wire [15:0] vmul_output_sample;
+
 	AUDIO_mul_16x4 vmul_l(
 		.clk(i_clock),
-		.a(vmul_l_sample),
+		.a(vmul_sample),
 		.b(i_volume),
-		.y(o_output_sample_left)
-	);
-
-	bit [15:0] vmul_r_sample = 16'd0;
-	AUDIO_mul_16x4 vmul_r(
-		.clk(i_clock),
-		.a(vmul_r_sample),
-		.b(i_volume),
-		.y(o_output_sample_right)
+		.y(vmul_output_sample)
 	);
 
 	// Read new sample from FIFO whenever sample clock change.
 	bit last_sample_clock = 1'b0;
 	bit last_fifo_rd = 1'b0;
+
+	bit [3:0] sample_process_step = 0;
+	bit [15:0] sample_process_tmp;
 
 	always_ff @(posedge i_clock) begin
 
@@ -204,14 +201,27 @@ module AUDIO_channel(
 			if (!sample_fifo_empty)
 				sample_fifo_rd <= 1'b1;
 			else begin
-				vmul_l_sample <= 0;
-				vmul_r_sample <= 0;
+				o_output_sample_left <= 0;
+				o_output_sample_right <= 0;
 			end
 		end
 
 		if (last_fifo_rd) begin
-			vmul_l_sample <= sample_fifo_rdata[31:16];
-			vmul_r_sample <= sample_fifo_rdata[15:0];
+			vmul_sample <= sample_fifo_rdata[31:16];
+			sample_process_step <= 0;
+		end
+
+		// Process the multiplication; serialize left and right sample.
+		if (sample_process_step <= 12) begin
+			if (sample_process_step == 6) begin
+				sample_process_tmp <= vmul_output_sample;
+				vmul_sample <= sample_fifo_rdata[15:0];
+			end
+			else if (sample_process_step == 12) begin
+				o_output_sample_left <= sample_process_tmp;
+				o_output_sample_right <= vmul_output_sample;
+			end
+			sample_process_step <= sample_process_step + 1;
 		end
 	end
 
