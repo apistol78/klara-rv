@@ -26,19 +26,13 @@ module CPU_BranchPrediction (
 	input wire i_jump,
 	input wire [31:0] i_jump_pc
 );
-
-	typedef struct packed
-	{
-		bit [22:0] from_pc;
-		bit [31:0] target_pc;
-	}
-	cache_t;
-
-	cache_t c[64];
+	bit [22:0] from_pc [64];
+	bit [31:0] target_pc [64];
 
 	genvar i;
 	generate for (i = 0; i < 64; i = i + 1) begin : initialize_btb
-		initial c[i] = 64'b0;
+		initial from_pc[i] = 0;
+		initial target_pc[i] = 0;
 	end endgenerate
 
 	wire [5:0] i_pc_tag = i_pc[8:2];
@@ -50,8 +44,8 @@ module CPU_BranchPrediction (
 	always_comb begin
 		o_pc_hint = i_pc;
 
-		if (c[i_pc_tag].from_pc == i_pc_rest)
-			o_pc_hint = c[i_pc_tag].target_pc;
+		if (from_pc[i_pc_tag] == i_pc_rest)
+			o_pc_hint = target_pc[i_pc_tag];
 		else if (i_is_jal)
 			o_pc_hint = i_pc + i_inst_J_imm;
 		else if (i_is_jump_conditional)
@@ -69,8 +63,8 @@ module CPU_BranchPrediction (
 			else begin
 				dbg_bp_miss <= dbg_bp_miss + 1;
 
-				c[i_pc_launch_tag].from_pc <= i_pc_launch_rest;
-				c[i_pc_launch_tag].target_pc <= i_jump_pc;
+				from_pc[i_pc_launch_tag] <= i_pc_launch_rest;
+				target_pc[i_pc_launch_tag] <= i_jump_pc;
 
 			end
 		end
