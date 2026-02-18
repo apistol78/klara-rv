@@ -1,6 +1,6 @@
 /*
  Klara-RTL
- Copyright (c) 2025 Anders Pistol.
+ Copyright (c) 2025-2026 Anders Pistol.
 
  This Source Code Form is subject to the terms of the Mozilla Public
  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -966,4 +966,27 @@ int32_t hal_sd_init(int32_t mode)
 
 	s_mode = mode;
 	return SD_RESULT_OK;
+}
+
+void hal_sd_shutdown()
+{
+	// Use SW mode for shutdown.
+	s_mode = SD_MODE_SW;
+	s_dataBits = 4;
+
+	*SD_CTRL = 0x0000ff00;
+
+	SD_WR_CMD_DIR_OUT();
+	SD_WR_DAT_DIR_IN();
+	SD_WR_CLK_HIGH();
+	SD_WR_CMD_HIGH();
+	SD_WR_DAT(0x0);
+
+	hal_sd_dummy_clock(100);
+
+	hal_sd_cmd0();
+	hal_sd_dummy_delay(1000);
+
+	SD_WR_CMD_DIR_IN();
+	SD_WR_DAT_DIR_IN();
 }

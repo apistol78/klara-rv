@@ -1,6 +1,6 @@
 /*
  Klara-RTL
- Copyright (c) 2025 Anders Pistol.
+ Copyright (c) 2025-2026 Anders Pistol.
 
  This Source Code Form is subject to the terms of the Mozilla Public
  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,6 +20,8 @@
 EXTERN_C int32_t hal_sd_card_inserted();
 
 EXTERN_C int32_t hal_sd_init(int32_t mode);
+
+EXTERN_C void hal_sd_shutdown();
 
 EXTERN_C int32_t hal_sd_read_block512(uint32_t block, uint8_t* buffer, uint32_t bufferLen);
 
