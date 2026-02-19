@@ -3,7 +3,8 @@
 #ARCH=rv32imf_zicsr
 #ARCH=rv32im_zfinx_zicsr_zba_zbb
 ARCH=rv32im_zfinx_zicsr_zba
-#ARCH=rv32i_zicsr
+#ARCH=rv32im_zfinx_zicsr
+#ARCH=rv32im_zicsr
 
 ABI=ilp32
 

@@ -443,14 +443,13 @@ else if ((word & 0x7f) == 0x53)
 	else if ((word & 0xfff0007f) == 0xd0000053)	// FCVT_S_W
 	{
 		const auto f = FormatR::parse(word);
-		const float v = (float)R_s(f.rs1);
-		FR(f.rd) = v;
+		FR(f.rd) = (float)R_s(f.rs1);
 	}
 	// R
 	else if ((word & 0xfff0007f) == 0xc0100053)	// FCVT_WU_S
 	{
 		const auto f = FormatR::parse(word);
-		R_u(f.rd) = (uint32_t)FR(f.rs1);
+		R_u(f.rd) = (uint32_t)std::max(FR(f.rs1), 0.0f);
 	}
 	// R
 	else if ((word & 0xfe00007f) == 0x18000053)	// FDIV
@@ -462,7 +461,7 @@ else if ((word & 0x7f) == 0x53)
 	else if ((word & 0xfff0007f) == 0xd0100053)	// FCVT_S_WU
 	{
 		const auto f = FormatR::parse(word);
-		FR_u(f.rd) = (float)R_u(f.rs1);
+		FR(f.rd) = (float)R_u(f.rs1);
 	}
 	// R
 	else if ((word & 0xfe00707f) == 0xa0000053)	// FLE

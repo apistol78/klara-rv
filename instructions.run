@@ -549,7 +549,7 @@ local instructions = {
 		type = insttype.FPU,
 		cpp = [[
 			const auto f = FormatR::parse(word);
-			R_u(f.rd) = (uint32_t)FR(f.rs1);
+			R_u(f.rd) = (uint32_t)std::max(FR(f.rs1), 0.0f);
 		]],
 		verilog_fpu = {
 			operation = fpu_operations.F2UI
@@ -565,8 +565,7 @@ local instructions = {
 		type = insttype.FPU,
 		cpp = [[
 			const auto f = FormatR::parse(word);
-			const float v = (float)R_s(f.rs1);
-			FR(f.rd) = v;
+			FR(f.rd) = (float)R_s(f.rs1);
 		]],
 		verilog_fpu = {
 			operation = fpu_operations.I2F
@@ -583,7 +582,7 @@ local instructions = {
 		type = insttype.FPU,
 		cpp = [[
 			const auto f = FormatR::parse(word);
-			FR_u(f.rd) = (float)R_u(f.rs1);
+			FR(f.rd) = (float)R_u(f.rs1);
 		]],
 		verilog_fpu = {
 			operation = fpu_operations.UI2F

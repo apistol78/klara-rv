@@ -369,7 +369,16 @@ void GDBServer::setMode(int32_t mode)
 	};
 
 	if (mode != m_mode)
-		T_GDB_LOG(L"[GDB] mode changed to " << modeNames[mode] << L" (from " << modeNames[m_mode] << L")");
+	{
+		if (mode == ModeStopped)
+		{
+			T_GDB_LOG(L"[GDB] mode changed to " << modeNames[mode] << L" (from " << modeNames[m_mode] << L", PC " << str(L"%08x", m_cpu->getPC()) << L", SP " << str(L"%08x", m_cpu->getRegister(2)) << L")");
+		}
+		else
+		{
+			T_GDB_LOG(L"[GDB] mode changed to " << modeNames[mode] << L" (from " << modeNames[m_mode] << L")");
+		}
+	}
 
 	if (m_clientSocket != nullptr && mode == ModeStopped)
 		send(m_clientSocket, "S05");
