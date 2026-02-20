@@ -335,6 +335,11 @@ module CPU_DCache_Reg #(
 
 		// Re-initialize cache at reset.
 		if (i_reset) begin
+			o_bus_rw <= 1'b0;
+			o_bus_request <= 1'b0;
+			o_bus_address <= 32'h0;
+			o_bus_wdata <= 32'h0;
+			o_bus_wmask <= 4'h0;
 			state <= INITIALIZE;
 			flush_address <= 0;
 		end

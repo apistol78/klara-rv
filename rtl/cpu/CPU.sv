@@ -58,6 +58,8 @@ module CPU #(
 	output wire o_memory_busy,
 	output wire o_fault,
 	output wire [31:0] o_debug_pc,
+	output wire [31:0] o_debug_bp_hit,
+	output wire [31:0] o_debug_bp_miss,	
 	output wire [31:0] o_debug_registers [32],
 	output wire [31:0] o_debug_epc,
 	output wire [31:0] o_debug_status,
@@ -193,7 +195,9 @@ module CPU #(
 		.o_data(fetch_data_0),
 
 		// Debug
-		.o_debug_pc(o_debug_pc)
+		.o_debug_pc(o_debug_pc),
+		.o_debug_bp_hit(o_debug_bp_hit),
+		.o_debug_bp_miss(o_debug_bp_miss)		
 	);
 
 	CPU_SkidBuffer #(

@@ -66,16 +66,15 @@ module I2C_v2 #(
 		bit [7:0] device_address;
 		bit [7:0] control_address;
 		bit [7:0] nbytes_or_data;
-		bit [31:0] tag;
 	}
 	i2c_command_t;
 
 	typedef enum bit [5:0]
 	{
 		IDLE,				// 0
-		READ_CMD_0,
+		__READ_CMD_0__,
 		READ_CMD,
-		READ_CMD_RETIRED,
+		__READ_CMD_RETIRED__,
 		S_I2C_READ_0,
 		S_I2C_READ_1,
 		S_I2C_READ_2,
@@ -117,27 +116,10 @@ module I2C_v2 #(
 	}
 	state_t;
 
-	// Command queue.
-	wire queue_empty;
-	wire queue_full;
-	bit queue_write = 0;
-	bit queue_read = 0;
-	i2c_command_t queue_wdata;
-	i2c_command_t queue_rdata;
-	FIFO #(
-		.DEPTH(16),
-		.WIDTH($bits(i2c_command_t))
-	) queue(
-		.i_reset(i_reset),
-		.i_clock(i_clock),
-		.o_empty(queue_empty),
-		.o_almost_full(queue_full),
-		.i_write(queue_write),
-		.i_wdata(queue_wdata),
-		.i_read(queue_read),
-		.o_rdata(queue_rdata),
-		.o_queued()
-	);
+	// Command
+	i2c_command_t cmd;
+	bit cmd_tx = 1'b0;
+	bit cmd_rx = 1'b0;
 
 	// Receive data queue.
 	wire rx_queue_empty;
@@ -147,7 +129,7 @@ module I2C_v2 #(
 	bit [7:0] rx_queue_wdata;
 	wire [7:0] rx_queue_rdata;
 	FIFO #(
-		.DEPTH(16),
+		.DEPTH(32),
 		.WIDTH(8)
 	) rx_queue(
 		.i_reset(i_reset),
@@ -162,7 +144,6 @@ module I2C_v2 #(
 	);
 
 	// State registers
-
 	state_t i2c_read_rs;
 	bit [6:0] i2c_read_device_address;		//!< Input
 	bit [7:0] i2c_read_control_address;		//!< Input
@@ -194,20 +175,16 @@ module I2C_v2 #(
 	state_t state = IDLE;
 	bit [2:0] read_state = 0;
 
-	bit [31:0] queued_counter = 32'h0;
-	bit [31:0] retired_counter = 32'h0;
-
 	// CPU interface
 	// Receive commands and insert into queue.
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			o_ready <= 1'b0;
 			read_state <= 0;		
-			queue_write <= 1'b0;
+			cmd_tx <= 1'b0;
 			rx_queue_read <= 1'b0;
 		end
 		else begin
-			queue_write <= 1'b0;
 			rx_queue_read <= 1'b0;
 
 			if (i_request && !o_ready) begin
@@ -217,8 +194,8 @@ module I2C_v2 #(
 						{
 							27'b0,
 							state != IDLE,
-							queue_empty,
-							queue_full,
+							1'b0,
+							1'b0,
 							rx_queue_empty,
 							rx_queue_full
 						};
@@ -242,28 +219,21 @@ module I2C_v2 #(
 							end
 						endcase
 					end
-					else if (i_address == 2'd2) begin
-						o_rdata <= queued_counter;
-						o_ready <= 1'b1;
-					end
-					else if (i_address == 2'd3) begin
-						o_rdata <= retired_counter;
-						o_ready <= 1'b1;
-					end
 					else
 						o_ready <= 1'b1;
 				end
 				else begin
 					if (i_address == 2'd0) begin
-						queue_wdata.cmd <= i_wdata[0];
-						queue_wdata.speed <= i_wdata[1];
-						queue_wdata.device_address <= i_wdata[15:8];
-						queue_wdata.control_address <= i_wdata[23:16];
-						queue_wdata.nbytes_or_data <= i_wdata[31:24];
-						queue_wdata.tag <= queued_counter + 1;
-						if (!queue_full) begin
-							queue_write <= 1'b1;
-							queued_counter <= queued_counter + 1;
+						if (state == IDLE) begin
+
+							cmd.cmd <= i_wdata[0];
+							cmd.speed <= i_wdata[1];
+							cmd.device_address <= i_wdata[15:8];
+							cmd.control_address <= i_wdata[23:16];
+							cmd.nbytes_or_data <= i_wdata[31:24];
+
+							cmd_tx <= ~cmd_rx;
+
 							o_ready <= 1'b1;
 						end
 					end
@@ -280,7 +250,6 @@ module I2C_v2 #(
 
 
 	// I2C state machine
-	bit [31:0] busy_counter = 0;
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			scl <= 1'b1;
@@ -289,7 +258,7 @@ module I2C_v2 #(
 
 			state <= IDLE;
 
-			queue_read <= 0;
+			cmd_rx <= 1'b0;
 			rx_queue_write <= 0;
 
 			dly_speed <= DELAY_SLOW;
@@ -298,47 +267,34 @@ module I2C_v2 #(
 			unique case (state)
 
 				IDLE: begin
-					if (!queue_empty) begin
-						queue_read <= 1'b1;
-						state <= READ_CMD_0;
+					if (cmd_rx != cmd_tx) begin
+						cmd_rx <= cmd_tx;
+						state <= READ_CMD;
 					end
-				end
-
-				READ_CMD_0: begin
-					queue_read <= 1'b0;
-					state <= READ_CMD;
 				end
 
 				READ_CMD: begin
-					dly_speed <= queue_rdata.speed ? DELAY_FAST : DELAY_SLOW;
-					if (queue_rdata.cmd == I2C_CMD_READ) begin
-						i2c_read_device_address <= queue_rdata.device_address;
-						i2c_read_control_address <= queue_rdata.control_address;
-						i2c_read_nbytes <= queue_rdata.nbytes_or_data;
-						busy_counter <= queue_rdata.tag;
-						`I2C_READ(READ_CMD_RETIRED);
+					dly_speed <= cmd.speed ? DELAY_FAST : DELAY_SLOW;
+					if (cmd.cmd == I2C_CMD_READ) begin
+						i2c_read_device_address <= cmd.device_address;
+						i2c_read_control_address <= cmd.control_address;
+						i2c_read_nbytes <= cmd.nbytes_or_data;
+						`I2C_READ(IDLE);
 					end
-					else if (queue_rdata.cmd == I2C_CMD_WRITE) begin
-						i2c_write_device_address <= queue_rdata.device_address;
-						i2c_write_control_address <= queue_rdata.control_address;
-						i2c_write_data <= queue_rdata.nbytes_or_data;
-						busy_counter <= queue_rdata.tag;
-						`I2C_WRITE(READ_CMD_RETIRED);
+					else if (cmd.cmd == I2C_CMD_WRITE) begin
+						i2c_write_device_address <= cmd.device_address;
+						i2c_write_control_address <= cmd.control_address;
+						i2c_write_data <= cmd.nbytes_or_data;
+						`I2C_WRITE(IDLE);
 					end
 					else
-						state <= READ_CMD_RETIRED;
-				end
-
-				READ_CMD_RETIRED: begin
-					retired_counter <= busy_counter;
-					state <= IDLE;
+						state <= IDLE;
 				end
 
 
 				// I2C_READ
 
 				S_I2C_READ_0: begin
-					$display("S_I2C_READ_0 device address %02x, control %02x, nbytes %d", i2c_read_device_address, i2c_read_control_address, i2c_read_nbytes);
 					`I2C_START(S_I2C_READ_1);
 				end
 				S_I2C_READ_1: begin

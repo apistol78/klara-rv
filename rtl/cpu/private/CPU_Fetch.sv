@@ -40,7 +40,9 @@ module CPU_Fetch #(
 	output fetch_data_t o_data,
 
 	// Debug
-	output wire [31:0] o_debug_pc
+	output wire [31:0] o_debug_pc,
+	output wire [31:0] o_debug_bp_hit,
+	output wire [31:0] o_debug_bp_miss	
 );
 
 	typedef enum bit [1:0]
@@ -151,6 +153,7 @@ module CPU_Fetch #(
 	bit [31:0] bp_pc_launch;
 	wire [31:0] bp_pc_hint;
 	CPU_BranchPrediction bp(
+		.i_reset(i_reset),
 		.i_clock(i_clock),
 		.i_pc(pc),
 		.i_is_jal(is_JAL),
@@ -160,7 +163,9 @@ module CPU_Fetch #(
 		.i_pc_launch(bp_pc_launch),
 		.o_pc_hint(bp_pc_hint),
 		.i_jump(i_jump),
-		.i_jump_pc(i_jump_pc)
+		.i_jump_pc(i_jump_pc),
+		.o_debug_bp_hit(o_debug_bp_hit),
+		.o_debug_bp_miss(o_debug_bp_miss)
 	);
 
 	always_ff @(posedge i_clock) begin
@@ -208,7 +213,6 @@ module CPU_Fetch #(
 							// for an explicit "goto" signal before
 							// we can continue feeding the pipeline.
 							bp_pc_launch <= pc;
-							pc <= bp_pc_hint;
 							state <= WAIT_JUMP;
 						end
 						else if (is_ECALL || is_WFI) begin
@@ -225,6 +229,7 @@ module CPU_Fetch #(
 
 				WAIT_JUMP: begin
 					// Wait for "goto" signal.
+					pc <= bp_pc_hint;
 					if (i_jump) begin
 						pc <= i_jump_pc;
 						state <= WAIT_ICACHE;
