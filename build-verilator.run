@@ -13,6 +13,7 @@ run:loadScript("sv2v.run")
 
 local PATH_CPU < const > = "rtl/cpu"
 local PATH_MISC < const > = "rtl/misc"
+local PATH_FIFO < const > = "rtl/fifo"
 local PATH_OUTPUT < const > = "code/Emulator2/CPU/GL/verilator"
 
 local SOURCE < const > =
@@ -51,7 +52,9 @@ local SOURCE < const > =
 	PATH_CPU .. "/private/fpu/CPU_FPU_Int.sv",
 	PATH_CPU .. "/private/fpu/CPU_FPU_Mul.sv",
 	PATH_CPU .. "/private/fpu/CPU_FPU_MulAdd.sv",
+	PATH_MISC .. "/WriteBuffer.sv",
 	PATH_MISC .. "/DualPort.sv",
+	PATH_FIFO .. "/FIFO.sv"
 }
 
 function main()

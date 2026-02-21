@@ -40,9 +40,9 @@ module CPU_BranchPrediction (
 	wire [26:0] i_pc_launch_rest = i_pc_launch[31:5];
 
 	initial begin
-		o_pc_hint <= 0;
-		o_debug_bp_hit <= 0;
-		o_debug_bp_miss <= 0;
+		o_pc_hint = 0;
+		o_debug_bp_hit = 0;
+		o_debug_bp_miss = 0;
 	end
 
 	always_ff @(posedge i_clock) begin
