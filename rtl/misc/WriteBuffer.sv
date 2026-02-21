@@ -21,6 +21,7 @@ module WriteBuffer #(
 	// Control
 	output bit o_empty,
 	output bit o_full,
+	input wire i_cached,
 
 	// Bus
 	output wire o_bus_rw,
@@ -63,8 +64,8 @@ module WriteBuffer #(
 			.i_reset(i_reset),
 			.i_clock(i_clock),
 			.o_empty(wq_empty),
-			.o_full(wq_full),
-			.o_almost_full(),
+			.o_full(),
+			.o_almost_full(wq_full),
 			.i_write(wq_write),
 			.i_wdata(wq_wdata),
 			.i_read(wq_read),
@@ -81,8 +82,8 @@ module WriteBuffer #(
 			.i_reset(i_reset),
 			.i_clock(i_clock),
 			.o_empty(wq_empty),
-			.o_full(wq_full),
-			.o_almost_full(),
+			.o_full(),
+			.o_almost_full(wq_full),
 			.i_write(wq_write),
 			.i_wdata(wq_wdata),
 			.i_read(wq_read),
@@ -91,10 +92,13 @@ module WriteBuffer #(
 		);
 	end endgenerate
 
+	bit dp_pa_rw;
 	bit dp_pa_request;
 	wire dp_pa_ready;
 	bit [31:0] dp_pa_address;
 	wire [31:0] dp_pa_rdata;
+	bit [31:0] dp_pa_wdata;
+	bit [3:0] dp_pa_wmask;
 
 	bit dp_pb_request = 1'b0;
 	wire dp_pb_ready;
@@ -114,14 +118,14 @@ module WriteBuffer #(
 		.o_bus_wdata(o_bus_wdata),
 		.o_bus_wmask(o_bus_wmask),
 
-		// Read port
-		.i_pb_rw(1'b0),
+		// Read (write uncached) port
+		.i_pb_rw(dp_pa_rw),
 		.i_pb_request(dp_pa_request),
 		.o_pb_ready(dp_pa_ready),
 		.i_pb_address(dp_pa_address),
 		.o_pb_rdata(dp_pa_rdata),
-		.i_pb_wdata(32'h0),
-		.i_pb_wmask(4'h0),
+		.i_pb_wdata(dp_pa_wdata),
+		.i_pb_wmask(dp_pa_wmask),
 
 		// Write port
 		.i_pa_rw(1'b1),
@@ -174,30 +178,50 @@ module WriteBuffer #(
 		end
 	end
 
+	bit request_r = 1'b0;
+	always_ff @(posedge i_clock) begin
+		request_r <= i_request;
+	end
+
 	always_comb begin
 	
 		wq_wdata = 0;
 		wq_write = 1'b0;
 
+		dp_pa_rw = 1'b0;
 		dp_pa_request = 1'b0;
 		dp_pa_address = 32'h0;
+		dp_pa_wdata = 32'h0;
+		dp_pa_wmask = 4'h0;
 
 		o_ready = 1'b0;
 		o_rdata = 32'h0;
 		o_empty = wq_empty;
 		o_full = wq_full;
 
-		if (i_request && !i_rw && wq_empty) begin
+		// Write uncached data (no pending writes)
+		if (i_request && i_rw && !i_cached && wq_empty) begin
+			dp_pa_rw = 1'b1;
 			dp_pa_request = 1'b1;
+			dp_pa_wdata = i_wdata;
+			dp_pa_wmask = i_wmask;
+			dp_pa_address = i_address;
 			o_ready = dp_pa_ready;
+		end
+		// Read data from bus (no pending writes)
+		else if (i_request && !i_rw && wq_empty) begin
+			dp_pa_rw = 1'b0;
+			dp_pa_request = 1'b1;
 			dp_pa_address = i_address;
 			o_rdata = dp_pa_rdata;
+			o_ready = dp_pa_ready;
 		end
-		else if (i_request && i_rw && !wq_full) begin
+		// Write cached data (queue not full)
+		else if (i_request && i_rw && i_cached && !wq_full) begin
 			wq_wdata.address = i_address;
 			wq_wdata.wdata = i_wdata;
 			wq_wdata.wmask = i_wmask;
-			wq_write = 1'b1;
+			wq_write = 1'b1 && !request_r;	// Ensure we are only writing one entry to queue per request.
 			o_ready = 1'b1;
 		end
 	end

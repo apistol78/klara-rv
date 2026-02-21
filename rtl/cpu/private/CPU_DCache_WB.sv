@@ -16,26 +16,28 @@ module CPU_DCache_WB(
 	input wire i_clock,
 
 	// Bus
-	output bit o_bus_rw,
-	output bit o_bus_request,
+	output wire o_bus_rw,
+	output wire o_bus_request,
 	input wire i_bus_ready,
-	output bit [31:0] o_bus_address,
+	output wire [31:0] o_bus_address,
 	input wire [31:0] i_bus_rdata,
-	output bit [31:0] o_bus_wdata,
-	output bit [3:0] o_bus_wmask,
+	output wire [31:0] o_bus_wdata,
+	output wire [3:0] o_bus_wmask,
 
 	// Input
 	input wire i_rw,
 	input wire i_request,
-	output bit o_ready,
+	output wire o_ready,
 	input wire [31:0] i_address,
-	output bit [31:0] o_rdata,
+	output wire [31:0] o_rdata,
 	input wire [31:0] i_wdata,
 	input wire [3:0] i_wmask,
 	input wire i_cached,
 
-	output wire o_pending
+	output bit o_pending
 );
+
+	wire wb_empty;
 
 	WriteBuffer #(
 		.DEPTH(8),
@@ -45,8 +47,9 @@ module CPU_DCache_WB(
 		.i_reset(i_reset),
 		.i_clock(i_clock),
 		
-		.o_empty(),
+		.o_empty(wb_empty),
 		.o_full(),
+		.i_cached(i_cached),
 		
 		.o_bus_rw(o_bus_rw),
 		.o_bus_request(o_bus_request),
@@ -64,5 +67,9 @@ module CPU_DCache_WB(
 		.i_wdata(i_wdata),
 		.i_wmask(i_wmask)
 	);
+
+	always_comb begin
+		o_pending = !wb_empty;
+	end
 
 endmodule

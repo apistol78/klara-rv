@@ -29,6 +29,7 @@ module WriteBuffer_tb();
 
         .o_empty(),
         .o_full(),
+        .i_cached(1'b1),
 
 		.o_bus_rw(),
         .o_bus_request(wb_bus_request),
@@ -64,6 +65,7 @@ module WriteBuffer_tb();
             wb_wmask <= wmask;
             @(posedge wb_ready);
             @(posedge clk);
+            @(posedge clk);         // Keep request one cycle longer than necessary.
             wb_request <= 1'b0;
             wb_address <= 32'h0;
             wb_wdata <= 32'h0;
@@ -85,6 +87,7 @@ module WriteBuffer_tb();
             wb_address <= address;
             @(posedge wb_ready);
             @(posedge clk);
+            @(posedge clk);         // Keep request one cycle longer than necessary.
             $display("wb_read %h", wb_rdata);
             wb_request <= 1'b0;
             wb_address <= 32'h0;
