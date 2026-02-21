@@ -35,8 +35,8 @@ module AUDIO_channel(
 
 	// Audio output stream
 	input wire i_output_sample_clock,
-	output wire [15:0] o_output_sample_left,
-	output wire [15:0] o_output_sample_right
+	output bit [15:0] o_output_sample_left,
+	output bit [15:0] o_output_sample_right
 );
 	typedef enum bit [2:0]
 	{
@@ -106,6 +106,8 @@ module AUDIO_channel(
 	initial begin
 		o_dma_request = 1'b0;
 		o_busy = 1'b0;
+		o_output_sample_left = 0;
+		o_output_sample_right = 0;
 	end
 
 	// Channel is only busy when DMA command queue have any pending.

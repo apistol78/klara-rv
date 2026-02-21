@@ -52,7 +52,7 @@ module CPU_Memory #(
 	wire [31:0] wb_rdata;
 	bit [31:0] wb_wdata;
 	bit [3:0] wb_wmask;
-	wire wb_cacheable = (wb_address[31:28] == 4'h1);
+	wire wb_cacheable = 1'b1; // (wb_address[31:28] == 4'h1);
 	wire wb_pending;
 
 	generate if (DCACHE_WB_QUEUE != 0) begin : memory_wb

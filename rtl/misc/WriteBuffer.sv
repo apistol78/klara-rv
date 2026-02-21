@@ -64,8 +64,8 @@ module WriteBuffer #(
 			.i_reset(i_reset),
 			.i_clock(i_clock),
 			.o_empty(wq_empty),
-			.o_full(),
-			.o_almost_full(wq_full),
+			.o_full(wq_full),
+			.o_almost_full(),
 			.i_write(wq_write),
 			.i_wdata(wq_wdata),
 			.i_read(wq_read),
@@ -82,8 +82,8 @@ module WriteBuffer #(
 			.i_reset(i_reset),
 			.i_clock(i_clock),
 			.o_empty(wq_empty),
-			.o_full(),
-			.o_almost_full(wq_full),
+			.o_full(wq_full),
+			.o_almost_full(),
 			.i_write(wq_write),
 			.i_wdata(wq_wdata),
 			.i_read(wq_read),
@@ -152,6 +152,7 @@ module WriteBuffer #(
 		dp_pb_wmask = wq_rdata.wmask;
 	end
 
+	// Process write queue requests.
 	bit [3:0] st = 0;
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
@@ -165,10 +166,13 @@ module WriteBuffer #(
 				end
 			end
 			else if (st == 1) begin
+				
 				wq_read <= 1'b0;
 				dp_pb_request <= 1'b1;
+
 				if (dp_pb_ready) begin
 					dp_pb_request <= 1'b0;
+			
 					if (wq_empty)
 						st <= 0;
 					else
@@ -178,9 +182,10 @@ module WriteBuffer #(
 		end
 	end
 
-	bit request_r = 1'b0;
+	bit ready_r = 1'b0;
+	bit next_ready_r = 1'b0;
 	always_ff @(posedge i_clock) begin
-		request_r <= i_request;
+		ready_r <= !i_reset && next_ready_r;
 	end
 
 	always_comb begin
@@ -194,10 +199,12 @@ module WriteBuffer #(
 		dp_pa_wdata = 32'h0;
 		dp_pa_wmask = 4'h0;
 
-		o_ready = 1'b0;
+		o_ready = ready_r & i_request;
 		o_rdata = 32'h0;
 		o_empty = wq_empty;
 		o_full = wq_full;
+
+		next_ready_r = ready_r & i_request;
 
 		// Write uncached data (no pending writes)
 		if (i_request && i_rw && !i_cached && wq_empty) begin
@@ -221,8 +228,9 @@ module WriteBuffer #(
 			wq_wdata.address = i_address;
 			wq_wdata.wdata = i_wdata;
 			wq_wdata.wmask = i_wmask;
-			wq_write = 1'b1 && !request_r;	// Ensure we are only writing one entry to queue per request.
+			wq_write = 1'b1 & !next_ready_r;
 			o_ready = 1'b1;
+			next_ready_r = 1'b1;	// We need to keep ready high until request if finished; since wq_full will go high.
 		end
 	end
 

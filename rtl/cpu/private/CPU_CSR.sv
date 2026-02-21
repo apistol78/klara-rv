@@ -78,6 +78,9 @@ module CPU_CSR #(
 	bit waiting_on_mret = 1'b0;
 
 	assign o_epc = mepc;
+	assign o_status = mstatus;
+	assign o_ie = mie;
+	assign o_ip = mip;
 	assign o_scratch = mscratch;
 
 	// Read CSR value by index.
