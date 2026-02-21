@@ -157,6 +157,8 @@ module WriteBuffer #(
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			st <= 0;
+			wq_read <= 1'b0;
+			dp_pb_request <= 1'b0;
 		end
 		else begin
 			if (st == 0) begin
