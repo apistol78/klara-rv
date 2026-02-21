@@ -56,7 +56,10 @@ module CPU_FPU_Int(
 
 			SPECIAL_CASES: begin
 				if ($signed(a_e) == -127) begin
-					z <= 0;
+					z <= 32'h00000000;
+					state <= PUT_Z;
+				end else if (!i_signed && a_s) begin
+					z <= 32'h00000000;
 					state <= PUT_Z;
 				end else if ($signed(a_e) > 31) begin
 					z <= 32'h80000000;
