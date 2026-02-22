@@ -29,10 +29,7 @@ module CPU_ICache_Reg_tb();
 		.o_bus_request(bus_request),
 		.i_bus_ready(bus_ready),
 		.o_bus_address(bus_address),
-		.i_bus_rdata(bus_rdata),
-
-		.o_hit(),
-		.o_miss()
+		.i_bus_rdata(bus_rdata)
 	);
 
 	initial begin
@@ -54,7 +51,7 @@ module CPU_ICache_Reg_tb();
 	end
 
     initial begin
-        $dumpfile("build/test/CPU_ICache_Reg_tb.vcd");
+        $dumpfile("build/test/CPU_ICache_Reg_tb.fst");
         $dumpvars(0, CPU_ICache_Reg_tb);
 
 		repeat (10) @(posedge clk);

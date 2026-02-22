@@ -185,7 +185,7 @@ module WriteBuffer #(
 	end
 
 	bit ready_r = 1'b0;
-	bit next_ready_r = 1'b0;
+	bit next_ready_r;
 	always_ff @(posedge i_clock) begin
 		ready_r <= !i_reset && next_ready_r;
 	end

@@ -104,9 +104,31 @@ module CPU_DCache_Reg #(
 			cache_address = i_address[(SIZE - 1) + 2:2];
 	end
 
+	bit [31:0] rdata_r = 32'h0;
+	bit ready_r = 1'b0;
+
+	always_comb begin
+		o_rdata = rdata_r;
+		o_ready = ready_r;
+
+		// If cache rd or wr hit then
+		// acknowledge request quickly.
+		if (state[2]) begin
+			if (cache_rdata.mask == 0 || cache_entry_address == i_address) begin
+				o_ready = 1'b1;
+			end
+		end
+		else if (state[4]) begin
+			if (&cache_rdata.mask && cache_entry_address == i_address) begin
+				o_rdata = cache_rdata.data;
+				o_ready = 1'b1;
+			end
+		end
+	end
+
 	always_ff @(posedge i_clock) begin
 
-		o_ready <= 1'b0;
+		ready_r <= 1'b0;
 		cache_rw <= 1'b0;
 
 		unique case (1'b1)
@@ -122,11 +144,11 @@ module CPU_DCache_Reg #(
 							// Check "super hot" cache line first, since
 							// RMW pattern access same address multiple times
 							// it's a high probability this will be true.
-							if (&cache_rdata.mask && cache_entry_address == i_address) begin
-								o_rdata <= cache_rdata.data;
-								o_ready <= 1'b1;
-							end
-							else
+							// if (&cache_rdata.mask && cache_entry_address == i_address) begin
+							// 	o_rdata <= cache_rdata.data;
+							// 	o_ready <= 1'b1;
+							// end
+							// else
 								state <= READ_SETUP;
 
 						end
@@ -134,15 +156,15 @@ module CPU_DCache_Reg #(
 
 							// Check "super hot" cache line here as well,
 							// see comment above.
-							if (/*|cache_rdata.mask &&*/ cache_entry_address == i_address) begin
-								cache_rw <= 1'b1;
-								cache_wdata.dirty <= 1'b1;
-								cache_wdata.address <= i_address[31:2];
-								cache_wdata.data <= (cache_rdata.data & ~i_wmask_extended) | (i_wdata & i_wmask_extended);
-								cache_wdata.mask <= cache_rdata.mask | i_wmask;
-								o_ready <= 1'b1;
-							end
-							else
+							// if (/*|cache_rdata.mask &&*/ cache_entry_address == i_address) begin
+							// 	cache_rw <= 1'b1;
+							// 	cache_wdata.dirty <= 1'b1;
+							// 	cache_wdata.address <= i_address[31:2];
+							// 	cache_wdata.data <= (cache_rdata.data & ~i_wmask_extended) | (i_wdata & i_wmask_extended);
+							// 	cache_wdata.mask <= cache_rdata.mask | i_wmask;
+							// 	o_ready <= 1'b1;
+							// end
+							// else
 								state <= WRITE_SETUP;
 
 						end
@@ -166,8 +188,8 @@ module CPU_DCache_Reg #(
 			/* PASS_THROUGH */ state[1]: begin
 				if (i_bus_ready) begin
 					o_bus_request <= 1'b0;
-					o_rdata <= i_bus_rdata;
-					o_ready <= 1'b1;
+					rdata_r <= i_bus_rdata;
+					ready_r <= 1'b1;
 					state <= IDLE;
 				end
 			end
@@ -198,7 +220,7 @@ module CPU_DCache_Reg #(
 						cache_wdata.data <= i_wdata;
 						cache_wdata.mask <= i_wmask;
 					end
-					o_ready <= 1'b1;
+					// ready_r <= 1'b1;
 					state <= IDLE;
 				end
 			end
@@ -212,7 +234,7 @@ module CPU_DCache_Reg #(
 					cache_wdata.data <= i_wdata;
 					cache_wdata.mask <= i_wmask;
 					o_bus_request <= 1'b0;
-					o_ready <= 1'b1;
+					ready_r <= 1'b1;
 					state <= IDLE;
 				end
 			end
@@ -224,8 +246,8 @@ module CPU_DCache_Reg #(
 			// Check if cache entry valid, if not then read from bus.
 			/* READ_SETUP */ state[4]: begin
 				if (&cache_rdata.mask && cache_entry_address == i_address) begin
-					o_rdata <= cache_rdata.data;
-					o_ready <= 1'b1;
+					// rdata_r <= cache_rdata.data;
+					// ready_r <= 1'b1;
 					state <= IDLE;
 				end
 				else begin
@@ -266,8 +288,8 @@ module CPU_DCache_Reg #(
 					cache_wdata.data <= i_bus_rdata;
 					cache_wdata.mask <= 4'b1111;
 					o_bus_request <= 1'b0;
-					o_rdata <= i_bus_rdata;
-					o_ready <= 1'b1;
+					rdata_r <= i_bus_rdata;
+					ready_r <= 1'b1;
 					state <= IDLE;
 				end
 			end
@@ -280,7 +302,7 @@ module CPU_DCache_Reg #(
 					if (flush_address <= RANGE - 1)
 						state <= FLUSH_CHECK;
 					else begin
-						o_ready <= 1'b1;
+						ready_r <= 1'b1;
 						state <= IDLE;
 					end
 				end
