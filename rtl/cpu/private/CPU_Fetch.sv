@@ -168,6 +168,9 @@ module CPU_Fetch #(
 		.o_debug_bp_miss(o_debug_bp_miss)
 	);
 
+	register_t fast_rd = register_t'(have_RD ? { `INSTRUCTION[ 11:7] } : 0);
+	wire is_fast_jump = !i_busy && (is_JAL && fast_rd == 0);
+
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin
 			state <= WAIT_ICACHE;
@@ -189,26 +192,34 @@ module CPU_Fetch #(
 						pc <= i_irq_pc;
 					end
 					else if (!i_busy && icache_ready) begin
-						data.strobe <= ~data.strobe;
-						data.instruction <= icache_rdata;
-						data.pc <= pc;
 
-						// Decode register indices here since we
-						// need those for fetching registers while
-						// we are decoding rest of instruction.
-// `ifdef FPU_ENABLE
-// 						data.inst_rs1 <= register_t'(have_RS1 ? { RS1_bank, `INSTRUCTION[19:15] } : 0);
-// 						data.inst_rs2 <= register_t'(have_RS2 ? { RS2_bank, `INSTRUCTION[24:20] } : 0);
-// 						data.inst_rs3 <= register_t'(have_RS3 ? { RS3_bank, `INSTRUCTION[31:27] } : 0);
-// 						data.inst_rd  <= register_t'(have_RD  ? {  RD_bank, `INSTRUCTION[ 11:7] } : 0);
-// `else
-						data.inst_rs1 <= register_t'(have_RS1 ? { `INSTRUCTION[19:15] } : 0);
-						data.inst_rs2 <= register_t'(have_RS2 ? { `INSTRUCTION[24:20] } : 0);
-						data.inst_rs3 <= register_t'(have_RS3 ? { `INSTRUCTION[31:27] } : 0);
-						data.inst_rd  <= register_t'(have_RD  ? { `INSTRUCTION[ 11:7] } : 0);
-// `endif
+						if (!is_fast_jump) begin
+							data.strobe <= ~data.strobe;
+							data.instruction <= icache_rdata;
+							data.pc <= pc;
 
-						if (is_JUMP || is_JUMP_CONDITIONAL || is_MRET) begin
+							// Decode register indices here since we
+							// need those for fetching registers while
+							// we are decoding rest of instruction.
+	// `ifdef FPU_ENABLE
+	// 						data.inst_rs1 <= register_t'(have_RS1 ? { RS1_bank, `INSTRUCTION[19:15] } : 0);
+	// 						data.inst_rs2 <= register_t'(have_RS2 ? { RS2_bank, `INSTRUCTION[24:20] } : 0);
+	// 						data.inst_rs3 <= register_t'(have_RS3 ? { RS3_bank, `INSTRUCTION[31:27] } : 0);
+	// 						data.inst_rd  <= register_t'(have_RD  ? {  RD_bank, `INSTRUCTION[ 11:7] } : 0);
+	// `else
+							data.inst_rs1 <= register_t'(have_RS1 ? { `INSTRUCTION[19:15] } : 0);
+							data.inst_rs2 <= register_t'(have_RS2 ? { `INSTRUCTION[24:20] } : 0);
+							data.inst_rs3 <= register_t'(have_RS3 ? { `INSTRUCTION[31:27] } : 0);
+							data.inst_rd  <= register_t'(have_RD  ? { `INSTRUCTION[ 11:7] } : 0);
+	// `endif
+						end
+
+						if (is_fast_jump) begin
+							// Fast jump allowes fetch unit to just adjust
+							// PC without feeding rest of pipeline.
+							pc <= pc + inst_J_imm;
+						end
+						else if (is_JUMP || is_JUMP_CONDITIONAL || is_MRET) begin
 							// Branch instruction, need to wait
 							// for an explicit "goto" signal before
 							// we can continue feeding the pipeline.
