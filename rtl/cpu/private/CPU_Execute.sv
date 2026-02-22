@@ -203,12 +203,6 @@ module CPU_Execute (
 		o_busy =
 			(
 				(i_data.strobe != last_strobe) &&
-				(
-					i_data.op != OP_MRET &&
-					i_data.op != OP_CSRRC &&
-					i_data.op != OP_CSRRW &&
-					i_data.op != OP_CSRRS
-				) &&
 `ifdef FPU_ENABLE
 				(i_data.complx || i_data.fpu)
 `else
