@@ -30,5 +30,8 @@ public:
 private:
 	ICPU* m_cpu = nullptr;
 	uint32_t m_enable = 0;
-	mutable uint32_t m_raised = 0;
+	mutable uint32_t m_pending = 0;
+	mutable uint32_t m_claimed = 0;
+
+	void update() const;
 };
