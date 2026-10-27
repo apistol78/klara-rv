@@ -39,7 +39,8 @@ module CPU_Memory #(
 	typedef enum bit [2:0]
 	{
 		IDLE,
-		FLUSH
+		FLUSH,
+		FLUSH_WB
 	} state_t;
 
 	// ================
@@ -237,20 +238,34 @@ module CPU_Memory #(
 		dcache_wmask = 4'b0000;
 		dcache_flush = 0;
 
+		// Output data is loaded speculatively while instruction is pending,
+		// only strobe waits for dcache ready to keep it out of the data enables.
+		// Output is not consumed before strobe toggle since earlier stages are
+		// stalled while busy; writeback might see a speculative value but with
+		// same inst_rd as memory output, which has forward priority.
+		if (i_data.strobe != last_strobe) begin
+			next_data_pc = i_data.pc;
+			if (i_data.mem_read) begin
+				case (i_data.mem_width)
+					`MEMW_4: next_data_rd = dcache_rdata;
+					`MEMW_2: next_data_rd = { { 16{ i_data.mem_signed & bus_rdata_half[15] } }, bus_rdata_half[15:0] };
+					`MEMW_1: next_data_rd = { { 24{ i_data.mem_signed & bus_rdata_byte[ 7] } }, bus_rdata_byte[ 7:0] };
+					default: next_data_rd = 0;
+				endcase
+				next_data_inst_rd = i_data.mem_inst_rd;
+			end
+			else begin
+				next_data_rd = i_data.rd;
+				next_data_inst_rd = i_data.inst_rd;
+			end
+		end
+
 		unique case (state)
 			IDLE: begin
 				if (i_data.strobe != last_strobe) begin
 					if (i_data.mem_read) begin
 						dcache_request = 1;
 						if (dcache_ready) begin
-							next_data_pc = i_data.pc;
-							case (i_data.mem_width)
-								`MEMW_4: next_data_rd = dcache_rdata;
-								`MEMW_2: next_data_rd = { { 16{ i_data.mem_signed & bus_rdata_half[15] } }, bus_rdata_half[15:0] };
-								`MEMW_1: next_data_rd = { { 24{ i_data.mem_signed & bus_rdata_byte[ 7] } }, bus_rdata_byte[ 7:0] };
-								default: next_data_rd = 0;
-							endcase
-							next_data_inst_rd = i_data.mem_inst_rd;
 							next_data_strobe = ~data.strobe;
 							next_last_strobe = i_data.strobe;
 						end
@@ -303,9 +318,6 @@ module CPU_Memory #(
 							endcase
 						end
 						if (dcache_ready) begin
-							next_data_pc = i_data.pc;
-							next_data_rd = i_data.rd;
-							next_data_inst_rd = i_data.inst_rd;	
 							next_data_strobe = ~data.strobe;
 							next_last_strobe = i_data.strobe;
 						end
@@ -316,9 +328,6 @@ module CPU_Memory #(
 						next_state = FLUSH;
 					end
 					else begin
-						next_data_pc = i_data.pc;
-						next_data_rd = i_data.rd;
-						next_data_inst_rd = i_data.inst_rd;
 						next_data_strobe = ~data.strobe;
 						next_last_strobe = i_data.strobe;
 					end
@@ -329,10 +338,22 @@ module CPU_Memory #(
 				dcache_request = 1;
 				dcache_flush = 1;
 
-				if (dcache_ready && !wb_pending) begin
-					next_data_pc = i_data.pc;
-					next_data_rd = i_data.rd;
-					next_data_inst_rd = i_data.inst_rd;				
+				if (dcache_ready) begin
+					if (!wb_pending) begin
+						next_data_strobe = ~data.strobe;
+						next_last_strobe = i_data.strobe;
+						next_state = IDLE;
+					end
+					else begin
+						// Stop requesting while write back queue drains,
+						// else dcache would restart the flush.
+						next_state = FLUSH_WB;
+					end
+				end
+			end
+
+			FLUSH_WB: begin
+				if (!wb_pending) begin
 					next_data_strobe = ~data.strobe;
 					next_last_strobe = i_data.strobe;
 					next_state = IDLE;

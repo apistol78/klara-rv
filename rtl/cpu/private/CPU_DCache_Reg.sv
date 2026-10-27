@@ -40,6 +40,10 @@ module CPU_DCache_Reg #(
 
 	localparam RANGE = 1 << SIZE;
 
+	// Index bits are implied by entry location so only
+	// the remaining address bits are stored as tag.
+	localparam TAG_WIDTH = 30 - SIZE;
+
 	typedef enum bit [10:0]
 	{
 		IDLE			= 11'b00000000001,
@@ -58,7 +62,7 @@ module CPU_DCache_Reg #(
 	typedef struct packed
 	{
 		bit dirty;
-		bit [29:0] address;
+		bit [TAG_WIDTH - 1:0] tag;
 		bit [3:0] mask;
 		bit [31:0] data;
 	} cache_entry_t;
@@ -89,7 +93,12 @@ module CPU_DCache_Reg #(
 		.o_ready()
 	);
 
-	wire [31:0] cache_entry_address = { cache_rdata.address, 2'b00 };
+	wire [TAG_WIDTH - 1:0] i_tag = i_address[31:SIZE + 2];
+	wire tag_hit = (cache_rdata.tag == i_tag);
+	wire write_back = |cache_rdata.mask && cache_rdata.dirty;
+
+	// Cache address is still the one entry was read from.
+	wire [31:0] cache_entry_address = { cache_rdata.tag, cache_address, 2'b00 };
 	wire [31:0] i_wmask_extended = {
 		{ 8{ i_wmask[3] } },
 		{ 8{ i_wmask[2] } },
@@ -108,19 +117,20 @@ module CPU_DCache_Reg #(
 	bit ready_r = 1'b0;
 
 	always_comb begin
-		o_rdata = rdata_r;
+		// Read data is only used when ready so select on state
+		// alone, keeps tag compare out of the data path.
+		o_rdata = state[4] ? cache_rdata.data : rdata_r;
 		o_ready = ready_r;
 
 		// If cache rd or wr hit then
 		// acknowledge request quickly.
 		if (state[2]) begin
-			if (cache_rdata.mask == 0 || cache_entry_address == i_address) begin
+			if (cache_rdata.mask == 0 || tag_hit) begin
 				o_ready = 1'b1;
 			end
 		end
 		else if (state[4]) begin
-			if (&cache_rdata.mask && cache_entry_address == i_address) begin
-				o_rdata = cache_rdata.data;
+			if (&cache_rdata.mask && tag_hit) begin
 				o_ready = 1'b1;
 			end
 		end
@@ -133,7 +143,9 @@ module CPU_DCache_Reg #(
 
 		unique case (1'b1)
 			/* IDLE */ state[0]: begin
-				if (i_request && !o_ready) begin
+				// o_ready is ready_r when idle, using it directly
+				// keeps tag compare out of this logic.
+				if (i_request && !ready_r) begin
 					if (i_flush) begin
 						flush_address <= 0;
 						state <= FLUSH_SETUP;
@@ -200,27 +212,27 @@ module CPU_DCache_Reg #(
 
 			// Write, write back if necessary.
 			/* WRITE_SETUP */ state[2]: begin
-				if (|cache_rdata.mask && cache_entry_address != i_address) begin
-					o_bus_rw <= 1'b1;
-					o_bus_address <= cache_entry_address;
+
+				// Bus and cache data are loaded unconditionally, only
+				// request and state depend on the tag compare.
+				o_bus_rw <= 1'b1;
+				o_bus_address <= cache_entry_address;
+				o_bus_wdata <= cache_rdata.data;
+				o_bus_wmask <= cache_rdata.mask;
+
+				// Always merge; when entry is empty the mask is
+				// zero and the unmasked bytes are never used.
+				cache_wdata.dirty <= 1'b1;
+				cache_wdata.tag <= i_tag;
+				cache_wdata.data <= (cache_rdata.data & ~i_wmask_extended) | (i_wdata & i_wmask_extended);
+				cache_wdata.mask <= cache_rdata.mask | i_wmask;
+
+				if (|cache_rdata.mask && !tag_hit) begin
 					o_bus_request <= 1'b1;
-					o_bus_wdata <= cache_rdata.data;
-					o_bus_wmask <= cache_rdata.mask;
 					state <= WRITE_WAIT;
 				end
 				else begin
 					cache_rw <= 1'b1;
-					cache_wdata.dirty <= 1'b1;
-					cache_wdata.address <= i_address[31:2];
-					if (cache_entry_address == i_address)  begin
-						cache_wdata.data <= (cache_rdata.data & ~i_wmask_extended) | (i_wdata & i_wmask_extended);
-						cache_wdata.mask <= cache_rdata.mask | i_wmask;
-					end
-					else begin
-						cache_wdata.data <= i_wdata;
-						cache_wdata.mask <= i_wmask;
-					end
-					// ready_r <= 1'b1;
 					state <= IDLE;
 				end
 			end
@@ -230,7 +242,7 @@ module CPU_DCache_Reg #(
 				if (i_bus_ready) begin
 					cache_rw <= 1'b1;
 					cache_wdata.dirty <= 1'b1;
-					cache_wdata.address <= i_address[31:2];
+					cache_wdata.tag <= i_tag;
 					cache_wdata.data <= i_wdata;
 					cache_wdata.mask <= i_wmask;
 					o_bus_request <= 1'b0;
@@ -245,26 +257,23 @@ module CPU_DCache_Reg #(
 
 			// Check if cache entry valid, if not then read from bus.
 			/* READ_SETUP */ state[4]: begin
-				if (&cache_rdata.mask && cache_entry_address == i_address) begin
-					// rdata_r <= cache_rdata.data;
-					// ready_r <= 1'b1;
+
+				// Either write back entry or read from bus, loaded
+				// unconditionally since request is not set on a hit.
+				o_bus_rw <= write_back;
+				o_bus_address <= write_back ? cache_entry_address : i_address;
+				o_bus_wdata <= cache_rdata.data;
+				o_bus_wmask <= cache_rdata.mask;
+
+				if (&cache_rdata.mask && tag_hit) begin
 					state <= IDLE;
 				end
 				else begin
-					if (|cache_rdata.mask && cache_rdata.dirty) begin
-						o_bus_rw <= 1'b1;
-						o_bus_address <= cache_entry_address;
-						o_bus_request <= 1'b1;
-						o_bus_wdata <= cache_rdata.data;
-						o_bus_wmask <= cache_rdata.mask;
+					o_bus_request <= 1'b1;
+					if (write_back)
 						state <= READ_WB_WAIT;
-					end
-					else begin
-						o_bus_rw <= 1'b0;
-						o_bus_address <= i_address;
-						o_bus_request <= 1'b1;
+					else
 						state <= READ_BUS_WAIT;
-					end
 				end
 			end
 
@@ -284,7 +293,7 @@ module CPU_DCache_Reg #(
 				if (i_bus_ready) begin
 					cache_rw <= 1'b1;
 					cache_wdata.dirty <= 1'b0;
-					cache_wdata.address <= i_address[31:2];
+					cache_wdata.tag <= i_tag;
 					cache_wdata.data <= i_bus_rdata;
 					cache_wdata.mask <= 4'b1111;
 					o_bus_request <= 1'b0;
@@ -309,7 +318,7 @@ module CPU_DCache_Reg #(
 			end
 
 			/* FLUSH_CHECK */ state[8]: begin
-				if (|cache_rdata.mask && cache_rdata.dirty) begin
+				if (write_back) begin
 					o_bus_rw <= 1'b1;
 					o_bus_address <= cache_entry_address;
 					o_bus_request <= 1'b1;
@@ -339,7 +348,7 @@ module CPU_DCache_Reg #(
 				if (flush_address < RANGE) begin
 					cache_rw <= 1'b1;
 					cache_wdata.dirty <= 1'b0;
-					cache_wdata.address <= 30'h0;
+					cache_wdata.tag <= 0;
 					cache_wdata.data <= 32'h0;
 					cache_wdata.mask <= 4'b0000;
 					flush_address <= flush_address + 1;
