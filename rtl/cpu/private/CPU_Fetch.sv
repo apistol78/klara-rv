@@ -168,8 +168,8 @@ module CPU_Fetch #(
 		.o_debug_bp_miss(o_debug_bp_miss)
 	);
 
-	register_t fast_rd = register_t'(have_RD ? { `INSTRUCTION[ 11:7] } : 0);
-	wire is_fast_jump = !i_busy && (is_JAL && fast_rd == 0);
+	// JAL always has an RD field so no need to check have_RD here.
+	wire is_fast_jump = !i_busy && is_JAL && (`INSTRUCTION[11:7] == 5'd0);
 
 	always_ff @(posedge i_clock) begin
 		if (i_reset) begin

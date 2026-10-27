@@ -43,7 +43,13 @@ module CPU_Registers #(
 	assign o_rs2 = rs2;
 	assign o_rs3 = rs3;
 
-	assign o_debug_registers = r;
+	// Exposing every register prevents mapping to LUT RAM, a debug
+	// copy would need to be kept in separate flip-flops if needed.
+	generate
+		for (genvar k = 0; k < 32; ++k) begin : debug_registers
+			assign o_debug_registers[k] = 32'h0;
+		end
+	endgenerate
 
 	integer I;
 	initial begin
@@ -68,18 +74,6 @@ module CPU_Registers #(
 			rs3 <= 0;
 
 			last_write_strobe <= 1'b0;
-
-			// Integer registers.
-			for (I = 0; I < 32; ++I)
-				r[I] <= 32'h0000_0000;
-
-// `ifdef FPU_ENABLE
-// 			// Float point registers.
-// 			for (I = 32; I < 64; ++I)
-// 				r[I] <= 32'h0000_0000;
-// `endif
-
-			r[ 2] <= STACK_POINTER;
 		end
 		else begin
 
@@ -88,14 +82,26 @@ module CPU_Registers #(
 			rs2 <= r[i_fetch_data.inst_rs2];
 			rs3 <= r[i_fetch_data.inst_rs3];
 
-			// Write later.
-			if (i_memory_data.strobe != last_write_strobe) begin
-				// Never write to "zero" register.
-				if (|i_memory_data.inst_rd) 
-					r[i_memory_data.inst_rd] <= i_memory_data.rd;
+			if (i_memory_data.strobe != last_write_strobe)
 				last_write_strobe <= i_memory_data.strobe;
-			end
 		end
+	end
+
+	// Registers are not cleared on reset so they can be mapped to
+	// LUT RAM; only stack pointer is restored, using the single write
+	// port while reset is held.
+	wire write_enable =
+		i_reset ||
+		(
+			i_memory_data.strobe != last_write_strobe &&
+			|i_memory_data.inst_rd	// Never write to "zero" register.
+		);
+	wire [4:0] write_index = i_reset ? 5'd2 : i_memory_data.inst_rd;
+	wire [31:0] write_data = i_reset ? STACK_POINTER : i_memory_data.rd;
+
+	always_ff @(posedge i_clock) begin
+		if (write_enable)
+			r[write_index] <= write_data;
 	end
 
 endmodule
